@@ -1,0 +1,22 @@
+{
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-legacy-separators-cumulative.zip",
+  "app_source_count": 304,
+  "app_sources_byte_identical": true,
+  "app_inventory_sha256": "38e817c56635c4631555053fa72e926b03f5894868a3fb974b9628cf14c553fa",
+  "security_C2_HTTP_reviews_unchanged": true,
+  "checker_bytes_unchanged": true,
+  "reused_raw_Bandit_scan": "docs/validation/r210/legacy-separator-bandit.json",
+  "reused_Bandit_findings": 165,
+  "reused_actual_ONNX_cases": 7,
+  "unchanged_prior_optional_skips": 7,
+  "full_CI_or_financial_or_Chromium_repeated": false,
+  "workflow_yaml_and_default_off_scope_validated": true,
+  "Apple_source_binding_current": true,
+  "Apple_sdk_tests_executed": false,
+  "runtime_inventory": {
+    "sources": 551,
+    "boundaries": 782
+  },
+  "release_candidate": false,
+  "Apple_prerequisite_report_sha256": "5ed6f8d4c36d4f3064382950ed2e665b03bfd143a454c9a339383bc9340bed9b"
+}

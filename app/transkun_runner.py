@@ -42,6 +42,8 @@ def main():
     parser=argparse.ArgumentParser()
     for key in ('source','output','checkpoint','checkpoint-sha256','config','config-sha256','runtime','device'):parser.add_argument('--'+key,required=True)
     args=parser.parse_args()
+    from app.model_license_policy import evaluate_model
+    evaluate_model('transkun-assets')
     from studio_offline_runner import activate
     activate()
     sys.path.insert(0,str(Path(args.runtime).resolve()))

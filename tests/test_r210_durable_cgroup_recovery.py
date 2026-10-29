@@ -441,7 +441,7 @@ def test_metering_failure_with_unknown_cleanup_keeps_gpu_lease_and_claim(operato
         raise RuntimeError('Kernel cleanup unavailable')
     monkeypatch.setattr(ai_cgroup_metering,'run_cgroup_process',unresolved)
     with pytest.raises(FenceBlocked,match='quiescence'):
-        agent._execute_registered_worker(operator,'whisper',{'kind':'whisper'},source_wav=source_audio())
+        agent.execute_registered_worker(operator,'whisper',{'kind':'whisper'},source_wav=source_audio())
     assert acquired
     with auth.db() as c:
         assert c.execute('SELECT status FROM ai_compute_jobs').fetchone()[0]=='running'

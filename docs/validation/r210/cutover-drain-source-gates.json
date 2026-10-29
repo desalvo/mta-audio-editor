@@ -1,0 +1,48 @@
+{
+  "bandit": {
+    "reviewed_findings": 164,
+    "source_files": 299,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 143
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "service_admission": {
+    "inventory_passed": true,
+    "source_files": 299,
+    "reviewed_sites": 170,
+    "scope": "Supported single pinned Linux authority replicas and HTTPS-only original workers",
+    "financial_transition_authorized": false,
+    "external_kernel_or_multihost_accepted": false,
+    "release_candidate": false
+  },
+  "execution_entries": {
+    "inventory_passed": true,
+    "runtime_source_files": 540,
+    "reviewed_boundaries": 779,
+    "families": 10,
+    "hardware_model_rights_or_kernel_attestation": false,
+    "release_candidate": false
+  },
+  "transport": {
+    "inventory_passed": true,
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "checker_changed": false
+  },
+  "ruff": "passed app/native/tests/scripts",
+  "compileall": "passed app/scripts",
+  "javascript_syntax": "passed both changed scripts",
+  "gitleaks": {
+    "version": "8.24.3",
+    "configuration_changed": false,
+    "scope": "Introduced/replaced UTF8 lines against complete4559-file B5 baseline",
+    "bytes_scanned": 554527,
+    "findings": 0,
+    "report": "docs/validation/r210/cutover-drain-gitleaks.json"
+  }
+}

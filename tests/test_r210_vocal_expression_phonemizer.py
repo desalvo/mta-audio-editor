@@ -136,6 +136,8 @@ def test_vocoder_has_independent_policy_and_free_only_is_stricter(monkeypatch):
 
 
 def test_full_diffsinger_bridge_uses_exact_config_checkpoint_and_score(tmp_path,monkeypatch):
+    from model_rights_fixtures import authorize_singing_fixture
+    authorize_singing_fixture(monkeypatch,tmp_path)
     """Contract test with test PCM, explicitly not neural model inference."""
     import soundfile as sf
     import numpy as np

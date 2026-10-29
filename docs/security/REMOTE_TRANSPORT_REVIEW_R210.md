@@ -1,3 +1,33 @@
+## Current legacy separator review — 29 October2026
+
+304 app sources,165 reviewed Bandit findings(0HIGH/21MEDIUM/144LOW),30 explicit HTTP sites/21files. Direct Demucs and backing selectors/revocation are checked;opaque lead/backing commands are refused. Fixed DSP is shared and bounded;unverified registered descendant usage remains held. No whole F4/F5/F6 promotion or new model/kernel proof. See LEGACY_SEPARATOR_ACCEPTANCE_R210.md. Existing checker bytes and suppressions are unchanged.
+
+---
+
+## Revisione selettori — 29 ottobre 2026
+
+274 passati/44 nuovi;304sorgenti app/166finding invariati(0HIGH/21MED/145LOW),171confiniC2,30sitiHTTP/21file,548sorgenti/783punti runtime. Nuovo resolver stdlib di nomi dichiarati;nessun nuovo processo/rete/grant.7 identità di finding riallocate e un call-shape Whisper riesaminati,checker invariati. Vedere ../MODEL_SELECTOR_BOUNDARIES_R210.md;F4/F6 interi restano aperti.
+
+---
+
+## Revisione corrente — 29 ottobre 2026
+
+Diritti rivalutati su18 ingressi diretti e wrapper a componente.507 passati/99 nuovi/7 skip,7 ONNX reali.303sorgenti app/166finding(0HIGH/21MED/145LOW),171confiniC2,30sitiHTTP/21file,547sorgenti/783punti runtime. Nessun nuovo finding/trasporto/checker o grant modello. Vedere ../DIRECT_EXECUTOR_RIGHTS_R210.md. Tutta F4/F6 non certificata.
+
+---
+
+## Revisione allocazioni parziali — 28 ottobre 2026
+
+357 casi distinti/40 nuovi. Tre moduli finanziari modificati,nessun nuovo finding o trasporto.303 sorgenti app/166 finding(0HIGH/21MED/145LOW),171confiniC2,30sitiHTTP/21file,547sorgenti/783punti runtime. Inventari aggiornati sui byte correnti,checker/soppressioni invariati. Vedere ../PAYPAL_PARTIAL_SETTLEMENT_R210.md. Non certifica storico integrale,diritti o target reali.
+
+---
+
+## Aggiornamento settlement — 28 ottobre 2026
+
+303 sorgenti app/166 finding(0HIGH,21MEDIUM,145LOW),due nuove disposizioni LOW per import subprocess/argv SFTP revisionate. Il trasporto SSH fisso autenticato è un nuovo confine di processoC2;il census PythonHTTP resta30 siti e non lo conta. 547sorgenti/783punti runtime. Vedere ../PAYPAL_SETTLEMENT_RECOVERY_R210.md e ledger JSON aggiornati;nessuna soppressione/checker indebolito o accettazione provider reale.
+
+---
+
 Current PayPal dispute-history review: PayPal merchant client call shape unchanged; newly used financial paths are fixed GET-only. Pagination links are parsed only after exact merchant host/path/query/method checks and never followed. Original owner/configuration/epoch is rechecked at transactional settlement; no new remote model permission. Inventory29 sites/20 files; checker unchanged.
 
 Current PayPal dispute-history review: PayPal merchant client call shape unchanged; newly used financial paths are fixed GET-only. Pagination links are parsed only after exact merchant host/path/query/method checks and never followed. Original owner/configuration/epoch is rechecked at transactional settlement; no new remote model permission. Inventory29 sites/20 files; checker unchanged.

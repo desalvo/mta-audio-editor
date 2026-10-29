@@ -1,0 +1,25 @@
+{
+  "baseline": "MTA-0.3.0-r210-pre-RC-reviewed-checkpoint-cumulative.zip",
+  "baseline_sha256": "5ab4eaeb894c739920bed0d334d947beab0154b203ab92f727b029a43ce4d4a2",
+  "baseline_files": 4635,
+  "original_logs_byte_identical": 616,
+  "original_modes": "unchanged",
+  "original_zip_attributes": "copied exactly",
+  "missing_files": [],
+  "original42_criteria_wording_weights_states": "unchanged",
+  "promoted": [],
+  "progress": {
+    "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
+    "numerator": 28,
+    "denominator": 42,
+    "percent": 66.7,
+    "accepted_macroareas": 1,
+    "macroarea_denominator": 7,
+    "historical_dual_regime_estimate_percent": 70,
+    "historical_estimate_is_comparable": false,
+    "full_product_completion_percent": null,
+    "production_validation_percent": 0
+  },
+  "requested_numeric_progress_achieved": false,
+  "release_candidate": false
+}

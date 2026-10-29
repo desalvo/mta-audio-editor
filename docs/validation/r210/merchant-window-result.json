@@ -1,0 +1,10 @@
+{
+  "passed": 28,
+  "new_tests": 13,
+  "progress_percent": 66.7,
+  "criteria_promoted": [],
+  "release_candidate": false,
+  "report": "docs/validation/r210/merchant-window-coverage.xml",
+  "report_sha256": "a7c9cceebfa27fec6f0e974a266bd25ea41db49232ec54f9f671ae37cfa4251f",
+  "scope": "Offline requested-window interval union and same-window conflict detection,not account-wide financial clearance"
+}

@@ -531,6 +531,14 @@ class DemucsStemSplitter:
         progress=None,
         cancel_event=None,
     ) -> list[Path]:
+        from .model_license_policy import evaluate
+        from .model_selectors import demucs_model
+        # Direct native/diagnostic callers do not pass through the server API.
+        # Reject the requested selector before cardinality can replace it.
+        model = demucs_model(model)
+        evaluate('demucs', {'model': model})
+        if os.getenv('MTA_DEMUCS_LOCAL_REPO', '').strip():
+            raise ValueError('Local Demucs repositories require a separately reviewed checkpoint integration')
         if stem_count != 0 and not 2 <= stem_count <= 64:
             raise ValueError("unsupported stem count")
         profiles = cls._model_profiles()
@@ -547,6 +555,8 @@ class DemucsStemSplitter:
                 model = str(matching[0]["model"])
         if model not in by_model:
             raise ValueError("unsupported Demucs model")
+        model = demucs_model(model)
+        evaluate('demucs', {'model': model})
         if not cls.available():
             raise RuntimeError("Demucs stem plugin is not installed in this runtime")
         local_repo = os.getenv("MTA_DEMUCS_LOCAL_REPO", "").strip()
@@ -566,6 +576,7 @@ class DemucsStemSplitter:
                 progress(20, "Caricamento modello Demucs nell'app nativa")
             if cancel_event is not None and cancel_event.is_set():
                 raise RuntimeError("stem separation cancelled")
+            evaluate('demucs', {'model': model})
             from demucs.separate import main as demucs_main
 
             old_argv = sys.argv[:]
@@ -576,6 +587,7 @@ class DemucsStemSplitter:
                 if stem_count == 2:
                     sys.argv += ["--two-stems", "vocals"]
                 sys.argv.append(str(source))
+                evaluate('demucs', {'model': model})
                 try:
                     result = demucs_main()
                 except SystemExit as exc:
@@ -591,6 +603,7 @@ class DemucsStemSplitter:
                 raise RuntimeError("stem separation cancelled")
             if progress:
                 progress(88, "Raccolta delle tracce separate")
+            evaluate('demucs', {'model': model})
             candidates = sorted(output_dir.glob(f"{model}/**/*.wav"))
             if not candidates:
                 candidates = sorted(output_dir.rglob("*.wav"))
@@ -614,6 +627,7 @@ class DemucsStemSplitter:
         cmd.append(str(source))
         if progress:
             progress(20, "Avvio del modello Demucs")
+        evaluate('demucs', {'model': model})
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
@@ -669,6 +683,7 @@ class DemucsStemSplitter:
             raise RuntimeError("\n".join(tail)[-3000:] or "stem separation failed")
         if progress:
             progress(88, "Raccolta delle tracce separate")
+        evaluate('demucs', {'model': model})
         candidates = sorted(output_dir.glob(f"{model}/**/*.wav"))
         if not candidates:
             candidates = sorted(output_dir.rglob("*.wav"))

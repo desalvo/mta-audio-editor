@@ -100,9 +100,9 @@ def current_regime() -> Regime:
     installation must have an initialized, matching SQLite fence epoch.
     """
     import sqlite3
-    from . import auth
-    mirror = read_regime(auth.data_root() / "service-regime.json")
-    db_file = auth.db_path()
+    from .runtime_paths import policy_paths
+    data_root,db_file = policy_paths()
+    mirror = read_regime(data_root / "service-regime.json")
     if not db_file.exists():
         if mirror.regime == Regime.COMMERCIAL:
             raise RegimeError("Commercial regime requires a matching initialized fence")

@@ -1,3 +1,13 @@
+## Current r210 local model rights — 29 October2026
+
+Local Core ML requires an exact checkpoint review included in the signed app and a protected device installation receipt. The current registry is empty and authorizes no real model. Automatic bootstrap/update and the build skip unreviewed downloads;existing files are preserved for removal. Explicit Local execution is unavailable until review;server workflows retain their existing controls. Source hashes or download tokens alone never approve a checkpoint.
+
+Policy,private installation/rollback,compiled-byte verification,per-chunk checks and IT/EN denial are implemented. Local Python checks pass;Swift/Keychain/iOS compile acceptance is **pending**. After committing,run **Optional iOS model rights**,input **ios_model_rights=true**,requiring32 actual SDK checks and unsigned compilation of this app. This is not installed-OS or neural inference acceptance. See [complete handoff](../../docs/IOS_LOCAL_MODEL_RIGHTS_R210.md).
+
+The earlier design below describes available model/runtime features subject to this current admission contract.
+
+---
+
 # MTA Audio Editor for iOS/iPadOS
 
 Whole-page UI zoom (50–200%, persisted) is available under Options → Interface zoom; 100% resets it. This uses WKWebView.pageZoom on iPhone/iPad. See [r210 zoom and target checks](../../docs/NATIVE_UI_ZOOM_R210.md).

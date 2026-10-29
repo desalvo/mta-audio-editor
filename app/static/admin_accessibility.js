@@ -17,7 +17,8 @@ function semantics(){
   region.tabIndex=0;region.setAttribute('role','region');
   const table=region.querySelector('table'),head=table?[...table.querySelectorAll('thead th')].map(x=>x.textContent.trim()).filter(Boolean).slice(0,4).join(' · '):'';
   const section=region.closest('section'),title=section?.querySelector('h2,h3')?.textContent.trim();
-  region.setAttribute('aria-label',head?tr('Scrollable table','Tabella scorrevole')+': '+head:tr('Scrollable details','Dettagli scorrevoli')+(title?': '+title:''));
+  const financialLabels={regimeIssues:tr('Reconciliation prerequisites','Prerequisiti di riconciliazione'),regimeOutbox:tr('Original checkout dispatches','Dispatch dei checkout originali')};
+  region.setAttribute('aria-label',financialLabels[region.id]||(head?tr('Scrollable table','Tabella scorrevole')+': '+head:tr('Scrollable details','Dettagli scorrevoli')+(title?': '+title:'')));
  }
 }
 semantics();new MutationObserver(semantics).observe(document.body,{childList:true,subtree:true,characterData:true});

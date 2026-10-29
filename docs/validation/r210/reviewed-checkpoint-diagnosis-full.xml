@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="4.173" timestamp="2026-10-28T08:18:03.431677+01:00" hostname="a7359ae99bf6"><testcase classname="tests.test_r210_reviewed_checkpoint" name="test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[False-NON_COMMERCIAL]" time="3.670"><failure message="AssertionError: {&quot;cpu_seconds&quot;:3.958477,&quot;execution_status&quot;:&quot;failed&quot;,&quot;media_type&quot;:null,&quot;model_receipt&quot;:{&quot;context&quot;:{&quot;contract&quot;:{&quot;epoch&quot;:{&quot;regime&quot;:&quot;NON_COMMERCIAL&quot;,&quot;revision&quot;:0},&quot;kind&quot;:&quot;audio-to-midi-basic-pitch&quot;,&quot;model_sha256&quot;:&quot;2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec&quot;,&quot;policy&quot;:{&quot;mode&quot;:&quot;cost_recovery&quot;,&quot;model_id&quot;:&quot;basic-pitch&quot;,&quot;operator_review&quot;:false,&quot;policy_sha256&quot;:&quot;bd51c116156268280ef661473528c2b810513e233bdc9b4145568a8a65490f88&quot;,&quot;source&quot;:&quot;https://github.com/spotify/basic-pitch/blob/main/LICENSE&quot;},&quot;rights&quot;:{&quot;documents&quot;:{&quot;LICENSE&quot;:&quot;929c910bae2152fa87199a5d0660e09263419b7eee6d4b301d05ee2aaf211c37&quot;,&quot;NOTICE&quot;:&quot;b810e55c0e3b520fabb45fc2ccc74880187bf84e309971968541cc812dcde905&quot;},&quot;license&quot;:&quot;Apache-2.0&quot;,&quot;model_id&quot;:&quot;basic-pitch&quot;,&quot;runtime&quot;:{&quot;basic-pitch&quot;:&quot;0.4.0&quot;,&quot;onnxruntime&quot;:&quot;1.23.2&quot;},&quot;source&quot;:&quot;https://github.com/spotify/basic-pitch/tree/9991303bba609a3b93089d13ec80d1d495083596&quot;,&quot;upstream_commit&quot;:&quot;9991303bba609a3b93089d13ec80d1d495083596&quot;,&quot;version&quot;:&quot;0.4.0&quot;},&quot;rights_sha256&quot;:&quot;95df9eacf5a1f81fafc650f8208e1e2cd1a200ba70dbf1599822f949699c9a4e&quot;,&quot;schema&quot;:&quot;mta-reviewed-checkpoint-load-2&quot;,&quot;sources&quot;:{&quot;ai_model_attestation.py&quot;:&quot;640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10&quot;,&quot;ai_model_bytes.py&quot;:&quot;fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0&quot;,&quot;ai_studio_adapter.py&quot;:&quot;2abac4bbbda35c2edbfd7f9f19d9ad528b0810840f4ac1c0cc5616783ca0a831&quot;}},&quot;instance&quot;:&quot;e871bb51ed2bf523f5c08ec6b9319522&quot;,&quot;job_id&quot;:&quot;712baac8c48f4a0894a7005ed7f3763e&quot;,&quot;kind&quot;:&quot;audio-to-midi-basic-pitch&quot;,&quot;nonce&quot;:&quot;50273624f607975e046ef0c590d669b965b0356d6c6ae33a715d93d96314c759&quot;,&quot;plan_sha256&quot;:&quot;44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a&quot;,&quot;policy&quot;:{&quot;mode&quot;:&quot;cost_recovery&quot;,&quot;model_id&quot;:&quot;basic-pitch&quot;,&quot;operator_review&quot;:false,&quot;policy_sha256&quot;:&quot;bd51c116156268280ef661473528c2b810513e233bdc9b4145568a8a65490f88&quot;,&quot;source&quot;:&quot;https://github.com/spotify/basic-pitch/blob/main/LICENSE&quot;},&quot;source_sha256&quot;:&quot;1c641a70274de87b52ca5c560d7a7dff78a87fe3160fb2c0e74dcce4e52a51e0&quot;},&quot;model_sha256&quot;:&quot;2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec&quot;,&quot;pid&quot;:22,&quot;rights_sha256&quot;:&quot;95df9eacf5a1f81fafc650f8208e1e2cd1a200ba70dbf1599822f949699c9a4e&quot;,&quot;runtime&quot;:{&quot;basic-pitch&quot;:&quot;0.4.0&quot;,&quot;onnxruntime&quot;:&quot;1.23.2&quot;},&quot;schema&quot;:&quot;mta-reviewed-checkpoint-load-2&quot;},&quot;result_sha256&quot;:&quot;e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&quot;,&quot;status&quot;:&quot;failed&quot;,&quot;worker_proof_sha256&quot;:&quot;1e5eaef29bc7f26644d21cbd19924a6466fe73175576881a3d9d9344100a7923&quot;}&#10;assert ('failed', 'finished', 'closed') == ('done', 'finished', 'closed')&#10;  &#10;  At index 0 diff: 'failed' != 'done'&#10;  &#10;  Full diff:&#10;    (&#10;  -     'done',&#10;  +     'failed',&#10;        'finished',&#10;        'closed',&#10;    )">reviewed = ((1, {'node_id': 'ad64054244a9e56369a437fdd668cc83', 'credential': '[REDACTED_TEST_CREDENTIAL]', 'shown_once': True})
+https = {'requests': ['/api/pull-worker/claim', '/api/pull-worker/712baac8c48f4a0894a7005ed7f3763e/heartbeat', '/api/pull-work...ker/712baac8c48f4a0894a7005ed7f3763e/complete'], 'drops': {}, 'redirect': False, 'url': 'https://127.0.0.1:44111', ...}
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f850cbb7170&gt;
+regime = 'NON_COMMERCIAL', lost = False
+
+    @pytest.mark.skipif(not os.getenv('MTA_STUDIO_PYTHON'),reason='Explicit installed reviewed model/runtime required')
+    @pytest.mark.parametrize('regime',['NON_COMMERCIAL','COMMERCIAL'])
+    @pytest.mark.parametrize('lost',[False,True])
+    def test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay(reviewed,https,monkeypatch,regime,lost):
+        authority,node=reviewed
+        if regime=='COMMERCIAL':
+            # Provision the initial empty authority before admission, not a cutover.
+            (auth.data_root()/'service-regime.json').write_text('{"regime":"COMMERCIAL","revision":0}')
+            with auth.db() as c:
+                from app.regime_operation_fence import initialize
+                initialize(c,initial_regime='COMMERCIAL')
+        with pytest.raises(LicenseDenied) if regime=='COMMERCIAL' else __import__('contextlib').nullcontext():
+            authorize_remote_execution(KIND,{})
+        job=central.enqueue(authority[0],KIND,{},source_wav=sound(),timeout_seconds=240)
+        if lost:https['drops']['complete']=1
+        config=cli(authority,https,'reviewed-real-node',credential=node['credential'])
+        probe='''import json,sys
+    from app import ai_metering_agent as metering,ai_pull_worker as worker
+    import subprocess
+    spawn=subprocess.Popen
+    def visible(*args,**kwargs):
+     kwargs['stderr']=sys.stderr
+     return spawn(*args,**kwargs)
+    metering.subprocess.Popen=visible
+    original=metering.run_metered_process
+    def measure(*args,**kwargs):
+     result=original(*args,**kwargs)
+     if result.exit_code:print(repr(result),file=sys.stderr)
+     return result
+    metering.run_metered_process=measure
+    cfg=json.loads(worker.private_file(sys.argv[1],limit=16384))
+    worker.run_once(worker.WorkerClient(**cfg),sys.argv[2])
+    '''
+        result=subprocess.run([sys.executable,'-c',probe,str(config[2]/'worker.json'),str(config[2]/'state')],env=config[1],capture_output=True,text=True,timeout=180)
+        assert result.returncode==0,(result.stdout,result.stderr)
+&gt;       assert economic(job)==('done','finished','closed'),task(job)['completion_json']
+E       AssertionError: {"cpu_seconds":3.958477,"execution_status":"failed","media_type":null,"model_receipt":{"context":{"contract":{"epoch":{"regime":"NON_COMMERCIAL","revision":0},"kind":"audio-to-midi-basic-pitch","model_sha256":"2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec","policy":{"mode":"cost_recovery","model_id":"basic-pitch","operator_review":false,"policy_sha256":"bd51c116156268280ef661473528c2b810513e233bdc9b4145568a8a65490f88","source":"https://github.com/spotify/basic-pitch/blob/main/LICENSE"},"rights":{"documents":{"LICENSE":"929c910bae2152fa87199a5d0660e09263419b7eee6d4b301d05ee2aaf211c37","NOTICE":"b810e55c0e3b520fabb45fc2ccc74880187bf84e309971968541cc812dcde905"},"license":"Apache-2.0","model_id":"basic-pitch","runtime":{"basic-pitch":"0.4.0","onnxruntime":"1.23.2"},"source":"https://github.com/spotify/basic-pitch/tree/9991303bba609a3b93089d13ec80d1d495083596","upstream_commit":"9991303bba609a3b93089d13ec80d1d495083596","version":"0.4.0"},"rights_sha256":"95df9eacf5a1f81fafc650f8208e1e2cd1a200ba70dbf1599822f949699c9a4e","schema":"mta-reviewed-checkpoint-load-2","sources":{"ai_model_attestation.py":"640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10","ai_model_bytes.py":"fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0","ai_studio_adapter.py":"2abac4bbbda35c2edbfd7f9f19d9ad528b0810840f4ac1c0cc5616783ca0a831"}},"instance":"e871bb51ed2bf523f5c08ec6b9319522","job_id":"712baac8c48f4a0894a7005ed7f3763e","kind":"audio-to-midi-basic-pitch","nonce":"50273624f607975e046ef0c590d669b965b0356d6c6ae33a715d93d96314c759","plan_sha256":"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","policy":{"mode":"cost_recovery","model_id":"basic-pitch","operator_review":false,"policy_sha256":"bd51c116156268280ef661473528c2b810513e233bdc9b4145568a8a65490f88","source":"https://github.com/spotify/basic-pitch/blob/main/LICENSE"},"source_sha256":"1c641a70274de87b52ca5c560d7a7dff78a87fe3160fb2c0e74dcce4e52a51e0"},"model_sha256":"2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec","pid":22,"rights_sha256":"95df9eacf5a1f81fafc650f8208e1e2cd1a200ba70dbf1599822f949699c9a4e","runtime":{"basic-pitch":"0.4.0","onnxruntime":"1.23.2"},"schema":"mta-reviewed-checkpoint-load-2"},"result_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","status":"failed","worker_proof_sha256":"1e5eaef29bc7f26644d21cbd19924a6466fe73175576881a3d9d9344100a7923"}
+E       assert ('failed', 'finished', 'closed') == ('done', 'finished', 'closed')
+E         
+E         At index 0 diff: 'failed' != 'done'
+E         
+E         Full diff:
+E           (
+E         -     'done',
+E         +     'failed',
+E               'finished',
+E               'closed',
+E           )
+
+tests/test_r210_reviewed_checkpoint.py:144: AssertionError</failure></testcase></testsuite></testsuites>

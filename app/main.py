@@ -12,7 +12,6 @@ import logging
 import os
 import re
 import shutil
-import shlex
 import subprocess
 import tempfile
 import threading
@@ -4729,6 +4728,8 @@ def _download_name(title: str, ext: str) -> str:
 
 
 def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: str | None = None, cancel_event=None) -> tuple[Path, Path, str]:
+    from .model_license_policy import evaluate
+    evaluate('backing-vocals', {'model': model_id or LEAD_BACKING_DEFAULT_MODEL})
     if _ai_external_engine('backing-vocals'):
         result, remote_id = _native_remote_infer('backing-vocals', vocal_stem, {'model':model_id or LEAD_BACKING_DEFAULT_MODEL})
         files=list(result['audio'].items())
@@ -4758,15 +4759,6 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
     output_dir.mkdir(parents=True, exist_ok=True)
     lead = output_dir / "lead_vocals.wav"
     backing = output_dir / "backing_vocals.wav"
-    command_template = os.getenv("MTA_LEAD_BACKING_COMMAND", "").strip()
-    if command_template:
-        values = {"input": str(vocal_stem), "lead": str(lead), "backing": str(backing), "output_dir": str(output_dir)}
-        command = [part.format(**values) for part in shlex.split(command_template)]
-        from .separator_process import run
-        run(command,cancel_event=cancel_event)
-        if any(path.is_symlink() or not path.is_file() or path.stat().st_nlink!=1 for path in (lead,backing)):
-            raise RuntimeError("lead/backing vocal separator produced unsafe or missing output")
-        return lead, backing, os.getenv("MTA_LEAD_BACKING_MODEL", "configured-ai").strip() or "configured-ai"
     selected = (model_id or LEAD_BACKING_DEFAULT_MODEL).strip()
     if selected == "mvsep-mega53":
         from .mega53_runtime import infer
@@ -4778,18 +4770,8 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
             from .uvr_kara_integrity import verify_kara_2
             verify_kara_2(LEAD_BACKING_MODEL_DIR / 'UVR_MDXNET_KARA_2.onnx')
     if selected == "ffmpeg-center-side":
-        if shutil.which("ffmpeg") is None:
-            raise RuntimeError("FFmpeg is required for lead/backing vocal fallback separation")
-        filter_graph = (
-            "[0:a]asplit=2[a][b];"
-            "[a]pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1[lead];"
-            "[b]pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[backing]"
-        )
-        cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(vocal_stem), "-filter_complex", filter_graph, "-map", "[lead]", "-c:a", "pcm_s24le", str(lead), "-map", "[backing]", "-c:a", "pcm_s24le", str(backing)]
-        proc = subprocess.run(cmd, capture_output=True, text=True)
-        if proc.returncode:
-            raise RuntimeError(proc.stderr.strip() or "lead/backing vocal fallback separation failed")
-        return lead, backing, "ffmpeg-center-side"
+        from .backing_vocals_runtime import split_center_side
+        return split_center_side(vocal_stem, output_dir, cancel_event=cancel_event)
 
     info = _lead_backing_model_info(selected)
     if not info["installed"]:
@@ -4810,7 +4792,7 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
         ) from exc
     separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(output_dir), output_format="WAV")
     try:
-        from .backing_vocals_runtime import load_backing_model
+        from .backing_vocals_runtime import load_backing_model, separate_backing
         load_backing_model(separator, info["filename"])
     except Exception as exc:
         if "beartype" in str(exc).lower() and ("callable" in str(exc).lower() or "pep" in str(exc).lower()):
@@ -4824,7 +4806,7 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
         raise RuntimeError("stem separation cancelled")
     # audio-separator may return bare filenames even when output_dir is configured.
     # Never resolve those against the server's current working directory.
-    raw_outputs = separator.separate(str(vocal_stem)) or []
+    raw_outputs = separate_backing(separator, vocal_stem, info["filename"]) or []
     outputs = []
     for item in raw_outputs:
         path = Path(item)

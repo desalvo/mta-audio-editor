@@ -14,6 +14,8 @@ def digest(data):return hashlib.sha256(data).hexdigest()
 
 @pytest.fixture
 def singing(tmp_path,monkeypatch):
+    from model_rights_fixtures import authorize_singing_fixture
+    authorize_singing_fixture(monkeypatch,tmp_path)
     spectral={'sample_rate':44100,'hop_size':512,'win_size':2048,'fft_size':2048,'num_mel_bins':128,
               'mel_fmin':0,'mel_fmax':22050,'mel_base':'e','mel_scale':'slaney'}
     data={'config':json.dumps({**spectral,'acoustic':'acoustic','vocoder':'test-vocoder','phonemes':'phones','languages':'languages'}).encode(),
@@ -22,7 +24,8 @@ def singing(tmp_path,monkeypatch):
           'acoustic':b'fake acoustic','vocoder':b'fake vocoder'}
     for name,raw in data.items():(tmp_path/name).write_bytes(raw)
     value={'bindings':{k:k for k in ['config','vocoder_config','acoustic','vocoder']},
-           'files':{k:{'bytes':len(v),'sha256':digest(v)} for k,v in data.items()},'languages':['en']}
+           'files':{k:{'bytes':len(v),'sha256':digest(v)} for k,v in data.items()},'languages':['en'],
+           'licenses':[{'policy_model':model} for model in ('diffsinger-nishiren','diffsinger-vocoder')]}
     def asset(name):return tmp_path/name
     monkeypatch.setattr(backend,'inventory',lambda:(value,asset))
     for key in ['MTA_NEURAL_SINGER_CHECKPOINT','MTA_DIFFSINGER_VOCODER','MTA_NEURAL_SINGER_SHA256']:monkeypatch.delenv(key,raising=False)

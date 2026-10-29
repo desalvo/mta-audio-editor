@@ -107,7 +107,7 @@ def test_actual_sam_worker_reaches_inference_and_writes_wav(tmp_path,monkeypatch
 
 
 def test_sam_import_failure_emits_only_fixed_stage_marker(tmp_path,monkeypatch,capsys):
-    monkeypatch.setattr(sys,'argv',['sam','--source','in','--output',str(tmp_path/'out'),'--model','id','--prompt','PRIVATE'])
+    monkeypatch.setattr(sys,'argv',['sam','--source','in','--output',str(tmp_path/'out'),'--model','facebook/sam-audio-small','--prompt','PRIVATE'])
     monkeypatch.setitem(sys.modules,'torch',None)
     with pytest.raises(ModuleNotFoundError):worker.main()
     assert capsys.readouterr().err.strip()=='MTA_SAM_FAILURE:imports'
@@ -131,7 +131,14 @@ def separator():
     return SimpleNamespace(model_instance=inst,load_model=lambda **kwargs:None)
 
 
-def test_backing_same_onnx_checkpoint_runs_on_rocm_and_returns_expected_numpy(monkeypatch):
+@pytest.fixture
+def backing_rights(tmp_path,monkeypatch):
+    from model_rights_fixtures import authorize_fixture
+    for model in ('uvr-kara-2','audio-separator-weights'):
+        authorize_fixture(monkeypatch,tmp_path,model)
+
+
+def test_backing_same_onnx_checkpoint_runs_on_rocm_and_returns_expected_numpy(monkeypatch,backing_rights):
     observed={};s=separator()
     class Model:
         def to(self,device):observed['device']=device;return self
@@ -146,20 +153,20 @@ def test_backing_same_onnx_checkpoint_runs_on_rocm_and_returns_expected_numpy(mo
     assert s.model_instance.uses_pytorch_inference and s.model_instance.mta_execution_backend=='pytorch-rocm'
 
 
-@pytest.mark.parametrize('hip,gpu,filename',[(None,True,'model.onnx'),('7.2',False,'model.onnx'),('7.2',True,'model.ckpt')])
-def test_other_backing_devices_and_models_keep_existing_route(monkeypatch,hip,gpu,filename):
+@pytest.mark.parametrize('hip,gpu,filename',[(None,True,'UVR_MDXNET_KARA_2.onnx'),('7.2',False,'UVR_MDXNET_KARA_2.onnx'),('7.2',True,'mel_band_roformer_karaoke_gabox_v2.ckpt')])
+def test_other_backing_devices_and_models_keep_existing_route(monkeypatch,hip,gpu,filename,backing_rights):
     s=separator();original=s.model_instance.model_run
     monkeypatch.setitem(sys.modules,'torch',SimpleNamespace(version=SimpleNamespace(hip=hip),cuda=SimpleNamespace(is_available=lambda:gpu)))
     backing.load_backing_model(s,filename)
     assert s.model_instance.model_run is original
 
 
-def test_backing_conversion_failure_does_not_fall_back_to_cpu(monkeypatch):
+def test_backing_conversion_failure_does_not_fall_back_to_cpu(monkeypatch,backing_rights):
     s=separator()
     monkeypatch.setitem(sys.modules,'torch',SimpleNamespace(version=SimpleNamespace(hip='7.2'),cuda=SimpleNamespace(is_available=lambda:True),device=lambda x:x))
     def failed(path):raise ValueError('unsupported operator')
     monkeypatch.setitem(sys.modules,'onnx2torch',SimpleNamespace(convert=failed))
-    with pytest.raises(RuntimeError,match='rocm_conversion_failed'):backing.load_backing_model(s,'model.onnx')
+    with pytest.raises(RuntimeError,match='rocm_conversion_failed'):backing.load_backing_model(s,'UVR_MDXNET_KARA_2.onnx')
 
 
 def test_installer_exercises_model_loader_without_huggingface_download(monkeypatch):

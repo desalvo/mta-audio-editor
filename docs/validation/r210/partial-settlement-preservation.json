@@ -1,0 +1,24 @@
+{
+  "baseline": "MTA-0.3.0-r210-pre-RC-settlement-recovery-cumulative.zip",
+  "baseline_sha256": "cacd281c095279b84600aa55b4ba9f552d9027ff9c2bf2c981eec531d039abde",
+  "baseline_files": 4682,
+  "original_logs_byte_identical": 616,
+  "missing_files": [],
+  "original_modes": "unchanged",
+  "original_zip_attributes": "copy original per-entry ZipInfo at packaging",
+  "original42_wording_weights_states": "unchanged",
+  "promoted": [],
+  "progress": {
+    "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
+    "numerator": 28,
+    "denominator": 42,
+    "percent": 66.7,
+    "accepted_macroareas": 1,
+    "macroarea_denominator": 7,
+    "historical_dual_regime_estimate_percent": 70,
+    "historical_estimate_is_comparable": false,
+    "full_product_completion_percent": null,
+    "production_validation_percent": 0
+  },
+  "release_candidate": false
+}

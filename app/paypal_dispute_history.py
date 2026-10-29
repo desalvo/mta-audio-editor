@@ -27,7 +27,7 @@ def identifier(value):
     return value
 
 
-def normalize(document,cfg,*,captures=None):
+def normalize(document,cfg,*,captures=None,settlement_context=None):
     if not isinstance(document,dict):raise HistoryBlocked('Malformed PayPal dispute')
     did=identifier(document.get('dispute_id'));transactions=document.get('disputed_transactions')
     if not isinstance(transactions,list) or not 1<=len(transactions)<=100:
@@ -35,6 +35,18 @@ def normalize(document,cfg,*,captures=None):
     from .paypal_dispute_details import item_allocations,movement_review
     if any(not isinstance(tx,dict) for tx in transactions):raise HistoryBlocked('Malformed dispute transaction')
     item_amounts,allocation_proof=item_allocations(transactions)
+    report_amounts = None
+    # Reports supplement missing allocations only. They cannot replace
+    # contradictory provider item amounts or bind an unlisted capture.
+    if item_amounts is None and len(transactions)>1:
+        if settlement_context is not None:
+            report_amounts = settlement_context.allocate(document, captures)
+        else:
+            from .paypal_report_reconciliation import replay_allocations
+            report_amounts = replay_allocations(document, cfg, captures)
+        if report_amounts is not None:
+            allocation_proof={'method':'authenticated_settlement_report_amounts',
+                              'sha256':hashlib.sha256(json.dumps(sorted(report_amounts.items())).encode()).hexdigest()}
     allocations={}
     for tx in transactions:
         if not isinstance(tx,dict):raise HistoryBlocked('Malformed PayPal dispute transaction')
@@ -45,6 +57,7 @@ def normalize(document,cfg,*,captures=None):
         if 'gross_amount' in tx and captures is not None and paypal._cents(tx['gross_amount'])!=captures[cid]:
             raise HistoryBlocked('PayPal dispute transaction gross mismatch')
         if item_amounts is not None:amount=item_amounts[cid]
+        elif report_amounts is not None:amount=report_amounts[cid]
         elif len(transactions)==1:amount=paypal._cents(document.get('dispute_amount'))
         else:
             # Gross transaction amount is not a partial dispute allocation.
@@ -76,9 +89,13 @@ def normalize(document,cfg,*,captures=None):
     elif document.get('status') not in ('OPEN','WAITING_FOR_BUYER_RESPONSE','WAITING_FOR_SELLER_RESPONSE','UNDER_REVIEW'):
         state='uncertain'
     review=movement_review(document)
+    settlement = settlement_context.resolve(document,allocations,captures) if settlement_context is not None else {}
+    document_sha = hashlib.sha256(json.dumps(document,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
     fingerprint=hashlib.sha256(cfg['client_id'].encode()).hexdigest()
     return [{'type':'risk','hold_id':'dispute:'+did+(':'+cid if len(allocations)>1 else ''),
-             'capture_id':cid,'amount_minor':amount,'status':state,'updated_ms':updated,'kind':'dispute',
+             'capture_id':cid,'amount_minor':amount,'status':'released' if cid in settlement else state,'updated_ms':updated,'kind':'dispute',
+             'dispute_document_sha256':document_sha,
+             **({'settlement_report_proof':settlement[cid]} if cid in settlement else {}),
              'environment':cfg['environment'],'merchant_fingerprint':fingerprint,
              **({'allocation_proof':allocation_proof} if allocation_proof else {}),
              **({'movement_review':review} if review else {})}
@@ -122,7 +139,7 @@ def _list(cfg,cid,budget,observed):
     raise HistoryBlocked('PayPal dispute history exceeds page bound')
 
 
-def _discover(canonical,cfg,observed):
+def _discover(canonical,cfg,observed,settlement_context=None):
     captures={x['id']:paypal._cents(x['amount']) for x in canonical['purchase_units'][0]['payments']['captures']}
     budget=[0];first={cid:_list(cfg,cid,budget,observed) for cid in captures};documents={};members={}
     if sum(map(len,first.values()))>2000:raise HistoryBlocked('PayPal dispute references exceed bound')
@@ -139,7 +156,7 @@ def _discover(canonical,cfg,observed):
                 if field not in summary or summary[field]!=detail.get(field):raise HistoryBlocked('PayPal dispute summary changed')
     rows=[]
     for did,detail in documents.items():
-        normalized=normalize(detail,cfg,captures=captures)
+        normalized=normalize(detail,cfg,captures=captures,settlement_context=settlement_context)
         if {x['capture_id'] for x in normalized}!=members[did]:raise HistoryBlocked('PayPal filtered dispute collection is incomplete')
         rows.extend(normalized)
     # Re-read every detail and complete filtered collection, including empties.
@@ -150,9 +167,9 @@ def _discover(canonical,cfg,observed):
     return rows
 
 
-def discover(canonical,cfg):
+def discover(canonical,cfg,*,settlement_context=None):
     observed=set()
-    try:return _discover(canonical,cfg,observed)
+    try:return _discover(canonical,cfg,observed,settlement_context)
     except (ValueError,KeyError,TypeError,AttributeError) as exc:
         blocked=HistoryBlocked('PayPal dispute history cannot be verified')
         blocked.observed=sorted(observed)

@@ -1,0 +1,662 @@
+{
+  "schema": "mta-ios-local-rights-checkpoint-1",
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-legacy-separators-cumulative.zip",
+  "input_sha256": "48db1dba2889d914780138b724f7c2412b01001f3e8df7994d3b715380901ef3",
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "passed": 90,
+  "new_cases": 41,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "reports": [
+    {
+      "path": "docs/validation/r210/ios-rights-first.xml",
+      "sha256": "69110ebf9e08f6f3a95aae5d63b105153bb7ecca3d0a05cea6d8ea089b798bbf"
+    },
+    {
+      "path": "docs/validation/r210/ios-rights-final.xml",
+      "sha256": "852f3b768bad485e41fb356718532465bed394cb4c64cd2841b81781132d7f4c"
+    },
+    {
+      "path": "docs/validation/r210/ios-rights-final-application.xml",
+      "sha256": "278ef65a0e40a2d4d165f108fce365b28035a3f28ed64b88d1640cc7dc5cdb1d"
+    },
+    {
+      "path": "docs/validation/r210/ios-rights-receipt-final.xml",
+      "sha256": "09600fd3d71654ec01b7c7780f61aad94cb6ae56c7274b075b868f0f4dcf389c"
+    },
+    {
+      "path": "docs/validation/r210/ios-rights-inventory-final.xml",
+      "sha256": "106943f751c965085ae77b0222f4bdbfbf302bf7d010b805da301e64821d6d2a"
+    },
+    {
+      "path": "docs/validation/r210/ios-rights-source-final.xml",
+      "sha256": "720b192512c04f589fd30ed3989f7ddde4586cd120ca737b54a6d9d952c3dafb"
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_exact_review_license_notice_and_bundled_bytes_form_one_workflow",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[id-../demucs-4]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[stemCount-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[stemCount-1]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[sourceFormat-foreign]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[sourceSHA256-FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[localNoncommercialOnly-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[localNoncommercialOnly-1]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[authorizationBasis-noncommercial_context]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[authorizationBasis-value8]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[reviewer-]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[reviewedAt-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[reviewedAt-1800000001]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[expiresAt-1800000000]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[expiresAt-18446744073709551616]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[reviewReference-http://example.test/rights]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[reviewReference-https://user:fixture@example.test/rights]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[licenseFile-../LICENSE-fixture.txt]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_incomplete_or_incompatible_review_cannot_authorize_download[noticeSHA256-0000000000000000000000000000000000000000000000000000000000000000]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_duplicate_selection_unknown_fields_and_duplicate_json_are_refused",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_symlinked_build_input_is_never_rights_evidence[registry]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_symlinked_build_input_is_never_rights_evidence[license]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_symlinked_build_input_is_never_rights_evidence[model]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_compiled_source_inventory_binds_filenames_bytes_and_empty_members",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_unknown_compiled_member_and_hardlink_are_not_counted_as_a_valid_model",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_shipped_empty_registry_grants_no_model_and_no_download",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_actual_cli_refuses_bundling_unreviewed_bytes_and_preserves_them",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_acceptance_gate_rejects_incomplete_or_substituted_proof[skip]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_acceptance_gate_rejects_incomplete_or_substituted_proof[failure]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_acceptance_gate_rejects_incomplete_or_substituted_proof[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_acceptance_gate_rejects_incomplete_or_substituted_proof[duplicate]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_acceptance_gate_rejects_incomplete_or_substituted_proof[substituted]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_acceptance_gate_rejects_incomplete_or_substituted_proof[false-counter]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_acceptance_gate_rejects_incomplete_or_substituted_proof[fake-keychain]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_report_schema_validation_is_not_itself_native_acceptance",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_missing_apple_sdk_is_blocked_with_zero_fake_passes",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_sdk_driver_declares_exact_checked_cases_and_is_in_real_compile_workflow",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_native_actual_entry_binds_review_and_receipt_before_compile_load_and_predict",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_standard_ios_build_no_longer_downloads_a_blanket_approved_default",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_ios_local_demucs_097",
+      "name": "test_coreml_local_engine_is_part_of_ios_target",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_ios_local_demucs_097",
+      "name": "test_local_engine_supports_requested_counts_and_chunking",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_ios_local_demucs_097",
+      "name": "test_mobile_bridge_exposes_local_stem_runtime",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_ios_local_demucs_097",
+      "name": "test_web_workflow_exposes_auto_local_server",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_ios_local_demucs_097",
+      "name": "test_backend_provisions_authenticated_coreml_models",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_ios_local_demucs_097",
+      "name": "test_export_utility_documents_contract",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_ios_local_demucs_097",
+      "name": "test_coreml_model_repository_endpoints",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_compiler_regressions_106",
+      "name": "test_android_buildconfig_is_generated_for_version_name_usage",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_compiler_regressions_106",
+      "name": "test_ios_15_uses_compatible_locale_api",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_compiler_regressions_106",
+      "name": "test_ios_local_stem_sync_path_carries_model_id_and_uses_explicit_types",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_compiler_regressions_106",
+      "name": "test_ci_has_early_mobile_compile_preflights",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_native_updates_099",
+      "name": "test_desktop_native_update_channel_and_github_sources",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_native_updates_099",
+      "name": "test_android_updater_supports_stable_early_and_apk_install",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_native_updates_099",
+      "name": "test_ios_updater_and_default_demucs_bootstrap",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_native_updates_099",
+      "name": "test_ci_publishes_rolling_early_main_packages",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_native_updates_099",
+      "name": "test_coreml_status_exposes_fingerprints_and_authenticated_default",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_demucs_updates_100",
+      "name": "test_server_periodic_model_updater_and_platform_endpoints",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_demucs_updates_100",
+      "name": "test_ios_wifi_only_default_and_periodic_refresh",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_demucs_updates_100",
+      "name": "test_android_wifi_only_and_model_sync",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_demucs_updates_100",
+      "name": "test_project_file_contains_new_project_action",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_demucs_updates_100",
+      "name": "test_mobile_release_builds_bundle_default_models",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_ci_regressions",
+      "name": "test_android_ci_uses_supported_setup_android_action",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_ci_regressions",
+      "name": "test_ios_open_panel_is_availability_guarded_for_ios_15_target",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_ci_regressions",
+      "name": "test_android_project_enables_androidx",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_native_clients",
+      "name": "test_android_native_client_files_and_storage_bridge_exist",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_native_clients",
+      "name": "test_ios_native_client_files_and_document_bridge_exist",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_native_clients",
+      "name": "test_mobile_frontend_bridge_and_server_side_export_jobs_are_integrated",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_native_clients",
+      "name": "test_ci_builds_android_and_ios_and_publishes_mobile_artifacts",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_native_clients",
+      "name": "test_mobile_default_server_is_automatic_and_hidden_from_ui",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_mobile_native_clients",
+      "name": "test_mobile_default_server_url_is_not_published_in_user_docs",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_dynamic_stem_models_101",
+      "name": "test_custom_registry_exposes_12_16_and_24_stem_models",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_dynamic_stem_models_101",
+      "name": "test_mobile_inventory_discovers_arbitrary_counts",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_dynamic_stem_models_101",
+      "name": "test_model_updater_allows_more_than_8_stems",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_dynamic_stem_models_101",
+      "name": "test_ios_engine_discovers_installed_models_dynamically",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-first.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_actual_cli_returns_only_the_verified_fixture_fingerprint",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_ios_model_rights",
+      "name": "test_missing_current_source_invalidates_an_older_accepted_report",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-receipt-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-source-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "status": "passed",
+      "report": "docs/validation/r210/ios-rights-inventory-final.xml"
+    }
+  ],
+  "scope": "Build review/actual CLI and source/inventory regression. Python cases are not execution of Swift,CryptoKit,Keychain or Core ML.",
+  "native_target": {
+    "status": "blocked",
+    "accepted": false,
+    "executed_checks": 0,
+    "prepared_real_SDK_checks": 32,
+    "ios_app_compiled": false,
+    "report": "docs/validation/r210/ios-rights-target/acceptance.json",
+    "workflow": ".github/workflows/ios-model-rights.yml",
+    "input": {
+      "ios_model_rights": true
+    },
+    "automatic_dispatch": false,
+    "required_platform": "macOS with Swift/CryptoKit/Security and Xcode iOS SDK",
+    "report_sha256": "5ed6f8d4c36d4f3064382950ed2e665b03bfd143a454c9a339383bc9340bed9b"
+  },
+  "source_syntax": "docs/validation/r210/ios-rights-swift-syntax.json",
+  "syntax_limit": "No introduced Swift grammar flags;6 baseline Result<Void>.success(()) flags retained. Not a Swift compiler or SDK verdict.",
+  "initial_failure_preserved": "ios-rights-inventory.xml rejected the stale review before occurrence-preserving ledger refresh;15 later cases pass. Checker unchanged.",
+  "reuse": {
+    "proof": "docs/validation/r210/ios-rights-unchanged-proof.json",
+    "app_sources_identical": 304,
+    "Bandit_findings_unchanged": 165,
+    "C2_boundaries_unchanged": 170,
+    "HTTP_sites_sources_unchanged": [
+      30,
+      21
+    ],
+    "prior_real_ONNX_cases_reused": 7,
+    "old_optional_skips_still_open": 7,
+    "full_CI_financial_Chromium_repeated": false
+  },
+  "current_runtime_inventory": {
+    "sources": 551,
+    "boundaries": 782,
+    "checker_unchanged": true
+  },
+  "rights": {
+    "shipped_approved_real_CoreML_models": 0,
+    "no_synthetic_permission_added_to_production": true,
+    "independent_checkpoint_rights_review_completed": false,
+    "real_neural_model_inference": false,
+    "offline_authority": "Current signed app bundle review plus protected installation receipt;not a server-supplied model fingerprint."
+  },
+  "progress": {
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ],
+    "promoted": [],
+    "requested_numeric_progress_achieved": false,
+    "release_candidate": false
+  },
+  "remaining_original_criteria": [
+    "A4",
+    "A5",
+    "A6",
+    "B2",
+    "B6",
+    "C3",
+    "C5",
+    "C6",
+    "D6",
+    "F4",
+    "F5",
+    "F6",
+    "G5",
+    "G6"
+  ],
+  "commit_deferred": true,
+  "real_server_provider_or_GitHub_mutation": false,
+  "secret_scan": {
+    "version": "gitleaks8.24.3",
+    "source_archive_sha256": "9991e0b2903da4c8f6122b5c3186448b927a5da4deef1fe45271c3793f4ee29c",
+    "scope": "Final introduced/replaced UTF8 lines versus exact input,including final complete manifest. Not unchanged historical rescan.",
+    "findings": 0,
+    "config_and_ignore_unchanged": true,
+    "report": "docs/validation/r210/ios-rights-gitleaks.json"
+  }
+}

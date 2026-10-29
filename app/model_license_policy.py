@@ -146,6 +146,8 @@ def selected(kind,plan):
     if kind=='singer-separation':return 'sam-audio'
     if kind=='backing-vocals':
         import os
+        if os.getenv('MTA_LEAD_BACKING_COMMAND','').strip():
+            raise LicenseDenied('Legacy lead/backing commands have no checkpoint rights contract; use a reviewed supported model integration')
         model=effective_backing_model(plan)
         return 'mta-analysis' if model=='ffmpeg-center-side' else ('mvsep-mega53' if model=='mvsep-mega53' else ('uvr-kara-2' if model=='uvr_mdxnet_kara_2' else 'audio-separator-weights'))
     if kind=='drumsep':
@@ -172,6 +174,9 @@ def authorize_remote_execution(kind, plan):
     must authorize the actual model against its current service regime.
     """
     from .service_regime import current_regime, Regime
+    import os
+    if os.getenv('MTA_PULL_MODEL_ATTESTATION','off')=='verified-pull-v1':
+        raise LicenseDenied('Reviewed remote inference requires the authenticated pull checkpoint protocol')
     decision = evaluate(kind, plan)
     if current_regime() == Regime.COMMERCIAL:
         # No provider/model attestation is exchanged with the remote worker yet.
@@ -183,6 +188,8 @@ def authorize_remote_execution(kind, plan):
 
 
 def evaluate(kind,plan):
+    from .model_selectors import validate_selection
+    validate_selection(kind,plan)
     primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[];inventories=[]
     if kind=='audio-to-midi-transkun':asset_ids.append(plan.get('options',{}).get('asset_id',''))
     if kind=='vocal-synthesis':
@@ -211,6 +218,17 @@ def evaluate(kind,plan):
     digest=hashlib.sha256(material.encode()).hexdigest()
     return Decision(primary.model_id,'free_only' if any(not d.billable for d in decisions) else 'cost_recovery',
                     primary.source,digest,any(d.operator_review for d in decisions))
+
+
+def evaluate_singing_components():
+    """Both installed component permissions are required by direct child CLIs.
+
+    An operator's acoustic policy never grants rights to a separate vocoder.
+    No request field or inherited admission envelope can substitute these IDs.
+    """
+    import os
+    return [evaluate_model(os.getenv('MTA_NEURAL_SINGER_POLICY_MODEL','unreviewed-neural-singer')),
+            evaluate_model(os.getenv('MTA_DIFFSINGER_VOCODER_POLICY_MODEL','diffsinger-vocoder'))]
 
 
 def evaluate_model(model_id):

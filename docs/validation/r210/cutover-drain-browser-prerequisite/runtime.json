@@ -1,0 +1,31 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "commit": "local-uncommitted",
+  "playwright": "1.58.0",
+  "source_sha256": {
+    "app/regime_service_lease.py": "1f5c8de729a144b2b6ef4d5e7c47e90e32599541ec3a2991c2bc774873fd71af",
+    "app/regime_local_readiness.py": "38aa7bdfe23a0978271439fe2fe596f22ec355d89b7447b1b4d584d306d351db",
+    "app/regime_admin_cutover.py": "ad64b10daad349002fa7ac2a7d8c08e166ac3db9c3d4c1754ddb18f230ede54a",
+    "app/regime_balance_continuity.py": "a9888d50e85c8076f473c6c2ba9e34f9bc4eb10db835d9ab822131cab3f62163",
+    "app/resource_routes.py": "de826bdc15ea5bfd7a518bb4ebaafa561e378726a910c02c58f1db44622eaa85",
+    "app/static/regime_cutover_panel.js": "5f24dd286432d7b3d4c697803899f2d6818af6d43139b2fb41e1a2f7f206d5fb",
+    "app/auth.py": "7197a25d08ec5924510a2a4fd02809b5f894b7f908ce73ac13be47b3277a537c",
+    "app/ai_arranger_runtime.py": "02e340a5bcca197863879463cc9c96204b3a3676c3d808d13b1baa78a874dda8",
+    "app/ai_billing_outbox.py": "03a01c828d5cdbfa2d983074beb0e76d1d3dff4634edde45cee19420b53e6ef6",
+    "app/ai_publish_outbox.py": "4bf5069c14559fefe768c00c829b2b30ed6ea932e68f8558113f7a85866d88bb",
+    "app/main.py": "d91109db80c08e43bc3195a3b186ea06cb723c3745074c5a7c084f29d292375d",
+    "app/account_lifecycle.py": "dc2a034d92b49c76f4953cfce42da64432edf54283d5b31ccc78456115a7c59c",
+    "app/regime_transition_journal.py": "b9c7be5c1bff75cb56f2d3d99a0fbfcdc786d16875ed16fe86f7dac14c35eebb",
+    "app/templates/admin.html": "225c0bf9268764d3a1e22c8a2ded0743688e12023975c71d865a944fc060ba91",
+    "tests/test_r210_admin_cutover_browser.py": "41396584b939cae2710adb0f45e35110eec447fd8dc45801db121bff1c901893",
+    "tests/test_r210_admin_cutover_e2e.py": "91b506ca6c9718b60c5b764e8492c687e8419891b2124d08606627296016139c",
+    "scripts/run_admin_cutover_chromium.py": "b537c366de883968913788d7d7fb287bec6c864d7fa26954d4a9e7a4c80a3085",
+    ".github/workflows/admin-cutover-chromium.yml": "4db3cda1103d0036c3b86c7d6dedc93963273b2a5edb5ce148bfb9379fd5b826",
+    "app/service_admission.py": "004fe5d0d4b7f163b8b7fd41a69165da9a2110bacb89848d5448d3d33d8559eb",
+    "app/service_drain_obligations.py": "eb020888886dbb62e060aea8e517d83f061800e69073422e0f3322eace8306ae",
+    "app/static/service_drain_panel.js": "65319252b89d46fb93e95a7e9720711150a2e2e071adff88ae953c46ec5a2802",
+    "tests/test_r210_cutover_service_drain.py": "44aee139f67e6b60075a039d2f2af8fb739e19471398d341f7a7bf38569c8ef1",
+    "tests/test_r210_cutover_service_drain_browser.py": "180f200d429cc93b776404c1b0ebdec9fe26feae8e23605d9498d6ce8178d2d9",
+    ".github/workflows/service-drain-cutover-chromium.yml": "ce6d17c5d726edff14249711d7408328d1586d9a52a4ba7f2f7936045fa63a8d"
+  }
+}

@@ -17,6 +17,13 @@ def main():
     parser.add_argument("--prompt", required=True)
     parser.add_argument("--anchors-json", default="")
     args = parser.parse_args()
+    # Also enforce policy when called without the unified parent/registry.
+    if __package__ in (None, ''):
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from app.model_license_policy import evaluate_model
+    evaluate_model('sam-audio')
+    from app.model_selectors import sam_model
+    args.model = sam_model(args.model)
     stage = "imports"
     try:
         import torch

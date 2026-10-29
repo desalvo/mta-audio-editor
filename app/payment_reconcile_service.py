@@ -112,7 +112,7 @@ def reconcile_stripe(order_id,*,client,expected_owner=None):
                 'refunds':len(refunds),'disputes':len(disputes),'transition_authorized':False}
 
 
-def reconcile_paypal(order_id,*,expected_owner=None):
+def reconcile_paypal(order_id,*,expected_owner=None,_merchant_context=None,_settlement_context=None):
     from . import paypal_payments as paypal
     with auth.db() as c:
         paypal.init(c)
@@ -120,26 +120,35 @@ def reconcile_paypal(order_id,*,expected_owner=None):
         if row is None or (expected_owner is not None and (type(expected_owner) is not int or row['user_id']!=expected_owner)):
             raise ValueError('Payment unavailable')
         order=dict(row)
+        if _settlement_context is not None:_settlement_context.verify(c,order,cfg)
+        if _merchant_context is not None:
+            from .paypal_merchant_reconcile import check_context
+            check_context(c,_merchant_context,order,cfg)
     if order['environment']!=cfg['environment'] or order['client_fingerprint']!=hashlib.sha256(cfg['client_id'].encode()).hexdigest():
         raise FenceBlocked('PayPal merchant configuration changed')
     pid=_reference(order['provider_order'])
     canonical=paypal._api(cfg,'GET','/v2/checkout/orders/'+pid)
-    if canonical.get('status')!='COMPLETED':return _paypal_unpaid(order,cfg,canonical)
+    if _settlement_context is not None:
+        with auth.db() as c:_settlement_context.verify(c,order,cfg,canonical)
+    if canonical.get('status')!='COMPLETED':
+        if _merchant_context is not None:raise FenceBlocked('Merchant discovery requires a completed original payment')
+        return _paypal_unpaid(order,cfg,canonical)
     from .paypal_reconciliation import discover
     from .paypal_dispute_history import discover as disputes,record_gap
     try:
         history=discover(canonical,cfg)
-        risk_history=disputes(canonical,cfg)
+        risk_history=disputes(canonical,cfg,settlement_context=_settlement_context)
     except (ValueError,KeyError,TypeError,AttributeError) as exc:
         record_gap(order,cfg,getattr(exc,'observed',()))
         raise ValueError('PayPal dispute history is incomplete; refresh or contact the administrator') from None
-    try:result=paypal.fulfill(order_id,canonical,_reconciliation=(order,cfg,history),_disputes=risk_history)
+    try:result=paypal.fulfill(order_id,canonical,_reconciliation=(order,cfg,history),_disputes=risk_history,_merchant_context=_merchant_context,_settlement_context=_settlement_context)
     except (FenceBlocked,ValueError):
         record_gap(order,cfg,{x['hold_id'].split(':')[1] for x in risk_history})
         raise
     with auth.db() as c:
         pending=bool(c.execute("SELECT 1 FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='pending' LIMIT 1",(order_id,)).fetchone())
-    return {**result,'provider':'paypal','ledger_reconciled':result.get('status')=='paid','refunds':len(history),'disputes':len({x['hold_id'].split(':')[1] for x in risk_history}),'financial_review_pending':pending,'history_scope':'known_order_captures_and_disputes','transition_authorized':False}
+    return {**result,'provider':'paypal','ledger_reconciled':result.get('status')=='paid','refunds':len(history),'disputes':len({x['hold_id'].split(':')[1] for x in risk_history}),'financial_review_pending':pending,'history_scope':'known_order_captures_and_disputes','transition_authorized':False,
+            **({'settlement_report_resolutions':sum(bool(x.get('settlement_report_proof')) for x in risk_history)} if _settlement_context is not None else {})}
 
 
 def _stripe_unpaid(order,key,session,*,client,journal):

@@ -315,6 +315,18 @@ def change(*, actor, expected_generation, draining, identifier, confirm):
             raise FenceBlocked('Service drain generation conflict')
         if not draining and state['drain_id'] != identifier:
             raise FenceBlocked('Original drain identity required')
+        if not draining:
+            from . import auth
+            # The journal write lock excludes any integrated cutover. Never
+            # reopen timers/HTTP after a committed crash or live reservation.
+            with control(), auth.db() as ledger:
+                if ledger.execute("SELECT 1 FROM sqlite_master WHERE name='regime_fence_state'").fetchone():
+                    held = ledger.execute('SELECT transitioning FROM regime_fence_state WHERE singleton=1').fetchone()
+                    if held is None or held[0] != 0:
+                        raise FenceBlocked('Complete or abort the original regime transition before resuming service')
+                if ledger.execute("SELECT 1 FROM sqlite_master WHERE name='regime_admin_cutovers'").fetchone() and ledger.execute(
+                        "SELECT 1 FROM regime_admin_cutovers WHERE phase!='finalized' LIMIT 1").fetchone():
+                    raise FenceBlocked('Complete the original cutover recovery before resuming service')
         generation = expected_generation+1
         con.execute('UPDATE state SET generation=?,phase=?,drain_id=? WHERE singleton=1',
             (generation,'draining' if draining else 'open',identifier if draining else None))
@@ -347,6 +359,42 @@ def inspect(*, actor):
                 'active_by_source':counts,'active_count':sum(counts.values()),
                 'pending':pending,'drained':state['phase']=='draining' and state['pinned_build']==build() and not counts and pending['verified'] and not pending['count'],
                 'audit':history,'transition_authorized':False,'release_candidate':False}
+
+
+@contextmanager
+def cutover_guard(*, actor, recovering=None):
+    """Hold the original drain snapshot through commit, mirror and finalization.
+
+    The admission journal is locked before the service lease, as in inspect().
+    A read-only drained response is never a permit to change regime later.
+    Legacy installations without this protocol retain their restricted local
+    cutover; an existing durable journal cannot be disabled by changing env.
+    """
+    from .regime_service_lease import lease
+    if not active():
+        with lease(exclusive=True):
+            yield None
+        return
+    _actor(actor)
+    from .service_drain_obligations import audit
+    with control(), closing(_connect()) as con:
+        con.execute('BEGIN IMMEDIATE')
+        if con.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
+            raise FenceBlocked('Original service admission integrity unavailable')
+        state = con.execute('SELECT * FROM state WHERE singleton=1').fetchone()
+        event = con.execute('SELECT drain_id,action,generation FROM events ORDER BY seq DESC LIMIT 1').fetchone()
+        if (state['phase'] != 'draining' or not state['drain_id'] or
+                state['build'] != build() or event is None or
+                event['drain_id'] != state['drain_id'] or event['generation'] != state['generation'] or
+                event['action'] not in ('begin', 'upgrade') or
+                con.execute("SELECT 1 FROM admissions WHERE state='open' LIMIT 1").fetchone()):
+            raise FenceBlocked('Original service admission must be fully drained before cutover')
+        with lease(exclusive=True):
+            pending = audit(recovering_cutover=recovering)
+            if not pending['verified'] or pending['count']:
+                raise FenceBlocked('Unfinished original service work prevents cutover')
+            yield {'drain_id': state['drain_id'], 'generation': state['generation'],
+                   'build': state['build'], 'instance': state['instance']}
 
 
 def upgrade(*,actor,expected_generation,expected_build,confirm):
@@ -390,6 +438,24 @@ def continuation(scope):
     if method=='DELETE' and re.fullmatch(r'/api/projects/[A-Za-z0-9_-]+/(audio-capture|vst3-live)/[a-f0-9]{32}',path_): return True
     if method=='POST' and re.fullmatch(r'/api/projects/[A-Za-z0-9_-]+/audio-capture/[a-f0-9]{32}/finish',path_): return True
     base = '/api/admin/service-regime/cutovers'
+    # Exact authenticated read-only financial/recovery diagnostics. No broad
+    # admin-prefix exemption and no new checkout/refund/period creation.
+    diagnostics = {
+        '/api/admin/service-regime', '/api/admin/service-regime/transition-audit',
+        '/api/admin/service-regime/reconciliation-report', '/api/admin/service-regime/combined-readiness',
+        '/api/admin/service-regime/worker-processes', '/api/admin/service-regime/worker-losses',
+        '/api/admin/service-regime/payment-outbox-review', '/api/admin/service-regime/transition-reservations',
+        '/api/admin/service-regime/transition-plan', '/api/admin/service-regime/operation-fence',
+        '/api/admin/service-regime/payment-ledger', '/api/admin/service-regime/subscription-evidence',
+        '/api/admin/payment-refunds', '/api/admin/paypal/merchant-history',
+    }
+    if method == 'GET' and path_ in diagnostics: return True
+    if method == 'POST' and path_ in {'/api/admin/service-regime/reconcile-payment',
+                                      '/api/admin/service-regime/recover-checkout-reference'}: return True
+    if method == 'GET' and re.fullmatch(r'/api/admin/paypal/merchant-history/[a-f0-9]{64}(/review)?',path_): return True
+    if method == 'POST' and re.fullmatch(r'/api/admin/paypal/merchant-history/[a-f0-9]{64}/reconcile',path_): return True
+    if method == 'POST' and re.fullmatch(r'/api/admin/service-regime/worker-processes/[a-f0-9]{32}/quiesce', path_): return True
+    if method == 'POST' and re.fullmatch(r'/api/admin/service-regime/worker-losses/[a-f0-9]{32}/(resolve|recover-frozen)', path_): return True
     if method=='GET' and (path_==base or re.fullmatch(base+r'/(preview|lifecycle|[A-Za-z0-9_-]{1,120})',path_)): return True
     if method=='POST' and (path_==base or re.fullmatch(base+r'/[A-Za-z0-9_-]{1,120}/recover',path_)
             or re.fullmatch(base+r'/reservations/[A-Za-z0-9_-]{1,120}/abort',path_)): return True

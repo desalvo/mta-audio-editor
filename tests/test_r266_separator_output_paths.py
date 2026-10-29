@@ -12,7 +12,7 @@ def test_audio_separator_relative_output_filenames(monkeypatch, tmp_path,local_n
     output = tmp_path / "job" / "stems"
     output.mkdir(parents=True)
     monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)
-    monkeypatch.setattr(main, "_lead_backing_model_info", lambda name: {"installed": True, "filename": "fixture.ckpt"})
+    monkeypatch.setattr(main, "_lead_backing_model_info", lambda name: {"installed": True, "filename": "mel_band_roformer_karaoke_aufr33_viperx_sdr_10.1956.ckpt"})
     torch = types.ModuleType("torch")
     torch.empty = lambda *args: None
     ops = types.ModuleType("torchvision.ops")

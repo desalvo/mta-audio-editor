@@ -13,8 +13,8 @@ MODEL_SHA='2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec'
 
 
 def root():
-    from .auth import data_root
-    path=data_root()/'.studio-models'
+    from .runtime_paths import policy_paths
+    path=policy_paths()[0]/'.studio-models'
     if path.is_symlink():raise ValueError('Unsafe studio model directory')
     path.mkdir(parents=True,exist_ok=True,mode=0o700)
     return path

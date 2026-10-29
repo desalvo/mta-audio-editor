@@ -1,0 +1,1743 @@
+{
+  "date": "2026-10-28",
+  "baseline_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "criterion": "B5",
+  "original_criterion": "Prove ownership/metering for every legacy/local/native executor entry",
+  "criterion_promoted": true,
+  "criteria_wording_or_weights_changed": false,
+  "latest_affected_distinct": {
+    "passed": 271,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "new_cases": 59,
+  "builtin_worker_kinds": 18,
+  "operator_extension_actual_process": true,
+  "actual_process_API_CPU_in_new_positive_matrix": true,
+  "actual_models_or_hardware_in_new_matrix": false,
+  "first_prior_version_reproduction": {
+    "report": "execution-entry-repro.xml",
+    "failed_expected": 3
+  },
+  "intermediate_report_limit": "Early runs and incomplete80-second invocation are retained as historical attempts,not summed or accepted as final proof. Final XML and per-stage JSONL cover249 unique latest passing identities.",
+  "reports": [
+    "execution-entry-final.xml",
+    "execution-entry-cancel-response-repro.xml",
+    "execution-entry-metering.xml",
+    "execution-entry-repro.xml",
+    "execution-entry-core.xml",
+    "execution-entry-acceptance-first.xml",
+    "execution-entry-integration-first.xml",
+    "execution-entry-cancel-response.xml",
+    "execution-entry-acceptance.xml"
+  ],
+  "cases": [
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_internal_registered_entry_requires_actual_scheduler_owner",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_revoked_token_cannot_dispatch_from_an_original_running_queue",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_cancelled_child_preserves_reaped_cpu_and_no_artifact",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[ace-step]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[arranger]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-basic-pitch]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-mr-mt3]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-transkun]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-yourmt3]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[backing-vocals]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[chords-ml]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[demucs]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[drumsep]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[markers]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[remix]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[sam-audio]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[singer-separation]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-harmony]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-synthesis]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[whisper]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[revoke]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[foreign]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[inactive]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[source_score]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[source_audio]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[input_path]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[output_path]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[command]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[executable]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[cwd]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[shell]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_malformed_wav_never_creates_a_ledger_or_claim",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_unverifiable_process_tree_keeps_original_claim_without_publication",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_token_revocation_stops_actual_process_and_retains_measured_cpu",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-json]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-wav]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-json]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-wav]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_operator_extension_cannot_bypass_the_same_owner_metering_contract",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_token_and_nested_web_jobs_share_one_fifo_slot",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_queued_cancel_does_not_dispatch",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_orphan_remote_admission_does_not_block_fifo",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_operator_registry_supports_future_engine_and_rejects_bad_config",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_markers_and_chord_options_are_available_in_unified_protocol",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_native_future_engine_uses_shared_token_and_keeps_it_private",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_production_server_requires_authenticated_queue_identity",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_authenticated_token_worker_uses_global_queue_and_owner_receipt",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_server_raw_wav_preserves_publication_metadata",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_server_runtime_configuration_is_private_and_preserves_settings",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_global_ai_execution",
+      "name": "test_server_whisper_cannot_bill_an_unprofiled_cli",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[queued]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[blocked]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[completed]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[failed]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[cancelled]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[interrupted]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_missing_queue_context_does_not_become_a_new_permit",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_nested_cross_owner_rejected_but_same_owner_keeps_one_slot",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[local]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[pull]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_pid]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_identity]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_identity]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_actor]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[persisted]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[event]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[callback]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_server_source_conversion_rejects_inactive_context",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[0]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[-1]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[True]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[None]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[1]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_pre_cancelled_process_does_not_execute_actual_child",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_cancellation_probe_failure_does_not_spawn_child",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_native_fallback_pre_cancel_never_spawns",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_server_conversion_cancellation_reaps_child_and_never_enters_model",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[cancelled]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[license_denied]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[engine_override]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[failed]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[oversized]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[empty]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_source_preparation_uses_one_remaining_budget_and_preserves_bound_identity",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_independent_process_cannot_reuse_live_parent_scheduler_identity",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_inner_dispatch_rechecks_owner_after_outer_admission[local]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_active_execution_owner",
+      "name": "test_inner_dispatch_rechecks_owner_after_outer_admission[pull]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r207_process_metering",
+      "name": "test_metered_child_cpu_and_io",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r207_process_metering",
+      "name": "test_metering_timeout",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r207_process_metering",
+      "name": "test_invalid_invocation",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r207_process_metering",
+      "name": "test_registered_worker_error_is_tracked",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r207_process_metering",
+      "name": "test_no_host_cpu_is_charged",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r207_process_metering",
+      "name": "test_no_double_counting_of_output_payload",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[whisper]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[chords-ml]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[markers]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[demucs]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[sam-audio]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[backing-vocals]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[singer-separation]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_historical_all_adapters_in_queue_and_admin[future-adapter]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_unverified_gpu_never_promoted[worker-None]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_unverified_gpu_never_promoted[cgroup-None]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_unverified_gpu_never_promoted[unmetered-None]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_unverified_gpu_never_promoted[gpu-kernel-verified-None]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_unverified_gpu_never_promoted[gpu-kernel-verified-8]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_zero_distinct_from_missing_and_owner_isolation",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_multiple_components_and_running_diagnostics",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_ace_verified_values_preserved",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_live_cpu_rejects_bad_values[nan]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_live_cpu_rejects_bad_values[inf]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_live_cpu_rejects_bad_values[-1]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_live_cpu_rejects_bad_values[True]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_live_cpu_rejects_bad_values[2]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_live_cpu_preserves_progress_and_ace_backend",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_real_worker_live_and_final_cpu",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_process_cpu_uses_only_utime_and_stime",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_worker_checkpoint_keeps_cpu_and_gpu_together",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_queue_ui_labels_missing_zero_and_diagnostic",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_universal_queue_usage",
+      "name": "test_live_sidecar_does_not_replace_multistage_sum",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_real_harmony_queue_auto_publication_and_reopen",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_results_can_be_reviewed_and_imported_idempotently",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_studio_validates_source_range_and_harmony_settings",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_score_transport_denies_client_paths_before_running",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_commit_gate_rejects_ambiguous_late_cancellation",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_manual_import_updates_publication_receipt",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_zero_credit_admission_is_actionable",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_retention_only_removes_terminal_private_results",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_source_region_uses_clip_offset_delay_and_gain",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_harmony_structured_score_real_server_ledger",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_project_changed_during_worker_keeps_reviewable_result",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_private_diagnostics_zip_and_missing_jobs",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_studio_workflows",
+      "name": "test_admin_policy_is_validated_and_uninstall_protects_active_jobs",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_registration_commits_original_binding_without_exposing_token",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_live_or_unknown_supervisor_never_stopped[]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_live_or_unknown_supervisor_never_stopped[same]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_recovery_preserves_actual_contract_reservations_and_money",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_recursive_kernel_stop_persists_only_after_empty",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_failed_kernel_stop_keeps_financial_claim_and_no_false_receipt",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_uncertain_scope_blocks_every_financial_finalization[finish]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_uncertain_scope_blocks_every_financial_finalization[idempotent]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_uncertain_scope_blocks_every_financial_finalization[fence]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_original_owner_clean_exit_then_normal_billing_works",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_bootstrap_enters_before_exec_under_original_scope",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[dead]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[unknown]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[quiesced]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_recovery_receipt_blocks_delayed_spawn_even_if_supervisor_is_reused",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_bootstrap_join_and_recovery_cannot_cross_the_write_barrier",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_pagination_and_invalid_windows_are_explicit",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_original_supervisor_ownership_cannot_be_reused_by_new_process",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_missing_history_refuses_new_launch_before_any_effect",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_missing_proof_blocks_second_scope_even_if_one_is_quiescent",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_reused_supervisor_pid_proves_old_process_death_without_signaling_new_one",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_crash_before_audit_commit_retries_without_changing_money",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_real_supervisor_crash_after_durable_registration_before_spawn",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_changed_host_boot_namespace_cannot_reinterpret_scope[boot]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_changed_host_boot_namespace_cannot_reinterpret_scope[machine]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_changed_host_boot_namespace_cannot_reinterpret_scope[namespace]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_recreated_cgroup_inode_is_not_the_original_worker_scope",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_group_symlink_refused_without_signaling",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_non_kernel_directory_is_refused_even_with_similar_files",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_recovery_request_is_durable_idempotent_under_concurrency",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_lost_journal_schema_is_not_recreated[worker_cgroup_scopes]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_lost_journal_schema_is_not_recreated[worker_cgroup_receipts]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_tampered_binding_fails_closed[binding_json]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_tampered_binding_fails_closed[sha256]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_missing_counted_scope_does_not_look_quiescent",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_immutable_rows_and_scoped_retired_owner_erasure",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_foreign_owner_cannot_erase_worker_evidence",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_actual_admin_api_requires_auth_csrf_confirmation_and_hides_claim_token",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_registered_runner_commits_scope_before_spawn_and_cleanup_before_measurement[True]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_registered_runner_commits_scope_before_spawn_and_cleanup_before_measurement[False]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_durable_cgroup_recovery",
+      "name": "test_metering_failure_with_unknown_cleanup_keeps_gpu_lease_and_claim",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[-external]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[-project]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[-routing]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[-arranger]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[false-external]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[false-project]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[false-routing]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[false-arranger]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[1-external]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[1-project]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[1-routing]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_server_cannot_use_native_credentials_or_legacy_worker[1-arranger]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_native_legacy_policy_denial_precedes_worker_and_source[external]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_native_legacy_policy_denial_precedes_worker_and_source[project]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-release_task]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/init]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/generate]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/audio]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/models]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-query_result]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[GET-v1/audio]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[json]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[wav]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[timeout]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[cancel]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_native_project_worker_receives_original_policy_and_actual_cpu",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_legacy_executor_closure",
+      "name": "test_native_studio_no_wait4_fallback_stops_its_own_session",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_legacy_stem_admission_persists_authenticated_actor_and_real_cpu",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_old_queue_owner_recovered_only_from_unique_explicit_ledger_link",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_queue_name_is_not_guessed_from_project_owner_or_ambiguous_ledger",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_queue_ui_has_visible_user_column_and_escapes_names",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_model_download_also_persists_actor",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[whisper]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[chords-ml]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[demucs]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[drumsep]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[sam-audio]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[singer-separation]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[backing-vocals]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_cancellation_during_artifact_packaging_cannot_bill_success",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_loader_uses_verified_stream_after_path_replacement",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_config_is_private_exact_copy_removed_after_parse",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[checkpoint]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[config]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[missing]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[kind]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[digest]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[review-type]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[duplicate]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[schema]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_actual_child_entry_rejects_before_reading_score_or_loading_models",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_registered_parent_overwrites_inherited_policy_and_real_child_verifies",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_pull_parent_propagates_original_assignment_to_actual_child",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_native_parent_actual_studio_adapter_preserves_output_and_no_server_invoice",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_policy_binding",
+      "name": "test_registered_child_cannot_adopt_different_current_policy",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_service_admission_acceptance",
+      "name": "test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[arranger]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_service_admission_acceptance",
+      "name": "test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[remix]",
+      "outcome": "passed",
+      "report": "execution-entry-final.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_revocation_returns_private_api_cancellation_instead_of_server_error[json]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_revocation_returns_private_api_cancellation_instead_of_server_error[wav]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_cancel_between_ledger_admission_and_popen_has_typed_private_response[json]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_cancel_between_ledger_admission_and_popen_has_typed_private_response[wav]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_cancel_invalid_key_rejected",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_cancel_no_database_record",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_cancel_requires_authentication",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_cancel_response_does_not_claim_worker_stopped",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_client_cancel_rejects_invalid_request_id[x]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_client_cancel_rejects_invalid_request_id[../unauthorized]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_client_cancel_rejects_invalid_request_id[]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_client_cancel_rejects_invalid_request_id[abc?defabc?defabc?defabc?def]",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_barrier",
+      "name": "test_client_cancel_never_calls_network_with_invalid_token",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_predispatch_cancellation",
+      "name": "test_cancel_after_admission_prevents_dispatch",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_predispatch_cancellation",
+      "name": "test_ordinary_admitted_job_still_dispatches",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_post_failure_propagation",
+      "name": "test_network_failure_after_cancellation_sends_durable_barrier",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_post_failure_propagation",
+      "name": "test_cancelled_result_attempts_barrier_before_exposing_data",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cancel_post_failure_propagation",
+      "name": "test_failed_barrier_never_claims_remote_stop",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cooperative_cancellation",
+      "name": "test_cancelled_inference_never_contacts_server",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cooperative_cancellation",
+      "name": "test_cancelled_recovery_never_contacts_server",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cooperative_cancellation",
+      "name": "test_cancelled_result_cannot_call_metering_sink",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    },
+    {
+      "class": "tests.test_r208_remote_cooperative_cancellation",
+      "name": "test_cancel_after_result_bytes_prevents_sink",
+      "outcome": "passed",
+      "report": "execution-entry-cancel-response.xml"
+    }
+  ],
+  "source_sha256": {
+    "app/ai_metering_agent.py": "sha256:1c2316e13fe70f54ba0ca06ab727e84c3959f433e418c06116aac2377ed02a61",
+    "app/ai_billing_routes.py": "sha256:c8c5e5e6b70b85c9d3db7365c3576b2d2dc465466ba8c8810510db34b86d3b42",
+    "app/ai_server_execution.py": "sha256:b108e0318c2e23b7e6ae336c3f9a9ba3442b4a98044aee6e5522589d4d4c531c",
+    "scripts/check_ai_execution_inventory.py": "sha256:3e92827094b9581acec3fd604816b783af1a67803befd087400bb54985b94bfb",
+    "tests/test_r210_execution_entry_acceptance.py": "sha256:23191b3ee9615edd895960d8403c9179a96a27e8e94745f5d113448d6a4b29fa",
+    "tests/test_r210_execution_entry_inventory.py": "sha256:d5491f297a96e65153f662ed693d0b8ba0bb2fde6d57a8d45d456767ccfb0128",
+    "tests/test_r210_global_ai_execution.py": "sha256:c636216b7603d8355ec8025e2d6eed7c19fa7b8fe7fa4494a54af1471c06b681",
+    "tests/test_r210_durable_cgroup_recovery.py": "sha256:4631ebd0e5824b015fc15bce8b2f03970559b6962148b15905878ad9fcf1f59b"
+  },
+  "inventory": {
+    "runtime_sources": 539,
+    "reviewed_points": 779,
+    "http_handlers": 528,
+    "process_boundaries": 174,
+    "inference_calls": 72,
+    "native_inference_points": 5,
+    "families": 10,
+    "not_universal_reachability_or_kernel_proof": true
+  },
+  "security": {
+    "reviewed_findings": 164,
+    "source_files": 299,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 143
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "transport": {
+    "sites": 30,
+    "files": 21,
+    "passed": true
+  },
+  "C2_source_inventory": {
+    "sites": 170,
+    "files": 299,
+    "passed": true
+  },
+  "ruff": "passed",
+  "compilation": "passed",
+  "gitleaks_delta": {
+    "version": "8.24.3",
+    "status": "passed",
+    "findings": 0,
+    "scope": "All introduced or replaced UTF8 lines relative to the complete full-CI-confirmed cumulative;unchanged scanner config and allowlists. Final packaged text delta is verified again after proof/manifest updates."
+  },
+  "full_CI_repeated": false,
+  "new_GitHub_CI_green_claim": false,
+  "unchanged_baseline_full_CI": 40584085026,
+  "unchanged_browser_repeated": false,
+  "remote_or_Git_mutations": 0,
+  "progress": {
+    "before": 25,
+    "accepted": 26,
+    "total": 42,
+    "percent": 61.9,
+    "macroareas_accepted": 0,
+    "macroareas_total": 7
+  },
+  "candidate": false,
+  "financial_cutover_authorized": false,
+  "next_commit_message": "Close AI execution entry coverage and preserve cancellation metering",
+  "complete_proof_runs": [
+    {
+      "report": "execution-entry-final.xml",
+      "passed": 249,
+      "seconds": 81.17
+    },
+    {
+      "report": "execution-entry-cancel-response.xml",
+      "passed": 28,
+      "seconds": 12.22
+    }
+  ],
+  "overlap_counted_once": 6,
+  "latest_response_refinement": "4 new JSON/WAV running-revocation and prelaunch-cancellation cases reproduced the unhandled/non-private response,then pass with private409 and persistent cancelled request tombstones;28 affected API/remote cancellation cases pass on the final response refinement. Other prior249 cases are reused for unchanged paths."
+}

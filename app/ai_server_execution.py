@@ -15,7 +15,10 @@ def enabled(native=False):
 
 def identity():
     from .ai_global_execution import active_owner
-    return active_owner()
+    from .ai_metering_agent import require_dispatch_identity
+    user_id = active_owner()
+    require_dispatch_identity(user_id)
+    return user_id
 
 
 def infer(kind,source,options=None,*,cancel_check=None,raw=False):

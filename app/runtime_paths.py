@@ -20,6 +20,20 @@ def application_data_root():
     return Path('/data/projects').resolve()
 
 
+def policy_paths():
+    """Authority paths without importing the web stack in model-only children.
+
+    A running application retains its original injected auth paths. Standalone
+    adapters use the same configured data root and read-only fence database.
+    This resolves paths only; it grants no permission and never initializes DBs.
+    """
+    auth=sys.modules.get('app.auth')
+    if auth is not None:
+        return auth.data_root(),auth.db_path()
+    root=application_data_root()
+    return root,root/'auth.sqlite3'
+
+
 def optional_vst3_root(data_root=None):
     """Managed plugin directory; stdlib only, also used by standalone SDK tools."""
     default=Path(data_root if data_root is not None else application_data_root()).parent/'mta-optional-vst3'

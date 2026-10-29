@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="14" failures="0" skipped="0" tests="14" time="5.012" timestamp="2026-10-28T02:32:44.167136+01:00" hostname="22ab8ade88aa"><testcase classname="tests.test_r210_cutover_service_drain" name="test_actual_two_way_cutover_keeps_original_drain_until_explicit_resume" time="1.157"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_actual_two_way_cutover_ke0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa145ccad20&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa143edba70&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_two_way_cutover_ke0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_two_way_cutover_ke0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_actual_two_way_cutover_ke0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_open_service_cannot_preview_or_execute_old_confirmation" time="0.201"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_open_service_cannot_previ0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa1265bf5f0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa143edbdd0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_open_service_cannot_previ0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_open_service_cannot_previ0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_open_service_cannot_previ0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_resume_and_new_drain_invalidate_unchanged_financial_preview" time="0.206"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_resume_and_new_drain_inva0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126332ba0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa1263335c0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_resume_and_new_drain_inva0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_resume_and_new_drain_inva0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_resume_and_new_drain_inva0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_original_predrain_ticket_blocks_cutover_even_without_financial_work" time="0.211"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_original_predrain_ticket_0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126333da0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa126333650&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_original_predrain_ticket_0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_original_predrain_ticket_0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_original_predrain_ticket_0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_committed_crash_cannot_resume_and_only_original_forward_recovery_clears_it" time="0.193"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_committed_crash_cannot_re0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126367080&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa126366a80&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_committed_crash_cannot_re0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_committed_crash_cannot_re0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_committed_crash_cannot_re0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-journal]" time="0.201"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa145d8fb60&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa1263336e0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-instance]" time="0.231"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori1/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126c2b020&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa126332f00&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori1')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori1/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori1/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_damaged_or_unfinished_original_admission_never_authorizes_cutover[build]" time="0.209"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori2/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126365220&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa12634daf0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori2')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori2/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori2/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_damaged_or_unfinished_original_admission_never_authorizes_cutover[event]" time="0.209"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori3/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126365a90&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa1263676e0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori3')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori3/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori3/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_damaged_or_unfinished_original_admission_never_authorizes_cutover[active]" time="0.266"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori4/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126588da0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa126367680&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori4')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori4/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori4/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_damaged_or_unfinished_original_admission_never_authorizes_cutover[schema]" time="0.227"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori5/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126367cb0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa1263672f0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori5')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori5/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_damaged_or_unfinished_ori5/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_removed_configuration_cannot_bypass_persisted_drain" time="0.206"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_removed_configuration_can0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126366540&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa126367380&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_removed_configuration_can0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_removed_configuration_can0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_removed_configuration_can0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_financial_history_is_still_blocked_after_successful_service_drain" time="0.222"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_financial_history_is_stil0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa1263f4860&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa126365b80&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_financial_history_is_stil0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_financial_history_is_stil0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_financial_history_is_stil0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase><testcase classname="tests.test_r210_cutover_service_drain" name="test_resume_waits_until_financial_commit_mirror_and_finalization_release_original_guard" time="0.228"><error message="failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_resume_waits_until_financ0/projects'&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7fa126716cf0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa143edbf50&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_resume_waits_until_financ0')
+
+    @pytest.fixture
+    def drained(ready, monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION', gate.MODE)
+        monkeypatch.setattr(storage, 'ROOT', tmp_path / 'projects')
+&gt;       storage.ROOT.mkdir()
+
+tests/test_r210_cutover_service_drain.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-0/test_resume_waits_until_financ0/projects')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+&gt;           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/pytest-of-root/pytest-0/test_resume_waits_until_financ0/projects'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:1311: FileExistsError</error></testcase></testsuite></testsuites>

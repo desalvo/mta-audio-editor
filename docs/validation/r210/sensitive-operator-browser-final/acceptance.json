@@ -1,0 +1,9 @@
+{
+  "accepted": true,
+  "passed": 59,
+  "failed": 0,
+  "skipped": 0,
+  "scope": "actual_complete_sensitive_operator_workflow",
+  "release_candidate": false,
+  "transition_authorized": false
+}

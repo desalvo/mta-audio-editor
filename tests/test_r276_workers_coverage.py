@@ -32,6 +32,8 @@ def test_drumsep_small_real_stft_and_inverse(monkeypatch):
 
 
 def test_drumsep_worker_end_to_end_small_onnx(monkeypatch, tmp_path):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
     _small_window(monkeypatch)
     calls = []
     class Named:
@@ -61,6 +63,8 @@ def test_drumsep_worker_end_to_end_small_onnx(monkeypatch, tmp_path):
 
 
 def test_drumsep_worker_resample_and_validation(monkeypatch, tmp_path):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
     _small_window(monkeypatch)
     class Named:
         def __init__(self, name): self.name = name

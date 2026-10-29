@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.627" timestamp="2026-10-28T14:19:26.217090+01:00" hostname="c07aad750e6c"><testcase classname="tests.test_r210_merchant_ledger_bridge" name="test_actual_merchant_recovery_remains_available_under_service_drain" time="0.984"><failure message="app.regime_operation_fence.FenceBlocked: Service admission is draining">tests/test_r210_merchant_ledger_bridge.py:264: in test_actual_merchant_recovery_remains_available_under_service_drain
+    assert resources.state(account)['credits_micro'] == 1_000_000
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+app/resource_accounts.py:167: in state
+    with auth.db() as c:
+         ^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+app/auth.py:65: in db
+    con = connect(db_path())
+          ^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:166: in connect
+    return sqlite3.connect(*args, factory=_Connection, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:112: in __init__
+    self._admission.__enter__()
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+app/service_admission.py:209: in operation
+    ticket = reserve(source)
+             ^^^^^^^^^^^^^^^
+app/service_admission.py:174: in reserve
+    raise FenceBlocked('Service admission is draining')
+E   app.regime_operation_fence.FenceBlocked: Service admission is draining</failure></testcase></testsuite></testsuites>

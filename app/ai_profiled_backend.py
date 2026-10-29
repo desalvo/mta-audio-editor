@@ -16,7 +16,12 @@ def main():
     parser.add_argument('--report-dir', type=Path, required=True)
     parser.add_argument('arguments', nargs=argparse.REMAINDER)
     args = parser.parse_args()
+    from app.model_license_policy import evaluate_model
+    evaluate_model(args.backend)
     arguments = args.arguments[1:] if args.arguments[:1] == ['--'] else args.arguments
+    if args.backend=='demucs':
+        from app.model_selectors import demucs_arguments
+        demucs_arguments(arguments)
 
     def call():
         previous = sys.argv

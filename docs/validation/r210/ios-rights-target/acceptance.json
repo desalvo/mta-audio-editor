@@ -1,0 +1,30 @@
+{
+  "schema": "mta-ios-rights-acceptance-1",
+  "accepted": false,
+  "status": "blocked",
+  "source_sha256": {
+    ".github/workflows/ci-cd.yml": "a13af6fd47fd7f255290272a290c4da12975dcc5964be6fae2058b412c2ead7b",
+    ".github/workflows/ios-model-rights.yml": "df321e252535fce30c989084f90dfe2ff7e854cdb16a711adaddea27b380b0f6",
+    "mobile/ios/MTAEditorMobile/AppDelegate.swift": "a56c5a2874b0bbb81d4842166349cda6f26bf314ea5938a21c237ead7695a800",
+    "mobile/ios/MTAEditorMobile/LocalModelRights.swift": "86c2deb1c58370afd03e46f189cc9ee2cd4d958c0a58e10ad67ae317b0fb7ba0",
+    "mobile/ios/MTAEditorMobile/LocalStemEngine.swift": "6ce2e71f3bfa770ef7aea25d57e4e71f5311fac83781fc8a8b7ac3ca5d999a7b",
+    "mobile/ios/MTAEditorMobile/MobileWebViewController.swift": "591d015a51ed78a0a328f1e619e1270924b05f3d8e63c320fc7f082e32c0c49f",
+    "mobile/ios/MTAEditorMobile/Models/README.txt": "3987bd9c02be9c37a22aa23e741cb168e1b558de420fe25950699cba70ad7d5c",
+    "mobile/ios/MTAEditorMobile/Models/model-rights.json": "6d2a9a7d0b29be389342ad98eac2f6d69b46fd0fd4e1ee2046ed22598aed7455",
+    "mobile/ios/MTAEditorMobile/NativeUpdateManager.swift": "7f2d3ccea62b05758e551ce7f95e8892f2b36ef442b59502b84ccaa150c210de",
+    "mobile/ios/MTAEditorMobile.xcodeproj/project.pbxproj": "57eaee7eaae2e463c8d01c930e550a76339f8f165e536ce2b851d6876fb98dc1",
+    "scripts/check_ios_model_rights.py": "db6551886cc8cd8a00a4c871b3f15c4e7467dd96076e34934b0cb5ce4f8aec79",
+    "scripts/run_ios_model_rights_acceptance.py": "a48e75d7809013e0845f73b0f22abf8aed970f70b45acc19b617f485dcb6d33e",
+    "tests/ios/LocalModelRightsAcceptance.swift": "07dfb34147badc6034b6ca270e29b084e37dc63dddec582d40e4e229651057bd"
+  },
+  "passed": 0,
+  "skipped": 0,
+  "native_sdk_tests_executed": false,
+  "ios_app_compiled": false,
+  "real_neural_model_inference": false,
+  "installed_OS_acceptance": false,
+  "full_F4_accepted": false,
+  "release_candidate": false,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "reason": "Apple Swift/CryptoKit/Security SDK and Xcode iOS SDK required;run the opt-in workflow on macOS."
+}

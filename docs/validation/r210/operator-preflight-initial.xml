@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="15" time="5.022" timestamp="2026-10-28T07:01:35.071788+01:00" hostname="1a6e92dfee30"><testcase classname="tests.test_r210_operator_preflight" name="test_actual_complete_review_has_original_preview_and_never_changes_money" time="0.685"><failure message="AssertionError: assert 'no-store' == 'private, no-store'&#10;  &#10;  - private, no-store&#10;  + no-store">tests/test_r210_operator_preflight.py:28: in test_actual_complete_review_has_original_preview_and_never_changes_money
+    assert result.headers['cache-control'] == 'private, no-store'
+E   AssertionError: assert 'no-store' == 'private, no-store'
+E     
+E     - private, no-store
+E     + no-store</failure></testcase><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[target-unknown]" time="0.212" /><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[limit-0]" time="0.204" /><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[limit-101]" time="0.249" /><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[offset--1]" time="0.285" /><testcase classname="tests.test_r210_operator_preflight" name="test_financial_review_never_discloses_to_non_administrator[anonymous]" time="0.199" /><testcase classname="tests.test_r210_operator_preflight" name="test_financial_review_never_discloses_to_non_administrator[owner]" time="0.208" /><testcase classname="tests.test_r210_operator_preflight" name="test_financial_review_never_discloses_to_non_administrator[inactive-admin]" time="0.193" /><testcase classname="tests.test_r210_operator_preflight" name="test_unavailable_financial_family_is_isolated_private_and_not_zero" time="0.217" /><testcase classname="tests.test_r210_operator_preflight" name="test_unproven_history_and_schemas_remain_visible_blockers[provider]" time="0.201" /><testcase classname="tests.test_r210_operator_preflight" name="test_unproven_history_and_schemas_remain_visible_blockers[unknown-schema]" time="0.206" /><testcase classname="tests.test_r210_operator_preflight" name="test_unproven_history_and_schemas_remain_visible_blockers[missing-schema]" time="0.226" /><testcase classname="tests.test_r210_operator_preflight" name="test_actual_settings_notification_default_is_not_an_economic_obligation" time="0.218" /><testcase classname="tests.test_r210_operator_preflight" name="test_drain_allows_exact_private_review_reads_but_no_new_financial_dispatch" time="0.320"><failure message="ImportError: Using SOCKS proxy, but the 'socksio' package is not installed. Make sure to install httpx using `pip install httpx[socks]`.">../venv/lib/python3.12/site-packages/httpx/_transports/default.py:189: in __init__
+    import socksio  # noqa
+    ^^^^^^^^^^^^^^
+E   ModuleNotFoundError: No module named 'socksio'
+
+The above exception was the direct cause of the following exception:
+tests/test_r210_operator_preflight.py:109: in test_drain_allows_exact_private_review_reads_but_no_new_financial_dispatch
+    assert client.post('/api/admin/service-regime/reconcile-payment', headers=HEADERS,
+../venv/lib/python3.12/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+../venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+../venv/lib/python3.12/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/httpx/_client.py:928: in send
+    raise exc
+../venv/lib/python3.12/site-packages/httpx/_client.py:922: in send
+    response.read()
+../venv/lib/python3.12/site-packages/httpx/_models.py:881: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/httpx/_models.py:897: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/httpx/_models.py:951: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/httpx/_client.py:153: in __iter__
+    for chunk in self._stream:
+                 ^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+../venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+../venv/lib/python3.12/site-packages/fastapi/applications.py:1215: in __call__
+    await super().__call__(scope, receive, send)
+../venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+../venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+../venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+../venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+app/service_admission.py:488: in __call__
+    return await serve(scope,receive,send,self.app)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/service_admission.py:464: in serve
+    with control(): return await call(scope,receive,send)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/starlette/middleware/base.py:203: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:650: in security_middleware
+    return await _security_middleware(request,call_next)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:757: in _security_middleware
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/starlette/middleware/base.py:179: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+../venv/lib/python3.12/site-packages/starlette/middleware/base.py:149: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+app/regime_service_lease.py:202: in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+../venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+../venv/lib/python3.12/site-packages/fastapi/routing.py:2786: in app
+    await route.handle(scope, receive, send)
+../venv/lib/python3.12/site-packages/fastapi/routing.py:1817: in handle
+    await self.original_router.handle(scope, receive, send)
+../venv/lib/python3.12/site-packages/fastapi/routing.py:2869: in handle
+    await included_router._handle_selected(scope, receive, send)
+../venv/lib/python3.12/site-packages/fastapi/routing.py:1843: in _handle_selected
+    await original_route.handle(scope, receive, send)
+../venv/lib/python3.12/site-packages/fastapi/routing.py:1308: in handle
+    await effective_context.app(scope, receive, send)
+../venv/lib/python3.12/site-packages/fastapi/routing.py:165: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../venv/lib/python3.12/site-packages/fastapi/routing.py:151: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/fastapi/routing.py:727: in app
+    raw_response = await run_endpoint_function(
+../venv/lib/python3.12/site-packages/fastapi/routing.py:362: in run_endpoint_function
+    return await run_in_threadpool(
+../venv/lib/python3.12/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py:240: in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+app/resource_routes.py:759: in admin_reconcile_payment
+    return call(lambda:reconcile_checkout(body['provider'],body['order_id']))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/resource_routes.py:10: in call
+    try:return fn()
+               ^^^^
+app/resource_routes.py:759: in &lt;lambda&gt;
+    return call(lambda:reconcile_checkout(body['provider'],body['order_id']))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/payment_reconcile_service.py:220: in reconcile_checkout
+    with httpx.Client(timeout=15,follow_redirects=False) as client:return reconcile_stripe(order_id,client=client,expected_owner=expected_owner)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/httpx/_client.py:700: in __init__
+    else self._init_proxy_transport(
+../venv/lib/python3.12/site-packages/httpx/_client.py:750: in _init_proxy_transport
+    return HTTPTransport(
+../venv/lib/python3.12/site-packages/httpx/_transports/default.py:191: in __init__
+    raise ImportError(
+E   ImportError: Using SOCKS proxy, but the 'socksio' package is not installed. Make sure to install httpx using `pip install httpx[socks]`.</failure></testcase><testcase classname="tests.test_r210_operator_preflight" name="test_preflight_digest_is_diagnostic_and_never_a_write_permit" time="0.281" /></testsuite></testsuites>

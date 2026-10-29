@@ -155,11 +155,11 @@ def test_unified_subprocess_models(tmp_path, monkeypatch):
         else:
             Path(cmd[cmd.index('--output') + 1]).write_bytes(b'a')
     monkeypatch.setattr(subprocess, 'run', fake_run)
-    with pytest.raises(RuntimeError, match='configure'):
+    with pytest.raises(ValueError, match='supported SAM checkpoint'):
         unified.infer({'kind': 'sam-audio', 'source_audio': source}, output)
-    monkeypatch.setenv('MTA_AI_SAM_MODEL', 'test-model')
+    monkeypatch.setenv('MTA_AI_SAM_MODEL', 'sam-audio-small')
     unified.infer({'kind': 'sam-audio', 'source_audio': source}, output)
-    with pytest.raises(ValueError, match='Invalid Demucs'):
+    with pytest.raises(ValueError, match='declared Demucs checkpoint'):
         unified.infer({'kind': 'demucs', 'source_audio': source, 'model': '../bad'}, output)
     unified.infer({'kind': 'demucs', 'source_audio': source}, output)
     assert (tmp_path/'stem_vocals.wav').exists()
@@ -216,7 +216,7 @@ def test_backing_vocals_artifact_security(tmp_path, monkeypatch):
     monkeypatch.setitem(sys.modules, 'torch', types.SimpleNamespace(version=types.SimpleNamespace(hip=None)))
     with pytest.raises(RuntimeError, match='configure'):
         unified.infer({'kind': 'backing-vocals', 'source_audio': source}, output)
-    monkeypatch.setenv('MTA_AI_VOCAL_MODEL', 'safe_model.onnx')
+    monkeypatch.setenv('MTA_AI_VOCAL_MODEL', 'mel_band_roformer_karaoke_gabox_v2.ckpt')
     with pytest.raises(RuntimeError, match='no audio'):
         unified.infer({'kind': 'backing-vocals', 'source_audio': source}, output)
     Separator.outputs = ['../escape.wav']

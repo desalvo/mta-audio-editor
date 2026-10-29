@@ -118,7 +118,7 @@ def collect(cfg, start, end):
     raise ValueError('Reporting page bound exceeded')
 
 
-def acquire(actor, start_date, end_date, *, confirm=False):
+def acquire(actor, start_date, end_date, *, confirm=False, expected_merchant=None):
     if confirm is not True:
         raise ValueError('Explicit merchant history confirmation required')
     start, end = instant(start_date), instant(end_date)
@@ -130,6 +130,9 @@ def acquire(actor, start_date, end_date, *, confirm=False):
         cfg = paypal._keys(c)
     if not cfg['enabled'] or not cfg['client_id'] or not cfg['client_secret']:
         raise ValueError('Configured merchant reporting access required')
+    if expected_merchant is not None and expected_merchant != (
+            cfg['environment'], hashlib.sha256(cfg['client_id'].encode()).hexdigest()):
+        raise FenceBlocked('Original requested merchant changed before readback')
     first = collect(cfg, start_date, end_date)
     second = collect(cfg, start_date, end_date)
     if first != second:

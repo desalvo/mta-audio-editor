@@ -5,6 +5,7 @@ auxiliary assets. It supplements the worker's OS isolation; it is not a sandbox
 for malicious administrator-supplied native code.
 """
 import runpy
+import os
 import socket
 import sys
 from pathlib import Path
@@ -18,9 +19,45 @@ def activate():
     sys.addaudithook(audit)
 
 
+def authorize_script(script,checkpoint_guard=False):
+    """A fixed MTA component role is required before executing operator code.
+
+    The role selects checks, not permission. Original installed bindings and
+    every current component policy are independently verified in this child.
+    """
+    role=os.getenv('MTA_STUDIO_OFFLINE_KIND','')
+    if role in ('seed-vc','rvc'):
+        if checkpoint_guard != (role=='seed-vc'):
+            raise ValueError('Offline checkpoint guard does not match component')
+        from app.studio_asset_registry import manifest,policies,binding
+        asset=os.getenv('MTA_STUDIO_CONVERSION_ASSET_ID','')
+        value=manifest(asset,verify=True)
+        if (value['kind']!=role or not value['enabled']
+                or binding(value,'script').resolve(strict=True)!=script
+                or binding(value,'runtime_root').resolve(strict=True)!=Path.cwd().resolve()):
+            raise ValueError('Offline script does not match original installed component')
+        policies(asset,verify=True)
+        return
+    if role!='diffsinger' or checkpoint_guard:
+        raise ValueError('Explicit supported offline component required')
+    from app.model_license_policy import evaluate_singing_components
+    evaluate_singing_components()
+    model_format=os.getenv('MTA_DIFFSINGER_FORMAT','native')
+    if model_format=='openutau-onnx':
+        expected=Path(__file__).with_name('diffsinger_onnx.py').resolve()
+    elif model_format=='native':
+        expected=(Path(os.environ['MTA_DIFFSINGER_ROOT'])/'scripts'/'infer.py').resolve(strict=True)
+    else:
+        raise ValueError('Unsupported offline singing format')
+    if script!=expected:
+        raise ValueError('Offline singing script is not the selected runtime')
+
+
 def main(checkpoint_guard=False):
     if len(sys.argv)<2:raise ValueError('Pinned model script required')
     script=Path(sys.argv[1]).resolve(strict=True)
+    sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+    authorize_script(script,checkpoint_guard)
     if checkpoint_guard:
         from seed_checkpoint import load_checkpoint
         from seed_audio_export import install_export_guard

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "reviewed_findings": 164,
+    "source_files": 299,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 143
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "reviewed_changes": [
+    {
+      "path": "app/ai_metering_agent.py",
+      "test_id": "B404",
+      "old_line": 13,
+      "new_line": 14,
+      "review": "Fixed operator-selected executable;original live scheduler/account/token checked,known no-launch distinguished from uncertain dispatched work,cancelled CPU retained and exact child reaped. No command from client options."
+    },
+    {
+      "path": "app/ai_metering_agent.py",
+      "test_id": "B603",
+      "old_line": 102,
+      "new_line": 155,
+      "review": "Fixed operator-selected executable;original live scheduler/account/token checked,known no-launch distinguished from uncertain dispatched work,cancelled CPU retained and exact child reaped. No command from client options."
+    }
+  ]
+}

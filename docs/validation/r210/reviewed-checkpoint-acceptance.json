@@ -1,0 +1,1532 @@
+{
+  "schema": "mta-reviewed-remote-checkpoint-acceptance-1",
+  "date": "2026-10-28",
+  "timezone": "Europe/Rome",
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "accepted_criterion": "F3",
+  "criterion": "Authenticated remote checkpoint identity and rights attestation",
+  "profile": "verified-pull-v1",
+  "accepted": true,
+  "release_candidate": false,
+  "progress": {
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ]
+  },
+  "counts": {
+    "passed": 246
+  },
+  "new_test_cases": 55,
+  "real_model_cases": 5,
+  "authenticated_independent_https_worker_cases": 4,
+  "supported_checkpoint": "Spotify BasicPitch0.4.0 ONNX,immutable reviewed byte identity",
+  "unsupported_checkpoints": "Refused before ledger admission in reviewed profile",
+  "generic_remote_transports": "Refused in COMMERCIAL and NON_COMMERCIAL in reviewed profile",
+  "trust_boundary": "Authenticated assertions by trusted operator workers;not hardware/TEE or hostile-host confinement.Off/legacy compatibility is not certified by this profile.",
+  "rights_review": "Authority source-controlled pinned upstream/LICENSE/NOTICE and immutable model digest;worker independently checks installed package rights and runtime before inference. No arbitrary checkpoint/license claims or commercial flag waiver.",
+  "remaining": [
+    "F4 every opaque/local/native executor bypass acceptance",
+    "F5 all native OS guarantees",
+    "F6 independent rights review of every optional checkpoint",
+    "Global financial/backend cutover and physical kernel/target criteria retain original states"
+  ],
+  "runtime": {
+    "basic-pitch": "0.4.0",
+    "onnxruntime": "1.23.2",
+    "librosa": "0.11.0",
+    "resampy": "0.4.2",
+    "setuptools": "80.9.0"
+  },
+  "runtime_metadata_limit": "Upstream basic-pitch Py3.12 metadata declares TensorFlow;this explicit ONNX-only test environment omitsTF. No pip-check-clean/full optional environment claim or new production requirements.",
+  "reports": [
+    {
+      "path": "docs/validation/r210/reviewed-checkpoint-current.xml",
+      "sha256": "sha256:bdd9f55e89833d83b0a9149d35408426f5b639c6dd84b4c29422c6b13d10e2a6"
+    },
+    {
+      "path": "docs/validation/r210/reviewed-checkpoint-gates.xml",
+      "sha256": "sha256:d7c9360dcddbef819cade69a04e16d258bceda431d15bdec122be9faedd76aa4"
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_contract_binds_rights_loader_plan_and_original_epoch_before_dispatch",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[rights]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[runtime]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[model]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[plan]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[epoch]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[pid]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_failed_measured_execution_also_requires_its_original_load_rights_receipt",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_revoked_contract_never_rebinds_an_original_dispatched_job",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_missing_original_requirement_never_downgrades_to_unattested_completion",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[ace-step]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[arranger]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi-mr-mt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi-transkun]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi-yourmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[backing-vocals]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[chords-ml]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[markers]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[remix]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[sam-audio]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[singer-separation]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[vocal-harmony]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[vocal-synthesis]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[False-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[False-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[True-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[True-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_internal_pull_ceiling_does_not_change_public_configuration_minimum",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[0]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[15]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[17]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[63]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[016]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[16.0]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[-16]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_other_invalid_trusted_limits_remain_invalid[8193]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_installed_rights_document_is_checked_not_just_a_version_string",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_worker_independently_refuses_a_substituted_contract[sources]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_worker_independently_refuses_a_substituted_contract[rights]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_worker_independently_refuses_a_substituted_contract[epoch]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint_boundaries",
+      "name": "test_reviewed_profile_cannot_be_bypassed_by_generic_remote_transport",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[client-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[client-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[gateway-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[gateway-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[ace-request-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[ace-request-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[ace-run-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_remote_profile",
+      "name": "test_production_profile_blocks_every_generic_transport_before_network[ace-run-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_requirement_frozen_at_admission_and_nonpilot_denied_before_ledger",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[model]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[job]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[instance]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[nonce]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[pid-bool]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[schema]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_valid_authenticated_receipt_frozen_with_result_and_replay_conflict_denied",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_wrong_authenticated_node_cannot_submit_receipt",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_opaque_adapter_refused_before_process",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_real_receipt_writer_is_exclusive_and_bound_to_actual_pid",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_record_is_not_emitted_if_onnx_constructor_fails",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_https_attested_completion_lost_ack_recovers_exact_receipt_without_reexecution",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_receipt_pid_matches_reaped_process_before_output_is_accepted",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[matching]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[foreign-pid]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_revoked_rights_before_freeze_hold_original_assignment",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_attested_retention_erases_receipt_but_preserves_exact_lost_ack",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_receipt_writer_runs_without_site_packages_or_server_imports",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_pilot_availability_matches_actual_new_admission",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation_real",
+      "name": "test_real_basic_pitch_load_receipt_original_ledger_and_no_repeat",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_actual_executor_waits_for_worker_and_settles_real_ledger_once",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_atomic_capacity_rejection_leaves_no_ledger_fence_or_license_or_claim",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_two_independent_connections_never_assign_same_operation",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_claim_lost_response_recovers_same_attempt_but_not_new_instance",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_stale_epoch_receipt_and_policy_never_dispatch[epoch]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_stale_epoch_receipt_and_policy_never_dispatch[claim]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_stale_epoch_receipt_and_policy_never_dispatch[policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_frozen_result_survives_accounting_failure_without_inference_replay",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[cpu_seconds--1]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-nan]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[media_type-text/plain]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[result_b64-bad!]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_forged_assignment_and_frozen_sql_overwrite_are_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_pause_resume_revoke_do_not_claim_worker_quiescence",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_queued_cancel_settles_no_cpu_and_never_grants_source",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_running_cancel_remains_held_until_authenticated_completion",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_prune_preserves_unknown_execution_and_opaque_acknowledges_closed_result",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_authority_drain_rejects_new_admission_but_finishes_existing_queue",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_current_epoch_corruption_blocks_pull_readiness",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_copied_authority_database_cannot_become_second_active_coordinator",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_planned_offline_rebind_requires_closed_work_revoked_nodes_and_operator",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_coordinator",
+      "name": "test_deferred_generation_admission_is_atomic_with_authority_drain",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_full_middleware_worker_token_is_exactly_scoped",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_admin_register_pause_revoke_role_csrf_and_no_key_readback",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_owner_result_is_private_settled_and_not_executable",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_middleware_hides_worker_api_in_native_mode",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pending_error_is_localized_and_never_claims_stop",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_retired_queued_owner_never_transfers_source_and_maintenance_closes_only_undispatched",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_erasure_rejects_active_remote_task_before_writing_journal",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_completed_erasure_receipt_drops_private_artifacts_and_acknowledges_lost_reply",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-True-arranger]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-True-remix]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-False-arranger]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-False-remix]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-True-arranger]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-True-remix]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-False-arranger]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-False-remix]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_commercial_remote_and_path_injection_are_denied_before_admission",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_ai_token_submission_uses_pull_without_local_authority_adapter[audio]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_ai_token_submission_uses_pull_without_local_authority_adapter[json]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_admin_drain_requires_confirmation_generation_and_durable_audit",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_retired_account_confirmation_erases_pull_payload_and_recovers_lost_node_ack",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_known_failed_deferred_completion_settles_original_owner_without_publication[failed]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_lifecycle",
+      "name": "test_known_failed_deferred_completion_settles_original_owner_without_publication[cancelled]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_two_separate_worker_processes_share_only_https_not_sqlite",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_partition_after_committed_claim_or_completion_never_reexecutes[claim]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_partition_after_committed_claim_or_completion_never_reexecutes[complete]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_untrusted_tls_never_transmits_worker_credential",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_redirect_cannot_forward_credential",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_journal_rejects_authority_key_and_trust_drift_before_network[credential]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_journal_rejects_authority_key_and_trust_drift_before_network[trust]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_dispatched_journal_never_reexecutes_after_actual_supervisor_sigkill",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_shared_worker_state_lock_serializes_two_processes",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_transport",
+      "name": "test_actual_authority_sigkill_after_frozen_result_recovers_without_new_inference",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_reimbursement_is_not_an_automatic_license_exception",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_review_requires_permission_and_free_access_acknowledgement",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_free_resources_remain_accounted_without_billing_or_quota_use",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_license_snapshot_is_idempotent_but_not_mutable",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_raw_client_commercial_denies_before_source_validation_or_network[whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_raw_client_commercial_denies_before_source_validation_or_network[demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-basic-pitch]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-yourmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_raw_client_commercial_denies_before_source_validation_or_network[vocal-harmony]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_raw_client_commercial_denies_before_source_validation_or_network[arranger]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_raw_client_commercial_denies_before_source_validation_or_network[remix]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_disabled_nc_policy_cannot_use_direct_transport[client]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_disabled_nc_policy_cannot_use_direct_transport[gateway]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_disabled_nc_policy_cannot_use_direct_transport[ace-request]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_disabled_nc_policy_cannot_use_direct_transport[ace-run]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_mutations_cannot_forward_commercial_work[release_task]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_mutations_cannot_forward_commercial_work[v1/init]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_mutations_cannot_forward_commercial_work[v1/generate]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_mutations_cannot_forward_commercial_work[v1/audio]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_mutations_cannot_forward_commercial_work[v1/models]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_commercial_metadata_does_not_start_inference[GET-health]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_commercial_metadata_does_not_start_inference[GET-v1/models]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_native_gateway_token_still_cannot_skip_accounted_endpoint",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_standalone_remote_worker_denies_before_missing_audio_or_dns",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_remote_ace_read_and_cancel_skip_inference_gate[/health-None]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_remote_ace_read_and_cancel_skip_inference_gate[/query_result-{}]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_remote_ace_read_and_cancel_skip_inference_gate[/mta/tasks/existing/control-{}]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_client_historical_operations_stay_available_under_commercial_denial[status]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_client_historical_operations_stay_available_under_commercial_denial[recover]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_client_historical_operations_stay_available_under_commercial_denial[cancel]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_client_historical_operations_stay_available_under_commercial_denial[list]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_client_historical_operations_stay_available_under_commercial_denial[resources]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_client_historical_operations_stay_available_under_commercial_denial[capabilities]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://127.0.0.1:8001]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://localhost:8001]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://[::1]:8001]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/api/ai-gatewayevil/query_result]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/xxxxxxxxxxxxxx/query_result]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/other/query_result]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/release_task]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_configured_gateway_polling_still_works_without_new_inference",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[None-options0]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[123-options1]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[kind2-options2]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[whisper-options3]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options4]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[whisper-invalid]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options6]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "name": "test_malformed_model_selection_is_value_error_without_transport[audio-to-midi-transkun-options7]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-current.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_actual_source_bound_service_admission_review",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "status": "passed",
+      "report": "docs/validation/r210/reviewed-checkpoint-gates.xml"
+    }
+  ]
+}

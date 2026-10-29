@@ -172,13 +172,21 @@ def _cents(amount):
     return int(whole)*100+int(fraction.ljust(2,'0'))
 
 
-def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _reconciliation=None, _disputes=()):
+def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _reconciliation=None, _disputes=(), _merchant_context=None, _settlement_context=None):
     from .regime_operation_fence import FenceBlocked
     with auth.db() as c:
         r.init(c);init(c);c.execute('BEGIN IMMEDIATE')
         order=c.execute('SELECT * FROM paypal_orders WHERE id=?',(local_id,)).fetchone()
         if _disputes and _reconciliation is None:raise ValueError('Authenticated history context required')
         if not order:raise ValueError('Unknown PayPal order')
+        if _settlement_context is not None:
+            if _reconciliation is None:raise ValueError('Original report reconciliation required')
+            _settlement_context.verify(c,order,_reconciliation[1],result)
+        merchant_event=None
+        if _merchant_context is not None:
+            if _reconciliation is None:raise ValueError('Authenticated merchant history required')
+            from .paypal_merchant_reconcile import before_commit
+            merchant_event=before_commit(c,_merchant_context,order,_reconciliation[1],result,_reconciliation[2])
         if _reconciliation is not None:
             initial,cfg,history=_reconciliation
             immutable=('user_id','kind','period_start','amount_cents','environment','client_fingerprint','provider_order')
@@ -215,6 +223,7 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
                 encoded=json.dumps(data,sort_keys=True).encode()
                 record_event(c,'paypal','reconcile:refund:'+data['refund_id'],hashlib.sha256(encoded).hexdigest(),data)
         if _reconciliation is not None:
+            if _settlement_context is not None:_settlement_context.claim(c,_disputes)
             for data in _disputes:
                 encoded=json.dumps(data,sort_keys=True).encode();key=hashlib.sha256(encoded).hexdigest()
                 record_event(c,'paypal','reconcile:risk:'+key,key,data)
@@ -242,6 +251,7 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
             _record_position(c,order,financial_id)
             mark_applied(c,'paypal',financial_id,local_id)
             _replay_pending_refunds(c,local_id)
+            if merchant_event:mark_applied(c,'paypal',merchant_event,local_id)
             if webhook_event_id is not None:
                 c.execute('INSERT OR IGNORE INTO paypal_events VALUES(?,?)',(webhook_event_id,int(time.time())))
             return {'status':'paid','order_id':local_id,'duplicate':duplicate}
@@ -267,6 +277,7 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
         _record_position(c,order,financial_id)
         mark_applied(c,'paypal',financial_id,local_id)
         _replay_pending_refunds(c,local_id)
+        if merchant_event:mark_applied(c,'paypal',merchant_event,local_id)
         if webhook_event_id is not None:
             c.execute('INSERT INTO paypal_events VALUES(?,?)',(webhook_event_id,int(time.time())))
     return {'status':'paid','order_id':local_id,'refund_due_micro':refund}
@@ -489,6 +500,13 @@ def _apply_risk(c,data,event_id):
     if old and (old[0],old[1],old[4],old[5])!=(data['capture_id'],data['amount_minor'],data['kind'],order['id']):raise ValueError('Risk event identity changed')
     # Associate unresolved evidence with its verified local owner/order too.
     c.execute("UPDATE payment_reconciliation_events SET order_id=? WHERE provider='paypal' AND event_id=? AND state='pending'",(order['id'],event_id))
+    # A replay of the identical canonical case must retain its original
+    # authenticated report resolution. Changed case bytes still require review.
+    if old and old[2]=='released' and data['status']=='uncertain' and data.get('dispute_document_sha256'):
+        from .paypal_report_reconciliation import verified_replay
+        if verified_replay(c,data):
+            mark_applied(c,'paypal',event_id,order['id'])
+            return True
     if old and old[2] in ('released','permanent') and data['status']!=old[2]:
         if data['status'] not in ('released','permanent') and data['updated_ms']<old[3]:
             mark_applied(c,'paypal',event_id,order['id'])
@@ -497,10 +515,12 @@ def _apply_risk(c,data,event_id):
         # A terminal provider outcome is not undone by a newer provisional or
         # contradictory terminal document. Preserve it as durable pending.
         return False
-    if old and old[3]==data['updated_ms'] and old[2]!=data['status']:raise ValueError('Ambiguous risk event order')
+    report_upgrade = (old and old[2]=='uncertain' and data['status']=='released'
+                      and data.get('settlement_report_proof',{}).get('schema')=='mta-paypal-defended-settlement-1')
+    if old and old[3]==data['updated_ms'] and old[2]!=data['status'] and not report_upgrade:raise ValueError('Ambiguous risk event order')
     position=c.execute("SELECT net_micro FROM payment_reconciliation_positions WHERE provider='paypal' AND order_id=?",(order['id'],)).fetchone()
     if position is None:raise ValueError('PayPal financial position missing')
-    if not old or data['updated_ms']>old[3]:
+    if not old or data['updated_ms']>old[3] or (report_upgrade and data['updated_ms']==old[3]):
         c.execute('''INSERT INTO paypal_financial_holds VALUES(?,?,?,?,?,?,?)
           ON CONFLICT(hold_id) DO UPDATE SET status=excluded.status,updated_ms=excluded.updated_ms''',
           (data['hold_id'],order['id'],data['capture_id'],data['amount_minor'],data['status'],data['updated_ms'],data['kind']))
@@ -520,7 +540,11 @@ def _apply_risk(c,data,event_id):
     # blocking once the provider supplies a later unambiguous resolution.
     for pending_id,raw in c.execute("SELECT event_id,normalized_json FROM payment_reconciliation_events WHERE provider='paypal' AND state='pending'").fetchall():
         prior=json.loads(raw)
-        if (prior.get('hold_id')==data['hold_id'] and prior.get('updated_ms',0)<data['updated_ms']
+        same_report_resolution=(data['status']=='released' and data.get('settlement_report_proof')
+            and prior.get('status')=='uncertain' and prior.get('dispute_document_sha256')
+            and prior.get('dispute_document_sha256')==data.get('dispute_document_sha256')
+            and prior.get('updated_ms')==data['updated_ms'])
+        if (prior.get('hold_id')==data['hold_id'] and (prior.get('updated_ms',0)<data['updated_ms'] or same_report_resolution)
             and not (prior.get('status') in ('released','permanent') and prior['status']!=data['status'])):
             mark_applied(c,'paypal',pending_id,order['id'])
     c.execute('INSERT OR IGNORE INTO paypal_events VALUES(?,?)',(event_id,int(time.time())))

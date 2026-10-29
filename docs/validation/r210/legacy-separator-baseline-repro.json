@@ -1,0 +1,10 @@
+{
+  "baseline": {
+    "type": "RuntimeError",
+    "message": "runtime-probe-reached"
+  },
+  "current": {
+    "type": "LicenseDenied",
+    "message": "Model disabled pending license review: demucs. Contact the administrator; cost recovery alone does not grant permission."
+  }
+}

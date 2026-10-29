@@ -31,7 +31,10 @@ PREFIXES = ('resource_', 'paypal_', 'credit_payment_', 'credit_purchase_',
             'payment_', 'subscription_', 'nc_contribution_', 'operator_refund',
             'worker_', 'ai_',
             'regime_provider_', 'regime_financial_', 'regime_payment_')
-CONFIGS = frozenset({'credit_payment_config', 'paypal_config', 'nc_contribution_settings'})
+# Notification configuration carries no economic claim. Opening the real
+# settings page initializes its default row; it must not invent an obligation.
+# Sending/history rows retain their independent worker/journal checks below.
+CONFIGS = frozenset({'credit_payment_config', 'paypal_config', 'nc_contribution_settings', 'ai_mail_config'})
 REVIEWED_JOB_TABLES = frozenset('''ai_compute_jobs ai_job_hardware_snapshots
  ai_job_license_snapshots ai_job_settlement_requirements ai_job_billing_exemptions ai_compute_job_diagnostics
  resource_job_contracts resource_job_budgets resource_job_modes'''.split())

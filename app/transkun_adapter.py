@@ -6,6 +6,8 @@ import tempfile
 
 
 def transcribe(source,options):
+    from .model_license_policy import evaluate_model
+    evaluate_model('transkun-assets')
     from .studio_asset_registry import runtime,binding
     from .music_interchange import MusicResult,MusicPart,no_notes
     from .midi_smf import read_parts

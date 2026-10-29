@@ -87,7 +87,8 @@ def convert(path,settings,progress=lambda *a:None):
     if info.channels!=1 or info.samplerate!=48000 or not 0<info.duration<=610:raise ValueError('Invalid conversion source')
     # All HF auxiliary models must already be present in the pinned local cache.
     env={**os.environ,'HF_HUB_OFFLINE':'1','TRANSFORMERS_OFFLINE':'1','HF_HUB_DISABLE_TELEMETRY':'1',
-         'WANDB_MODE':'disabled','PYTHONDONTWRITEBYTECODE':'1','DO_NOT_TRACK':'1'}
+         'WANDB_MODE':'disabled','PYTHONDONTWRITEBYTECODE':'1','DO_NOT_TRACK':'1',
+         'MTA_STUDIO_OFFLINE_KIND':value['kind'],'MTA_STUDIO_CONVERSION_ASSET_ID':cfg.asset_id}
     if 'hf_home' in value['bindings']:env['HF_HOME']=str(binding(value,'hf_home'))
     progress('voice-conversion',value['name'])
     with tempfile.TemporaryDirectory(prefix='.conversion-',dir=source.parent) as temporary:

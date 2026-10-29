@@ -142,13 +142,17 @@ f=pathlib.Path(a.output).parent;r=f/'markers.json';r.write_text('{"markers":[]}'
 
 def test_server_raw_wav_preserves_publication_metadata(isolated_queue,tmp_path,monkeypatch):
     import io,wave
-    from app import ai_server_execution as server,ai_metering_agent
+    from app import ai_server_execution as server,ai_metering_agent,auth
+    auth.init_auth_db()
+    with auth.db() as con:
+        con.execute("INSERT INTO users(username,email,password_hash,active,role,created_at,updated_at) VALUES('metadata-owner','metadata@example.test','unused',1,'user',1,1)")
+        uid=con.execute("SELECT id FROM users WHERE username='metadata-owner'").fetchone()[0]
     out=io.BytesIO()
     with wave.open(out,'wb') as handle:
         handle.setnchannels(1);handle.setsampwidth(2);handle.setframerate(44100);handle.writeframes(bytes(882))
     audio=out.getvalue();source=tmp_path/'source.wav';source.write_bytes(audio)
     monkeypatch.setattr(ai_metering_agent,'execute_registered_worker',lambda *a,**k:(audio,{'job_id':'metered','usage':{'cpu_seconds':1},'metering_source':'worker'}))
-    result=execution.execute(1,'ace-step',lambda c:server.infer('ace-step',source,{},raw=True))
+    result=execution.execute(uid,'ace-step',lambda c:server.infer('ace-step',source,{},raw=True))
     assert result[0]==audio
     assert result[1]['frames']==441 and result[1]['sample_rate']==44100 and result[1]['channels']==1
     assert result[1]['usage']=={'cpu_seconds':1}

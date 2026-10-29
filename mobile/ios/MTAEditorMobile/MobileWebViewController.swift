@@ -266,20 +266,21 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
     }
 
     private func bootstrapDefaultCoreMLModelIfNeeded(base: String) {
+        guard LocalStemEngine.shared.hasModelReview(modelId: "demucs-4", stemCount: 4) else { return }
         if LocalStemEngine.shared.isModelInstalled(stemCount: 4) { return }
         guard mayDownloadModelUpdate() else { return }
         if LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { return }
+        guard LocalStemEngine.shared.hasDownloadReview(modelId: "demucs-4", stemCount: 4) else { return }
         guard let endpoint = URL(string: base + "/api/mobile/demucs-coreml/bootstrap") else { return }
         modelAuthorizedRequest(url: endpoint) { request in
             URLSession.shared.downloadTask(with: request) { location, response, _ in
                 guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let location else { return }
                 do {
                     let temp = FileManager.default.temporaryDirectory.appendingPathComponent("demucs-bootstrap-\(UUID().uuidString).mlmodel")
-                    try? FileManager.default.removeItem(at: temp)
+                    defer { try? FileManager.default.removeItem(at: temp) }
                     try FileManager.default.copyItem(at: location, to: temp)
                     let fingerprint = http.value(forHTTPHeaderField: "X-MTA-Model-SHA256") ?? ""
                     try LocalStemEngine.shared.installDownloadedModel(temp, stemCount: 4, fingerprint: fingerprint)
-                    try? FileManager.default.removeItem(at: temp)
                 } catch { }
             }.resume()
         }
@@ -488,6 +489,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
             let semaphore = DispatchSemaphore(value: 0)
             for item in wanted {
                 guard let id = item["id"] as? String, let count = item["stem_count"] as? Int else { continue }
+                guard LocalStemEngine.shared.hasDownloadReview(modelId: id, stemCount: count) else { continue }
                 let sha = item["sha256"] as? String ?? ""
                 if LocalStemEngine.shared.isModelInstalled(modelId: id, stemCount: count), !sha.isEmpty,
                    LocalStemEngine.shared.modelFingerprint(modelId: id, stemCount: count) == sha { continue }
@@ -498,6 +500,12 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
     }
 
     private func downloadAndInstallCoreMLModel(modelId: String, stemCount: Int, fingerprint: String = "", completion: @escaping (Result<Void, Error>) -> Void) {
+        do {
+            let reviewed = try LocalStemEngine.shared.reviewedDownloadFingerprint(modelId: modelId, stemCount: stemCount)
+            guard fingerprint.isEmpty || fingerprint == reviewed else {
+                throw LocalModelRightsError.denied("server metadata does not match the reviewed checkpoint")
+            }
+        } catch { DispatchQueue.main.async { completion(.failure(error)) }; return }
         guard let base = webView.url else { completion(.failure(LocalStemError.modelMissing(stemCount))); return }
         let safeId = modelId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? modelId
         let endpoint = URL(string: "/api/models/coreml/\(safeId)", relativeTo: base)!.absoluteURL
@@ -509,10 +517,10 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
                 }
                 do {
                     let temp = FileManager.default.temporaryDirectory.appendingPathComponent("\(modelId)-\(UUID().uuidString).mlmodel")
-                    try? FileManager.default.removeItem(at: temp)
+                    defer { try? FileManager.default.removeItem(at: temp) }
                     try FileManager.default.copyItem(at: location, to: temp)
-                    try LocalStemEngine.shared.installDownloadedModel(temp, modelId: modelId, stemCount: stemCount, fingerprint: fingerprint)
-                    try? FileManager.default.removeItem(at: temp)
+                    let announced = http.value(forHTTPHeaderField: "X-MTA-Model-SHA256") ?? fingerprint
+                    try LocalStemEngine.shared.installDownloadedModel(temp, modelId: modelId, stemCount: stemCount, fingerprint: announced)
                     DispatchQueue.main.async { completion(.success(())) }
                 } catch { DispatchQueue.main.async { completion(.failure(error)) } }
             }.resume()
@@ -524,15 +532,35 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
             guard let self else { return }
             DispatchQueue.main.async {
                 let italian = Locale.current.languageCode?.lowercased() == "it"
-                let alert = UIAlertController(title: "Demucs models", message: italian ? "Scarica, aggiorna o elimina i modelli locali. I modelli mancanti vengono scaricati automaticamente quando richiesti." : "Download, update, or delete local models. Missing models are downloaded automatically when requested.", preferredStyle: .actionSheet)
-                for item in models.sorted(by: { ($0["stem_count"] as? Int ?? 0) < ($1["stem_count"] as? Int ?? 0) }) {
+                var selections = models
+                for stored in LocalStemEngine.shared.storedModelSelections() {
+                    if !selections.contains(where: { ($0["id"] as? String) == stored.id && ($0["stem_count"] as? Int) == stored.stemCount }) {
+                        selections.append(["id": stored.id, "stem_count": stored.stemCount, "display_name": stored.id])
+                    }
+                }
+                let alert = UIAlertController(title: "Demucs models", message: italian ? "I modelli locali richiedono una revisione dei diritti inclusa nell’app. Un modello del server o già scaricato non è automaticamente autorizzato." : "Local models require a rights review included in the app. A server listing or previous download does not automatically authorize a checkpoint.", preferredStyle: .actionSheet)
+                for item in selections.sorted(by: { ($0["stem_count"] as? Int ?? 0) < ($1["stem_count"] as? Int ?? 0) }) {
                     guard let id = item["id"] as? String, let count = item["stem_count"] as? Int else { continue }
                     let title = item["display_name"] as? String ?? id
-                    let installed = LocalStemEngine.shared.isModelInstalled(modelId: id, stemCount: count)
-                    alert.addAction(UIAlertAction(title: "\(title) · \(count) stem · \(installed ? "installed" : "available")", style: .default) { _ in
-                        let sub = UIAlertController(title: title, message: nil, preferredStyle: .actionSheet)
-                        sub.addAction(UIAlertAction(title: installed ? "Force update" : "Download", style: .default) { _ in self.downloadAndInstallCoreMLModel(modelId: id, stemCount: count) { _ in } })
-                        if installed { sub.addAction(UIAlertAction(title: "Delete local model", style: .destructive) { _ in try? LocalStemEngine.shared.deleteInstalledModel(modelId: id, stemCount: count) }) }
+                    let installed = LocalStemEngine.shared.hasStoredModel(modelId: id, stemCount: count)
+                    let reviewed = LocalStemEngine.shared.hasModelReview(modelId: id, stemCount: count)
+                    let downloadable = LocalStemEngine.shared.hasDownloadReview(modelId: id, stemCount: count)
+                    let state = reviewed ? (installed ? "installed" : "available") : (italian ? "revisione necessaria" : "review required")
+                    alert.addAction(UIAlertAction(title: "\(title) · \(count) stem · \(state)", style: .default) { _ in
+                        var message: String? = nil
+                        if !reviewed {
+                            message = italian ? "L’esecuzione locale di questo checkpoint non è autorizzata dalla versione corrente dell’app." : "Local execution of this checkpoint is not authorized by the current app version."
+                        } else if !downloadable && !installed {
+                            message = italian ? "Questo checkpoint richiede il modello compilato incluso nell’app revisionata." : "This checkpoint requires the compiled model included in the reviewed app."
+                        }
+                        let sub = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+                        if downloadable { sub.addAction(UIAlertAction(title: installed ? "Force update" : "Download", style: .default) { _ in self.downloadAndInstallCoreMLModel(modelId: id, stemCount: count) { result in
+                            if case .failure(let error) = result { self.showMessage("Demucs", error.localizedDescription) }
+                        } }) }
+                        if installed { sub.addAction(UIAlertAction(title: "Delete local model", style: .destructive) { _ in
+                            do { try LocalStemEngine.shared.deleteInstalledModel(modelId: id, stemCount: count) }
+                            catch { self.showMessage("Demucs", error.localizedDescription) }
+                        }) }
                         sub.addAction(UIAlertAction(title: "Cancel", style: .cancel)); self.present(sub, animated: true)
                     })
                 }
@@ -542,6 +570,8 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
     }
 
     private func ensureLocalModel(modelId: String, stemCount: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        do { _ = try LocalStemEngine.shared.reviewedSourceFingerprint(modelId: modelId, stemCount: stemCount) }
+        catch { completion(.failure(error)); return }
         if LocalStemEngine.shared.isModelInstalled(modelId: modelId, stemCount: stemCount) { completion(.success(())); return }
         if stemCount == 4, modelId == "demucs-4", LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { completion(.success(())); return }
         downloadAndInstallCoreMLModel(modelId: modelId, stemCount: stemCount, completion: completion)

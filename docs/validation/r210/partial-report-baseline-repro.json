@@ -1,0 +1,21 @@
+{
+  "baseline_sha256": "1d683fdf24574348b42ef93671b3bc1f48c8c37d16c9409a37d03b7422620225",
+  "baseline_result": {
+    "blocked": true,
+    "type": "HistoryBlocked",
+    "reason": "Partial multicapture dispute requires exact allocation evidence"
+  },
+  "current_result": [
+    {
+      "capture_id": "CAPTURE111",
+      "amount_minor": 200,
+      "status": "released"
+    },
+    {
+      "capture_id": "CAPTURE222",
+      "amount_minor": 200,
+      "status": "released"
+    }
+  ],
+  "scope": "Pure normalization of synthetic canonical document and validated synthetic report allocation; no provider or money mutation"
+}

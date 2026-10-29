@@ -13,7 +13,8 @@ from .regime_balance_continuity import encode, commit_preserving_balances, final
 from .regime_cutover_mirror import reconcile_mirror
 from .regime_local_readiness import audit
 from .regime_operation_fence import FenceBlocked
-from .regime_service_lease import enabled, lease
+from .regime_service_lease import enabled
+from .service_admission import cutover_guard
 from .service_regime import Regime, read_regime, write_initial_noncommercial
 
 
@@ -48,7 +49,7 @@ def _initialize(con):
         BEFORE DELETE ON regime_admin_cutover_events BEGIN SELECT RAISE(ABORT,'Immutable transition event'); END''')
 
 
-def _preview(con, target):
+def _preview(con, target, admission=None):
     target = Regime(target).value
     mirror = read_regime(auth.data_root() / 'service-regime.json')
     state = con.execute('SELECT regime,revision,transitioning FROM regime_fence_state WHERE singleton=1').fetchone()
@@ -60,6 +61,8 @@ def _preview(con, target):
     if target == state[0]:
         raise FenceBlocked('Requested regime is already active')
     proof = audit(con)
+    if admission is not None:
+        proof = {**proof, 'service_admission': admission}
     body = {'source': state[0], 'target': target, 'source_revision': state[1], 'readiness': proof}
     return body | {'preview_sha256': hashlib.sha256(encode(body).encode()).hexdigest(), 'transition_enabled': True}
 
@@ -67,10 +70,10 @@ def _preview(con, target):
 def preview(*, target, actor):
     if not enabled():
         raise FenceBlocked('Local-authority cutover is not enabled')
-    with lease(exclusive=True), auth.db() as con:
+    with cutover_guard(actor=actor) as admission, auth.db() as con:
         con.execute('BEGIN IMMEDIATE')
         _actor(con, actor)
-        return _preview(con, target)
+        return _preview(con, target, admission)
 
 
 def _row(con, identifier):
@@ -124,7 +127,18 @@ def execute(*, identifier, target, expected_revision, preview_sha256, confirm, a
     target = Regime(target).value
     if not enabled():
         raise FenceBlocked('Local-authority cutover is not enabled')
-    with lease(exclusive=True):
+    # A finalized original request is read-only even after explicit reopening.
+    # Requiring another drain for this receipt would break response-loss replay.
+    from .service_admission import control
+    with control(), auth.db() as con:
+        _actor(con, actor)
+        old = _row(con, identifier)
+        if old and old['phase'] == 'finalized':
+            if (old['actor_id'], old['target'], old['source_revision'], old['preview_sha256']) != (
+                    actor, target, expected_revision, preview_sha256):
+                raise FenceBlocked('Administrative cutover identity replay conflict')
+            return _public(old)
+    with cutover_guard(actor=actor, recovering=identifier) as admission:
         with auth.db() as con:
             con.execute('BEGIN IMMEDIATE')
             _actor(con, actor)
@@ -134,7 +148,7 @@ def execute(*, identifier, target, expected_revision, preview_sha256, confirm, a
                         actor, target, expected_revision, preview_sha256):
                     raise FenceBlocked('Administrative cutover identity replay conflict')
             else:
-                review = _preview(con, target)
+                review = _preview(con, target, admission)
                 if review['source_revision'] != expected_revision or review['preview_sha256'] != preview_sha256:
                     raise FenceBlocked('Preview is stale; inspect and confirm again')
                 # Default NC mirrors are provisioned before committing SQLite,
@@ -162,7 +176,7 @@ def execute(*, identifier, target, expected_revision, preview_sha256, confirm, a
 def recover(*, identifier, expected_revision, confirm, actor):
     if not enabled() or confirm is not True or type(expected_revision) is not int or expected_revision < 1:
         raise FenceBlocked('Enabled local-authority recovery and explicit epoch confirmation required')
-    with lease(exclusive=True), auth.db() as con:
+    with cutover_guard(actor=actor, recovering=identifier), auth.db() as con:
         _actor(con, actor)
         row = _row(con, identifier)
         if row is None or row['source_revision'] + 1 != expected_revision:

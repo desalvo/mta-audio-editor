@@ -1,0 +1,20 @@
+{
+  "schema": "mta-cumulative-preservation-1",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-service-drain-cutover-cumulative.zip",
+  "baseline_sha256": "sha256:635cf713aaf3fc149b5cc180b3ac51babd1e5736a0d8f66155122f8786c97d50",
+  "baseline_files": 4580,
+  "missing_baseline_files": [],
+  "original_log_files": 615,
+  "original_log_bytes": "all identical",
+  "original_modes": "all identical",
+  "original_zip_attributes": "copied exactly per baseline entry",
+  "original42criteria_wording_weights": "all identical",
+  "original_criteria_promoted": [
+    "E4"
+  ],
+  "accepted_macroareas": [
+    "E"
+  ],
+  "release_candidate": false,
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+}

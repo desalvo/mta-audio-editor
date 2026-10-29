@@ -1,0 +1,1833 @@
+{
+  "schema": "mta-legacy-separator-boundaries-1",
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-model-selectors-cumulative.zip",
+  "baseline_sha256": "ba9dbc8cc52c03a7d4fbe025b887b1f9a00f58b959f4a70722308f424b0bc5c4",
+  "passed": 286,
+  "new_cases": 47,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "reports": [
+    {
+      "path": "docs/validation/r210/legacy-separator-final.xml",
+      "sha256": "220134a4dee600e400f6ba68392773226ec14fb340be98dfa4120a90f9862d45"
+    },
+    {
+      "path": "docs/validation/r210/legacy-separator-integration.xml",
+      "sha256": "da0b96b042176ffe697b9d8c0e8226c378bd58a308c7603d725312a4a2a25ea8"
+    },
+    {
+      "path": "docs/validation/r210/legacy-separator-fixtures-final.xml",
+      "sha256": "442c5b6a1691baa0687ccfad51896c62af2734c2dceb21b3729f537bd7ba1066"
+    },
+    {
+      "path": "docs/validation/r210/legacy-separator-subprocess-final.xml",
+      "sha256": "f1a3ec15269e95d07b9ba46b88ce2691b3af4f6a597e10f1080f4c3b4028e129"
+    },
+    {
+      "path": "docs/validation/r210/legacy-separator-api-final.xml",
+      "sha256": "acc1b09ec5aafafd8b90b53158c58825a21de08ee54ff33d1fc3e735f6cb45b0"
+    },
+    {
+      "path": "docs/validation/r210/legacy-separator-gates.xml",
+      "sha256": "7e2065533a542fa324b5684ab3de7128728bca078c556141cc2bbc97c114dfdd"
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_operator_local_repository_is_not_a_checkpoint_permission[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_operator_local_repository_is_not_a_checkpoint_permission[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_cardinality_profile_cannot_inject_an_unreviewed_model_after_initial_admission",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_loader_rejects_revocation_before_runtime_load[UVR_MDXNET_KARA_2.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_loader_rejects_revocation_before_runtime_load[mel_band_roformer_karaoke_gabox_v2.ckpt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[/unreviewed/weights.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[../UVR_MDXNET_KARA_2.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[foreign.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[operator-provided.ckpt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[None]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_load_revocation_cannot_mark_the_cached_runtime_admitted",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_loaded_backing_runtime_rechecks_current_permission_and_exact_selector",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-native]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-unified]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-native]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-unified]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-native]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-unified]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_rejection_precedes_actual_queue_and_ledger_admission",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_builtin_dsp_actual_child_outputs_preserve_center_side_pcm_and_current_policy",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_registered_dsp_cannot_fabricate_single_process_measurement_for_ffmpeg_child",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_revocation_inside_inference_does_not_release_result",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[0-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[1-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[1-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_bridge_does_not_retry_or_swallow_model_failures",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_actual_sam_worker_reaches_inference_and_writes_wav[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_actual_sam_worker_reaches_inference_and_writes_wav[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_import_failure_emits_only_fixed_stage_marker",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_safe_sam_failure_and_backing_categories",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_backing_same_onnx_checkpoint_runs_on_rocm_and_returns_expected_numpy",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_other_backing_devices_and_models_keep_existing_route[None-True-UVR_MDXNET_KARA_2.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_other_backing_devices_and_models_keep_existing_route[7.2-False-UVR_MDXNET_KARA_2.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_other_backing_devices_and_models_keep_existing_route[7.2-True-mel_band_roformer_karaoke_gabox_v2.ckpt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_backing_conversion_failure_does_not_fall_back_to_cpu",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_installer_exercises_model_loader_without_huggingface_download",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_native_bundle_contains_sam_bridge_source",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_youtube_uses_real_track_publication_receipt_and_survives_reopen",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_youtube_failure_removes_only_owned_audio_and_original",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_reusable_clip_is_not_falsely_in_use_and_can_be_deleted",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_cleanup_preserves_timeline_original_and_queued_sources",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_cleanup_does_not_delete_uncommitted_import_or_recent_temp",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_malformed_media_journal_prevents_destructive_cleanup",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_legacy_job_reservation_is_released_at_termination",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_cleanup_api_requires_integrity_and_explicit_policy",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_external_demucs_runtime_and_gpu_device_are_forwarded",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_web_track_separation_is_queued_and_publishes_stems[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_web_track_separation_is_queued_and_publishes_stems[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_horizontal_import_removed_but_sidebar_picker_preserved",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_signed_server_builds_include_demucs_setup",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_file_link_cannot_delete_another_referenced_media",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_only_verified_content_addressed_hardlinks_are_trusted",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_cleanup_account_acl_denies_foreign_project",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_media_stems_cleanup",
+      "name": "test_demucs_installer_preserves_accelerator_versions_and_configuration",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_ui_native_split_regressions",
+      "name": "test_ui_regressions_for_import_split_tracks_and_transport",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_ui_native_split_regressions",
+      "name": "test_native_icons_and_metadata_are_wired",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_ui_native_split_regressions",
+      "name": "test_frozen_demucs_runs_in_process_without_spawning_native_gui",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_ui_native_split_regressions",
+      "name": "test_stem_split_without_original_mix_never_adds_original_track",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_123",
+      "name": "test_ui_exposes_second_pass_backing_vocals",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_123",
+      "name": "test_backend_accepts_and_tracks_backing_vocals_option",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_123",
+      "name": "test_configured_ai_separator_without_checkpoint_contract_is_denied",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_123",
+      "name": "test_ffmpeg_fallback_builds_center_side_outputs",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[../escape]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[/absolute]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[C:/escape]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[a\\\\b]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[a//b]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[a/./b]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[a/../b]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[x.]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[x ]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[CON]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[a/aux.txt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_untrusted_model_names_fail_before_any_extraction[a/COM1.txt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_alias_and_file_directory_conflicts_fail_before_writes[names0]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_alias_and_file_directory_conflicts_fail_before_writes[names1]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_alias_and_file_directory_conflicts_fail_before_writes[names2]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_links_and_special_archive_entries_are_rejected[41471]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_links_and_special_archive_entries_are_rejected[8576]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_links_and_special_archive_entries_are_rejected[4480]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_expanded_archive_budgets_preflight_all_members[MAX_DOWNLOAD_BYTES]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_expanded_archive_budgets_preflight_all_members[MAX_EXPANDED_BYTES]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_expanded_archive_budgets_preflight_all_members[MAX_ARCHIVE_MEMBERS]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_extraction_does_not_overwrite_existing_or_follow_destination_link",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_model_download_budget_removes_only_own_partial_file",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_failed_secondary_download_never_publishes_partial_model",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_existing_install_is_preserved_without_redownload",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_revoked_rights_at_publication_preserve_absent_install",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_delete_and_lookup_require_exact_registered_model[../outside]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_delete_and_lookup_require_exact_registered_model[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_delete_and_lookup_require_exact_registered_model[/outside]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_actual_custom_separator_no_longer_deadlocks_on_pipe_sized_output",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_separator_cancellation_before_start_never_spawns",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_separator_log_overflow_and_failure_are_explicit",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_separator_timeout_stops_its_owned_process",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_separator_cancel_stops_worker_and_normal_descendant",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_process_and_models",
+      "name": "test_failed_member_crc_never_publishes_an_installed_model",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r266_separator_output_paths",
+      "name": "test_audio_separator_relative_output_filenames",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r267_roformer_beartype_compat",
+      "name": "test_native_build_validates_roformer_pep604_hints",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r267_roformer_beartype_compat",
+      "name": "test_roformer_type_checker_reports_actionable_error",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_rocm_loaded_callback_rechecks_current_rights_before_every_chunk",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[/untrusted/unknown.pt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[./tiny.pt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[https://example.test/a.pt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[tiny/../weights]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[--model=base]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[unreviewed]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[model6]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[1]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_sam_entry_rejects_unknown_identity_before_heavy_import[/untrusted/checkpoint]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_sam_entry_rejects_unknown_identity_before_heavy_import[other/sam-audio-small]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_sam_entry_rejects_unknown_identity_before_heavy_import[facebook/sam-audio-small@unreviewed]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_sam_entry_rejects_unknown_identity_before_heavy_import[facebook/sam-audio-small/../other]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_sam_entry_rejects_unknown_identity_before_heavy_import[https://example.test/sam]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_sam_entry_rejects_unknown_identity_before_heavy_import[--model=x]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_invalid_selector_is_refused_before_actual_queue_ledger_admission[whisper-/untrusted/unknown.pt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_invalid_selector_is_refused_before_actual_queue_ledger_admission[sam-audio-foreign/repo]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_invalid_selector_is_refused_before_actual_queue_ledger_admission[demucs-foreign_model]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_published_selectors_retain_actual_accounted_worker_contract[whisper-tiny.en]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_published_selectors_retain_actual_accounted_worker_contract[sam-audio-sam-audio-small]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_published_selectors_retain_actual_accounted_worker_contract[demucs-htdemucs_6s]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_environment_defaults_cannot_bypass_parent_or_direct_adapter[whisper-MTA_LYRICS_WHISPER_MODEL-/untrusted/private.pt]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_environment_defaults_cannot_bypass_parent_or_direct_adapter[sam-audio-MTA_AI_SAM_MODEL-foreign/repo]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments0]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments1]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments2]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments3]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments4]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments5]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments6]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments7]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments8]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_refuses_ambiguous_or_repository_override_before_profiling[arguments9]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_preserves_valid_arguments_and_restores_process_argv[arguments0]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_preserves_valid_arguments_and_restores_process_argv[arguments1]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_profiled_demucs_preserves_valid_arguments_and_restores_process_argv[arguments2]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_whisper_aliases_and_shared_demucs_registry_preserve_declared_variants",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_unified_whisper_uses_same_validated_default_as_direct_path",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_token_api_rejects_unknown_checkpoint_without_worker_or_ledger[whisper-/untrusted/checkpoint.pt-json]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_token_api_rejects_unknown_checkpoint_without_worker_or_ledger[whisper-/untrusted/checkpoint.pt-wav]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_token_api_rejects_unknown_checkpoint_without_worker_or_ledger[sam-audio-other/private-json]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_token_api_rejects_unknown_checkpoint_without_worker_or_ledger[sam-audio-other/private-wav]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_token_api_rejects_unknown_checkpoint_without_worker_or_ledger[demucs-custom_model-json]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_selector_boundaries",
+      "name": "test_actual_token_api_rejects_unknown_checkpoint_without_worker_or_ledger[demucs-custom_model-wav]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[chords-ml]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[sam-audio]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[singer-separation]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[backing-vocals]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_cancellation_during_artifact_packaging_cannot_bill_success",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[http://127.0.0.1:8001-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[http://localhost:8001/-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[http://192.168.1.2:8001-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[https://example.org-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[http://8.8.8.8:8001-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[http://example.org-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[file:///tmp/a-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[http://user:password@127.0.0.1-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[https://example.org/api/admin-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_upstream_validation[nonsense-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_authorization_methods_size_and_audit",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_gateway_proxy_success_limits_and_errors",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_unified_manifest_validation",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_unified_transcripts_and_chords",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_unified_drumsep_and_missing_model",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_unified_subprocess_models",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-subprocess-final.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_singer_separation_invalid_options[bad0]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_singer_separation_invalid_options[bad1]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_singer_separation_invalid_options[bad2]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_singer_separation_invalid_options[bad3]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_singer_separation_invalid_options[bad4]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_singer_separation_invalid_options[bad5]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_singer_separation_selected_and_all",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_backing_vocals_artifact_security",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-fixtures-final.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_unified_cli_main",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_unified_cli_requires_original_admission[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "name": "test_unified_cli_requires_original_admission[wrong-kind]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_reimbursement_is_not_an_automatic_license_exception",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_review_requires_permission_and_free_access_acknowledgement",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_free_resources_remain_accounted_without_billing_or_quota_use",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_license_snapshot_is_idempotent_but_not_mutable",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_mega53_adapter_r210",
+      "name": "test_catalog_and_policy_identity",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_mega53_adapter_r210",
+      "name": "test_not_configured_fails_closed",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_mega53_adapter_r210",
+      "name": "test_adapter_with_synthetic_stub",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_mega53_adapter_r210",
+      "name": "test_invalid_model_files_are_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_mega53_primary_secondary_r210",
+      "name": "test_uvr_primary_and_mega_secondary",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_mega53_primary_secondary_r210",
+      "name": "test_mega53_rejects_unverified_weights",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_mega53_primary_secondary_r210",
+      "name": "test_multi_singer_remains_distinct_from_lead_backing",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_mega53_drum_parts",
+      "name": "test_drums_use_same_authorized_inference_pipeline",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_mega53_drum_parts",
+      "name": "test_drum_target_rejects_cymbals",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_mega53_drums_percussion_groups",
+      "name": "test_two_native_group_sources_requested_from_original_mix",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_mega53_drums_percussion_groups",
+      "name": "test_missing_group_stem_is_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_124",
+      "name": "test_ai_catalog_default_and_choices",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_124",
+      "name": "test_native_catalog_marks_local",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_124",
+      "name": "test_ui_sends_selected_backing_model",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_backing_vocals_124",
+      "name": "test_requirements_include_audio_separator",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-integration.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_actual_token_api_denies_opaque_command_without_worker_or_ledger[json]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-api-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_actual_token_api_denies_opaque_command_without_worker_or_ledger[wav]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-api-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_fixed_tool_sharing_metered_group_is_stopped_and_reaped_without_signalling_parent",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-api-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_actual_source_bound_service_admission_review",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "status": "passed",
+      "report": "docs/validation/r210/legacy-separator-gates.xml"
+    }
+  ],
+  "historical_failures_retained": [
+    "legacy-separator-first.xml:missing DSP production route initially failed;original39-case attempt retained.",
+    "legacy-separator-affected.xml:old generated filenames,permissions and opaque-command expectation required fixture updates;all assertion purposes retained or moved to the internal process primitive.",
+    "legacy-dsp-actual.xml and legacy-dsp-final.xml:the real wait4 supervisor correctly withheld unverified descendant accounting. The test now requires the original held claim instead of fabricating successful billing.",
+    "legacy-separator-integration.xml and legacy-separator-fixtures-final.xml:old SAM identifier/error text and generated backing filename updated to the declared selectors;exact failed cases rerun green in the later XML."
+  ],
+  "security": {
+    "app_sources": 304,
+    "bandit_findings": 165,
+    "high": 0,
+    "medium": 21,
+    "low": 144,
+    "new_findings": 0,
+    "removed_findings": 1,
+    "C2_boundaries": 170,
+    "http_sites": 30,
+    "http_sources": 21,
+    "runtime_sources": 548,
+    "runtime_boundaries": 781,
+    "checker_bytes_unchanged": true,
+    "suppressions_or_threshold_changes": false,
+    "ruff": "passed",
+    "app_scripts_compile": "passed"
+  },
+  "reuse": {
+    "F3_loader_proof": "docs/validation/r210/legacy-separator-unchanged-proof.json",
+    "actual_new_neural_model_runs": 0,
+    "prior_real_ONNX_cases_reused": 7,
+    "prior_optional_skips_remain_open": 7,
+    "unchanged_financial_UI_full_CI_repeated": false
+  },
+  "scope": "Direct desktop Demucs plus loaded backing/ROCm permissions,opaque command refusal and explicit shared DSP. Actual CLI,token APIs,SQLite and process cleanup;model runtime fixtures do not prove real neural weights.",
+  "progress": {
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ],
+    "promoted": [],
+    "requested_numeric_progress_achieved": false,
+    "release_candidate": false
+  },
+  "remaining_original_criteria": [
+    "A4",
+    "A5",
+    "A6",
+    "B2",
+    "B6",
+    "C3",
+    "C5",
+    "C6",
+    "D6",
+    "F4",
+    "F5",
+    "F6",
+    "G5",
+    "G6"
+  ],
+  "remaining_F4_code_or_acceptance": [
+    "iOS Core ML local execution lacks a completed current-rights/offline admission contract;not merely a missing OS test.",
+    "Full end-to-end opaque neural/native/dynamic-runtime rights and bypass acceptance is not proved by the explicit Python guards or this source census."
+  ],
+  "external_actions": {
+    "commit": false,
+    "github_mutation": false,
+    "real_server_or_provider": false
+  },
+  "secret_scan": {
+    "scanner": "gitleaks8.24.3",
+    "source_archive_sha256": "9991e0b2903da4c8f6122b5c3186448b927a5da4deef1fe45271c3793f4ee29c",
+    "scope": "Final introduced/replaced UTF8 lines versus the exact input,including complete final manifest;not an unchanged historical repository rescan.",
+    "findings": 0,
+    "config_and_ignore_bytes_unchanged": true,
+    "report": "docs/validation/r210/legacy-separator-gitleaks.json"
+  }
+}

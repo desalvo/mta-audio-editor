@@ -23,6 +23,8 @@ def test_asset_requires_digest(tmp_path):
 
 
 def test_runtime_rejects_checkpoint_outside_experiment(tmp_path,monkeypatch):
+    from model_rights_fixtures import authorize_singing_fixture
+    authorize_singing_fixture(monkeypatch,tmp_path)
     from app.diffsinger_bridge import run
     root=tmp_path/'runtime'; (root/'scripts').mkdir(parents=True)
     (root/'checkpoints'/'singer').mkdir(parents=True)

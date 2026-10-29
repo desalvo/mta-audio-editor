@@ -92,9 +92,27 @@
       if(!data.items.length&&!offset)items.textContent=it?'Nessuna lettura salvata':'No saved readbacks';
       for(const snapshot of data.items){
         const panel=document.createElement('details'),summary=document.createElement('summary');summary.textContent=snapshot.environment+' · '+snapshot.start_date+' / '+snapshot.end_date+' · '+snapshot.records;panel.append(summary);
-        let rowOffset=0;const rows=document.createElement('pre'),more=document.createElement('button');rows.style.maxWidth='100%';rows.style.overflowX='auto';rows.tabIndex=0;rows.setAttribute('role','region');rows.setAttribute('aria-label',it?'Osservazioni dello storico PayPal':'PayPal history observations');more.type='button';more.textContent=it?'Carica osservazioni':'Load observations';
-        more.onclick=async()=>{more.disabled=true;try{const page=await get('/api/admin/paypal/merchant-history/'+encodeURIComponent(snapshot.id)+'?offset='+rowOffset+'&limit=50');rows.textContent+=(rowOffset?'\n':'')+JSON.stringify(page.items,null,2);rowOffset+=page.items.length;more.hidden=rowOffset>=page.total;}catch(e){status.textContent=(it?'Lettura non disponibile: ':'Readback unavailable: ')+e.message;}finally{more.disabled=false;}};
-        panel.append(rows,more);items.append(panel);
+        let rowOffset=0;const rows=document.createElement('pre'),actions=document.createElement('div'),more=document.createElement('button');rows.style.maxWidth='100%';rows.style.overflowX='auto';rows.tabIndex=0;rows.setAttribute('role','region');rows.setAttribute('aria-label',it?'Osservazioni dello storico PayPal':'PayPal history observations');more.type='button';more.textContent=it?'Carica osservazioni':'Load observations';
+        more.onclick=async()=>{more.disabled=true;try{
+          const base='/api/admin/paypal/merchant-history/'+encodeURIComponent(snapshot.id);
+          const page=await get(base+'?offset='+rowOffset+'&limit=50');
+          const review=await get(base+'/review?offset='+rowOffset+'&limit=50');
+          rows.textContent+=(rowOffset?'\n':'')+JSON.stringify(page.items,null,2);
+          for(const item of review.items){
+            const line=document.createElement('p'),button=document.createElement('button');
+            const label=document.createElement('span');label.textContent=item.transaction_id+' · '+(item.state==='unsupported'?(it?'Prova indipendente necessaria':'Independent evidence required'):item.order_id|| (it?'Ordine originale da verificare':'Original order requires discovery'))+' ';
+            line.append(label);button.type='button';button.textContent=it?'Riconcilia ordine originale':'Reconcile original order';button.disabled=item.state==='unsupported';
+            button.onclick=async()=>{
+              if(!confirm(it?'Rileggere il pagamento originale, tutti i rimborsi e le dispute e applicare il saldo esatto al ledger locale? Nessun nuovo incasso o rimborso verrà inviato al provider.':'Read back the original payment, all refunds and disputes and apply the exact local ledger balance? No new capture or refund will be sent to the provider.'))return;
+              button.disabled=true;
+              try{const response=await fetch(base+'/reconcile',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-MTA-Request':'1'},body:JSON.stringify({observation_sha256:item.observation_sha256,confirm:true})});if(!response.ok)throw Error('HTTP '+response.status);const result=await response.json();status.textContent=(result.ledger_reconciled?(it?'Ledger originale riconciliato. ':'Original ledger reconciled. '):(it?'Riconciliazione ancora pendente. ':'Reconciliation still pending. '))+(result.financial_review_pending?(it?'Restano obblighi da verificare. ':'Financial obligations still require review. '):'')+(it?'Lo storico completo e il cambio di regime non sono certificati.':'Complete history and regime switching are not certified.');}
+              catch(e){status.textContent=(it?'Riconciliazione non disponibile; conserva la prova originale: ':'Reconciliation unavailable; retain original evidence: ')+e.message;}
+              finally{button.disabled=false;}
+            };line.append(button);actions.append(line);
+          }
+          rowOffset+=page.items.length;more.hidden=rowOffset>=page.total;
+        }catch(e){status.textContent=(it?'Lettura non disponibile: ':'Readback unavailable: ')+e.message;}finally{more.disabled=false;}};
+        panel.append(rows,actions,more);items.append(panel);
       }
       offset+=data.items.length;view.hidden=offset>=data.total;
     }

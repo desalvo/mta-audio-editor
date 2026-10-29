@@ -1,0 +1,2157 @@
+{
+  "schema": "mta-paypal-settlement-recovery-1",
+  "date": "2026-10-28",
+  "timezone": "Europe/Rome",
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "passed": 348,
+  "new_cases": 46,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "report": "docs/validation/r210/settlement-recovery-current.xml",
+  "report_sha256": "ea4a21f0f7e7baa0c95a5040e13706fd3de6cd1aa9765b24d84acf5dc32d9f42",
+  "cases": [
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_exact_completed_defended_report_releases_original_hold_and_replays",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[account]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[amount]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[currency]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[reference]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[direction]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[fee_event]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[temporary_hold]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[duplicate]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[case]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[capture]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[gross]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[status]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[not_resolved]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[changed_case]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[missing_payee]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[role]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[config]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[owner]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[report_timeout]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[reused_case]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_invalid_or_changed_evidence_never_releases_original_money[stale_report]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_changed_canonical_after_resolution_is_pending_not_a_second_refund",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_failure_after_report_resolution_rolls_back_all_credit_changes",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[truncate]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[footer]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[duplicate_header]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[foreign_header]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[extra_section]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[bad_utf8]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[huge]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_incomplete_raw_report_cannot_become_authority[nul]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_multicapture_report_allocates_each_distinct_completed_credit",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_same_provider_movement_cannot_be_adopted_by_a_second_case",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_documented_acm_footer_order_and_trailing_report_field_are_supported",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_transport_is_fixed_host_pinned_keys_bounded_and_reaps[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_transport_is_fixed_host_pinned_keys_bounded_and_reaps[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_unsafe_transport_never_returns_unverified_report[username]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_unsafe_transport_never_returns_unverified_report[path]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_unsafe_transport_never_returns_unverified_report[format]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_unsafe_transport_never_returns_unverified_report[key_mode]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_unsafe_transport_never_returns_unverified_report[symlink]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_unsafe_transport_never_returns_unverified_report[timeout]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_actual_drain_waits_for_report_recovery_and_closes_after_reaped_work",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_admission_distinguishes_finished_failure_from_unknown_child[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_settlement_reports",
+      "name": "test_admission_distinguishes_finished_failure_from_unknown_child[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-reports-platform-final.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovery_funds_only_net_and_replays_idempotently[False-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovery_funds_only_net_and_replays_idempotently[False-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovery_funds_only_net_and_replays_idempotently[True-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovery_funds_only_net_and_replays_idempotently[True-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_PAYOUT]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_OTHER]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-UNKNOWN]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_PAYOUT]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_OTHER]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-UNKNOWN]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[missing_items]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[non_list]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[summary_status]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[summary_amount]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[summary_time]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[wrong_detail]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[foreign_capture]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[duplicate_capture]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[partial_multi]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[negative]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[currency]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[bad_time]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[naive_time]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[empty_transactions]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[missing_gross]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[gross_mismatch]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[single_gross_mismatch]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[incomplete_membership]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[collection_changed]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[detail_changed]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[order_changed]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[http_error]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_unverifiable_history_never_funds_and_retains_durable_gap[missing_known]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_gap_recovery_is_atomic_and_later_gap_never_reopens_an_immutable_event",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_original_context_drift_after_remote_discovery_never_settles[owner]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_original_context_drift_after_remote_discovery_never_settles[merchant]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_original_context_drift_after_remote_discovery_never_settles[amount]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_original_context_drift_after_remote_discovery_never_settles[kind]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_original_context_drift_after_remote_discovery_never_settles[provider]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_original_context_drift_after_remote_discovery_never_settles[epoch]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_opposing_final_history_is_pending_and_never_releases_permanent_loss[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_opposing_final_history_is_pending_and_never_releases_permanent_loss[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_complete_two_page_readback_applies_each_dispute_once",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[host]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[environment]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[credentials]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[port]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[fragment]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[path]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[filter]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[size]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[extra_query]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_query]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[method]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_link]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[empty_continuation]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_row]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[no_links_list]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[token]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[control]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[backslash]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[object_bound]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page_bound]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[request_bound]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_observed_dispute_during_unstable_scan_cannot_disappear_on_later_empty_scan",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_combined_historical_refunds_and_dispute_never_publish_gross_or_double_debit",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_discovered_repayment_dispute_reopens_exact_debt_and_release_restores_allocation",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_dispute_history",
+      "name": "test_changed_dispute_amount_preserves_old_hold_and_durable_private_review",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_partial_multicapture_original_subscription_risk_does_not_mint_credit",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_items]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[empty_items]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[wrong_type]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_id]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_id]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_cross_capture]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[control_id]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[long_id]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_money]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[negative]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[currency]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[capture_overflow]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[global_mismatch]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[numeric_quantity]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero_quantity]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[excess_items]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[malformed_item]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-fund_movements]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-money_movements]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-both]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-none]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-fund_movements]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-money_movements]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-both]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-none]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-fund_movements]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-money_movements]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-both]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-none]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_party]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_direction]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[unknown_reason]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_amount]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[bad_time]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[asset]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_time]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_malformed_movement_collection_requires_durable_history_review[non_list]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_malformed_movement_collection_requires_durable_history_review[non_object]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_malformed_movement_collection_requires_durable_history_review[over_bound]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_malformed_movement_collection_requires_durable_history_review[wrong_currency]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_malformed_movement_collection_requires_durable_history_review[invalid_money]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_private_movement_report_bounded_and_deduplicated_across_two_captures",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[value0]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[None]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[0]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_item_movements",
+      "name": "test_admin_only_safe_movement_dto_and_corrupt_observation_fail_closed",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_failure_after_funding_rolls_back_history_and_wallet",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_refunded_subscription_creates_exact_receivable",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1.01]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[NaN]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1e2]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[-1]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1.001]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[ 1]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1.]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_multiple_capture_refund_before_fulfillment_replays_atomically",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_canonical_refund_cannot_be_attributed_to_other_capture",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_refund_cannot_cross_provider_environment",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_failed_refund_replay_rolls_back_capture_and_wallet",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_subscription_refund_records_exact_receivable_without_wallet_credit",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_capture_reversal_and_refund_never_double_debit",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_reversal_before_capture_is_replayed_in_capture_transaction",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_dispute_readback_holds_then_releases_and_rejects_stale_updates",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_original_permanent_loss_can_be_repaid_exactly",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_full_reversal_and_refund_of_same_capture_never_double_debt[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_full_reversal_and_refund_of_same_capture_never_double_debt[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_duplicate_permanent_cases_on_same_capture_share_fee_cap",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_partial_permanent_loss_stays_unallocated",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_legacy_missing_original_basis_is_not_invented",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_payment_basis_is_immutable_and_failed_event_rolls_back",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_concurrent_verified_reversals_allocate_once",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_rounding_surplus_is_consumed_before_reopening_original_fee",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_gap_review_distinguishes_legacy_and_unproved_partial_loss",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_original_fee_basis_survives_later_subscription_price_change",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_actual_owner_api_repay_private_loss_obligation",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_same_capture_refund_after_loss_was_repaid_does_not_reopen_debt",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_original_subscription_loss",
+      "name": "test_buyer_favour_dispute_without_actual_reversal_never_collects_fee",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_discovered_initial_refunded_principal_uses_exact_original_net[ODR-capture]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_discovered_initial_refunded_principal_uses_exact_original_net[ODR-refund]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_discovered_initial_refunded_principal_uses_exact_original_net[TXN-capture]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_discovered_initial_refunded_principal_uses_exact_original_net[TXN-refund]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_unsupported_observation_remains_unresolved_before_network[fee]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_unsupported_observation_remains_unresolved_before_network[payout]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_unsupported_observation_remains_unresolved_before_network[pending]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_unsupported_observation_remains_unresolved_before_network[denied]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_unsupported_observation_remains_unresolved_before_network[currency]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_unsupported_observation_remains_unresolved_before_network[wrong_sign]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_reporting_observation_alone_never_funds_or_closes_unknown_money[amount]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_reporting_observation_alone_never_funds_or_closes_unknown_money[fraction]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_reporting_observation_alone_never_funds_or_closes_unknown_money[transaction]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_reporting_observation_alone_never_funds_or_closes_unknown_money[reference]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_reporting_observation_alone_never_funds_or_closes_unknown_money[timestamp]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_reporting_observation_alone_never_funds_or_closes_unknown_money[missing_time]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[actor]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[secret]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[merchant]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[owner]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[amount]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[kind]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[snapshot]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_context_drift_during_canonical_reads_rolls_back_money[epoch]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_failure_after_binding_and_partial_refund_rolls_back_then_recovers",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_private_admin_api_confirmation_and_no_provider_mutations",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_review_counts_all_cases_beyond_display_page_without_network",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_refund_cannot_be_associated_with_another_capture_in_same_order",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_discovery_never_adopts_payer_labels_when_original_order_is_missing",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_unknown_observation_and_unconfirmed_action_never_contact_provider",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_merchant_continuation_paths_are_exact_not_a_general_mutation_bypass",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_merchant_ledger_bridge",
+      "name": "test_actual_merchant_recovery_remains_available_under_service_drain",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_concurrent_fulfillment_delivers_one_allocation",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_dispute_release_after_second_repayment_creates_refund_liability",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_uncertain_create_stays_pending_without_second_provider_post",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_owner_api_quote_csrf_and_regime_guards",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_allocations_are_immutable_and_missing_position_blocks_report",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_refund_before_repayment_fulfillment_is_atomic",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_owner_quote_change_is_checked_before_provider_capture",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_multiple_sources_are_bound_to_original_refund",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_verified_webhook_retries_allocate_once",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_permanent_capture_reversal_reopens_original_receivable",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_journal_idempotence_and_never_settles",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_reject_missing_transaction",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation0]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation1]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation2]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation3]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation4]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation5]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation6]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_financial_evidence_journal",
+      "name": "test_conflicting_replay_and_tamper_detection",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-recovery-current.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_actual_source_bound_service_admission_review",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "status": "passed",
+      "report": "docs/validation/r210/settlement-source-gates-final.xml"
+    }
+  ],
+  "scope": "Explicit operator-only,authenticated single-file ACM S6 + exact STL completed T1202/T1205 credit -> canonical same-case/account/filer/update -> immutable movement claim -> original atomic ledger/replay. Not general PayPal payout clearance.",
+  "transport_validation": "Bounded OpenSSH argv/options/hostkeys/privatecopy/reaping exercised with isolated subprocess doubles;actual PayPal SFTP credential/report validation not performed. All API/provider transport is isolated or mocked;no live account contacted.",
+  "source_review": {
+    "app_sources": 303,
+    "findings": 166,
+    "high": 0,
+    "medium": 21,
+    "low": 145,
+    "new_reviewed_low_findings": 2,
+    "admission_sites": 171,
+    "python_transport_sites": 30,
+    "python_transport_files": 21,
+    "new_ssh_process_transport": 1,
+    "runtime_sources": 547,
+    "runtime_boundaries": 783,
+    "new_suppressions": 0
+  },
+  "original_criteria_promoted": [],
+  "progress_percent": 66.7,
+  "numeric_progress_requested_achieved": false,
+  "release_candidate": false,
+  "remaining": [
+    "Full merchant-account coverage and unknown original references",
+    "General payout/protection/partial/multifile/multicurrency/other-case-state proof",
+    "Legacy original fee/surplus evidence",
+    "Original14criteria retain requirements and states"
+  ],
+  "external_block": [
+    "Approved PayPal ACM/STL reporting access,separateSFTPidentity and trustedhostkeys notprovided;no real account/server action authorized",
+    "Actual matching production-format report pairs not available;this scoped protocol is not vendor/target certification"
+  ],
+  "prior_evidence_reused": [
+    "Unaffected F3 real model/HTTPS",
+    "Unchanged administration Chromium/axe",
+    "ConfirmedfullCI40584085026 on4c3"
+  ],
+  "commit_performed": false,
+  "remote_mutations": 0,
+  "reports": [
+    {
+      "path": "docs/validation/r210/settlement-recovery-current.xml",
+      "sha256": "ea4a21f0f7e7baa0c95a5040e13706fd3de6cd1aa9765b24d84acf5dc32d9f42"
+    },
+    {
+      "path": "docs/validation/r210/settlement-reports-platform-final.xml",
+      "sha256": "f2b4ee3f20f56f9a77694dd565fc407471e11688143742994fff812bb6bd7921"
+    },
+    {
+      "path": "docs/validation/r210/settlement-source-gates-final.xml",
+      "sha256": "9ac111d8d03221f64dbf784cf5a879f40c010c047d82c0305286d11b6e791442"
+    }
+  ],
+  "evidence_reuse": "Earlier broad348green selection retained for unchanged branches;finalactor-audit46 and finalsourcegates61 replace identical caseIDs;no repeated fullCI/browser.",
+  "platform_prerequisites": "Only transport/POSIX authority tests skip on unsupported targets;all46 new cases pass with0skips on this Linux/OpenSSH runtime."
+}

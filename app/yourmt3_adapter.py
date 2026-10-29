@@ -82,6 +82,8 @@ def _transcribe(source,options):
     from .ai_studio_adapter import progress
     if set(options)-{'name','program'}:raise ValueError('YourMT3 accepts name only; isolated-source Basic Pitch thresholds do not apply')
     if 'program' in options:raise ValueError('YourMT3 classifies instrument programs; remove the manual program override')
+    from .model_license_policy import evaluate_model
+    evaluate_model('yourmt3')
     import soundfile as sf
     info=sf.info(str(source))
     if info.channels not in (1,2) or not 0<info.duration<=600 or info.samplerate>192000:raise ValueError('YourMT3 accepts mono/stereo regions up to 10 minutes and 192 kHz')

@@ -1,0 +1,883 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="117" time="7.327" timestamp="2026-10-29T02:11:19.406568+01:00" hostname="235c84ed49d1"><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-False]" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-False]" time="0.005" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-True]" time="0.004" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/tmp/weights.pt-6-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/tmp/weights.pt-6-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_operator_local_repository_is_not_a_checkpoint_permission[False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_operator_local_repository_is_not_a_checkpoint_permission[True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_cardinality_profile_cannot_inject_an_unreviewed_model_after_initial_admission" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[False]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_loader_rejects_revocation_before_runtime_load[UVR_MDXNET_KARA_2.onnx]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_loader_rejects_revocation_before_runtime_load[mel_band_roformer_karaoke_gabox_v2.ckpt]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[/tmp/weights.onnx]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[../UVR_MDXNET_KARA_2.onnx]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[foreign.onnx]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[operator-provided.ckpt]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[None]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_load_revocation_cannot_mark_the_cached_runtime_admitted" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_loaded_backing_runtime_rechecks_current_permission_and_exact_selector" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-policy]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-native]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-unified]" time="0.005" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-policy]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-native]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-unified]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-policy]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-native]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-unified]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_rejection_precedes_actual_queue_and_ledger_admission" time="0.084" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_builtin_backing_dsp_still_runs_the_real_registered_adapter_and_ledger" time="0.877"><failure message="app.ai_metering_agent.WorkerUncertain: Worker process-tree metering is unverified; original owner retained">user_id = 1, kind = 'backing-vocals'
+plan = {'model': 'ffmpeg-center-side', 'kind': 'backing-vocals'}
+token_id = None, timeout_seconds = 1200
+source_wav = b'RIFF$\x02\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x02\x00\...00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+source_json = None
+cancel_check = &lt;function execute.&lt;locals&gt;.run.&lt;locals&gt;.cancelled at 0x7ff0875c6160&gt;
+license_decision = Decision(model_id='mta-analysis', mode='cost_recovery', source='https://github.com/desalvo/mta-audio-editor', policy_sha256='9b9ff0c12c55d7c4d6cdbbaafe1e2791f631d1c834d1a1a06b1b707b02037079', operator_review=False)
+_request_key = None, _request_digest = None
+
+    def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
+                                  timeout_seconds: int = 1200, source_wav: bytes | None = None, source_json: bytes | None = None,
+                                  cancel_check: Callable[[], bool] | None = None, license_decision=None,
+                                  _request_key=None, _request_digest=None) -&gt; tuple[bytes, dict]:
+        """Run the administrator-installed AI worker and persist measured usage.
+    
+        Unsupported GPU/process-tree telemetry is omitted, not guessed. Output is
+        returned to the caller without changing billing for model files shared
+        by multiple users.
+        """
+        import json
+        import tempfile
+        from . import ai_billing
+        from .ai_worker_protocol import verify_preview_wav, WorkerUnavailable, MAX_REQUEST_BYTES
+        from .ai_worker_registry import resolve_worker
+        from .ai_worker_artifacts import package_artifacts
+    
+        # Reject user-supplied paths before requiring a live scheduler context too.
+        if not isinstance(plan, dict) or plan.get('kind', kind) != kind:
+            raise ValueError('AI plan cannot override the registered engine')
+        if 'source_score' in plan:
+            raise ValueError('Score path must be generated by MTA')
+        require_dispatch_identity(user_id, token_id)
+        from . import ai_pull_coordinator as pull
+        if pull.mode() == 'pull':
+            return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
+                                source_wav=source_wav, source_json=source_json, cancel_check=cancel_check,
+                                request_key=_request_key, request_digest=_request_digest)
+    
+        from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
+        worker = resolve_worker(kind)
+        if plan.get('kind',kind)!=kind:raise ValueError('AI plan cannot override the registered engine')
+        plan={**plan,'kind':kind}
+        if worker is None:
+            raise WorkerUnavailable('No trusted AI worker configured')
+        if 'source_score' in plan:raise ValueError('Score path must be generated by MTA')
+        if source_json is not None:
+            if source_wav is not None or kind not in {'vocal-harmony','vocal-synthesis'}:raise ValueError('Unsupported structured score transport')
+            from .studio_score import validate
+            validate(source_json)
+        if source_wav is not None and ('source_audio' in plan or 'input_path' in plan):
+            raise ValueError('Audio path must be generated by MTA')
+        if source_wav is not None:
+            from .ai_payload_limits import MAX_SOURCE_BYTES
+            if not isinstance(source_wav, bytes) or not 0 &lt; len(source_wav) &lt;= MAX_SOURCE_BYTES:
+                raise ValueError('AI source audio exceeds size limit or is empty')
+            # Verify the exact immutable bytes before creating a ledger/claim.
+            from .ai_worker_artifacts import _verify_wav_bytes
+            _verify_wav_bytes(source_wav)
+        encoded = json.dumps(plan, ensure_ascii=False, allow_nan=False).encode('utf-8')
+        if len(encoded) &gt; MAX_REQUEST_BYTES:
+            raise ValueError('AI plan exceeds size limit')
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        # Freeze policy once. Later administrator changes cannot invalidate a
+        # running job between backend publication and server-side packaging.
+        artifact_limit_mib = queue.artifact_limit_mib()
+        artifact_budget = artifact_limit_mib * 1024 * 1024
+        queue_id=current_job.get();defer_settlement=False;job_id=None
+        if queue_id:
+            with queue._db() as con:queued=con.execute('SELECT operation FROM jobs WHERE job_id=?',(queue_id,)).fetchone()
+            if queued and queued[0] in ('arranger','remix'):
+                job_id=ai_billing.existing_inference_ledger_job(queue_id,user_id,queued[0])
+                defer_settlement=job_id is not None
+        from .model_license_policy import evaluate,record_job
+        license_decision=license_decision or evaluate(kind,plan)
+        job_id=job_id or ai_billing.create_job(user_id,kind,token_id,billing_exemption_reason=('license:'+license_decision.model_id) if not license_decision.billable else '')
+        record_job(job_id,license_decision)
+        from .ai_execution_policy import admitted_env
+        policy_env=admitted_env(kind,license_decision)
+        if queue_id:
+            with ai_billing.db() as con:
+                ai_billing._init(con);con.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(queue_id,job_id))
+        # Only operator-enabled GPU adapters obtain logical slots; neither the
+        # request plan nor the remote user may declare GPU eligibility.
+        from .ai_gpu_slot_accounting import slot_enabled_for_kind
+        gpu_slot_enabled = slot_enabled_for_kind(kind)
+        from contextlib import nullcontext
+        with tempfile.TemporaryDirectory(prefix='mta-meter-') as folder, (_ace_cleanup(plan, lambda: Path(folder)/'progress.json') if kind=='ace-step' else nullcontext()):
+            directory = Path(folder)
+            request_path = directory / 'request.json'
+            output_path = directory / 'preview.wav'
+            if source_wav is not None:
+                from .ai_worker_protocol import verify_preview_wav
+                input_path = directory / 'source.wav'
+                input_path.write_bytes(source_wav)
+                verify_preview_wav(input_path)
+                input_path.chmod(0o400)
+                staged_source = str(input_path)
+                if kind=='ace-step':
+                    (directory/'inputs').mkdir()
+                    input_path.replace(directory/'inputs'/'source.wav')
+                    staged_source=[{'filename':'inputs/source.wav'}]
+                encoded = json.dumps({**plan, 'source_audio': staged_source}, ensure_ascii=False, allow_nan=False).encode('utf-8')
+            if source_json is not None:
+                score_path=directory/'score.json';score_path.write_bytes(source_json);score_path.chmod(0o400)
+                encoded=json.dumps({**plan,'source_score':str(score_path)},ensure_ascii=False,allow_nan=False).encode('utf-8')
+            from .ai_torch_diagnostics import enabled as torch_diagnostics_enabled, read_report
+            from .ai_gpu_verified import readiness as gpu_readiness, VERIFIED_KINDS
+            from .ai_worker_registry import extensions
+            verified_kind=kind in VERIFIED_KINDS or extensions().get(kind,{}).get('metering_method')=='gpu-kernel-union-v1'
+            verified_enabled=verified_kind and gpu_readiness()['ready']
+            if torch_diagnostics_enabled() or verified_enabled:
+                # The server, never the request, assigns diagnostic identity.
+                encoded = json.dumps({**json.loads(encoded), 'gpu_profile_task_id': job_id},
+                                     ensure_ascii=False, allow_nan=False).encode('utf-8')
+            request_path.write_bytes(encoded)
+            request_path.chmod(0o600)
+            from .ai_worker_registry import worker_python
+            args = ([worker_python(kind), str(worker)] if worker.suffix == '.py' else [str(worker)])
+            args += ['--request', str(request_path), '--output', str(output_path)]
+            # Deferred workers reuse the scheduler's owner; publication and billing
+            # outboxes retain that same immutable receipt through recovery.
+            if defer_settlement:
+                from .deferred_execution_owner import credentials_for
+                claim_credentials=credentials_for(job_id)
+            else:
+                import secrets
+                import socket
+                from .regime_worker_claims import claim
+                claim_credentials={'worker_id':'local:'+socket.gethostname()+':'+str(os.getpid()),
+                                   'claim_token':secrets.token_hex(32)}
+                with ai_billing.db() as con:
+                    con.execute('BEGIN IMMEDIATE')
+                    claim(con,job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
+            result = None
+            gpu_slot_acquired = False
+            observed_at = float('-inf')
+            identity_lost = False
+            def diagnostic_checkpoint(*, final=False):
+                nonlocal observed_at, identity_lost
+                if final or time.monotonic() - observed_at &gt;= 2:
+                    observed_at = time.monotonic()
+                    if not final:
+                        try:
+                            require_dispatch_identity(user_id, token_id)
+                        except (ValueError, RuntimeError):
+                            identity_lost = True
+                            return True
+                    if claim_credentials and not final:
+                        from .regime_worker_claims import heartbeat
+                        with ai_billing.db() as con:
+                            con.execute('BEGIN IMMEDIATE')
+                            heartbeat(con,'job:ledger:'+job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
+                    try:
+                        from .ai_torch_diagnostics import store_report
+                        report = read_report(directory, job_id)
+                        if report:
+                            store_report(job_id, report)
+                        from .ai_compute_diagnostics import store as store_live_counters
+                        counters = dict(report or {})
+                        try:
+                            raw_progress = json.loads((directory/'progress.json').read_text())
+                        except (OSError, ValueError):
+                            raw_progress = {}
+                        if isinstance(raw_progress, dict):
+                            counters = {**raw_progress, **counters}
+                        store_live_counters(job_id, counters)
+                        if queue_id and counters:
+                            from .storage import _atomic_json_write
+                            allowed={'phase','message','progress_percent','progress_source','progress_estimated','steps_completed','steps_total','cpu_seconds_estimated','gpu_seconds_estimated','gpu_metrics_status','gpu_metrics_source'}
+                            published={k:v for k,v in counters.items() if k in allowed}
+                            _atomic_json_write(queue._ROOT/(queue_id+'.progress.json'),published)
+                    except Exception as exc:
+                        import logging
+                        logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
+                if not final:
+                    from .resource_accounts import has_limits,checkpoint
+                    if license_decision.billable and has_limits(user_id) and checkpoint(user_id,job_id,counters if 'counters' in locals() else {}):
+                        return True
+                return cancel_check() if not final and cancel_check is not None else False
+            worker_cancel_check = diagnostic_checkpoint
+            try:
+                if gpu_slot_enabled:
+                    from . import ai_gpu_slot_accounting as gpu_slots
+                    gpu_slots.acquire(job_id, os.getenv('MTA_AI_GPU_LOGICAL_DEVICE', 'gpu0'))
+                    gpu_slot_acquired = True
+                if os.getenv('MTA_AI_CGROUP_PARENT'):
+                    from .ai_cgroup_metering import run_cgroup_process
+                    result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
+                else:
+                    result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+                if not result.isolated:
+&gt;                   raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained')
+E                   app.ai_metering_agent.WorkerUncertain: Worker process-tree metering is unverified; original owner retained
+
+app/ai_metering_agent.py:415: WorkerUncertain
+
+The above exception was the direct cause of the following exception:
+
+operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff08759e300&gt;
+
+    def test_builtin_backing_dsp_still_runs_the_real_registered_adapter_and_ledger(operator, monkeypatch):
+        from app import ai_metering_agent, ai_billing
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND', raising=False)
+        monkeypatch.delenv('MTA_AI_WORKER_BACKING_VOCALS_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_WORKER_BACKING_VOCALS_PYTHON', sys.executable)
+&gt;       payload, metadata = ai_metering_agent.execute_registered_worker(
+            operator, 'backing-vocals', {'model': 'ffmpeg-center-side'}, source_wav=source_audio())
+
+tests/test_r210_legacy_separator_rights.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/service_admission.py:286: in invoke
+    with operation(source): return call(*args,**kwargs)
+                                   ^^^^^^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:497: in execute_registered_worker
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+app/ai_global_execution.py:67: in execute
+    if 'error' in result:raise result['error']
+                         ^^^^^^^^^^^^^^^^^^^^^
+app/ai_arranger_runtime.py:470: in execute
+    fn(progress, stop)
+app/ai_global_execution.py:54: in run
+    result['value']=call(cancelled)
+                    ^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:497: in &lt;lambda&gt;
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+user_id = 1, kind = 'backing-vocals'
+plan = {'model': 'ffmpeg-center-side', 'kind': 'backing-vocals'}
+token_id = None, timeout_seconds = 1200
+source_wav = b'RIFF$\x02\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x02\x00\...00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+source_json = None
+cancel_check = &lt;function execute.&lt;locals&gt;.run.&lt;locals&gt;.cancelled at 0x7ff0875c6160&gt;
+license_decision = Decision(model_id='mta-analysis', mode='cost_recovery', source='https://github.com/desalvo/mta-audio-editor', policy_sha256='9b9ff0c12c55d7c4d6cdbbaafe1e2791f631d1c834d1a1a06b1b707b02037079', operator_review=False)
+_request_key = None, _request_digest = None
+
+    def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
+                                  timeout_seconds: int = 1200, source_wav: bytes | None = None, source_json: bytes | None = None,
+                                  cancel_check: Callable[[], bool] | None = None, license_decision=None,
+                                  _request_key=None, _request_digest=None) -&gt; tuple[bytes, dict]:
+        """Run the administrator-installed AI worker and persist measured usage.
+    
+        Unsupported GPU/process-tree telemetry is omitted, not guessed. Output is
+        returned to the caller without changing billing for model files shared
+        by multiple users.
+        """
+        import json
+        import tempfile
+        from . import ai_billing
+        from .ai_worker_protocol import verify_preview_wav, WorkerUnavailable, MAX_REQUEST_BYTES
+        from .ai_worker_registry import resolve_worker
+        from .ai_worker_artifacts import package_artifacts
+    
+        # Reject user-supplied paths before requiring a live scheduler context too.
+        if not isinstance(plan, dict) or plan.get('kind', kind) != kind:
+            raise ValueError('AI plan cannot override the registered engine')
+        if 'source_score' in plan:
+            raise ValueError('Score path must be generated by MTA')
+        require_dispatch_identity(user_id, token_id)
+        from . import ai_pull_coordinator as pull
+        if pull.mode() == 'pull':
+            return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
+                                source_wav=source_wav, source_json=source_json, cancel_check=cancel_check,
+                                request_key=_request_key, request_digest=_request_digest)
+    
+        from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
+        worker = resolve_worker(kind)
+        if plan.get('kind',kind)!=kind:raise ValueError('AI plan cannot override the registered engine')
+        plan={**plan,'kind':kind}
+        if worker is None:
+            raise WorkerUnavailable('No trusted AI worker configured')
+        if 'source_score' in plan:raise ValueError('Score path must be generated by MTA')
+        if source_json is not None:
+            if source_wav is not None or kind not in {'vocal-harmony','vocal-synthesis'}:raise ValueError('Unsupported structured score transport')
+            from .studio_score import validate
+            validate(source_json)
+        if source_wav is not None and ('source_audio' in plan or 'input_path' in plan):
+            raise ValueError('Audio path must be generated by MTA')
+        if source_wav is not None:
+            from .ai_payload_limits import MAX_SOURCE_BYTES
+            if not isinstance(source_wav, bytes) or not 0 &lt; len(source_wav) &lt;= MAX_SOURCE_BYTES:
+                raise ValueError('AI source audio exceeds size limit or is empty')
+            # Verify the exact immutable bytes before creating a ledger/claim.
+            from .ai_worker_artifacts import _verify_wav_bytes
+            _verify_wav_bytes(source_wav)
+        encoded = json.dumps(plan, ensure_ascii=False, allow_nan=False).encode('utf-8')
+        if len(encoded) &gt; MAX_REQUEST_BYTES:
+            raise ValueError('AI plan exceeds size limit')
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        # Freeze policy once. Later administrator changes cannot invalidate a
+        # running job between backend publication and server-side packaging.
+        artifact_limit_mib = queue.artifact_limit_mib()
+        artifact_budget = artifact_limit_mib * 1024 * 1024
+        queue_id=current_job.get();defer_settlement=False;job_id=None
+        if queue_id:
+            with queue._db() as con:queued=con.execute('SELECT operation FROM jobs WHERE job_id=?',(queue_id,)).fetchone()
+            if queued and queued[0] in ('arranger','remix'):
+                job_id=ai_billing.existing_inference_ledger_job(queue_id,user_id,queued[0])
+                defer_settlement=job_id is not None
+        from .model_license_policy import evaluate,record_job
+        license_decision=license_decision or evaluate(kind,plan)
+        job_id=job_id or ai_billing.create_job(user_id,kind,token_id,billing_exemption_reason=('license:'+license_decision.model_id) if not license_decision.billable else '')
+        record_job(job_id,license_decision)
+        from .ai_execution_policy import admitted_env
+        policy_env=admitted_env(kind,license_decision)
+        if queue_id:
+            with ai_billing.db() as con:
+                ai_billing._init(con);con.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(queue_id,job_id))
+        # Only operator-enabled GPU adapters obtain logical slots; neither the
+        # request plan nor the remote user may declare GPU eligibility.
+        from .ai_gpu_slot_accounting import slot_enabled_for_kind
+        gpu_slot_enabled = slot_enabled_for_kind(kind)
+        from contextlib import nullcontext
+        with tempfile.TemporaryDirectory(prefix='mta-meter-') as folder, (_ace_cleanup(plan, lambda: Path(folder)/'progress.json') if kind=='ace-step' else nullcontext()):
+            directory = Path(folder)
+            request_path = directory / 'request.json'
+            output_path = directory / 'preview.wav'
+            if source_wav is not None:
+                from .ai_worker_protocol import verify_preview_wav
+                input_path = directory / 'source.wav'
+                input_path.write_bytes(source_wav)
+                verify_preview_wav(input_path)
+                input_path.chmod(0o400)
+                staged_source = str(input_path)
+                if kind=='ace-step':
+                    (directory/'inputs').mkdir()
+                    input_path.replace(directory/'inputs'/'source.wav')
+                    staged_source=[{'filename':'inputs/source.wav'}]
+                encoded = json.dumps({**plan, 'source_audio': staged_source}, ensure_ascii=False, allow_nan=False).encode('utf-8')
+            if source_json is not None:
+                score_path=directory/'score.json';score_path.write_bytes(source_json);score_path.chmod(0o400)
+                encoded=json.dumps({**plan,'source_score':str(score_path)},ensure_ascii=False,allow_nan=False).encode('utf-8')
+            from .ai_torch_diagnostics import enabled as torch_diagnostics_enabled, read_report
+            from .ai_gpu_verified import readiness as gpu_readiness, VERIFIED_KINDS
+            from .ai_worker_registry import extensions
+            verified_kind=kind in VERIFIED_KINDS or extensions().get(kind,{}).get('metering_method')=='gpu-kernel-union-v1'
+            verified_enabled=verified_kind and gpu_readiness()['ready']
+            if torch_diagnostics_enabled() or verified_enabled:
+                # The server, never the request, assigns diagnostic identity.
+                encoded = json.dumps({**json.loads(encoded), 'gpu_profile_task_id': job_id},
+                                     ensure_ascii=False, allow_nan=False).encode('utf-8')
+            request_path.write_bytes(encoded)
+            request_path.chmod(0o600)
+            from .ai_worker_registry import worker_python
+            args = ([worker_python(kind), str(worker)] if worker.suffix == '.py' else [str(worker)])
+            args += ['--request', str(request_path), '--output', str(output_path)]
+            # Deferred workers reuse the scheduler's owner; publication and billing
+            # outboxes retain that same immutable receipt through recovery.
+            if defer_settlement:
+                from .deferred_execution_owner import credentials_for
+                claim_credentials=credentials_for(job_id)
+            else:
+                import secrets
+                import socket
+                from .regime_worker_claims import claim
+                claim_credentials={'worker_id':'local:'+socket.gethostname()+':'+str(os.getpid()),
+                                   'claim_token':secrets.token_hex(32)}
+                with ai_billing.db() as con:
+                    con.execute('BEGIN IMMEDIATE')
+                    claim(con,job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
+            result = None
+            gpu_slot_acquired = False
+            observed_at = float('-inf')
+            identity_lost = False
+            def diagnostic_checkpoint(*, final=False):
+                nonlocal observed_at, identity_lost
+                if final or time.monotonic() - observed_at &gt;= 2:
+                    observed_at = time.monotonic()
+                    if not final:
+                        try:
+                            require_dispatch_identity(user_id, token_id)
+                        except (ValueError, RuntimeError):
+                            identity_lost = True
+                            return True
+                    if claim_credentials and not final:
+                        from .regime_worker_claims import heartbeat
+                        with ai_billing.db() as con:
+                            con.execute('BEGIN IMMEDIATE')
+                            heartbeat(con,'job:ledger:'+job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
+                    try:
+                        from .ai_torch_diagnostics import store_report
+                        report = read_report(directory, job_id)
+                        if report:
+                            store_report(job_id, report)
+                        from .ai_compute_diagnostics import store as store_live_counters
+                        counters = dict(report or {})
+                        try:
+                            raw_progress = json.loads((directory/'progress.json').read_text())
+                        except (OSError, ValueError):
+                            raw_progress = {}
+                        if isinstance(raw_progress, dict):
+                            counters = {**raw_progress, **counters}
+                        store_live_counters(job_id, counters)
+                        if queue_id and counters:
+                            from .storage import _atomic_json_write
+                            allowed={'phase','message','progress_percent','progress_source','progress_estimated','steps_completed','steps_total','cpu_seconds_estimated','gpu_seconds_estimated','gpu_metrics_status','gpu_metrics_source'}
+                            published={k:v for k,v in counters.items() if k in allowed}
+                            _atomic_json_write(queue._ROOT/(queue_id+'.progress.json'),published)
+                    except Exception as exc:
+                        import logging
+                        logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
+                if not final:
+                    from .resource_accounts import has_limits,checkpoint
+                    if license_decision.billable and has_limits(user_id) and checkpoint(user_id,job_id,counters if 'counters' in locals() else {}):
+                        return True
+                return cancel_check() if not final and cancel_check is not None else False
+            worker_cancel_check = diagnostic_checkpoint
+            try:
+                if gpu_slot_enabled:
+                    from . import ai_gpu_slot_accounting as gpu_slots
+                    gpu_slots.acquire(job_id, os.getenv('MTA_AI_GPU_LOGICAL_DEVICE', 'gpu0'))
+                    gpu_slot_acquired = True
+                if os.getenv('MTA_AI_CGROUP_PARENT'):
+                    from .ai_cgroup_metering import run_cgroup_process
+                    result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
+                else:
+                    result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+                if not result.isolated:
+                    raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained')
+                try:
+                    require_dispatch_identity(user_id, token_id)
+                except (ValueError, RuntimeError) as exc:
+                    identity_lost = True
+                    raise WorkerInterrupted(result) from exc
+                if cancel_check is not None and cancel_check():
+                    raise RuntimeError('AI worker cancelled; result discarded')
+                diagnostic_checkpoint(final=True)
+                if result.exit_code:
+                    raise WorkerUnavailable('AI worker failed or timed out')
+                payload, media_type = package_artifacts(directory, max_bytes=artifact_budget)
+                # Packaging may be expensive for multi-stem adapters. A cancellation
+                # during this phase must not finalize a successful billed job.
+                if cancel_check is not None and cancel_check():
+                    raise RuntimeError("AI worker cancelled during artifact packaging")
+                try:
+                    require_dispatch_identity(user_id, token_id)
+                except (ValueError, RuntimeError) as exc:
+                    identity_lost = True
+                    raise WorkerInterrupted(result) from exc
+                info = {"format": "wav" if media_type == "audio/wav" else "artifact-zip"}
+                usage = {key: value for key, value in result.usage.items() if key not in ('disk_read_bytes', 'disk_write_bytes')}
+                # Transient worker I/O is diagnostic only, never billable disk use.
+                # The output may already be counted in /proc/&lt;pid&gt;/io. Never add
+                # its size a second time as if it were extra physical disk I/O.
+                if gpu_slot_acquired:
+                    gpu_slots.release(job_id)
+                    gpu_slot_acquired = False
+                metered_source=result.source if result.isolated else 'unmetered'
+                usage=usage if result.isolated else {}
+                if verified_enabled:
+                    try:
+                        from .ai_gpu_verified import consume_report
+                        segments=(len(plan.get('singers',[])) if plan.get('selected','all')=='all' else 1) if kind=='singer-separation' else (None if kind=='ace-step' else 1)
+                        usage['gpu_seconds']=consume_report(job_id,directory,ace=kind=='ace-step',expected_segments=segments)
+                        metered_source='gpu-kernel-verified'
+                    except (OSError,ValueError,TypeError,KeyError):
+                        pass  # Missing/incomplete evidence can never create a GPU charge.
+                diagnostic_checkpoint(final=True)
+                from .ai_trusted_estimates import promote
+                usage,metered_source=promote(job_id,usage,metered_source)
+                if not defer_settlement:ai_billing.finish_job(job_id, 'done', usage or None,source=metered_source,**claim_credentials)
+                diagnostics = dict(result.gpu_diagnostics or {})
+                profile_report = read_report(directory, job_id)
+                if profile_report:
+                    diagnostics['torch_profile'] = profile_report
+                    diagnostic_checkpoint(final=True)
+                return payload, {'job_id': job_id, 'audio': info, 'usage': usage,
+                                 'billable':license_decision.billable,'license_model':license_decision.model_id,'license_policy_sha256':license_decision.policy_sha256,
+                                 'gpu_metered': 'gpu_seconds' in usage, 'metering_source':metered_source,'process_tree_metered': result.isolated,
+                                 'gpu_diagnostics': diagnostics, 'media_type': media_type}
+            except BaseException as exc:
+                if isinstance(exc, WorkerInterrupted):
+                    result = exc.measurement
+                if isinstance(exc, WorkerUncertain) or (result is not None and not result.isolated):
+&gt;                   raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained', job_id=job_id) from exc
+E                   app.ai_metering_agent.WorkerUncertain: Worker process-tree metering is unverified; original owner retained
+
+app/ai_metering_agent.py:471: WorkerUncertain</failure></testcase><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[0-False]" time="0.001" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[1-False]" time="0.001" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[1-True]" time="0.000" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_sam_bridge_does_not_retry_or_swallow_model_failures" time="0.000" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_actual_sam_worker_reaches_inference_and_writes_wav[False]" time="0.004" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_actual_sam_worker_reaches_inference_and_writes_wav[True]" time="0.004" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_sam_import_failure_emits_only_fixed_stage_marker" time="0.001" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_safe_sam_failure_and_backing_categories" time="0.000" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_backing_same_onnx_checkpoint_runs_on_rocm_and_returns_expected_numpy" time="0.001"><failure message="app.model_license_policy.LicenseDenied: Model disabled pending license review: uvr-kara-2. Contact the administrator; cost recovery alone does not grant permission.">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0875bac30&gt;
+
+    def test_backing_same_onnx_checkpoint_runs_on_rocm_and_returns_expected_numpy(monkeypatch):
+        observed={};s=separator()
+        class Model:
+            def to(self,device):observed['device']=device;return self
+            def eval(self):return self
+            def __call__(self,x):observed['input_device']=x.device;return x
+        def convert(path):observed['path']=path;return Model()
+        monkeypatch.setitem(sys.modules,'torch',SimpleNamespace(version=SimpleNamespace(hip='7.2'),cuda=SimpleNamespace(is_available=lambda:True),device=lambda x:x,inference_mode=nullcontext))
+        monkeypatch.setitem(sys.modules,'onnx2torch',SimpleNamespace(convert=convert))
+&gt;       backing.load_backing_model(s,'UVR_MDXNET_KARA_2.onnx')
+
+tests/test_r210_sam_hub_backing_rocm.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/backing_vocals_runtime.py:48: in load_backing_model
+    backing_policy(model_filename)
+app/backing_vocals_runtime.py:36: in backing_policy
+    return evaluate_model('uvr-kara-2' if model == 'uvr_mdxnet_kara_2' else 'audio-separator-weights')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_id = 'uvr-kara-2'
+
+    def evaluate_model(model_id):
+        known=CATALOG.get(model_id,('Unreviewed model/weights','disabled',''))
+        custom=overrides().get(model_id,{})
+        mode=custom.get('mode',known[1])
+        if mode not in ('disabled','free_only','cost_recovery'):raise LicenseDenied('Invalid model licensing mode')
+        # Re-evaluate rights at the admission boundary, including policy files
+        # imported/restored without passing through the administrative writer.
+        if model_id == 'diffsinger-qixuan' and mode == 'cost_recovery':
+            raise LicenseDenied('Qixuan cannot be enabled for paid inference')
+        if custom.get('authorization_basis') == 'noncommercial_context' and mode != 'disabled':
+            if mode != 'free_only':
+                raise LicenseDenied('Noncommercial-context authorization cannot be billed')
+            from .service_regime import current_regime, Regime
+            if current_regime() == Regime.COMMERCIAL:
+                raise LicenseDenied('Noncommercial-context authorization is incompatible with commercial service')
+        if mode=='cost_recovery' and not commercial_service_enabled():
+            raise LicenseDenied('Commercial service is globally disabled; this model must have a reviewed free-only authorization')
+        # Enforce the active service regime at the model admission boundary, not
+        # merely in the model picker. The commercial regime may not run a free-only
+        # model absent a separately reviewed commercial authorization recorded as
+        # cost_recovery in the version-specific operator policy.
+        from .service_regime import current_regime, Regime
+        if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+            raise LicenseDenied('Free-only model is not authorized for the commercial service: '+model_id)
+&gt;       if mode=='disabled':raise LicenseDenied('Model disabled pending license review: '+model_id+'. Contact the administrator; cost recovery alone does not grant permission.')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       app.model_license_policy.LicenseDenied: Model disabled pending license review: uvr-kara-2. Contact the administrator; cost recovery alone does not grant permission.
+
+app/model_license_policy.py:258: LicenseDenied</failure></testcase><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_other_backing_devices_and_models_keep_existing_route[None-True-model.onnx]" time="0.001"><failure message="ValueError: Unsupported backing-vocal checkpoint filename">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0875b8c50&gt;
+hip = None, gpu = True, filename = 'model.onnx'
+
+    @pytest.mark.parametrize('hip,gpu,filename',[(None,True,'model.onnx'),('7.2',False,'model.onnx'),('7.2',True,'model.ckpt')])
+    def test_other_backing_devices_and_models_keep_existing_route(monkeypatch,hip,gpu,filename):
+        s=separator();original=s.model_instance.model_run
+        monkeypatch.setitem(sys.modules,'torch',SimpleNamespace(version=SimpleNamespace(hip=hip),cuda=SimpleNamespace(is_available=lambda:gpu)))
+&gt;       backing.load_backing_model(s,filename)
+
+tests/test_r210_sam_hub_backing_rocm.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/backing_vocals_runtime.py:48: in load_backing_model
+    backing_policy(model_filename)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_filename = 'model.onnx'
+
+    def backing_policy(model_filename):
+        """Resolve only the shipped separator selectors, never a caller's policy ID."""
+        from .ai_backend_models import LEAD_BACKING_MODELS
+        from .model_license_policy import evaluate_model
+        models = {m['filename']: m['id'] for m in LEAD_BACKING_MODELS if m['id'] != 'mvsep-mega53'}
+        if not isinstance(model_filename, str) or model_filename not in models:
+&gt;           raise ValueError('Unsupported backing-vocal checkpoint filename')
+E           ValueError: Unsupported backing-vocal checkpoint filename
+
+app/backing_vocals_runtime.py:34: ValueError</failure></testcase><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_other_backing_devices_and_models_keep_existing_route[7.2-False-model.onnx]" time="0.000"><failure message="ValueError: Unsupported backing-vocal checkpoint filename">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0875cf470&gt;
+hip = '7.2', gpu = False, filename = 'model.onnx'
+
+    @pytest.mark.parametrize('hip,gpu,filename',[(None,True,'model.onnx'),('7.2',False,'model.onnx'),('7.2',True,'model.ckpt')])
+    def test_other_backing_devices_and_models_keep_existing_route(monkeypatch,hip,gpu,filename):
+        s=separator();original=s.model_instance.model_run
+        monkeypatch.setitem(sys.modules,'torch',SimpleNamespace(version=SimpleNamespace(hip=hip),cuda=SimpleNamespace(is_available=lambda:gpu)))
+&gt;       backing.load_backing_model(s,filename)
+
+tests/test_r210_sam_hub_backing_rocm.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/backing_vocals_runtime.py:48: in load_backing_model
+    backing_policy(model_filename)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_filename = 'model.onnx'
+
+    def backing_policy(model_filename):
+        """Resolve only the shipped separator selectors, never a caller's policy ID."""
+        from .ai_backend_models import LEAD_BACKING_MODELS
+        from .model_license_policy import evaluate_model
+        models = {m['filename']: m['id'] for m in LEAD_BACKING_MODELS if m['id'] != 'mvsep-mega53'}
+        if not isinstance(model_filename, str) or model_filename not in models:
+&gt;           raise ValueError('Unsupported backing-vocal checkpoint filename')
+E           ValueError: Unsupported backing-vocal checkpoint filename
+
+app/backing_vocals_runtime.py:34: ValueError</failure></testcase><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_other_backing_devices_and_models_keep_existing_route[7.2-True-model.ckpt]" time="0.001"><failure message="ValueError: Unsupported backing-vocal checkpoint filename">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0875bb6e0&gt;
+hip = '7.2', gpu = True, filename = 'model.ckpt'
+
+    @pytest.mark.parametrize('hip,gpu,filename',[(None,True,'model.onnx'),('7.2',False,'model.onnx'),('7.2',True,'model.ckpt')])
+    def test_other_backing_devices_and_models_keep_existing_route(monkeypatch,hip,gpu,filename):
+        s=separator();original=s.model_instance.model_run
+        monkeypatch.setitem(sys.modules,'torch',SimpleNamespace(version=SimpleNamespace(hip=hip),cuda=SimpleNamespace(is_available=lambda:gpu)))
+&gt;       backing.load_backing_model(s,filename)
+
+tests/test_r210_sam_hub_backing_rocm.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/backing_vocals_runtime.py:48: in load_backing_model
+    backing_policy(model_filename)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_filename = 'model.ckpt'
+
+    def backing_policy(model_filename):
+        """Resolve only the shipped separator selectors, never a caller's policy ID."""
+        from .ai_backend_models import LEAD_BACKING_MODELS
+        from .model_license_policy import evaluate_model
+        models = {m['filename']: m['id'] for m in LEAD_BACKING_MODELS if m['id'] != 'mvsep-mega53'}
+        if not isinstance(model_filename, str) or model_filename not in models:
+&gt;           raise ValueError('Unsupported backing-vocal checkpoint filename')
+E           ValueError: Unsupported backing-vocal checkpoint filename
+
+app/backing_vocals_runtime.py:34: ValueError</failure></testcase><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_backing_conversion_failure_does_not_fall_back_to_cpu" time="0.001"><failure message="ValueError: Unsupported backing-vocal checkpoint filename">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0875b9d90&gt;
+
+    def test_backing_conversion_failure_does_not_fall_back_to_cpu(monkeypatch):
+        s=separator()
+        monkeypatch.setitem(sys.modules,'torch',SimpleNamespace(version=SimpleNamespace(hip='7.2'),cuda=SimpleNamespace(is_available=lambda:True),device=lambda x:x))
+        def failed(path):raise ValueError('unsupported operator')
+        monkeypatch.setitem(sys.modules,'onnx2torch',SimpleNamespace(convert=failed))
+&gt;       with pytest.raises(RuntimeError,match='rocm_conversion_failed'):backing.load_backing_model(s,'model.onnx')
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_sam_hub_backing_rocm.py:162: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/backing_vocals_runtime.py:48: in load_backing_model
+    backing_policy(model_filename)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_filename = 'model.onnx'
+
+    def backing_policy(model_filename):
+        """Resolve only the shipped separator selectors, never a caller's policy ID."""
+        from .ai_backend_models import LEAD_BACKING_MODELS
+        from .model_license_policy import evaluate_model
+        models = {m['filename']: m['id'] for m in LEAD_BACKING_MODELS if m['id'] != 'mvsep-mega53'}
+        if not isinstance(model_filename, str) or model_filename not in models:
+&gt;           raise ValueError('Unsupported backing-vocal checkpoint filename')
+E           ValueError: Unsupported backing-vocal checkpoint filename
+
+app/backing_vocals_runtime.py:34: ValueError</failure></testcase><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_installer_exercises_model_loader_without_huggingface_download" time="0.004" /><testcase classname="tests.test_r210_sam_hub_backing_rocm" name="test_native_bundle_contains_sam_bridge_source" time="0.001" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_youtube_uses_real_track_publication_receipt_and_survives_reopen" time="0.355" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_youtube_failure_removes_only_owned_audio_and_original" time="0.128" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_reusable_clip_is_not_falsely_in_use_and_can_be_deleted" time="0.165" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_cleanup_preserves_timeline_original_and_queued_sources" time="0.041" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_cleanup_does_not_delete_uncommitted_import_or_recent_temp" time="0.030" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_malformed_media_journal_prevents_destructive_cleanup" time="0.004" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_legacy_job_reservation_is_released_at_termination" time="0.045" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_cleanup_api_requires_integrity_and_explicit_policy" time="0.035" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_external_demucs_runtime_and_gpu_device_are_forwarded" time="0.063" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_web_track_separation_is_queued_and_publishes_stems[False]" time="0.513" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_web_track_separation_is_queued_and_publishes_stems[True]" time="0.426" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_horizontal_import_removed_but_sidebar_picker_preserved" time="0.004" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_signed_server_builds_include_demucs_setup" time="0.001" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_file_link_cannot_delete_another_referenced_media" time="0.007" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_only_verified_content_addressed_hardlinks_are_trusted" time="0.010" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_cleanup_account_acl_denies_foreign_project" time="0.054" /><testcase classname="tests.test_r210_media_stems_cleanup" name="test_demucs_installer_preserves_accelerator_versions_and_configuration" time="0.005" /><testcase classname="tests.test_ui_native_split_regressions" name="test_ui_regressions_for_import_split_tracks_and_transport" time="0.002" /><testcase classname="tests.test_ui_native_split_regressions" name="test_native_icons_and_metadata_are_wired" time="0.001" /><testcase classname="tests.test_ui_native_split_regressions" name="test_frozen_demucs_runs_in_process_without_spawning_native_gui" time="0.002" /><testcase classname="tests.test_ui_native_split_regressions" name="test_stem_split_without_original_mix_never_adds_original_track" time="1.023" /><testcase classname="tests.test_backing_vocals_123" name="test_ui_exposes_second_pass_backing_vocals" time="0.002" /><testcase classname="tests.test_backing_vocals_123" name="test_backend_accepts_and_tracks_backing_vocals_option" time="0.001" /><testcase classname="tests.test_backing_vocals_123" name="test_configured_ai_separator_uses_no_shell" time="0.002"><failure message="app.model_license_policy.LicenseDenied: Legacy lead/backing commands have no checkpoint rights contract; use a reviewed supported model integration">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0a666e8a0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_configured_ai_separator_u0')
+
+    def test_configured_ai_separator_uses_no_shell(monkeypatch, tmp_path):
+        # Exercise the local desktop branch. Server calls require a global job.
+        monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
+        monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
+        src = tmp_path / "vocals.wav"
+        src.write_bytes(b"RIFF")
+        monkeypatch.setenv("MTA_LEAD_BACKING_COMMAND", "fake-separator --input {input} --lead {lead} --backing {backing}")
+        monkeypatch.setenv("MTA_LEAD_BACKING_MODEL", "karaoke-ai")
+    
+        class Proc:
+            returncode = 0
+            stdout = None
+            def poll(self):
+                return 0
+    
+        def fake_popen(command, **kwargs):
+            assert isinstance(command, list)
+            assert kwargs.get("stdout") is not None
+            lead = Path(command[command.index("--lead") + 1])
+            backing = Path(command[command.index("--backing") + 1])
+            lead.write_bytes(b"lead")
+            backing.write_bytes(b"backing")
+            return Proc()
+    
+        monkeypatch.setattr(main.subprocess, "Popen", fake_popen)
+&gt;       lead, backing, method = main._split_lead_backing_vocals(src, tmp_path / "out")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_backing_vocals_123.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4732: in _split_lead_backing_vocals
+    evaluate('backing-vocals', {'model': model_id or LEAD_BACKING_DEFAULT_MODEL})
+app/model_license_policy.py:193: in evaluate
+    primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[];inventories=[]
+                           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kind = 'backing-vocals', plan = {'model': 'uvr_mdxnet_kara_2'}
+
+    def selected(kind,plan):
+        if kind=='audio-to-midi-transkun':
+            from .studio_asset_registry import manifest
+            value=manifest(plan.get('options',{}).get('asset_id',''))
+            if value['kind']!='transkun':raise ValueError('Wrong piano model asset')
+            return 'transkun-assets'
+        if kind.startswith('audio-to-midi'):
+            import os
+            if kind.endswith('-mr-mt3') or (kind=='audio-to-midi' and os.getenv('MTA_STUDIO_TRANSCRIBER')=='mr-mt3'):return 'mr-mt3-assets'
+            return 'yourmt3' if kind.endswith('-yourmt3') or (kind=='audio-to-midi' and os.getenv('MTA_STUDIO_TRANSCRIBER')=='yourmt3') else 'basic-pitch'
+        if kind=='vocal-synthesis':
+            if plan.get('settings',{}).get('backend','oddvoices') in ('neural-external','diffsinger'):
+                import os
+                settings=plan.get('settings',{})
+                asset_id=settings.get('neural_bank') or next(iter(settings.get('neural_banks',[])),None)
+                if asset_id:
+                    from .studio_asset_registry import manifest
+                    return manifest(asset_id)['policies']['singer']
+                return os.getenv('MTA_NEURAL_SINGER_POLICY_MODEL','unreviewed-neural-singer')
+            return 'oddvoices'
+        if kind=='vocal-harmony':return 'mta-analysis'
+        if kind in ('arranger','remix','ace-step'):return 'ace-step'
+        if kind=='singer-separation':return 'sam-audio'
+        if kind=='backing-vocals':
+            import os
+            if os.getenv('MTA_LEAD_BACKING_COMMAND','').strip():
+&gt;               raise LicenseDenied('Legacy lead/backing commands have no checkpoint rights contract; use a reviewed supported model integration')
+E               app.model_license_policy.LicenseDenied: Legacy lead/backing commands have no checkpoint rights contract; use a reviewed supported model integration
+
+app/model_license_policy.py:150: LicenseDenied</failure></testcase><testcase classname="tests.test_backing_vocals_123" name="test_ffmpeg_fallback_builds_center_side_outputs" time="0.103"><failure message="RuntimeError: [in#0 @ 0x560544b8ddc0] Error opening input: Invalid data found when processing input&#10;Error opening input file /tmp/pytest-of-root/pytest-1/test_ffmpeg_fallback_builds_ce0/vocals.wav.&#10;Error opening input files: Invalid data found when processing input">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0a66e4b60&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_ffmpeg_fallback_builds_ce0')
+
+    def test_ffmpeg_fallback_builds_center_side_outputs(monkeypatch, tmp_path):
+        monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
+        monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
+        src = tmp_path / "vocals.wav"
+        src.write_bytes(b"RIFF")
+        monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)
+        monkeypatch.setattr(main.shutil, "which", lambda name: "/usr/bin/ffmpeg" if name == "ffmpeg" else None)
+    
+        class Result:
+            returncode = 0
+            stderr = ""
+    
+        def fake_run(command, **kwargs):
+            assert "-filter_complex" in command
+            Path(next(x for x in command if str(x).endswith("lead_vocals.wav"))).write_bytes(b"lead")
+            Path(next(x for x in command if str(x).endswith("backing_vocals.wav"))).write_bytes(b"backing")
+            return Result()
+    
+        monkeypatch.setattr(main.subprocess, "run", fake_run)
+&gt;       lead, backing, method = main._split_lead_backing_vocals(src, tmp_path / "out", model_id="ffmpeg-center-side")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_backing_vocals_123.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4774: in _split_lead_backing_vocals
+    return split_center_side(vocal_stem, output_dir, cancel_event=cancel_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/backing_vocals_runtime.py:22: in split_center_side
+    run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(source),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = ['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', ...]
+cancel_event = None, timeout = 7200, max_log_bytes = 8388608, cwd = None
+env = None
+
+    def run(command, *, cancel_event=None, timeout=7200, max_log_bytes=8*1024*1024,cwd=None,env=None):
+        if (not isinstance(command,list) or not command or any(not isinstance(x,str) or not x or '\x00' in x for x in command)
+                or type(timeout) not in (int,float) or not math.isfinite(timeout) or not 0&lt;timeout&lt;=7200
+                or type(max_log_bytes) is not int or not 1024&lt;=max_log_bytes&lt;=8*1024*1024):
+            raise ValueError('Invalid configured separator execution limits')
+        if cancel_event is not None and cancel_event.is_set():raise RuntimeError('stem separation cancelled')
+        with tempfile.TemporaryFile() as log:
+            process=subprocess.Popen(command,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=os.name=='posix',cwd=cwd,env=env)
+            deadline=time.monotonic()+timeout
+            try:
+                while True:
+                    if cancel_event is not None and cancel_event.is_set():raise RuntimeError('stem separation cancelled')
+                    if time.monotonic()&gt;=deadline:raise RuntimeError('stem separation timed out')
+                    if os.fstat(log.fileno()).st_size&gt;max_log_bytes:raise RuntimeError('separator diagnostic output limit exceeded')
+                    if process.poll() is not None:break
+                    time.sleep(.02)
+                log.seek(max(0,os.fstat(log.fileno()).st_size-3000))
+                diagnostic=log.read(3000).decode('utf-8',errors='replace')
+&gt;               if process.returncode:raise RuntimeError(diagnostic or 'lead/backing vocal separator failed')
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               RuntimeError: [in#0 @ 0x560544b8ddc0] Error opening input: Invalid data found when processing input
+E               Error opening input file /tmp/pytest-of-root/pytest-1/test_ffmpeg_fallback_builds_ce0/vocals.wav.
+E               Error opening input files: Invalid data found when processing input
+
+app/separator_process.py:33: RuntimeError</failure></testcase><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[../escape]" time="0.002" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[/absolute]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[C:/escape]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[a\\b]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[a//b]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[a/./b]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[a/../b]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[x.]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[x ]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[CON]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[a/aux.txt]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_untrusted_model_names_fail_before_any_extraction[a/COM1.txt]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_alias_and_file_directory_conflicts_fail_before_writes[names0]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_alias_and_file_directory_conflicts_fail_before_writes[names1]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_alias_and_file_directory_conflicts_fail_before_writes[names2]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_links_and_special_archive_entries_are_rejected[41471]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_links_and_special_archive_entries_are_rejected[8576]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_links_and_special_archive_entries_are_rejected[4480]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_expanded_archive_budgets_preflight_all_members[MAX_DOWNLOAD_BYTES]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_expanded_archive_budgets_preflight_all_members[MAX_EXPANDED_BYTES]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_expanded_archive_budgets_preflight_all_members[MAX_ARCHIVE_MEMBERS]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_extraction_does_not_overwrite_existing_or_follow_destination_link" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_model_download_budget_removes_only_own_partial_file" time="0.002" /><testcase classname="tests.test_r210_security_process_and_models" name="test_failed_secondary_download_never_publishes_partial_model" time="0.002" /><testcase classname="tests.test_r210_security_process_and_models" name="test_existing_install_is_preserved_without_redownload" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_revoked_rights_at_publication_preserve_absent_install" time="0.002" /><testcase classname="tests.test_r210_security_process_and_models" name="test_delete_and_lookup_require_exact_registered_model[../outside]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_delete_and_lookup_require_exact_registered_model[missing]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_delete_and_lookup_require_exact_registered_model[/outside]" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_actual_custom_separator_no_longer_deadlocks_on_pipe_sized_output" time="0.001"><failure message="app.model_license_policy.LicenseDenied: Legacy lead/backing commands have no checkpoint rights contract; use a reviewed supported model integration">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_actual_custom_separator_n0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0a6698f20&gt;
+
+    def test_actual_custom_separator_no_longer_deadlocks_on_pipe_sized_output(tmp_path,monkeypatch):
+        from app import main
+        monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True);monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
+        script=tmp_path/'separator.py'
+        script.write_text("import sys\nfrom pathlib import Path\nsys.stdout.write('x'*2_000_000)\nPath(sys.argv[sys.argv.index('--lead')+1]).write_bytes(b'lead')\nPath(sys.argv[sys.argv.index('--backing')+1]).write_bytes(b'backing')\n")
+        monkeypatch.setenv('MTA_LEAD_BACKING_COMMAND',shlex.join([sys.executable,str(script),'--input','{input}','--lead','{lead}','--backing','{backing}']))
+        source=tmp_path/'source with spaces;not-shell.wav';source.write_bytes(b'input')
+&gt;       started=time.monotonic();lead,backing,_=main._split_lead_backing_vocals(source,tmp_path/'out')
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_security_process_and_models.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4732: in _split_lead_backing_vocals
+    evaluate('backing-vocals', {'model': model_id or LEAD_BACKING_DEFAULT_MODEL})
+app/model_license_policy.py:193: in evaluate
+    primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[];inventories=[]
+                           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kind = 'backing-vocals', plan = {'model': 'uvr_mdxnet_kara_2'}
+
+    def selected(kind,plan):
+        if kind=='audio-to-midi-transkun':
+            from .studio_asset_registry import manifest
+            value=manifest(plan.get('options',{}).get('asset_id',''))
+            if value['kind']!='transkun':raise ValueError('Wrong piano model asset')
+            return 'transkun-assets'
+        if kind.startswith('audio-to-midi'):
+            import os
+            if kind.endswith('-mr-mt3') or (kind=='audio-to-midi' and os.getenv('MTA_STUDIO_TRANSCRIBER')=='mr-mt3'):return 'mr-mt3-assets'
+            return 'yourmt3' if kind.endswith('-yourmt3') or (kind=='audio-to-midi' and os.getenv('MTA_STUDIO_TRANSCRIBER')=='yourmt3') else 'basic-pitch'
+        if kind=='vocal-synthesis':
+            if plan.get('settings',{}).get('backend','oddvoices') in ('neural-external','diffsinger'):
+                import os
+                settings=plan.get('settings',{})
+                asset_id=settings.get('neural_bank') or next(iter(settings.get('neural_banks',[])),None)
+                if asset_id:
+                    from .studio_asset_registry import manifest
+                    return manifest(asset_id)['policies']['singer']
+                return os.getenv('MTA_NEURAL_SINGER_POLICY_MODEL','unreviewed-neural-singer')
+            return 'oddvoices'
+        if kind=='vocal-harmony':return 'mta-analysis'
+        if kind in ('arranger','remix','ace-step'):return 'ace-step'
+        if kind=='singer-separation':return 'sam-audio'
+        if kind=='backing-vocals':
+            import os
+            if os.getenv('MTA_LEAD_BACKING_COMMAND','').strip():
+&gt;               raise LicenseDenied('Legacy lead/backing commands have no checkpoint rights contract; use a reviewed supported model integration')
+E               app.model_license_policy.LicenseDenied: Legacy lead/backing commands have no checkpoint rights contract; use a reviewed supported model integration
+
+app/model_license_policy.py:150: LicenseDenied</failure></testcase><testcase classname="tests.test_r210_security_process_and_models" name="test_separator_cancellation_before_start_never_spawns" time="0.001" /><testcase classname="tests.test_r210_security_process_and_models" name="test_separator_log_overflow_and_failure_are_explicit" time="0.042" /><testcase classname="tests.test_r210_security_process_and_models" name="test_separator_timeout_stops_its_owned_process" time="0.305" /><testcase classname="tests.test_r210_security_process_and_models" name="test_separator_cancel_stops_worker_and_normal_descendant" time="0.044" /><testcase classname="tests.test_r210_security_process_and_models" name="test_failed_member_crc_never_publishes_an_installed_model" time="0.002" /><testcase classname="tests.test_r266_separator_output_paths" name="test_audio_separator_relative_output_filenames" time="0.009"><failure message="ValueError: Unsupported backing-vocal checkpoint filename">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ff0a666e210&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_audio_separator_relative_0')
+local_native_ai = None
+
+    def test_audio_separator_relative_output_filenames(monkeypatch, tmp_path,local_native_ai):
+        from model_rights_fixtures import authorize_fixture
+        authorize_fixture(monkeypatch,tmp_path,'audio-separator-weights')
+        source = tmp_path / "vocals.wav"
+        source.write_bytes(b"input")
+        output = tmp_path / "job" / "stems"
+        output.mkdir(parents=True)
+        monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)
+        monkeypatch.setattr(main, "_lead_backing_model_info", lambda name: {"installed": True, "filename": "fixture.ckpt"})
+        torch = types.ModuleType("torch")
+        torch.empty = lambda *args: None
+        ops = types.ModuleType("torchvision.ops")
+        ops.nms = lambda *args: None
+        tv = types.ModuleType("torchvision")
+        tv.ops = ops
+        monkeypatch.setitem(sys.modules, "torch", torch)
+        monkeypatch.setitem(sys.modules, "torchvision", tv)
+        monkeypatch.setitem(sys.modules, "torchvision.ops", ops)
+    
+        class Separator:
+            def __init__(self, **kwargs):
+                assert Path(kwargs["output_dir"]) == output
+            def load_model(self, **kwargs):
+                pass
+            def separate(self, path):
+                (output / "vocals_(Vocals)_UVR_MDXNET_KARA_2.WAV").write_bytes(b"lead")
+                (output / "vocals_(Instrumental)_UVR_MDXNET_KARA_2.WAV").write_bytes(b"backing")
+                return ["vocals_(Vocals)_UVR_MDXNET_KARA_2.WAV", "vocals_(Instrumental)_UVR_MDXNET_KARA_2.WAV"]
+        module = types.ModuleType("audio_separator.separator")
+        module.Separator = Separator
+        monkeypatch.setitem(sys.modules, "audio_separator", types.ModuleType("audio_separator"))
+        monkeypatch.setitem(sys.modules, "audio_separator.separator", module)
+&gt;       lead, backing, method = main._split_lead_backing_vocals(source, output,model_id='mel_roformer_karaoke_aufr33')
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r266_separator_output_paths.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4796: in _split_lead_backing_vocals
+    load_backing_model(separator, info["filename"])
+app/backing_vocals_runtime.py:48: in load_backing_model
+    backing_policy(model_filename)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_filename = 'fixture.ckpt'
+
+    def backing_policy(model_filename):
+        """Resolve only the shipped separator selectors, never a caller's policy ID."""
+        from .ai_backend_models import LEAD_BACKING_MODELS
+        from .model_license_policy import evaluate_model
+        models = {m['filename']: m['id'] for m in LEAD_BACKING_MODELS if m['id'] != 'mvsep-mega53'}
+        if not isinstance(model_filename, str) or model_filename not in models:
+&gt;           raise ValueError('Unsupported backing-vocal checkpoint filename')
+E           ValueError: Unsupported backing-vocal checkpoint filename
+
+app/backing_vocals_runtime.py:34: ValueError</failure></testcase><testcase classname="tests.test_r267_roformer_beartype_compat" name="test_native_build_validates_roformer_pep604_hints" time="0.001" /><testcase classname="tests.test_r267_roformer_beartype_compat" name="test_roformer_type_checker_reports_actionable_error" time="0.002" /></testsuite></testsuites>

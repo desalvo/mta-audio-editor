@@ -46,7 +46,31 @@ def model_bytes():
     return verified_model_bytes(path,MODEL_SHA256,max_bytes=64*1024*1024)
 
 
+def _wave_windows(audio_path,overlap_len,hop_size):
+    """Basic Pitch0.4 window contract using only our already validated WAV.
+
+    Keep upstream padding/window semantics; avoid generic audioread probing
+    that spawns gcc/FFmpeg even for an uncompressed private WAV on Linux.
+    """
+    import numpy as np
+    import soundfile as sf
+    import librosa
+    from basic_pitch.inference import AUDIO_SAMPLE_RATE,window_audio_file
+    if overlap_len%2 or hop_size<=0:raise ValueError('Invalid checkpoint window')
+    audio,rate=sf.read(str(audio_path),dtype='float32',always_2d=True)
+    audio=audio.mean(axis=1)
+    audio=librosa.resample(audio,orig_sr=rate,target_sr=AUDIO_SAMPLE_RATE,res_type='soxr_hq')
+    original_length=len(audio)
+    audio=np.concatenate([np.zeros(overlap_len//2,dtype=np.float32),audio])
+    for window,times in window_audio_file(audio,hop_size):
+        yield np.expand_dims(window,axis=0),times,original_length
+
+
 def transcribe(source, options):
+    from app.model_license_policy import evaluate_model
+    evaluate_model('basic-pitch')
+    from app.ai_model_attestation import verify_before_load
+    verify_before_load()
     from app.music_interchange import MusicPart, MusicResult
     from app.models import MidiNote
     import soundfile as sf
@@ -88,7 +112,13 @@ def transcribe(source, options):
     if model.model_type != Model.MODEL_TYPES.ONNX:
         raise RuntimeError('This adapter requires the tested ONNX CPU backend')
     progress('transcribing', 'Transcribing the isolated source; total work is not reported by the model')
-    _, _, events = predict(str(source), model_or_model_path=model, **args)
+    from basic_pitch import inference
+    previous=inference.get_audio_input
+    inference.get_audio_input=_wave_windows
+    try:
+        _, _, events = predict(str(source), model_or_model_path=model, **args)
+    finally:
+        inference.get_audio_input=previous
     from app.transcription_timing import bound_interval
     notes = [];trimmed=dropped=0
     for index, (start, end, pitch, activation, _) in enumerate(events):
@@ -114,6 +144,8 @@ def transcribe(source, options):
 
 
 def infer(plan, output):
+    from app.model_license_policy import evaluate
+    evaluate(plan.get('kind'), plan)
     folder = output.parent.resolve(strict=True)
     if plan.get('kind')=='vocal-synthesis':
         from app.studio_score import validate

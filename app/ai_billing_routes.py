@@ -259,6 +259,14 @@ def _pull_request_binding(key, digest):
     return {'_request_key': key, '_request_digest': digest} if key and mode() == 'pull' else {}
 
 
+def _cancelled_worker_response(user_id, key):
+    if key:
+        from .ai_request_dedup import cancel_admitted
+        cancel_admitted(user_id, key)
+    return JSONResponse({'detail': {'reason': 'worker_cancelled', 'retry_execution': False}},
+                        status_code=409, headers={'Cache-Control': 'private, no-store'})
+
+
 @router.post('/api/ai-jobs/execute')
 def execute_remote_ai_job(request: Request, body: dict):
     """Authenticated execution with fixed operator-configured worker and CPU metering.
@@ -271,7 +279,7 @@ def execute_remote_ai_job(request: Request, body: dict):
     identity = ai_access.authenticate(token)
     if not identity:
         raise HTTPException(401, 'Valid AI token required')
-    from .ai_metering_agent import execute_registered_worker
+    from .ai_metering_agent import execute_registered_worker, WorkerUncertain, WorkerInterrupted
     from .ai_worker_protocol import WorkerUnavailable
     kind = body.get('kind', '')
     plan = body.get('plan')
@@ -280,6 +288,11 @@ def execute_remote_ai_job(request: Request, body: dict):
     # Local filesystem paths must never be provided by remote callers.
     if any(k in plan for k in ('source_audio', 'input_path', 'output_path', 'command', 'executable')):
         raise HTTPException(400, 'File-backed plans require staged authenticated transfer')
+    from .ai_remote_transport import validate_audio_options
+    try:
+        validate_audio_options(plan)
+    except ValueError as exc:
+        raise HTTPException(400, 'Invalid or forbidden worker plan') from exc
     from . import ai_request_dedup as dedup
     import json
     key = request.headers.get('x-mta-ai-idempotency-key', '')
@@ -296,10 +309,18 @@ def execute_remote_ai_job(request: Request, body: dict):
             cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None,
             **_pull_request_binding(key, digest if key else None))
     except WorkerUnavailable as exc:
+        if getattr(exc, 'cancelled', False):
+            return _cancelled_worker_response(identity['user_id'], key)
         if key and not dedup.is_cancelled(identity['user_id'], key): dedup.finalize(identity['user_id'], key, state='failed')
         raise HTTPException(503, str(exc)) from exc
     except PullPending as exc:
         return JSONResponse(exc.detail(), status_code=409, headers={'Cache-Control': 'no-store'})
+    except WorkerUncertain as exc:
+        return JSONResponse({'detail': {'reason': 'worker_evidence_pending', 'job_id': exc.job_id,
+                            'retry_execution': False}}, status_code=409,
+                            headers={'Cache-Control': 'private, no-store'})
+    except WorkerInterrupted:
+        return _cancelled_worker_response(identity['user_id'], key)
     except RuntimeError as exc:
         if key and dedup.is_cancelled(identity['user_id'], key):
             raise HTTPException(409, 'AI request cancelled; worker stopped') from exc
@@ -445,7 +466,7 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
     if not identity:
         raise HTTPException(401, 'Valid AI token required')
     from .ai_worker_registry import execution_available
-    from .ai_metering_agent import execute_registered_worker
+    from .ai_metering_agent import execute_registered_worker, WorkerUncertain, WorkerInterrupted
     from .ai_worker_protocol import WorkerUnavailable
     try:
         if not execution_available(kind):
@@ -513,10 +534,18 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
             cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None,
             **_pull_request_binding(key, digest if key else None))
     except WorkerUnavailable as exc:
+        if getattr(exc, 'cancelled', False):
+            return _cancelled_worker_response(identity['user_id'], key)
         if key and not dedup.is_cancelled(identity['user_id'], key): dedup.finalize(identity['user_id'], key, state='failed')
         raise HTTPException(503, str(exc)) from exc
     except PullPending as exc:
         return JSONResponse(exc.detail(), status_code=409, headers={'Cache-Control': 'no-store'})
+    except WorkerUncertain as exc:
+        return JSONResponse({'detail': {'reason': 'worker_evidence_pending', 'job_id': exc.job_id,
+                            'retry_execution': False}}, status_code=409,
+                            headers={'Cache-Control': 'private, no-store'})
+    except WorkerInterrupted:
+        return _cancelled_worker_response(identity['user_id'], key)
     except RuntimeError as exc:
         if key and dedup.is_cancelled(identity['user_id'], key):
             raise HTTPException(409, 'AI request cancelled; worker stopped') from exc
@@ -582,7 +611,7 @@ def remote_job_resources(job_id: str,request: Request):
             'usage':json.loads(row['usage_json']),'metering_source':row['resource_source'],
             'gpu_verified':bool(proof),'billing_enabled':ai_billing.user_billing_enabled(identity['user_id'])}
     result['diagnostic_estimates_trusted']=row['resource_source']=='diagnostic-estimate'
-    result['resource_quality']='trusted-estimate' if result['diagnostic_estimates_trusted'] else ('verified' if proof else 'process-meter')
+    result['resource_quality']='trusted-estimate' if result['diagnostic_estimates_trusted'] else ('verified' if proof else 'unverified' if row['resource_source']=='unmetered' else 'process-meter')
     if proof:
         value=json.loads(proof[0])['payload']
         result['gpu_evidence']={key:value[key] for key in ('id','method','calibration_id','trace_sha256')}

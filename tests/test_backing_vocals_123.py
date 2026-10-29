@@ -1,4 +1,5 @@
 from pathlib import Path
+import pytest
 
 import app.main as main
 
@@ -19,7 +20,7 @@ def test_backend_accepts_and_tracks_backing_vocals_option():
     assert '"Backing Vocals"' in source
 
 
-def test_configured_ai_separator_uses_no_shell(monkeypatch, tmp_path):
+def test_configured_ai_separator_without_checkpoint_contract_is_denied(monkeypatch, tmp_path):
     # Exercise the local desktop branch. Server calls require a global job.
     monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
     monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
@@ -28,25 +29,11 @@ def test_configured_ai_separator_uses_no_shell(monkeypatch, tmp_path):
     monkeypatch.setenv("MTA_LEAD_BACKING_COMMAND", "fake-separator --input {input} --lead {lead} --backing {backing}")
     monkeypatch.setenv("MTA_LEAD_BACKING_MODEL", "karaoke-ai")
 
-    class Proc:
-        returncode = 0
-        stdout = None
-        def poll(self):
-            return 0
-
-    def fake_popen(command, **kwargs):
-        assert isinstance(command, list)
-        assert kwargs.get("stdout") is not None
-        lead = Path(command[command.index("--lead") + 1])
-        backing = Path(command[command.index("--backing") + 1])
-        lead.write_bytes(b"lead")
-        backing.write_bytes(b"backing")
-        return Proc()
-
-    monkeypatch.setattr(main.subprocess, "Popen", fake_popen)
-    lead, backing, method = main._split_lead_backing_vocals(src, tmp_path / "out")
-    assert lead.exists() and backing.exists()
-    assert method == "karaoke-ai"
+    from app.model_license_policy import LicenseDenied
+    monkeypatch.setattr(main.subprocess, 'Popen', lambda *a, **kw: pytest.fail('Unreviewed command spawned'))
+    with pytest.raises(LicenseDenied, match='checkpoint rights contract'):
+        main._split_lead_backing_vocals(src, tmp_path / 'out')
+    assert not (tmp_path / 'out').exists()
 
 
 def test_ffmpeg_fallback_builds_center_side_outputs(monkeypatch, tmp_path):
@@ -57,17 +44,13 @@ def test_ffmpeg_fallback_builds_center_side_outputs(monkeypatch, tmp_path):
     monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)
     monkeypatch.setattr(main.shutil, "which", lambda name: "/usr/bin/ffmpeg" if name == "ffmpeg" else None)
 
-    class Result:
-        returncode = 0
-        stderr = ""
-
     def fake_run(command, **kwargs):
         assert "-filter_complex" in command
+        assert kwargs['own_session'] is False
         Path(next(x for x in command if str(x).endswith("lead_vocals.wav"))).write_bytes(b"lead")
         Path(next(x for x in command if str(x).endswith("backing_vocals.wav"))).write_bytes(b"backing")
-        return Result()
 
-    monkeypatch.setattr(main.subprocess, "run", fake_run)
+    monkeypatch.setattr('app.separator_process.run', fake_run)
     lead, backing, method = main._split_lead_backing_vocals(src, tmp_path / "out", model_id="ffmpeg-center-side")
     assert lead.exists() and backing.exists()
     assert method == "ffmpeg-center-side"

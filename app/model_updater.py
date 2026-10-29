@@ -20,19 +20,7 @@ MAX_BYTES=max(64*1024*1024,int(os.getenv("MTA_DEMUCS_MODEL_MAX_MB","2048"))*1024
 TIMEOUT=max(5,int(os.getenv("MTA_DEMUCS_MODEL_UPDATE_TIMEOUT_SECONDS","180")))
 _lock=threading.Lock(); _started=False
 
-OFFICIAL_DEMUCS_MODELS={
- "htdemucs":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "htdemucs_ft":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "htdemucs_6s":{"stem_count":6,"stem_labels":["drums","bass","other","vocals","guitar","piano"]},
- "hdemucs_mmi":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "mdx":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "mdx_extra":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "mdx_q":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "mdx_extra_q":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "repro_mdx_a":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "repro_mdx_a_hybrid_only":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
- "repro_mdx_a_time_only":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
-}
+from .model_selectors import OFFICIAL_DEMUCS_MODELS
 
 def _https(url:str)->bool:return urlparse(url).scheme.lower()=="https"
 def _read_url(url:str)->bytes:

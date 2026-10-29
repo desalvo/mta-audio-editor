@@ -1,0 +1,34 @@
+name: Optional iOS model rights
+on:
+  workflow_dispatch:
+    inputs:
+      ios_model_rights:
+        description: Run 32 Apple SDK rights checks and compile the actual unsigned iOS app
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  ios-model-rights:
+    if: ${{ inputs.ios_model_rights }}
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Actual Apple SDK rights and iOS compile acceptance
+        run: python scripts/run_ios_model_rights_acceptance.py --output ios-rights-ci
+      - name: Retain exact native acceptance and compiler diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-model-rights-${{ github.run_id }}
+          if-no-files-found: error
+          path: |
+            ios-rights-ci/*.json
+            ios-rights-ci/*.log

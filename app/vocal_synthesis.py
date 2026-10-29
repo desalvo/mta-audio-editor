@@ -150,11 +150,13 @@ def validate_voice_lyrics(parts, cfg):
 
 
 def render(score,settings,output,progress=lambda phase,message:None):
+    cfg=Settings.model_validate(settings)
+    from .model_license_policy import evaluate
+    evaluate('vocal-synthesis', {'settings':cfg.model_dump()})
     from .vocal_banks import bank
     from .music_interchange import MusicResult
     import numpy as np
     import soundfile as sf
-    cfg=Settings.model_validate(settings)
     validate_voice_lyrics(score.music.parts,cfg)
     if cfg.backend in ('neural-external','diffsinger'):
         from .neural_vocal_adapter import render_neural

@@ -20,7 +20,7 @@ def _read(path):
         raise
 
 
-def audit():
+def audit(*, recovering_cutover=None):
     from . import auth, ai_arranger_runtime as queue, storage
     counts = {};reasons = []
     try:
@@ -58,6 +58,17 @@ def audit():
                 counts['gpu_leases'] = con.execute("SELECT COUNT(*) FROM ai_gpu_slot_leases WHERE state='active'").fetchone()[0]
             if 'regime_admin_cutovers' in tables:
                 counts['cutover_recovery'] = con.execute("SELECT COUNT(*) FROM regime_admin_cutovers WHERE phase!='finalized'").fetchone()[0]
+                # Recovery may carry exactly its own already committed barrier.
+                # A supplied identity alone cannot waive another transition or
+                # an inconsistent target epoch, even if all other work is quiet.
+                if recovering_cutover is not None:
+                    row = con.execute('''SELECT a.id FROM regime_admin_cutovers a
+                        JOIN regime_fence_state f ON f.singleton=1
+                        WHERE a.id=? AND a.phase='committed' AND f.transitioning=1
+                        AND f.regime=a.target AND f.revision=a.source_revision+1''',
+                        (recovering_cutover,)).fetchone()
+                    if row:
+                        counts['cutover_recovery'] -= 1
             if 'regime_payment_outbox' in tables:
                 # Provider effects without an original durable terminal receipt
                 # require the existing payment recovery; never infer completion.

@@ -7,6 +7,7 @@ isolation. Shared host GPU utilisation is NOT attributable to a user.
 from __future__ import annotations
 
 from .service_admission import admitted
+from .ai_worker_protocol import WorkerUnavailable
 
 import os
 import signal
@@ -27,6 +28,52 @@ class Measurement:
     isolated: bool = True
     gpu_diagnostics: dict[str, float] | None = None
     pid: int | None = None
+
+
+class WorkerInterrupted(RuntimeError):
+    """Cancellation retains the direct child's actual, reaped measurement."""
+
+    def __init__(self, measurement):
+        super().__init__('AI worker cancelled during execution; result discarded')
+        self.measurement = measurement
+
+
+class WorkerUncertain(RuntimeError):
+    """Unknown worker tree/evidence retains its original ledger and claim."""
+
+    def __init__(self, message, *, job_id=None):
+        super().__init__(message)
+        self.job_id = job_id
+
+
+class WorkerNotStarted(WorkerUnavailable):
+    """The supervisor proves that no worker process was launched."""
+
+    def __init__(self, message, *, cancelled=False):
+        super().__init__(message)
+        self.cancelled = cancelled
+
+
+def require_dispatch_identity(user_id, token_id=None):
+    """Recheck original scheduler, active account and optional revocable token.
+
+    The caller has already authenticated the request. Queue waits do not extend
+    that authentication indefinitely, and an internal runner is not an owner.
+    """
+    from .ai_global_execution import active_owner
+    from . import auth
+    active_owner(user_id)
+    with auth.db() as con:
+        user = con.execute('SELECT active FROM users WHERE id=?', (user_id,)).fetchone()
+        if user is None or user[0] != 1:
+            raise ValueError('Active AI execution identity required')
+        if token_id is not None:
+            if type(token_id) is not int or token_id <= 0:
+                raise ValueError('Active AI execution identity required')
+            token = con.execute('SELECT user_id,revoked_at FROM ai_access_tokens WHERE id=?',
+                                (token_id,)).fetchone()
+            if token is None or tuple(token) != (user_id, None):
+                raise ValueError('Active AI execution identity required')
 
 
 def _io(pid: int) -> tuple[int, int] | None:
@@ -91,23 +138,32 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
     directly reaped process is metered. Requires Unix wait4 (Linux server).
     """
     if os.name != 'posix' or not hasattr(os, 'wait4'):
-        raise RuntimeError('Linux wait4 metering required')
+        raise WorkerNotStarted('Linux wait4 metering required')
     if not argv or not isinstance(argv, list) or not all(isinstance(a, str) for a in argv):
         raise ValueError('Invalid process arguments')
     if timeout_seconds <= 0 or timeout_seconds > 86400:
         raise ValueError('Invalid timeout')
-    if cancel_check is not None and cancel_check():
-        raise RuntimeError('AI worker cancelled before execution')
+    if cancel_check is not None:
+        try:
+            before_launch_cancelled = cancel_check()
+        except Exception as exc:
+            raise WorkerNotStarted(str(exc)) from exc
+        if before_launch_cancelled:
+            raise WorkerNotStarted('AI worker cancelled before execution', cancelled=True)
     started = time.monotonic()
-    proc = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL,
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                            start_new_session=True, env=env)  # noqa: S603 -- operator-controlled executable only
+    try:
+        proc = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                start_new_session=True, env=env)  # noqa: S603 -- operator-controlled executable only
+    except OSError as exc:
+        raise WorkerNotStarted('AI worker could not start') from exc
     from .ai_queue_usage import CpuProgress, process_cpu
     live_cpu = CpuProgress(env)
     linux = sys.platform == 'linux'
     max_io = _io(proc.pid) if linux else None
     timed_out = False
     cancelled = False
+    reaped = False
     # wait4 exists on macOS too, but /proc-based tree evidence does not. CPU
     # for its direct child never certifies an unobserved native process tree.
     detected_descendants = not linux
@@ -115,6 +171,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
         while True:
             pid, status, rusage = os.wait4(proc.pid, os.WNOHANG)
             if pid == proc.pid:
+                reaped = True
                 break
             # wait4 and /proc/<pid>/io cover the direct child only. If it
             # creates other processes, do not pretend the account is complete.
@@ -132,6 +189,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
                 except ProcessLookupError:
                     pass
                 _, status, rusage = os.wait4(proc.pid, 0)
+                reaped = True
                 break
             if time.monotonic() - started >= timeout_seconds:
                 timed_out = True
@@ -140,6 +198,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
                 except ProcessLookupError:
                     pass
                 _, status, rusage = os.wait4(proc.pid, 0)
+                reaped = True
                 break
             time.sleep(0.05)
     finally:
@@ -151,20 +210,23 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
         except ProcessLookupError:
             pass
         # If sampling itself raised, reap the leader to avoid zombies.
-        if 'status' not in locals():
+        if not reaped:
             try:
                 _, status, rusage = os.wait4(proc.pid, 0)
+                reaped = True
             except ChildProcessError:
                 pass
-        proc.returncode = os.waitstatus_to_exitcode(status) if 'status' in locals() else None
-    if cancelled:
-        raise RuntimeError('AI worker cancelled during execution; result discarded')
+        proc.returncode = os.waitstatus_to_exitcode(status) if reaped else None
     elapsed = max(0.0, time.monotonic() - started)
     usage = {'cpu_seconds': max(0.0, rusage.ru_utime + rusage.ru_stime)}
     if max_io:
         usage['disk_read_bytes'] = float(max_io[0])
         usage['disk_write_bytes'] = float(max_io[1])
-    return Measurement(-1 if timed_out else proc.returncode, elapsed, usage, 'worker', not detected_descendants, pid=proc.pid)
+    measurement = Measurement(-1 if timed_out else proc.returncode, elapsed, usage,
+                              'worker', not detected_descendants, pid=proc.pid)
+    if cancelled:
+        raise WorkerInterrupted(measurement)
+    return measurement
 
 
 def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
@@ -184,9 +246,12 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
     from .ai_worker_registry import resolve_worker
     from .ai_worker_artifacts import package_artifacts
 
-    from .ai_global_execution import current_job,active_owner
-    if current_job.get() is not None:
-        active_owner(user_id)
+    # Reject user-supplied paths before requiring a live scheduler context too.
+    if not isinstance(plan, dict) or plan.get('kind', kind) != kind:
+        raise ValueError('AI plan cannot override the registered engine')
+    if 'source_score' in plan:
+        raise ValueError('Score path must be generated by MTA')
+    require_dispatch_identity(user_id, token_id)
     from . import ai_pull_coordinator as pull
     if pull.mode() == 'pull':
         return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
@@ -210,6 +275,9 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
         from .ai_payload_limits import MAX_SOURCE_BYTES
         if not isinstance(source_wav, bytes) or not 0 < len(source_wav) <= MAX_SOURCE_BYTES:
             raise ValueError('AI source audio exceeds size limit or is empty')
+        # Verify the exact immutable bytes before creating a ledger/claim.
+        from .ai_worker_artifacts import _verify_wav_bytes
+        _verify_wav_bytes(source_wav)
     encoded = json.dumps(plan, ensure_ascii=False, allow_nan=False).encode('utf-8')
     if len(encoded) > MAX_REQUEST_BYTES:
         raise ValueError('AI plan exceeds size limit')
@@ -289,10 +357,17 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
         result = None
         gpu_slot_acquired = False
         observed_at = float('-inf')
+        identity_lost = False
         def diagnostic_checkpoint(*, final=False):
-            nonlocal observed_at
+            nonlocal observed_at, identity_lost
             if final or time.monotonic() - observed_at >= 2:
                 observed_at = time.monotonic()
+                if not final:
+                    try:
+                        require_dispatch_identity(user_id, token_id)
+                    except (ValueError, RuntimeError):
+                        identity_lost = True
+                        return True
                 if claim_credentials and not final:
                     from .regime_worker_claims import heartbeat
                     with ai_billing.db() as con:
@@ -336,6 +411,13 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
             else:
                 result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+            if not result.isolated:
+                raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained')
+            try:
+                require_dispatch_identity(user_id, token_id)
+            except (ValueError, RuntimeError) as exc:
+                identity_lost = True
+                raise WorkerInterrupted(result) from exc
             if cancel_check is not None and cancel_check():
                 raise RuntimeError('AI worker cancelled; result discarded')
             diagnostic_checkpoint(final=True)
@@ -346,6 +428,11 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             # during this phase must not finalize a successful billed job.
             if cancel_check is not None and cancel_check():
                 raise RuntimeError("AI worker cancelled during artifact packaging")
+            try:
+                require_dispatch_identity(user_id, token_id)
+            except (ValueError, RuntimeError) as exc:
+                identity_lost = True
+                raise WorkerInterrupted(result) from exc
             info = {"format": "wav" if media_type == "audio/wav" else "artifact-zip"}
             usage = {key: value for key, value in result.usage.items() if key not in ('disk_read_bytes', 'disk_write_bytes')}
             # Transient worker I/O is diagnostic only, never billable disk use.
@@ -377,11 +464,17 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                              'billable':license_decision.billable,'license_model':license_decision.model_id,'license_policy_sha256':license_decision.policy_sha256,
                              'gpu_metered': 'gpu_seconds' in usage, 'metering_source':metered_source,'process_tree_metered': result.isolated,
                              'gpu_diagnostics': diagnostics, 'media_type': media_type}
-        except BaseException:
+        except BaseException as exc:
+            if isinstance(exc, WorkerInterrupted):
+                result = exc.measurement
+            if isinstance(exc, WorkerUncertain) or (result is not None and not result.isolated):
+                raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained', job_id=job_id) from exc
             diagnostic_checkpoint(final=True)
             from .worker_cgroup_recovery import require_quiescent
             with ai_billing.db() as con:require_quiescent(con,job_id)
-            terminal_status='cancelled' if cancel_check is not None and cancel_check() else 'failed'
+            if result is None and not isinstance(exc, WorkerNotStarted):
+                raise WorkerUncertain('Worker measurement unavailable; original owner retained', job_id=job_id) from exc
+            terminal_status='cancelled' if identity_lost or isinstance(exc, WorkerInterrupted) or (cancel_check is not None and cancel_check()) else 'failed'
             if gpu_slot_acquired:
                 # Do not silently finalize a job if its lease cannot be
                 # accounted for. Recovery must reconcile it explicitly.

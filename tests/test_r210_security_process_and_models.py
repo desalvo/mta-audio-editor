@@ -2,7 +2,6 @@
 import io
 import os
 from pathlib import Path
-import shlex
 import signal
 import sys
 import threading
@@ -116,9 +115,12 @@ def test_actual_custom_separator_no_longer_deadlocks_on_pipe_sized_output(tmp_pa
     monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True);monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
     script=tmp_path/'separator.py'
     script.write_text("import sys\nfrom pathlib import Path\nsys.stdout.write('x'*2_000_000)\nPath(sys.argv[sys.argv.index('--lead')+1]).write_bytes(b'lead')\nPath(sys.argv[sys.argv.index('--backing')+1]).write_bytes(b'backing')\n")
-    monkeypatch.setenv('MTA_LEAD_BACKING_COMMAND',shlex.join([sys.executable,str(script),'--input','{input}','--lead','{lead}','--backing','{backing}']))
     source=tmp_path/'source with spaces;not-shell.wav';source.write_bytes(b'input')
-    started=time.monotonic();lead,backing,_=main._split_lead_backing_vocals(source,tmp_path/'out')
+    lead,backing=tmp_path/'lead.wav',tmp_path/'backing.wav'
+    # The bounded process primitive remains an operator/internal tool. The
+    # application no longer treats an opaque command as a licensed model.
+    started=time.monotonic()
+    separator_process.run([sys.executable,str(script),'--input',str(source),'--lead',str(lead),'--backing',str(backing)])
     assert time.monotonic()-started<10 and lead.read_bytes()==b'lead' and backing.read_bytes()==b'backing'
 
 

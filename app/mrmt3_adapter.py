@@ -64,6 +64,8 @@ def _transcribe(source,options,*,_require_tested=True):
         raise ValueError('MR-MT3 classifies programs; only the source name is configurable')
     name=options.get('name','Transcribed mix')
     if not isinstance(name,str) or not 1<=len(name)<=180:raise ValueError('Invalid MR-MT3 source name')
+    from .model_license_policy import evaluate_model
+    evaluate_model('mr-mt3-assets')
     import soundfile as sf
     import numpy as np
     from scipy.signal import resample_poly

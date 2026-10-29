@@ -134,24 +134,30 @@ def _run(client, journal, state):
         outcome['status'] = 'cancelled'
         return outcome
     from dataclasses import asdict
-    from .model_license_policy import authorize_remote_execution
+    from .ai_model_attestation import authorize,verify_contract,VERIFIED_SCHEMA
     from .ai_worker_registry import resolve_worker, worker_python
     from .ai_worker_artifacts import package_artifacts, _verify_wav_bytes
     from .ai_metering_agent import run_metered_process
     from .ai_execution_policy import KEY
-    if asdict(authorize_remote_execution(task['kind'], task['plan'])) != task['policy']:
+    decision,local_requirement = authorize(task['kind'], task['plan'])
+    if asdict(decision) != task['policy']:
         raise ValueError('Worker model policy differs from admitted authority policy')
     worker = resolve_worker(task['kind'])
     if worker is None:
         raise ValueError('Operator-selected engine is unavailable on this worker')
     from .ai_model_attestation import CONTEXT,RECEIPT,context,validate
     model_requirement=task.get('model_requirement')
+    if local_requirement and local_requirement.get('schema')==VERIFIED_SCHEMA and (
+            model_requirement is None or model_requirement.get('schema')!=VERIFIED_SCHEMA):
+        raise ValueError('Original reviewed checkpoint requirement missing; no unattested fallback')
+    if model_requirement is not None and model_requirement.get('schema')==VERIFIED_SCHEMA:
+        verify_contract(model_requirement,decision)
     if model_requirement is not None:
         if (task['kind']!='audio-to-midi-basic-pitch'
-                or model_requirement.get('schema')!='mta-basic-pitch-load-1'
+                or model_requirement.get('schema') not in ('mta-basic-pitch-load-1',VERIFIED_SCHEMA)
                 or model_requirement.get('policy')!=task['policy']
                 or worker!=Path(__file__).with_name('ai_studio_adapter.py')
-                or hashlib.sha256(worker.read_bytes()).hexdigest()!=model_requirement.get('adapter_sha256')):
+                or hashlib.sha256(worker.read_bytes()).hexdigest()!=model_requirement.get('adapter_sha256',model_requirement.get('sources',{}).get('ai_studio_adapter.py'))):
             raise ValueError('Unsupported or changed attested adapter')
     cancelled = False
     pulse_at = float('-inf')
@@ -208,17 +214,19 @@ def _run(client, journal, state):
         outcome['cpu_seconds'] = measurement.usage.get('cpu_seconds') if measurement.isolated else None
         # Freeze known output/CPU before the next network request. The authority
         # atomically handles a concurrent cancellation while freezing completion.
-        if measurement.exit_code:
-            return outcome
         try:
             model_receipt=None
             if model_requirement is not None:
                 model_receipt=protocol.decode(private_file(directory/'model-receipt.json',limit=8192))
                 if measurement.pid is None:raise ValueError('Original measured worker PID required')
                 validate(model_receipt,model_requirement,task,pid=measurement.pid)
+                if model_requirement.get('schema')==VERIFIED_SCHEMA:outcome['model_receipt']=model_receipt
+            if measurement.exit_code:return outcome
             payload, media = package_artifacts(directory, max_bytes=protocol.MAX_BYTES)
             protocol.validate_payload(payload, media)
         except (ValueError, OSError):
+            if model_requirement is not None and model_requirement.get('schema')==VERIFIED_SCHEMA and 'model_receipt' not in outcome:
+                raise WorkerUncertain('Original checkpoint load/rights evidence missing; retain assignment') from None
             return outcome
         extra={'model_receipt':model_receipt} if model_receipt is not None else {}
         return extra | {'status': 'done', 'cpu_seconds': outcome['cpu_seconds'], 'media_type': media,

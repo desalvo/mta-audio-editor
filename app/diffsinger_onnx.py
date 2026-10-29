@@ -104,6 +104,8 @@ def acoustic_inputs(ds,config,phones,languages,defaults,steps=32):
 
 
 def session(path,expected_sha256):
+    from app.model_license_policy import evaluate_singing_components
+    evaluate_singing_components()
     import onnxruntime as ort
     ort.disable_telemetry_events()
     options=ort.SessionOptions();options.intra_op_num_threads=min(4,os.cpu_count() or 1);options.inter_op_num_threads=1
@@ -114,6 +116,8 @@ def session(path,expected_sha256):
 
 
 def run(request_path,output_path):
+    from app.model_license_policy import evaluate_singing_components
+    evaluate_singing_components()
     import numpy as np
     import yaml
     import soundfile as sf
@@ -122,6 +126,9 @@ def run(request_path,output_path):
     from scipy.signal import resample_poly
     from math import gcd
     value,asset=inventory();bindings=value['bindings']
+    from app.model_license_policy import evaluate_model
+    for notice in value['licenses']:
+        evaluate_model(notice['policy_model'])
     for binding,key in (('acoustic','MTA_NEURAL_SINGER_CHECKPOINT'),('vocoder','MTA_DIFFSINGER_VOCODER')):
         if os.getenv(key) and Path(os.environ[key]).resolve()!=asset(bindings[binding]).resolve():
             raise ValueError('ONNX inventory disagrees with selected '+binding)

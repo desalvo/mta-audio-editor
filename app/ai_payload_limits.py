@@ -32,6 +32,10 @@ def worker_artifact_bytes(default=MAX_ARTIFACT_BYTES):
         parsed = int(value)
         if str(parsed) != value:
             raise ValueError('Noncanonical artifact limit')
+        # Private pull workers use a stricter16MiB transport ceiling. This
+        # trusted process envelope is separate from the public64MiB minimum.
+        if parsed == 16:
+            return 16 * 1024 * 1024
         return validate_artifact_mib(parsed) * 1024 * 1024
     except (ValueError, TypeError) as exc:
         raise ValueError('Invalid trusted worker artifact size limit') from exc

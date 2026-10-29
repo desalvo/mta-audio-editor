@@ -1,0 +1,116 @@
+{
+  "schema": "mta-swift-syntax-delta-review-1",
+  "sources": [
+    {
+      "path": "mobile/ios/MTAEditorMobile/MobileWebViewController.swift",
+      "sha256": "591d015a51ed78a0a328f1e619e1270924b05f3d8e63c320fc7f082e32c0c49f",
+      "current_flags": [
+        {
+          "line": 650,
+          "type": "!",
+          "source_line": "DispatchQueue.main.async { completion(.success(())) }"
+        },
+        {
+          "line": 619,
+          "type": "!",
+          "source_line": "DispatchQueue.main.async { completion(.success(())) }"
+        },
+        {
+          "line": 581,
+          "type": "!",
+          "source_line": "if index >= files.count { completion(.success(())); return }"
+        },
+        {
+          "line": 576,
+          "type": "!",
+          "source_line": "if stemCount == 4, modelId == \"demucs-4\", LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { completion(.success(())); return }"
+        },
+        {
+          "line": 575,
+          "type": "!",
+          "source_line": "if LocalStemEngine.shared.isModelInstalled(modelId: modelId, stemCount: stemCount) { completion(.success(())); return }"
+        },
+        {
+          "line": 524,
+          "type": "!",
+          "source_line": "DispatchQueue.main.async { completion(.success(())) }"
+        }
+      ],
+      "baseline_flags": [
+        {
+          "line": 620,
+          "type": "!",
+          "source_line": "DispatchQueue.main.async { completion(.success(())) }"
+        },
+        {
+          "line": 589,
+          "type": "!",
+          "source_line": "DispatchQueue.main.async { completion(.success(())) }"
+        },
+        {
+          "line": 551,
+          "type": "!",
+          "source_line": "if index >= files.count { completion(.success(())); return }"
+        },
+        {
+          "line": 546,
+          "type": "!",
+          "source_line": "if stemCount == 4, modelId == \"demucs-4\", LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { completion(.success(())); return }"
+        },
+        {
+          "line": 545,
+          "type": "!",
+          "source_line": "if LocalStemEngine.shared.isModelInstalled(modelId: modelId, stemCount: stemCount) { completion(.success(())); return }"
+        },
+        {
+          "line": 516,
+          "type": "!",
+          "source_line": "DispatchQueue.main.async { completion(.success(())) }"
+        }
+      ],
+      "introduced_flags": []
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/LocalModelRights.swift",
+      "sha256": "86c2deb1c58370afd03e46f189cc9ee2cd4d958c0a58e10ad67ae317b0fb7ba0",
+      "current_flags": [],
+      "baseline_flags": [],
+      "introduced_flags": []
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/AppDelegate.swift",
+      "sha256": "a56c5a2874b0bbb81d4842166349cda6f26bf314ea5938a21c237ead7695a800",
+      "current_flags": [],
+      "baseline_flags": [],
+      "introduced_flags": []
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/NativeUpdateManager.swift",
+      "sha256": "7f2d3ccea62b05758e551ce7f95e8892f2b36ef442b59502b84ccaa150c210de",
+      "current_flags": [],
+      "baseline_flags": [],
+      "introduced_flags": []
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/LocalStemEngine.swift",
+      "sha256": "6ce2e71f3bfa770ef7aea25d57e4e71f5311fac83781fc8a8b7ac3ca5d999a7b",
+      "current_flags": [],
+      "baseline_flags": [],
+      "introduced_flags": []
+    },
+    {
+      "path": "tests/ios/LocalModelRightsAcceptance.swift",
+      "sha256": "07dfb34147badc6034b6ca270e29b084e37dc63dddec582d40e4e229651057bd",
+      "current_flags": [],
+      "baseline_flags": [],
+      "introduced_flags": []
+    }
+  ],
+  "new_grammar_flags": 0,
+  "retained_controller_grammar_flags": 6,
+  "swift_typecheck_or_apple_sdk_acceptance": false,
+  "parser_runtime": "tree-sitter0.25.2",
+  "grammar": "tree-sitter-swift0.7.4",
+  "limitation": "Six preexisting missing ! flags on unchanged Result<Void>.success(()) lines are retained. This is grammar-delta inspection,not a Swift compiler verdict.",
+  "initial_tool_failure": "tree-sitter0.26.0 segfaulted while traversing AST;not counted as a product test or successful check.0.25.2 completed;neither tool is a production dependency."
+}

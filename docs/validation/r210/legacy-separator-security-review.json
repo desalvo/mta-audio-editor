@@ -1,0 +1,304 @@
+{
+  "scan": {
+    "reviewed_findings": 165,
+    "source_files": 304,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 144
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "finding_identity_moves": [
+    {
+      "path": "app/main.py",
+      "test_id": "B404",
+      "old_line": 16,
+      "line": 15,
+      "reviewed_context_change": true
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 275,
+      "line": 274,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B107",
+      "old_line": 965,
+      "line": 964,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B107",
+      "old_line": 1015,
+      "line": 1014,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B404",
+      "old_line": 1579,
+      "line": 1578,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 1589,
+      "line": 1588,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 2953,
+      "line": 2952,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 2953,
+      "line": 2952,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 3434,
+      "line": 3433,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 3434,
+      "line": 3433,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 3456,
+      "line": 3455,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 3456,
+      "line": 3455,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B404",
+      "old_line": 4914,
+      "line": 4896,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 4926,
+      "line": 4908,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 5756,
+      "line": 5738,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 7227,
+      "line": 7209,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 7439,
+      "line": 7421,
+      "reviewed_context_change": false
+    },
+    {
+      "path": "app/plugins.py",
+      "test_id": "B603",
+      "old_line": 617,
+      "line": 631,
+      "reviewed_context_change": true
+    },
+    {
+      "path": "app/separator_process.py",
+      "test_id": "B603",
+      "old_line": 22,
+      "line": 23,
+      "reviewed_context_change": true
+    },
+    {
+      "path": "app/separator_process.py",
+      "test_id": "B603",
+      "old_line": 40,
+      "line": 41,
+      "reviewed_context_change": true
+    }
+  ],
+  "removed_findings": [
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "line": 4789
+    }
+  ],
+  "inventories": {
+    "SERVICE_ADMISSION_REVIEW": {
+      "inventory_passed": true,
+      "source_files": 304,
+      "reviewed_sites": 170,
+      "scope": "Supported single pinned Linux authority replicas and HTTPS-only original workers",
+      "financial_transition_authorized": false,
+      "external_kernel_or_multihost_accepted": false,
+      "release_candidate": false,
+      "newly_reviewed": [
+        {
+          "path": "app/separator_process.py",
+          "function": "run",
+          "line": 23,
+          "kind": "process_boundary",
+          "call": "subprocess.Popen",
+          "ast_sha256": "1c797070fa6fbf3e4ac52bd8a1dcdf1e256b4fe5760e8014f2f05a3ab91459d1"
+        }
+      ],
+      "removed_or_moved": [
+        {
+          "path": "app/main.py",
+          "function": "_split_lead_backing_vocals",
+          "line": 4789,
+          "kind": "process_boundary",
+          "call": "subprocess.run",
+          "ast_sha256": "670261876334f6e17f0b2477881ca8a0d57416d751cd42f6ec8d3dfc77dc1694",
+          "disposition": "request_lifetime",
+          "boundary": "Reviewed synchronous caller chain under a full request,finite tracked child,registered inference or install admission;parent waits through process/result cleanup. Reader/heartbeat/cancel helper threads now have independent tickets. Parent/unknown external loss leaves original admission or ledger held.",
+          "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred."
+        },
+        {
+          "path": "app/separator_process.py",
+          "function": "run",
+          "line": 22,
+          "kind": "process_boundary",
+          "call": "subprocess.Popen",
+          "ast_sha256": "2e2476eb31db56a7733c3d28b8ee45cc7122c68a83f2a44ab586ffeee37155d3",
+          "disposition": "request_lifetime",
+          "boundary": "Reviewed synchronous caller chain under a full request,finite tracked child,registered inference or install admission;parent waits through process/result cleanup. Reader/heartbeat/cancel helper threads now have independent tickets. Parent/unknown external loss leaves original admission or ledger held.",
+          "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred."
+        }
+      ]
+    },
+    "AI_EXECUTION_REVIEW": {
+      "inventory_passed": true,
+      "runtime_source_files": 548,
+      "reviewed_boundaries": 781,
+      "families": 10,
+      "hardware_model_rights_or_kernel_attestation": false,
+      "release_candidate": false,
+      "newly_reviewed": [
+        {
+          "path": "app/backing_vocals_runtime.py",
+          "function": "separate_backing",
+          "line": 44,
+          "kind": "inference_call",
+          "call": "separator.separate",
+          "shape_sha256": "2960d76b0007d6324ef214dec36b80472cb46a466c5a781eadb4ae85f330d14a"
+        },
+        {
+          "path": "app/separator_process.py",
+          "function": "run",
+          "line": 23,
+          "kind": "process_boundary",
+          "call": "subprocess.Popen",
+          "shape_sha256": "1c797070fa6fbf3e4ac52bd8a1dcdf1e256b4fe5760e8014f2f05a3ab91459d1"
+        }
+      ],
+      "removed_or_moved": [
+        {
+          "path": "app/ai_unified_adapter.py",
+          "function": "infer",
+          "line": 250,
+          "kind": "inference_call",
+          "call": "separator.separate",
+          "shape_sha256": "2960d76b0007d6324ef214dec36b80472cb46a466c5a781eadb4ae85f330d14a",
+          "family": "adapter_child",
+          "boundary": "Trusted bundled adapter executes only inside its parent registered/native/operator launch boundary; it does not create its own bill. Server parent owns the exact ledger and process measurement; nested subprocesses need cgroup evidence or are held. Loaded-checkpoint/rights authenticity remains F3/F4/F6.",
+          "evidence": [
+            "tests/test_r210_execution_policy_binding.py",
+            "tests/test_r210_legacy_executor_closure.py",
+            "tests/test_r210_execution_entry_acceptance.py"
+          ]
+        },
+        {
+          "path": "app/main.py",
+          "function": "_split_lead_backing_vocals",
+          "line": 4789,
+          "kind": "process_boundary",
+          "call": "subprocess.run",
+          "shape_sha256": "670261876334f6e17f0b2477881ca8a0d57416d751cd42f6ec8d3dfc77dc1694",
+          "family": "web_project",
+          "boundary": "Project ACL and durable actor bind asynchronous text/stem/Arranger/Remix/Studio work to the common registered owner. Old synchronous server generation is refused. Source preparation and non-ML DSP do not claim a separate AI measurement.",
+          "evidence": [
+            "tests/test_r210_queue_identity_stem_metering.py",
+            "tests/test_r210_global_ai_execution.py",
+            "tests/test_r210_legacy_executor_closure.py"
+          ]
+        },
+        {
+          "path": "app/main.py",
+          "function": "_split_lead_backing_vocals",
+          "line": 4827,
+          "kind": "inference_call",
+          "call": "separator.separate",
+          "shape_sha256": "cf0dc3004dc359ba3347db6bbb1448cd9f654b80ee392a897ad657037f6cb7c5",
+          "family": "web_project",
+          "boundary": "Project ACL and durable actor bind asynchronous text/stem/Arranger/Remix/Studio work to the common registered owner. Old synchronous server generation is refused. Source preparation and non-ML DSP do not claim a separate AI measurement.",
+          "evidence": [
+            "tests/test_r210_queue_identity_stem_metering.py",
+            "tests/test_r210_global_ai_execution.py",
+            "tests/test_r210_legacy_executor_closure.py"
+          ]
+        },
+        {
+          "path": "app/separator_process.py",
+          "function": "run",
+          "line": 22,
+          "kind": "process_boundary",
+          "call": "subprocess.Popen",
+          "shape_sha256": "2e2476eb31db56a7733c3d28b8ee45cc7122c68a83f2a44ab586ffeee37155d3",
+          "family": "native_local",
+          "boundary": "Explicit native single-user profile owns local execution; local actor zero cannot become a server actor or bill. Admitted model policy precedes source/worker dispatch; bounded supervision stops/reaps the worker. Native platform execution guarantees remain F5/G6.",
+          "evidence": [
+            "tests/test_r210_legacy_executor_closure.py",
+            "tests/test_r210_active_execution_owner.py",
+            "tests/test_r210_execution_policy_binding.py"
+          ]
+        }
+      ]
+    },
+    "REMOTE_TRANSPORT_REVIEW": {
+      "reviewed_sites": 30,
+      "source_files": 21,
+      "inventory_passed": true,
+      "remote_model_attestation_complete": false,
+      "release_candidate": false
+    }
+  },
+  "checker_bytes_unchanged": true
+}

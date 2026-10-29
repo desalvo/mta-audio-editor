@@ -1,0 +1,22 @@
+{
+  "packages": {
+    "basic-pitch": "0.4.0",
+    "fastapi": "0.142.2",
+    "librosa": "0.11.0",
+    "mir-eval": "0.8.2",
+    "numpy": "2.3.5",
+    "onnxruntime": "1.23.2",
+    "qrcode": "8.2",
+    "resampy": "0.4.2",
+    "setuptools": "80.9.0",
+    "soundfile": "0.13.1"
+  },
+  "production_requirements_changed": false,
+  "scope": "Separate local ONNX-only test interpreter. Upstream Basic Pitch TensorFlow requirement intentionally not installed;not a pip-check-clean or production/native packaging claim. Runtime/model not bundled.",
+  "selftest": {
+    "model_path": "/workspace/scratch/06e635791464/direct-model-runtime/lib/python3.12/site-packages/basic_pitch/saved_models/icassp_2022/nmp.onnx",
+    "sha256": "2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec",
+    "device": "cpu",
+    "notes": 1
+  }
+}

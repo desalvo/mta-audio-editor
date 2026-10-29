@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="0.546" timestamp="2026-10-29T02:17:05.791904+01:00" hostname="235c84ed49d1"><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_subprocess_models" time="0.013"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'Invalid Demucs'&#10;  Actual message: 'Select a declared Demucs checkpoint; custom model names require separate review'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_unified_subprocess_models0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f70ec699970&gt;
+
+    def test_unified_subprocess_models(tmp_path, monkeypatch):
+        source, output = _staged(tmp_path)
+        import subprocess
+        calls = []
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            if 'demucs.separate' in cmd:
+                folder = tmp_path/'demucs'/'htdemucs'/'source'
+                folder.mkdir(parents=True)
+                (folder/'vocals.wav').write_bytes(b'a')
+            else:
+                Path(cmd[cmd.index('--output') + 1]).write_bytes(b'a')
+        monkeypatch.setattr(subprocess, 'run', fake_run)
+        with pytest.raises(ValueError, match='supported SAM checkpoint'):
+            unified.infer({'kind': 'sam-audio', 'source_audio': source}, output)
+        monkeypatch.setenv('MTA_AI_SAM_MODEL', 'sam-audio-small')
+        unified.infer({'kind': 'sam-audio', 'source_audio': source}, output)
+&gt;       with pytest.raises(ValueError, match='Invalid Demucs'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'Invalid Demucs'
+E         Actual message: 'Select a declared Demucs checkpoint; custom model names require separate review'
+
+tests/test_r207_gateway_adapter_coverage.py:162: AssertionError</failure></testcase><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_backing_vocals_artifact_security" time="0.053" /></testsuite></testsuites>

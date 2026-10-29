@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="18" skipped="0" tests="81" time="2.263" timestamp="2026-10-29T00:15:51.883066+01:00" hostname="147bff3ee7dd"><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-whisper]" time="0.321" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-whisper_progressive]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-loaded_whisper]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-basic_pitch]" time="0.003" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-studio]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-yourmt3]" time="0.006" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-mrmt3]" time="0.003" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-mrmt3_selftest]" time="0.003" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-transkun]" time="0.002" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-transkun_cli]" time="0.003" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-drumsep]" time="0.003" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-sam_cli]" time="0.003" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-profile_demucs]" time="0.004" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-profile_sam]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-oddvoices]" time="0.014" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_bridge]" time="0.008" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_onnx]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_session]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-whisper]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:26: in dispatch
+    return extract_lyrics(source)
+           ^^^^^^^^^^^^^^^^^^^^^^
+app/music_text.py:479: in extract_lyrics
+    evaluate_model('whisper')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-whisper_progressive]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:29: in dispatch
+    return extract_lyrics_progressive(source)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/music_text.py:453: in extract_lyrics_progressive
+    evaluate_model('whisper')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-loaded_whisper]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:35: in dispatch
+    return _whisper_transcribe(Model(),str(source),language=None,device='cpu')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/music_text.py:402: in _whisper_transcribe
+    evaluate_model('whisper')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-basic_pitch]" time="0.003"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:38: in dispatch
+    if entry=='basic_pitch':return ai_studio_adapter.transcribe(source,{})
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_studio_adapter.py:71: in transcribe
+    evaluate_model('basic-pitch')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-studio]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:39: in dispatch
+    return ai_studio_adapter.infer({'kind':'audio-to-midi-basic-pitch','source_audio':str(source)},out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_studio_adapter.py:148: in infer
+    evaluate(plan.get('kind'), plan)
+app/model_license_policy.py:189: in evaluate
+    primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[];inventories=[]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-yourmt3]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:42: in dispatch
+    return transcribe(source,{})
+           ^^^^^^^^^^^^^^^^^^^^^
+app/yourmt3_adapter.py:75: in transcribe
+    try:return _transcribe(source,options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/yourmt3_adapter.py:86: in _transcribe
+    evaluate_model('yourmt3')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-mrmt3]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:45: in dispatch
+    return _transcribe(source,{},_require_tested=False) if entry.endswith('selftest') else transcribe(source,{})
+                                                                                           ^^^^^^^^^^^^^^^^^^^^^
+app/mrmt3_adapter.py:54: in transcribe
+    return _transcribe(source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/mrmt3_adapter.py:68: in _transcribe
+    evaluate_model('mr-mt3-assets')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-mrmt3_selftest]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:45: in dispatch
+    return _transcribe(source,{},_require_tested=False) if entry.endswith('selftest') else transcribe(source,{})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/mrmt3_adapter.py:68: in _transcribe
+    evaluate_model('mr-mt3-assets')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-transkun]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:48: in dispatch
+    return transcribe(source,{'asset_id':'missing-asset'})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/transkun_adapter.py:10: in transcribe
+    evaluate_model('transkun-assets')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-transkun_cli]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:72: in dispatch
+    return main()
+           ^^^^^^
+app/transkun_runner.py:46: in main
+    evaluate_model('transkun-assets')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-drumsep]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:51: in dispatch
+    return infer(source,folder/'missing.onnx',out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/drumsep_onnx_worker.py:80: in infer
+    evaluate_model('drumsep-weights')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-sam_cli]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:72: in dispatch
+    return main()
+           ^^^^^^
+app/sam_audio_worker.py:24: in main
+    evaluate_model('sam-audio')
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-profile_demucs]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:72: in dispatch
+    return main()
+           ^^^^^^
+app/ai_profiled_backend.py:20: in main
+    evaluate_model(args.backend)
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-profile_sam]" time="0.002"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:72: in dispatch
+    return main()
+           ^^^^^^
+app/ai_profiled_backend.py:20: in main
+    evaluate_model(args.backend)
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-oddvoices]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:54: in dispatch
+    return render(None,{},out)
+           ^^^^^^^^^^^^^^^^^^^
+app/vocal_synthesis.py:155: in render
+    evaluate('vocal-synthesis', {'settings':cfg.model_dump()})
+app/model_license_policy.py:189: in evaluate
+    primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[];inventories=[]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_bridge]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:57: in dispatch
+    if entry=='singer_bridge':return diffsinger_bridge.run(source,out)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/diffsinger_bridge.py:189: in run
+    evaluate_singing_components()
+app/model_license_policy.py:226: in evaluate_singing_components
+    return [evaluate_model(os.getenv('MTA_NEURAL_SINGER_POLICY_MODEL','unreviewed-neural-singer')),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_onnx]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:58: in dispatch
+    if entry=='singer_onnx':return diffsinger_onnx.run(source,out)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/diffsinger_onnx.py:120: in run
+    evaluate_singing_components()
+app/model_license_policy.py:226: in evaluate_singing_components
+    return [evaluate_model(os.getenv('MTA_NEURAL_SINGER_POLICY_MODEL','unreviewed-neural-singer')),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_session]" time="0.001"><failure message="app.service_regime.RegimeError: Commercial regime requires a matching initialized fence">tests/test_r210_direct_executor_rights.py:97: in test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects
+    dispatch(entry,tmp_path,monkeypatch)
+tests/test_r210_direct_executor_rights.py:59: in dispatch
+    return diffsinger_onnx.session(source,'0'*64)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/diffsinger_onnx.py:108: in session
+    evaluate_singing_components()
+app/model_license_policy.py:226: in evaluate_singing_components
+    return [evaluate_model(os.getenv('MTA_NEURAL_SINGER_POLICY_MODEL','unreviewed-neural-singer')),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/model_license_policy.py:252: in evaluate_model
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+       ^^^^^^^^^^^^^^^^
+app/service_regime.py:108: in current_regime
+    raise RegimeError("Commercial regime requires a matching initialized fence")
+E   app.service_regime.RegimeError: Commercial regime requires a matching initialized fence</failure></testcase><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-whisper]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-whisper_progressive]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-loaded_whisper]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-basic_pitch]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-studio]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-yourmt3]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-mrmt3]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-mrmt3_selftest]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-transkun]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-transkun_cli]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-drumsep]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-sam_cli]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-profile_demucs]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-profile_sam]" time="0.002" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-oddvoices]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_bridge]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_onnx]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_session]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-whisper]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-whisper_progressive]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-loaded_whisper]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-basic_pitch]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-studio]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-yourmt3]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-mrmt3]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-mrmt3_selftest]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-transkun]" time="0.002" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-transkun_cli]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-drumsep]" time="0.002" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-sam_cli]" time="0.002" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-profile_demucs]" time="0.002" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-profile_sam]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-oddvoices]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_bridge]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_onnx]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_session]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_loaded_whisper_revocation_denies_mps_cpu_fallback" time="0.002" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_permitted_loaded_whisper_retains_original_fallback_and_timestamps" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_bridge]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_onnx]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_session]" time="0.001" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_independent_actual_cli_denies_before_optional_runtime_import[sam]" time="0.284" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_independent_actual_cli_denies_before_optional_runtime_import[demucs]" time="0.290" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_independent_actual_cli_denies_before_optional_runtime_import[drumsep]" time="0.341" /><testcase classname="tests.test_r210_direct_executor_rights" name="test_independent_actual_cli_denies_before_optional_runtime_import[transkun]" time="0.279" /></testsuite></testsuites>

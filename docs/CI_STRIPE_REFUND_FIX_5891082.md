@@ -1,3 +1,5 @@
+> Aggiornamento 28 ottobre 2026: riparazione committata in `4c3c73a` e full CI40584085026 confermata verde (6887passati,114skip,76,88%). Leggere FULL_CI_CONFIRMED_4C3C73A_R210.md. Le istruzioni di applicazione/commit e la conferma pendente qui sotto sono storiche; non riapplicare la patch.
+
 # CI40550957081: correzione delle fixture Stripe per i rimborsi
 
 27 ottobre 2026 · MTA0.3.0-r210 PRE-RC

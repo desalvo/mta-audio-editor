@@ -1,0 +1,15 @@
+{
+  "schema": "mta-cumulative-preservation-1",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-execution-ownership-cumulative.zip",
+  "baseline_sha256": "sha256:03ab20ada81b9aa7976e11fa19676f65b84d5195b9471878e942f061e7dadef9",
+  "baseline_files": 4559,
+  "missing_baseline_files": [],
+  "original_log_files": 614,
+  "original_log_bytes": "all identical",
+  "original_modes": "all identical",
+  "original_zip_attributes": "copied exactly per baseline entry",
+  "original_42_criteria_wording_weights_states": "all identical",
+  "new_acceptance_promotions": [],
+  "release_candidate": false,
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+}

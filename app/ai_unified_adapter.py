@@ -118,7 +118,8 @@ def infer(plan: dict, output: Path) -> None:
         raise ValueError('Audio source must be an exclusive regular file')
     if kind == 'whisper':
         from app.music_text import extract_lyrics
-        lines = extract_lyrics(source, model_name=str(plan.get('model') or 'turbo'),
+        from app.model_selectors import whisper_model
+        lines = extract_lyrics(source, model_name=whisper_model(plan.get('model')),
                               language=plan.get('language') or None,
                               advanced_alignment=bool(plan.get('advanced_alignment', False)),require_inprocess=True)
         result = folder / 'transcript.json'
@@ -177,10 +178,8 @@ def infer(plan: dict, output: Path) -> None:
     if kind == 'sam-audio':
         from app.sam_audio_worker import main as _unused  # noqa: F401
         import subprocess
-        model = str(plan.get('model') or os.environ.get('MTA_AI_SAM_MODEL', ''))
-        if model in {'sam-audio-small','sam-audio-base','sam-audio-large'}:model='facebook/'+model
-        if not model: raise RuntimeError('Operator must configure MTA_AI_SAM_MODEL')
-        if plan.get('model') and model not in {'facebook/sam-audio-small','facebook/sam-audio-base','facebook/sam-audio-large'}:raise ValueError('Unsupported SAM model')
+        from app.model_selectors import sam_model
+        model = sam_model(plan.get('model'))
         target = folder / 'separated.wav'
         arguments=['--source',str(source),'--output',str(target),'--model',model,'--prompt',str(plan.get('prompt') or 'vocals')]
         if plan.get('anchors'):arguments+=['--anchors-json',json.dumps(plan['anchors'])]
@@ -188,9 +187,8 @@ def infer(plan: dict, output: Path) -> None:
         _artifacts(folder, [(target, 'audio/wav')]); return
     if kind == 'demucs':
         import subprocess
-        model = str(plan.get('model') or 'htdemucs')
-        if not model.replace('_', '').replace('-', '').isalnum() or len(model) > 64:
-            raise ValueError('Invalid Demucs model')
+        from app.model_selectors import demucs_model
+        model = demucs_model(plan.get('model'))
         from app.demucs_runtime import device_arguments
         count=plan.get('stem_count',0)
         if type(count) is not int or (count!=0 and not 2<=count<=64):raise ValueError('Invalid stem count')
@@ -232,6 +230,11 @@ def infer(plan: dict, output: Path) -> None:
     if kind == 'backing-vocals':
         from app.model_license_policy import effective_backing_model
         effective_model = effective_backing_model(plan)
+        if effective_model == 'ffmpeg-center-side':
+            from app.backing_vocals_runtime import split_center_side
+            lead, backing, _ = split_center_side(source, folder)
+            _artifacts(folder, [(lead, 'audio/wav'), (backing, 'audio/wav')])
+            return
         if effective_model == 'mvsep-mega53':
             from app.mega53_runtime import infer
             lead, backing, _ = infer(source, folder)
@@ -247,9 +250,9 @@ def infer(plan: dict, output: Path) -> None:
         if not model or '/' in model or '\\' in model:
             raise RuntimeError('Operator must configure a safe MTA_AI_VOCAL_MODEL filename')
         separator = Separator(output_dir=str(folder), output_format='WAV', model_file_dir=os.environ.get('MTA_LEAD_BACKING_MODEL_DIR', os.environ.get('MTA_AI_VOCAL_MODELS_DIR', '')))
-        from app.backing_vocals_runtime import load_backing_model
+        from app.backing_vocals_runtime import load_backing_model, separate_backing
         load_backing_model(separator, model)
-        names = separator.separate(str(source))
+        names = separate_backing(separator, source, model)
         paths=[]
         for index, name in enumerate(names):
             source_path = Path(name)

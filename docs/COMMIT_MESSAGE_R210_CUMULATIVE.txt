@@ -1,1 +1,1 @@
-Harden Stripe reconciliation, transition recovery and legacy AI execution boundaries
+Close AI execution entry coverage and preserve cancellation metering

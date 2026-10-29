@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
 
 import numpy as np
 
@@ -73,6 +74,10 @@ def reconstruct_frequency(freq_output: np.ndarray) -> np.ndarray:
 
 
 def infer(source: Path, model: Path, output: Path) -> list[Path]:
+    if __package__ in (None, ''):
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from app.model_license_policy import evaluate_model
+    evaluate_model('drumsep-weights')
     import soundfile as sf
     from scipy.signal import resample_poly
     import onnxruntime as ort

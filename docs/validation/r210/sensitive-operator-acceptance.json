@@ -1,0 +1,1550 @@
+{
+  "schema": "mta-sensitive-operator-acceptance-1",
+  "date": "2026-10-28",
+  "timezone": "Europe/Rome",
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "commit_deferred": true,
+  "release_candidate": false,
+  "accepted_original_criterion": "E4",
+  "original_criterion": "Complete sensitive regime-switch operator workflow",
+  "previous_progress": {
+    "accepted": 26,
+    "total": 42,
+    "percent": 61.9,
+    "macroareas": 0
+  },
+  "progress": {
+    "accepted": 27,
+    "total": 42,
+    "percent": 64.3,
+    "macroareas": 1
+  },
+  "accepted_macroarea": "E",
+  "counts": {
+    "passed": 243
+  },
+  "browser_cases": 59,
+  "backend_and_harness_cases": 123,
+  "source_gate_cases": 61,
+  "new_cases": {
+    "backend": 29,
+    "browser": 38,
+    "strict_harness": 6,
+    "total": 73
+  },
+  "accessibility_scans": {
+    "count": 8,
+    "scope": "Entire shipped service regime administration panel in full settings,IT/EN390/1280,ready/blocked",
+    "violations": 0,
+    "rule_exclusions": 0
+  },
+  "original_drain_browser_prerequisite": {
+    "previously_skipped": 12,
+    "now_passed": 12,
+    "pending": false
+  },
+  "acceptance_basis": [
+    "Entire original operator workflow now includes independent13-family original financial/work review,complete-set legacy totals with display pagination,absent/pending/unverified/unavailable distinctions and exact amounts",
+    "Actual active-admin/private/no-store review survives C2 drain;fixed original financial/worker settlement control routes retain auth/CSRF/original evidence;new financial dispatch remains barred",
+    "Unacknowledged/stale/failed reviews cannot confirm;original target/epoch/preview remains server authority,not diagnostic hash",
+    "Actual settings two-way change,audit,precommit cancellation evidence,committed crash/forward recovery,original replay/lost response,explicit reopen/build handoff and unknown-history refusals",
+    "Actual GET-only authenticated provider reconciliation changes original wallet and closes original checkout under drain;complete merchant-history clearance still refused",
+    "E4 closed from new complete operator contract and broad valid/blocked/failure-state proof,not promotion of the former restricted roundtrip alone;C3/C5/D6 are independent unaccepted financial/backend requirements"
+  ],
+  "remaining_limitations": [
+    "General financial clearance and broad backend cutover are not certified:C3/C5/D6 remain implementation_pending",
+    "A4/A5 global merchant/payout/legacy original fee evidence remains incomplete;no guessed migration or debt",
+    "C6 cross-host and B2/B6 external quiescence/partition/rights/native/hardware criteria retain original states",
+    "Full CI40584085026 on4c3 is retained for unchanged code;no new GitHub run or commit claimed"
+  ],
+  "raw_reports": [
+    {
+      "path": "docs/validation/r210/operator-backend-final.xml",
+      "sha256": "sha256:712170f423782a18c4b25516dd9ed5fd7fb9b9933972117957103be9f49f13bc"
+    },
+    {
+      "path": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml",
+      "sha256": "sha256:be2c5fd395c80e208b804ebd2a7c51ba882a2c24ebfb666be6831e081239fca6"
+    },
+    {
+      "path": "docs/validation/r210/operator-source-gates-final.xml",
+      "sha256": "sha256:58a7241b1bd714e683bc0fb2bf825bf2611e2e851fb465de18f494c31b0eface"
+    }
+  ],
+  "source_review": {
+    "app_python_files": 300,
+    "bandit_findings": 164,
+    "severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 143
+    },
+    "service_admission_boundaries": 170,
+    "transport_sites": 30,
+    "transport_files": 21,
+    "runtime_sources": 541,
+    "runtime_points": 780,
+    "checker_relaxations": 0,
+    "production_dependencies_added": 0
+  },
+  "cases": [
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_actual_complete_review_has_original_preview_and_never_changes_money",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_invalid_review_input_never_opens_cutover[target-unknown]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_invalid_review_input_never_opens_cutover[limit-0]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_invalid_review_input_never_opens_cutover[limit-101]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_invalid_review_input_never_opens_cutover[offset--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_financial_review_never_discloses_to_non_administrator[anonymous]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_financial_review_never_discloses_to_non_administrator[owner]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_financial_review_never_discloses_to_non_administrator[inactive-admin]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_unavailable_financial_family_is_isolated_private_and_not_zero",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_unproven_history_and_schemas_remain_visible_blockers[provider]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_unproven_history_and_schemas_remain_visible_blockers[unknown-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_unproven_history_and_schemas_remain_visible_blockers[missing-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_actual_settings_notification_default_is_not_an_economic_obligation",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_drain_allows_exact_private_review_reads_but_no_new_financial_dispatch",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_preflight_digest_is_diagnostic_and_never_a_write_permit",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_late_page_legacy_cases_are_all_audited_without_guessing_basis",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_running_original_worker_is_pending_not_merely_consistent",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_partial_optional_journal_is_never_waived_as_unused[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_partial_optional_journal_is_never_waived_as_unused[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/reconcile-payment-POST-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/recover-checkout-reference-POST-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-processes/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/quiesce-POST-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-losses/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/resolve-POST-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-losses/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/recover-frozen-POST-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-losses/foreign/resolve-POST-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/reconcile-payment/extra-POST-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/payment-ledger-POST-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/payment-refunds/dispatch-POST-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_preflight",
+      "name": "test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/paypal/merchant-history-POST-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_complete_exact_browser_report_is_required",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_any_failure_error_or_prerequisite_skip_refuses_acceptance[failure]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_any_failure_error_or_prerequisite_skip_refuses_acceptance[error]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_any_failure_error_or_prerequisite_skip_refuses_acceptance[skipped]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_missing_foreign_or_duplicate_case_cannot_replace_real_acceptance[<lambda>0]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_missing_foreign_or_duplicate_case_cannot_replace_real_acceptance[<lambda>1]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_missing_foreign_or_duplicate_case_cannot_replace_real_acceptance[<lambda>2]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_dtd_is_rejected_before_parsing",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_integrated_drain_acceptance_requires_twelve_exact_new_cases[None]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_integrated_drain_acceptance_requires_twelve_exact_new_cases[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_integrated_drain_acceptance_requires_twelve_exact_new_cases[skip]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_integrated_drain_acceptance_requires_twelve_exact_new_cases[duplicate]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_integrated_drain_acceptance_requires_twelve_exact_new_cases[wrong-family]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_integrated_drain_acceptance_requires_twelve_exact_new_cases[old-report]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_complete_operator_acceptance_requires_all_fifty_nine_cases[None]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_complete_operator_acceptance_requires_all_fifty_nine_cases[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_complete_operator_acceptance_requires_all_fifty_nine_cases[skip]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_complete_operator_acceptance_requires_all_fifty_nine_cases[duplicate]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_complete_operator_acceptance_requires_all_fifty_nine_cases[foreign-family]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_ci_gate",
+      "name": "test_complete_operator_acceptance_requires_all_fifty_nine_cases[old-nine]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_actual_two_way_cutover_keeps_original_drain_until_explicit_resume",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_open_service_cannot_preview_or_execute_old_confirmation",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_resume_and_new_drain_invalidate_unchanged_financial_preview",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_original_predrain_ticket_blocks_cutover_even_without_financial_work",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_committed_crash_cannot_resume_and_only_original_forward_recovery_clears_it",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_damaged_or_unfinished_original_admission_never_authorizes_cutover[build]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_damaged_or_unfinished_original_admission_never_authorizes_cutover[event]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_damaged_or_unfinished_original_admission_never_authorizes_cutover[active]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_damaged_or_unfinished_original_admission_never_authorizes_cutover[schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_removed_configuration_cannot_bypass_persisted_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_financial_history_is_still_blocked_after_successful_service_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_held_original_reservation_requires_abort_before_service_resume",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_forward_recovery_cannot_waive_an_unrelated_unfinished_publication",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_actual_process_sigkill_releases_os_locks_but_preserves_original_drain_and_cutover",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain",
+      "name": "test_resume_waits_until_financial_commit_mirror_and_finalization_release_original_guard",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[provider]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[history]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[credit]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[priced-plan]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[missing-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unknown-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unprefixed-legacy-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[running-job]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_preview_staleness_auth_csrf_default_off_and_confirmation_are_not_bypassable",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_live_accounting_connection_blocks_exclusive_cutover",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_independent_process_lease_blocks_api_and_sigkill_releases_only_os_lock",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_changed_original_receipt_cannot_rebaseline_or_abort_committed_transition",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_forward_recovery_records_the_actual_second_administrator",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_full_drain_blocks_new_work_and_explicit_resume_preserves_generation",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_predrain_request_can_finish_nested_original_background_work",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_sleeping_periodic_cycle_cannot_mutate_after_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_unexpected_exception_leaves_original_uncertain_admission",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_drain_confirmation_types_are_not_coerced[expected_generation-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_drain_confirmation_types_are_not_coerced[expected_generation--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_drain_confirmation_types_are_not_coerced[draining-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_drain_confirmation_types_are_not_coerced[confirm-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_drain_confirmation_types_are_not_coerced[identifier-../foreign]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_stale_replay_foreign_actor_and_audit_immutability",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_missing_or_foreign_journal_never_reopens_admission[missing-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_missing_or_foreign_journal_never_reopens_admission[missing-instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_missing_or_foreign_journal_never_reopens_admission[foreign-instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_missing_or_foreign_journal_never_reopens_admission[unknown-build]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_missing_or_foreign_journal_never_reopens_admission[corrupt]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_mode_removal_cannot_release_durable_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_actual_admin_api_auth_csrf_private_read_and_generation",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_websocket_lifetime_is_counted_and_new_connection_refused",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_streaming_and_background_response_keep_admission_until_finished",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_actual_supervisor_sigkill_never_expires_original_work",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_pending_ledger_queue_and_original_file_receipts_block_ready",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_lookalike_continuation_paths_cannot_create_work[/api/admin/service-admissionevil]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_lookalike_continuation_paths_cannot_create_work[/api/pull-worker/foreign/complete]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_lookalike_continuation_paths_cannot_create_work[/api/pull-worker/ffffffffffffffffffffffffffffffff/dispatch]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_lookalike_continuation_paths_cannot_create_work[/api/billing/credits/stripe-webhook/evil]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "name": "test_lookalike_continuation_paths_cannot_create_work[/api/projects/p/audio-capture/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/pcm]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_read_only_initial_status_has_real_counts_and_private_role_guard",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_reservation_abort_keeps_epoch_money_and_exact_actor_audit",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_committed_report_proves_original_receipts_and_only_forward_recovery",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[balance]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[mirror]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[second_reservation]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[orphan_commit]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[wrong_epoch]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_tracked_open_work_is_visible_and_not_certified_as_total_service_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_old_aborted_history_does_not_gain_invented_actor_and_pages_are_complete",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_legacy_commit_is_reported_without_adopting_admin_authority",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_active_admin_required_for_all_lifecycle_paths",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_recovery_settings_remain_accessible_after_commit",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-backend-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_committed_recovery_requires_confirmation_and_preserves_wallet[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_committed_recovery_requires_confirmation_and_preserves_wallet[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_lost_response_reload_retries_only_original_identity_without_second_cutover[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_lost_response_reload_retries_only_original_identity_without_second_cutover[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_unknown_financial_history_cannot_enable_confirmation",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_full_settings_original_drain_two_way_cutover_explicit_resume[390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_full_settings_original_drain_two_way_cutover_explicit_resume[390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_full_settings_original_drain_two_way_cutover_explicit_resume[1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_full_settings_original_drain_two_way_cutover_explicit_resume[1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_lost_drain_response_reload_uses_original_server_identity_without_second_begin[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_lost_drain_response_reload_uses_original_server_identity_without_second_begin[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_committed_crash_holds_service_until_original_forward_recovery[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_committed_crash_holds_service_until_original_forward_recovery[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_unavailable_drain_read_disables_controls_until_explicit_refresh[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_unavailable_drain_read_disables_controls_until_explicit_refresh[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_build_mismatch_requires_explicit_original_handoff[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_cutover_service_drain_browser",
+      "name": "test_build_mismatch_requires_explicit_original_handoff[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[provider-provider_history-390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[provider-provider_history-390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[provider-provider_history-1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[provider-provider_history-1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[legacy-original_subscription_basis-390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[legacy-original_subscription_basis-390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[legacy-original_subscription_basis-1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[legacy-original_subscription_basis-1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[unknown-schema-schema_coverage-390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[unknown-schema-schema_coverage-390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[unknown-schema-schema_coverage-1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[unknown-schema-schema_coverage-1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[worker-worker_claims-390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[worker-worker_claims-390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[worker-worker_claims-1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[worker-worker_claims-1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[ledger-unavailable-payment_ledger-390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[ledger-unavailable-payment_ledger-390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[ledger-unavailable-payment_ledger-1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_families_readable[ledger-unavailable-payment_ledger-1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_sensitive_review_requires_unchecked_acknowledgement_and_invalidates_after_new_drain[390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_sensitive_review_requires_unchecked_acknowledgement_and_invalidates_after_new_drain[390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_sensitive_review_requires_unchecked_acknowledgement_and_invalidates_after_new_drain[1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_sensitive_review_requires_unchecked_acknowledgement_and_invalidates_after_new_drain[1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[ready-390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[ready-390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[ready-1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[ready-1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[blocked-390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[blocked-390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[blocked-1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_entire_shipped_sensitive_controls_accessible_without_rule_exclusions[blocked-1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_failed_review_read_clears_prior_acknowledgement_until_explicit_retry[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_sensitive_operator_browser",
+      "name": "test_failed_review_read_clears_prior_acknowledgement_until_explicit_retry[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_drain_reconcile_browser",
+      "name": "test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_drain_reconcile_browser",
+      "name": "test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_drain_reconcile_browser",
+      "name": "test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_drain_reconcile_browser",
+      "name": "test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/sensitive-operator-browser-final/pytest.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_actual_source_bound_service_admission_review",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "state": "passed",
+      "report": "docs/validation/r210/operator-source-gates-final.xml"
+    }
+  ]
+}

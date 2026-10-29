@@ -1,3 +1,5 @@
+> Current iOS Core ML admission:local models require a checkpoint-specific rights review included in the signed app and a protected installation receipt. The shipped registry is empty,so no real Core ML checkpoint is approved. Existing cached files are preserved;server workflows remain available. Apple SDK acceptance is pending. See [iOS rights,build and migration](docs/IOS_LOCAL_MODEL_RIGHTS_R210.md).
+
 > Current PRE-RC handoff: [merchant-wide PayPal observations](docs/MERCHANT_HISTORY_HANDOFF_R210.md). RC false;23/42 criteria(54.8%);new browser acceptance remains blocked.
 
 > Current PRE-RC continuation: [original subscription loss and revised strategy](docs/ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md). RC false;23/42 locally verified criteria(54.8%).
@@ -302,7 +304,7 @@ Project Info can search selected rights societies (SIAE and Soundreef enabled by
 
 
 ### Lead Vocals / Backing Vocals
-**Import & Separate** can run a second pass on the vocal stem. When `MTA_LEAD_BACKING_COMMAND` is configured the server invokes that dedicated AI separator (supported placeholders: `{input}`, `{lead}`, `{backing}`, `{output_dir}`); otherwise it falls back to a local FFmpeg center/side split. The job records which method was used.
+**Import & Separate** can run a second pass on the vocal stem using an explicitly admitted supported model. `ffmpeg-center-side` is a shared desktop/server DSP option that splits center and side channels;it is not semantic neural separation. Legacy `MTA_LEAD_BACKING_COMMAND` is refused because it has no checkpoint/rights contract:remove that setting and select an admitted supported model or explicit DSP. Arbitrary checkpoint filenames and `MTA_DEMUCS_LOCAL_REPO` are also refused pending separate reviewed integration. Direct desktop Demucs and loaded backing/ROCm runtimes recheck current permissions. See [legacy separator migration and validation](docs/LEGACY_SEPARATOR_ACCEPTANCE_R210.md).
 
 
 ### Lead / Backing Vocals AI models (0.2.0-124)

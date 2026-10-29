@@ -1,0 +1,21 @@
+{
+  "baseline_sha256": "e357f93fa4afb3909688bf85aac95baac1c51b171d5b881042d3d4dba9978ba3",
+  "cases": [
+    {
+      "kind": "whisper",
+      "baseline_granted_engine": "whisper",
+      "current_denial": "Unsupported Whisper checkpoint; local paths are not model permissions"
+    },
+    {
+      "kind": "sam-audio",
+      "baseline_granted_engine": "sam-audio",
+      "current_denial": "Select a supported SAM checkpoint; arbitrary repositories and local paths are not authorized"
+    },
+    {
+      "kind": "demucs",
+      "baseline_granted_engine": "demucs",
+      "current_denial": "Select a declared Demucs checkpoint; custom model names require separate review"
+    }
+  ],
+  "scope": "Pure original policy-function AST,actual local default policy and synthetic selectors;no model execution or network."
+}

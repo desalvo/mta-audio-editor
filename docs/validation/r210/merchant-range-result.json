@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-28",
+  "passed": 106,
+  "new_cases": 9,
+  "reports": [
+    {
+      "path": "docs/validation/r210/merchant-range-tests.xml",
+      "sha256": "565cd4dec9674132241b56b8974ed686810160277e716957b42bacb81d072974"
+    },
+    {
+      "path": "docs/validation/r210/merchant-range-gates.xml",
+      "sha256": "7ab9bb347bf543f62d2c17ed035a084d6e0d8c2cefd5dffd6ac58d57e80ba726"
+    }
+  ],
+  "original_criteria_promoted": [],
+  "progress_percent": 66.7,
+  "release_candidate": false,
+  "numeric_progress_requested_achieved": false,
+  "scope": "Confirmed resumable requested-range acquisition,not complete-account or financial clearance",
+  "app_sources": 301,
+  "runtime_sources": 544,
+  "runtime_boundaries": 782,
+  "bandit_findings": 164,
+  "high": 0,
+  "medium": 21,
+  "low": 143
+}

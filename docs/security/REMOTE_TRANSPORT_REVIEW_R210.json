@@ -1,6 +1,6 @@
 {
   "schema": "mta-remote-transport-review-1",
-  "date": "2026-10-27",
+  "date": "2026-10-29",
   "scope": "Explicit app-owned Python HTTP/client/openers and socket constructors. Opaque operator commands, native libraries and dynamic code are separate trust boundaries; this inventory never grants rights or proves a remote checkpoint.",
   "sites": [
     {
@@ -64,7 +64,7 @@
       "line": 69,
       "call": "http.client.HTTPSConnection",
       "call_sha256": "7d699db894bae95facb054b74f994127231d0704684bbd305e8df575e93156a5",
-      "source_sha256": "f512bbcfeafa8fedeae73c5098c15910d33790a856b6990cff1009d8542570cb",
+      "source_sha256": "d2ac8882117daa13884909d784c249e24d791ae15b4342909f73f31ca78c9d5d",
       "category": "inference_guarded",
       "boundary": "Private operator-owned pull control only: fixed validated HTTPS origin and paths, verified system/operator CA, no redirects/proxies; bearer grants only exact claim/heartbeat/completion routes. Authority and node recheck NC model policy; no checkpoint attestation or commercial enablement.",
       "verification": "Actual TLS and independent worker processes, untrusted CA before credential transmission, redirect rejection, credential/CA journal drift rejection, exact API scope, partition and SIGKILL recovery in test_r210_pull_transport.py and companion acceptance tests."
@@ -204,10 +204,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5716,
+      "line": 5698,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "d91109db80c08e43bc3195a3b186ea06cb723c3745074c5a7c084f29d292375d",
+      "source_sha256": "b42393500b23f15c14b7e8b3b1ce41d5875e01d9d904156d060c31f989e8b997",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -237,10 +237,10 @@
     {
       "path": "app/model_updater.py",
       "function": "_read_url",
-      "line": 41,
+      "line": 29,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "a87081dd5231f6dfaced8ab50e5948df4c1b63f7203818518cba6ee8ff3a1e3b",
-      "source_sha256": "d1071ba5576ea4975eca06c108ff49d1815b794214ff28e77ffa41af66fa0032",
+      "source_sha256": "2ceb9df25b17d70d46427bda86fc5a52a9adabe0587b6af944d469306d0ce977",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -281,10 +281,10 @@
     {
       "path": "app/payment_reconcile_service.py",
       "function": "reconcile_checkout",
-      "line": 220,
+      "line": 229,
       "call": "httpx.Client",
       "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
-      "source_sha256": "8aee3544bced246eea16fa5e56227e4e077f1be88e85d3223de12843ea862833",
+      "source_sha256": "359d631353e79ba12a9aac62ce4f4fe4febde72b35c4d8df67a67e6c5e1963e9",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -295,7 +295,7 @@
       "line": 64,
       "call": "httpx.Client",
       "call_sha256": "1a0599f0d91a80de9b631fae1009e7cbcfa6c2007deb0fa81a14dff3be3f35c3",
-      "source_sha256": "013846aca1965cea2aeec91b803db336fe2e577d92f9d217a46f92fc348c02f0",
+      "source_sha256": "91b2aa0b4818ecd8c924424c939e917e109a2ef85d9753282026814426e0f17b",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -347,5 +347,71 @@
   "executor_boundary_continuation": {
     "date": "2026-10-26",
     "scope": "Only the unchanged explicit main.py transport site source hash refreshed after native/server legacy routing guards;call shape,function,line,category/disposition and checker unchanged. No new transport."
+  },
+  "reviewed_checkpoint_profile": "Transport census itself remains non-authorizing. New verified-pull-v1 explicitly authenticates reviewed checkpoint/rights in original HTTPS pull protocol;all generic inference still denied in commercial andNC profiles.30 existing transports unchanged;opaque/native/dynamic executors remainF4/F6.",
+  "settlement_report_transport_review": "Fixed reports.paypal.com OpenSSH transport is a reviewed process boundary pinned by complete app/runtime hashes. Python HTTP census remains unchanged;it does not enumerate SSH binary internals.",
+  "partial_report_review": {
+    "date": "2026-10-28",
+    "scope": "Exact partial multicapture report allocation and immutable claim-bound canonical replay. No new process/network/schema/model/UI permission. Full original A4/C3 remain open.",
+    "evidence": "tests/test_r210_partial_report_recovery.py",
+    "reviewed_source": [
+      "app/paypal_report_reconciliation.py",
+      "app/paypal_dispute_history.py",
+      "app/paypal_payments.py"
+    ]
+  },
+  "direct_executor_rights_review": {
+    "date": "2026-10-29",
+    "scope": "18 direct neural adapter/CLI entry paths recheck current local rights. Existing loaded Whisper and MPS-to-CPU fallback recheck revocation. Separate singer/vocoder rights enforced. Not a malicious-operator sandbox or every-legacy/native/opaque checkpoint review; F4/F6 remain open.",
+    "evidence": "tests/test_r210_direct_executor_rights.py",
+    "relocated_findings": []
+  },
+  "model_selector_review": {
+    "date": "2026-10-29",
+    "scope": "Published model selectors only for Whisper/SAM/Demucs;no arbitrary checkpoint path/repository or profile --repo/name abbreviation. Shared original Demucs registry and validated Whisper default. Engine permission is not installed-weight rights/identity proof;full F4/F6 remain open.",
+    "evidence": "tests/test_r210_model_selector_boundaries.py",
+    "relocated_findings": [
+      {
+        "path": "app/ai_unified_adapter.py",
+        "test_id": "B404",
+        "line": 180
+      },
+      {
+        "path": "app/ai_unified_adapter.py",
+        "test_id": "B603",
+        "line": 186
+      },
+      {
+        "path": "app/ai_unified_adapter.py",
+        "test_id": "B404",
+        "line": 189
+      },
+      {
+        "path": "app/ai_unified_adapter.py",
+        "test_id": "B603",
+        "line": 197
+      },
+      {
+        "path": "app/ai_unified_adapter.py",
+        "test_id": "B404",
+        "line": 206
+      },
+      {
+        "path": "app/ai_unified_adapter.py",
+        "test_id": "B603",
+        "line": 224
+      },
+      {
+        "path": "app/music_text.py",
+        "test_id": "B603",
+        "line": 950
+      }
+    ]
+  },
+  "legacy_separator_review": {
+    "handoff": "docs/LEGACY_SEPARATOR_ACCEPTANCE_R210.md",
+    "proof": "tests/test_r210_legacy_separator_rights.py",
+    "criteria_promoted": [],
+    "scope": "Direct desktop Demucs,closed backing checkpoint selectors,current loaded permissions,opaque-command refusal and explicit DSP. Not whole F4/F5/F6 or kernel acceptance."
   }
 }

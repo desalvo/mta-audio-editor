@@ -12,14 +12,15 @@ import tempfile
 import time
 
 
-def run(command, *, cancel_event=None, timeout=7200, max_log_bytes=8*1024*1024,cwd=None,env=None):
+def run(command, *, cancel_event=None, timeout=7200, max_log_bytes=8*1024*1024,cwd=None,env=None,own_session=True):
     if (not isinstance(command,list) or not command or any(not isinstance(x,str) or not x or '\x00' in x for x in command)
             or type(timeout) not in (int,float) or not math.isfinite(timeout) or not 0<timeout<=7200
-            or type(max_log_bytes) is not int or not 1024<=max_log_bytes<=8*1024*1024):
+            or type(max_log_bytes) is not int or not 1024<=max_log_bytes<=8*1024*1024
+            or type(own_session) is not bool):
         raise ValueError('Invalid configured separator execution limits')
     if cancel_event is not None and cancel_event.is_set():raise RuntimeError('stem separation cancelled')
     with tempfile.TemporaryFile() as log:
-        process=subprocess.Popen(command,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=os.name=='posix',cwd=cwd,env=env)
+        process=subprocess.Popen(command,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=own_session and os.name=='posix',cwd=cwd,env=env)
         deadline=time.monotonic()+timeout
         try:
             while True:
@@ -33,12 +34,16 @@ def run(command, *, cancel_event=None, timeout=7200, max_log_bytes=8*1024*1024,c
             if process.returncode:raise RuntimeError(diagnostic or 'lead/backing vocal separator failed')
         finally:
             if process.poll() is None:
-                if os.name=='posix':
+                if os.name=='posix' and own_session:
                     try:os.killpg(process.pid,signal.SIGKILL)
                     except ProcessLookupError:pass
-                else:
+                elif os.name!='posix':
                     subprocess.run([str(Path(os.environ.get('SystemRoot',r'C:\Windows'))/'System32/taskkill.exe'),
                                     '/PID',str(process.pid),'/T','/F'],stdin=subprocess.DEVNULL,
                                     stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=10,check=False)
+                    process.kill()
+                else:
+                    # Fixed single-process tools may share the original metered
+                    # worker group. Never signal that group (it includes us).
                     process.kill()
                 process.wait(timeout=10)

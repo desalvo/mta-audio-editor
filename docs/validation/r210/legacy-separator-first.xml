@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="39" time="2.483" timestamp="2026-10-29T02:10:17.342075+01:00" hostname="235c84ed49d1"><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-False]" time="0.048" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-False]" time="0.010" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-True]" time="0.004" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/tmp/weights.pt-6-False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/tmp/weights.pt-6-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_operator_local_repository_is_not_a_checkpoint_permission[False]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_operator_local_repository_is_not_a_checkpoint_permission[True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_cardinality_profile_cannot_inject_an_unreviewed_model_after_initial_admission" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[False]" time="0.013" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_loader_rejects_revocation_before_runtime_load[UVR_MDXNET_KARA_2.onnx]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_loader_rejects_revocation_before_runtime_load[mel_band_roformer_karaoke_gabox_v2.ckpt]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[/tmp/weights.onnx]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[../UVR_MDXNET_KARA_2.onnx]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[foreign.onnx]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[operator-provided.ckpt]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[None]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_load_revocation_cannot_mark_the_cached_runtime_admitted" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_loaded_backing_runtime_rechecks_current_permission_and_exact_selector" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-policy]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-native]" time="0.918" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-unified]" time="0.004" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-policy]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-native]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-unified]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-policy]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-native]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-unified]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_rejection_precedes_actual_queue_and_ledger_admission" time="0.099" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_builtin_backing_dsp_still_runs_the_real_registered_adapter_and_ledger" time="0.762"><failure message="app.ai_worker_protocol.WorkerUnavailable: AI worker failed or timed out">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fe81aeacd40&gt;
+
+    def test_builtin_backing_dsp_still_runs_the_real_registered_adapter_and_ledger(operator, monkeypatch):
+        from app import ai_metering_agent, ai_billing
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND', raising=False)
+        monkeypatch.delenv('MTA_AI_WORKER_BACKING_VOCALS_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_WORKER_BACKING_VOCALS_PYTHON', sys.executable)
+&gt;       payload, metadata = ai_metering_agent.execute_registered_worker(
+            operator, 'backing-vocals', {'model': 'ffmpeg-center-side'}, source_wav=source_audio())
+
+tests/test_r210_legacy_separator_rights.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/service_admission.py:286: in invoke
+    with operation(source): return call(*args,**kwargs)
+                                   ^^^^^^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:497: in execute_registered_worker
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+app/ai_global_execution.py:67: in execute
+    if 'error' in result:raise result['error']
+                         ^^^^^^^^^^^^^^^^^^^^^
+app/ai_arranger_runtime.py:470: in execute
+    fn(progress, stop)
+app/ai_global_execution.py:54: in run
+    result['value']=call(cancelled)
+                    ^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:497: in &lt;lambda&gt;
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+user_id = 1, kind = 'backing-vocals'
+plan = {'model': 'ffmpeg-center-side', 'kind': 'backing-vocals'}
+token_id = None, timeout_seconds = 1200
+source_wav = b'RIFF$\x02\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x02\x00\...00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+source_json = None
+cancel_check = &lt;function execute.&lt;locals&gt;.run.&lt;locals&gt;.cancelled at 0x7fe81ad64ea0&gt;
+license_decision = Decision(model_id='mta-analysis', mode='cost_recovery', source='https://github.com/desalvo/mta-audio-editor', policy_sha256='9b9ff0c12c55d7c4d6cdbbaafe1e2791f631d1c834d1a1a06b1b707b02037079', operator_review=False)
+_request_key = None, _request_digest = None
+
+    def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
+                                  timeout_seconds: int = 1200, source_wav: bytes | None = None, source_json: bytes | None = None,
+                                  cancel_check: Callable[[], bool] | None = None, license_decision=None,
+                                  _request_key=None, _request_digest=None) -&gt; tuple[bytes, dict]:
+        """Run the administrator-installed AI worker and persist measured usage.
+    
+        Unsupported GPU/process-tree telemetry is omitted, not guessed. Output is
+        returned to the caller without changing billing for model files shared
+        by multiple users.
+        """
+        import json
+        import tempfile
+        from . import ai_billing
+        from .ai_worker_protocol import verify_preview_wav, WorkerUnavailable, MAX_REQUEST_BYTES
+        from .ai_worker_registry import resolve_worker
+        from .ai_worker_artifacts import package_artifacts
+    
+        # Reject user-supplied paths before requiring a live scheduler context too.
+        if not isinstance(plan, dict) or plan.get('kind', kind) != kind:
+            raise ValueError('AI plan cannot override the registered engine')
+        if 'source_score' in plan:
+            raise ValueError('Score path must be generated by MTA')
+        require_dispatch_identity(user_id, token_id)
+        from . import ai_pull_coordinator as pull
+        if pull.mode() == 'pull':
+            return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
+                                source_wav=source_wav, source_json=source_json, cancel_check=cancel_check,
+                                request_key=_request_key, request_digest=_request_digest)
+    
+        from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
+        worker = resolve_worker(kind)
+        if plan.get('kind',kind)!=kind:raise ValueError('AI plan cannot override the registered engine')
+        plan={**plan,'kind':kind}
+        if worker is None:
+            raise WorkerUnavailable('No trusted AI worker configured')
+        if 'source_score' in plan:raise ValueError('Score path must be generated by MTA')
+        if source_json is not None:
+            if source_wav is not None or kind not in {'vocal-harmony','vocal-synthesis'}:raise ValueError('Unsupported structured score transport')
+            from .studio_score import validate
+            validate(source_json)
+        if source_wav is not None and ('source_audio' in plan or 'input_path' in plan):
+            raise ValueError('Audio path must be generated by MTA')
+        if source_wav is not None:
+            from .ai_payload_limits import MAX_SOURCE_BYTES
+            if not isinstance(source_wav, bytes) or not 0 &lt; len(source_wav) &lt;= MAX_SOURCE_BYTES:
+                raise ValueError('AI source audio exceeds size limit or is empty')
+            # Verify the exact immutable bytes before creating a ledger/claim.
+            from .ai_worker_artifacts import _verify_wav_bytes
+            _verify_wav_bytes(source_wav)
+        encoded = json.dumps(plan, ensure_ascii=False, allow_nan=False).encode('utf-8')
+        if len(encoded) &gt; MAX_REQUEST_BYTES:
+            raise ValueError('AI plan exceeds size limit')
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        # Freeze policy once. Later administrator changes cannot invalidate a
+        # running job between backend publication and server-side packaging.
+        artifact_limit_mib = queue.artifact_limit_mib()
+        artifact_budget = artifact_limit_mib * 1024 * 1024
+        queue_id=current_job.get();defer_settlement=False;job_id=None
+        if queue_id:
+            with queue._db() as con:queued=con.execute('SELECT operation FROM jobs WHERE job_id=?',(queue_id,)).fetchone()
+            if queued and queued[0] in ('arranger','remix'):
+                job_id=ai_billing.existing_inference_ledger_job(queue_id,user_id,queued[0])
+                defer_settlement=job_id is not None
+        from .model_license_policy import evaluate,record_job
+        license_decision=license_decision or evaluate(kind,plan)
+        job_id=job_id or ai_billing.create_job(user_id,kind,token_id,billing_exemption_reason=('license:'+license_decision.model_id) if not license_decision.billable else '')
+        record_job(job_id,license_decision)
+        from .ai_execution_policy import admitted_env
+        policy_env=admitted_env(kind,license_decision)
+        if queue_id:
+            with ai_billing.db() as con:
+                ai_billing._init(con);con.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(queue_id,job_id))
+        # Only operator-enabled GPU adapters obtain logical slots; neither the
+        # request plan nor the remote user may declare GPU eligibility.
+        from .ai_gpu_slot_accounting import slot_enabled_for_kind
+        gpu_slot_enabled = slot_enabled_for_kind(kind)
+        from contextlib import nullcontext
+        with tempfile.TemporaryDirectory(prefix='mta-meter-') as folder, (_ace_cleanup(plan, lambda: Path(folder)/'progress.json') if kind=='ace-step' else nullcontext()):
+            directory = Path(folder)
+            request_path = directory / 'request.json'
+            output_path = directory / 'preview.wav'
+            if source_wav is not None:
+                from .ai_worker_protocol import verify_preview_wav
+                input_path = directory / 'source.wav'
+                input_path.write_bytes(source_wav)
+                verify_preview_wav(input_path)
+                input_path.chmod(0o400)
+                staged_source = str(input_path)
+                if kind=='ace-step':
+                    (directory/'inputs').mkdir()
+                    input_path.replace(directory/'inputs'/'source.wav')
+                    staged_source=[{'filename':'inputs/source.wav'}]
+                encoded = json.dumps({**plan, 'source_audio': staged_source}, ensure_ascii=False, allow_nan=False).encode('utf-8')
+            if source_json is not None:
+                score_path=directory/'score.json';score_path.write_bytes(source_json);score_path.chmod(0o400)
+                encoded=json.dumps({**plan,'source_score':str(score_path)},ensure_ascii=False,allow_nan=False).encode('utf-8')
+            from .ai_torch_diagnostics import enabled as torch_diagnostics_enabled, read_report
+            from .ai_gpu_verified import readiness as gpu_readiness, VERIFIED_KINDS
+            from .ai_worker_registry import extensions
+            verified_kind=kind in VERIFIED_KINDS or extensions().get(kind,{}).get('metering_method')=='gpu-kernel-union-v1'
+            verified_enabled=verified_kind and gpu_readiness()['ready']
+            if torch_diagnostics_enabled() or verified_enabled:
+                # The server, never the request, assigns diagnostic identity.
+                encoded = json.dumps({**json.loads(encoded), 'gpu_profile_task_id': job_id},
+                                     ensure_ascii=False, allow_nan=False).encode('utf-8')
+            request_path.write_bytes(encoded)
+            request_path.chmod(0o600)
+            from .ai_worker_registry import worker_python
+            args = ([worker_python(kind), str(worker)] if worker.suffix == '.py' else [str(worker)])
+            args += ['--request', str(request_path), '--output', str(output_path)]
+            # Deferred workers reuse the scheduler's owner; publication and billing
+            # outboxes retain that same immutable receipt through recovery.
+            if defer_settlement:
+                from .deferred_execution_owner import credentials_for
+                claim_credentials=credentials_for(job_id)
+            else:
+                import secrets
+                import socket
+                from .regime_worker_claims import claim
+                claim_credentials={'worker_id':'local:'+socket.gethostname()+':'+str(os.getpid()),
+                                   'claim_token':secrets.token_hex(32)}
+                with ai_billing.db() as con:
+                    con.execute('BEGIN IMMEDIATE')
+                    claim(con,job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
+            result = None
+            gpu_slot_acquired = False
+            observed_at = float('-inf')
+            identity_lost = False
+            def diagnostic_checkpoint(*, final=False):
+                nonlocal observed_at, identity_lost
+                if final or time.monotonic() - observed_at &gt;= 2:
+                    observed_at = time.monotonic()
+                    if not final:
+                        try:
+                            require_dispatch_identity(user_id, token_id)
+                        except (ValueError, RuntimeError):
+                            identity_lost = True
+                            return True
+                    if claim_credentials and not final:
+                        from .regime_worker_claims import heartbeat
+                        with ai_billing.db() as con:
+                            con.execute('BEGIN IMMEDIATE')
+                            heartbeat(con,'job:ledger:'+job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
+                    try:
+                        from .ai_torch_diagnostics import store_report
+                        report = read_report(directory, job_id)
+                        if report:
+                            store_report(job_id, report)
+                        from .ai_compute_diagnostics import store as store_live_counters
+                        counters = dict(report or {})
+                        try:
+                            raw_progress = json.loads((directory/'progress.json').read_text())
+                        except (OSError, ValueError):
+                            raw_progress = {}
+                        if isinstance(raw_progress, dict):
+                            counters = {**raw_progress, **counters}
+                        store_live_counters(job_id, counters)
+                        if queue_id and counters:
+                            from .storage import _atomic_json_write
+                            allowed={'phase','message','progress_percent','progress_source','progress_estimated','steps_completed','steps_total','cpu_seconds_estimated','gpu_seconds_estimated','gpu_metrics_status','gpu_metrics_source'}
+                            published={k:v for k,v in counters.items() if k in allowed}
+                            _atomic_json_write(queue._ROOT/(queue_id+'.progress.json'),published)
+                    except Exception as exc:
+                        import logging
+                        logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
+                if not final:
+                    from .resource_accounts import has_limits,checkpoint
+                    if license_decision.billable and has_limits(user_id) and checkpoint(user_id,job_id,counters if 'counters' in locals() else {}):
+                        return True
+                return cancel_check() if not final and cancel_check is not None else False
+            worker_cancel_check = diagnostic_checkpoint
+            try:
+                if gpu_slot_enabled:
+                    from . import ai_gpu_slot_accounting as gpu_slots
+                    gpu_slots.acquire(job_id, os.getenv('MTA_AI_GPU_LOGICAL_DEVICE', 'gpu0'))
+                    gpu_slot_acquired = True
+                if os.getenv('MTA_AI_CGROUP_PARENT'):
+                    from .ai_cgroup_metering import run_cgroup_process
+                    result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
+                else:
+                    result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+                if not result.isolated:
+                    raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained')
+                try:
+                    require_dispatch_identity(user_id, token_id)
+                except (ValueError, RuntimeError) as exc:
+                    identity_lost = True
+                    raise WorkerInterrupted(result) from exc
+                if cancel_check is not None and cancel_check():
+                    raise RuntimeError('AI worker cancelled; result discarded')
+                diagnostic_checkpoint(final=True)
+                if result.exit_code:
+&gt;                   raise WorkerUnavailable('AI worker failed or timed out')
+E                   app.ai_worker_protocol.WorkerUnavailable: AI worker failed or timed out
+
+app/ai_metering_agent.py:425: WorkerUnavailable</failure></testcase></testsuite></testsuites>

@@ -303,7 +303,7 @@ class profiler:
 ''')
     wrapper = Path(__file__).resolve().parents[1] / 'app/ai_profiled_backend.py'
     result = subprocess.run([sys.executable, str(wrapper), '--backend', 'demucs',
-        '--task-id', 'task', '--report-dir', str(tmp_path), '--', '--name', 'm'],
+        '--task-id', 'task', '--report-dir', str(tmp_path), '--', '--name', 'htdemucs'],
         cwd=tmp_path, env={**os.environ, 'PYTHONPATH': str(tmp_path), 'MTA_AI_TORCH_PROFILER': 'true'},
         capture_output=True, text=True, timeout=20)
     assert result.returncode == exit_code, result.stderr

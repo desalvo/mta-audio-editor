@@ -1,3 +1,15 @@
+## Checkpoint corrente — B5 chiuso — 28 ottobre 2026
+
+Leggere **EXECUTION_ENTRY_ACCEPTANCE_R210.md** e `validation/r210/execution-entry-result.json`. **26/42 criteri originali verificati (61,9%), +1 criterio B5 rispetto a25/42(59,5%);0/7 macroaree,PRE-RC.** Proprietà e metering degli ingressi server/legacy/native censiti sono ora verificati:539 sorgenti runtime vincolati,779 punti classificati(18 tipi di worker incorporati;il conteggio dei punti include handler senza inferenza),271 test interessati distinti passati(unione degli esiti più recenti),59 nuovi,zero fallimenti/errori/skip. Identità account/token ricontrollata dopo FIFO e prima del risultato;CPU su cancellazione conservata;figlio raccolto anche su errore del sensore;incertezza conserva claim/fence/riserva e restituisce409 privato senza riesecuzione o falsa misura.
+
+Baseline committata **4c3c73afe6d3829aad155c23f5f1bbb6d375433a**,full CI40584085026 verde conservata per il codice invariato. Questo delta funzionale è **non committato** e non ha ancora una nuova conferma CI GitHub. Ruff,compilazione,Bandit299file/164finding(0HIGH/21MED/143LOW),trasporto30siti e ammissioneC2 170confini passano;nessun gate/soglia/checker di sicurezza allentato. Nessuna UI Chromium invariata o full CI ripetuta,nessuna mutazione Git/GitHub/server/provider.
+
+B2 e F3/F4/F5/F6 e gli altri criteri originali restano separati:questo non certifica quiescenza kernel esterna,checkpoint/diritti indipendenti,OS installati,modelli o hardware. Restano11 criteri funzionali/diritti e5 target/ambiente. Proseguire **C3+C5+D6+E4**,riutilizzando C2/E5/B5 accettati. I gate globali di transizione finanziaria e RC restano bloccati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-execution-ownership-cumulative.zip**;nessun commit da parte dell'agente.
+
+---
+
+Le sezioni seguenti sono cronologia:baseline,percentuali,commit suggeriti e attività già chiuse sono superati dove discordano dal checkpoint corrente.
+
 ## Current accepted milestone — C2 service admission and drain — 2026-10-27
 
 Read **SERVICE_ADMISSION_DRAIN_R210.md** first. Original C2 “Distributed admission barrier and service-wide drain” is now verified for the accepted B4 supported deployment:one pinned local Linux authority with multiple current-build API/timer processes and independent authenticated HTTPS workers. Full ASGI lifetimes,finite/helper threads,long capture/VST3 sessions,actual periodic/CLI cycles and original pending journals are covered. Preaccepted TLS/local workers complete once under the held barrier;new work is refused. Unknown/lost work never expires into quiescence. Actual source-build handoff fences old replicas;backup/restore preserves original journal/instance and uncertain admissions with exact bundled immutable schema validation.

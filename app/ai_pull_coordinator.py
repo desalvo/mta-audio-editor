@@ -229,21 +229,27 @@ def available():
         if row['enabled'] and row['accepting']:
             supported.update(decode(row['kinds_json']))
     pilot=os.getenv('MTA_PULL_MODEL_ATTESTATION','off')
-    if pilot not in ('off','basic-pitch-v1'):raise ValueError('Invalid model attestation setting')
+    if pilot not in ('off','basic-pitch-v1','verified-pull-v1'):raise ValueError('Invalid model attestation setting')
     return {k: k in supported and (pilot=='off' or k=='audio-to-midi-basic-pitch') for k in sorted(registered_kinds())}
 
 
-def _policy(row):
-    from .model_license_policy import authorize_remote_execution
-    decision = authorize_remote_execution(row['kind'], decode(row['plan_json']))
+def _policy(row,c):
+    from .ai_model_attestation import authorize, VERIFIED_SCHEMA
+    decision,required = authorize(row['kind'], decode(row['plan_json']))
     if encode(asdict(decision)) != row['policy_json']:
         raise FenceBlocked('Pull admission policy changed before dispatch')
+    original=c.execute('SELECT requirement_json FROM ai_pull_model_requirements WHERE job_id=?',(row['job_id'],)).fetchone()
+    if required and required.get('schema')==VERIFIED_SCHEMA and (not original or decode(original[0]).get('schema')!=VERIFIED_SCHEMA):
+        raise FenceBlocked('Original reviewed checkpoint requirement missing; no legacy adoption')
+    if original and decode(original[0]).get('schema')==VERIFIED_SCHEMA:
+        frozen=decode(original[0]);frozen.pop('epoch',None)
+        if encode(frozen)!=encode(required):raise FenceBlocked('Original checkpoint rights contract changed')
 
 
 def enqueue(uid, kind, plan, *, source_wav=None, source_json=None, timeout_seconds=1200, token_id=None,
             request_key=None, request_digest=None):
     from .ai_remote_transport import validate_audio_options, MAX_OPTIONS_BYTES
-    from .model_license_policy import authorize_remote_execution, record_job
+    from .model_license_policy import record_job
     from .ai_worker_artifacts import _verify_wav_bytes
     validate_audio_options(plan)
     if len(encode(plan).encode()) > MAX_OPTIONS_BYTES:
@@ -265,9 +271,8 @@ def enqueue(uid, kind, plan, *, source_wav=None, source_json=None, timeout_secon
         if kind not in ('vocal-harmony', 'vocal-synthesis'):
             raise ValueError('Unsupported structured source')
         validate(source)
-    decision = authorize_remote_execution(kind, plan)
-    from .ai_model_attestation import requirement
-    model_requirement=requirement(kind,decision)
+    from .ai_model_attestation import authorize,VERIFIED_SCHEMA
+    decision,model_requirement=authorize(kind,plan)
     from .ai_global_execution import current_job
     from . import ai_arranger_runtime as queue
     ledger = None
@@ -314,7 +319,11 @@ def enqueue(uid, kind, plan, *, source_wav=None, source_json=None, timeout_secon
             (job, uid, kind, encode(plan), encode(asdict(decision)), 'wav' if source_wav is not None else 'score' if source_json is not None else 'none',
              hashlib.sha256(source).hexdigest(), source, int(deferred), encode(owner), timeout_seconds, request_key, request_digest, int(time.time())))
         if model_requirement is not None:
-            c.execute('INSERT INTO ai_pull_model_requirements VALUES(?,?)',(job,encode(model_requirement)))
+            original=dict(model_requirement)
+            if original['schema']==VERIFIED_SCHEMA:
+                epoch=c.execute('SELECT regime,revision FROM regime_fence_operations WHERE operation_id=?',('job:ledger:'+job,)).fetchone()
+                original['epoch']={'regime':epoch[0],'revision':epoch[1]}
+            c.execute('INSERT INTO ai_pull_model_requirements VALUES(?,?)',(job,encode(original)))
         if deferred and kind == 'ace-step' and plan.get('input_source') in ('master', 'track'):
             payload = decode(entry['payload_json'])
             if payload.get('actor_user_id') != uid or payload.get('adapter') != entry['operation']:
@@ -392,7 +401,7 @@ def assignment(credential, instance):
             kinds = set(decode(node['kinds_json']))
             for candidate in c.execute("SELECT t.* FROM ai_pull_tasks t JOIN users u ON u.id=t.user_id WHERE t.state='queued' AND t.cancelled=0 AND u.active=1 ORDER BY t.created_at,t.job_id"):
                 if candidate['kind'] in kinds:
-                    _policy(candidate)
+                    _policy(candidate,c)
                     _receipt(c, candidate)
                     c.execute("UPDATE ai_pull_tasks SET state='dispatched',node_id=?,instance=?,nonce=? WHERE job_id=? AND state='queued'",
                               (node['id'], instance, secrets.token_hex(32), candidate['job_id']))
@@ -404,7 +413,7 @@ def assignment(credential, instance):
         active = c.execute('SELECT active FROM users WHERE id=?', (row['user_id'],)).fetchone()
         if row['cancelled'] or not active or not active[0] or _request_cancelled(c, row):
             return {'job_id': row['job_id'], 'instance': instance, 'nonce': row['nonce'], 'cancelled': True}
-        _policy(row)
+        _policy(row,c)
         required=c.execute('SELECT requirement_json FROM ai_pull_model_requirements WHERE job_id=?',(row['job_id'],)).fetchone()
         extra={'model_requirement':decode(required[0])} if required else {}
         return extra | {k: row[k] for k in ('job_id', 'kind', 'instance', 'nonce', 'source_kind', 'source_sha256', 'timeout')} | {
@@ -433,7 +442,7 @@ def heartbeat(credential, job, instance, nonce):
         owner_active = c.execute('SELECT active FROM users WHERE id=?', (row['user_id'],)).fetchone()
         cancel = bool(row['cancelled'] or not owner_active or not owner_active[0] or _request_cancelled(c, row))
         try:
-            _policy(row)
+            _policy(row,c)
         except ValueError:
             cancel = True
         return {'cancelled': cancel}
@@ -499,10 +508,13 @@ def complete(credential, job, instance, nonce, outcome):
             return {'job_id': job, 'acknowledged': True}
         row = _assigned(c, credential, job, instance, nonce)
         required=c.execute('SELECT requirement_json FROM ai_pull_model_requirements WHERE job_id=?',(job,)).fetchone()
-        if required and status=='done':
-            if row['state']=='dispatched':_policy(row)
+        if (row['state']=='dispatched' and os.getenv('MTA_PULL_MODEL_ATTESTATION','off')=='verified-pull-v1'
+                and (not required or decode(required[0]).get('schema')!='mta-reviewed-checkpoint-load-2')):
+            raise FenceBlocked('Original reviewed checkpoint requirement missing; retain original assignment')
+        if required and (status=='done' or (decode(required[0]).get('schema')=='mta-reviewed-checkpoint-load-2' and cpu is not None and cpu>0)):
+            if row['state']=='dispatched':_policy(row,c)
             from .ai_model_attestation import validate
-            validate(outcome.get('model_receipt'),decode(required[0]),dict(row)|{'policy':decode(row['policy_json'])})
+            validate(outcome.get('model_receipt'),decode(required[0]),dict(row)|{'policy':decode(row['policy_json']),'plan':decode(row['plan_json']),'model_requirement':decode(required[0])})
         elif 'model_receipt' in outcome:
             raise ValueError('Unexpected model receipt')
         if row['state'] in ('frozen', 'done'):

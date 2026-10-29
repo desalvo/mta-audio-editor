@@ -730,7 +730,7 @@ jobs:
     needs: [quality, security]
     steps:
       - uses: actions/checkout@v7
-      - name: Bundle default Demucs Core ML model when release asset is available
+      - name: Bundle only an independently reviewed default Core ML checkpoint
         shell: bash
         env:
           MTA_DEMUCS_COREML_BASELINE_URL: ${{ vars.MTA_DEMUCS_COREML_BASELINE_URL || 'https://github.com/desalvo/mta-audio-editor/releases/download/demucs-models/demucs-default-4.mlmodel' }}
@@ -738,13 +738,19 @@ jobs:
           set -euo pipefail
           mkdir -p mobile/ios/MTAEditorMobile/Models
           target=mobile/ios/MTAEditorMobile/Models/demucs-default-4.mlmodel
-          if curl --fail --location --retry 2 --connect-timeout 20 --max-time 600 "$MTA_DEMUCS_COREML_BASELINE_URL" -o "$target"; then
-            test -s "$target"
-            echo "Bundled baseline Core ML model from model release."
+          expected=$(python3 scripts/check_ios_model_rights.py --model-id demucs-4 --stem-count 4 --source-format mlmodel --optional-model)
+          if [ -n "$expected" ]; then
+            if curl --fail --location --retry 2 --connect-timeout 20 --max-time 600 "$MTA_DEMUCS_COREML_BASELINE_URL" -o "$target"; then
+              python3 scripts/check_ios_model_rights.py --model-id demucs-4 --stem-count 4 --source-format mlmodel --source "$target"
+              echo "Bundled Core ML bytes match the included rights review."
+            else
+              rm -f "$target"
+              echo "Baseline Core ML asset unavailable; runtime authenticated bootstrap will be used only for a checkpoint with a bundled rights review."
+            fi
           else
-            rm -f "$target"
-            echo "Baseline Core ML release asset unavailable; runtime authenticated bootstrap will be used."
+            echo "No approved Core ML checkpoint is bundled; local inference remains unavailable."
           fi
+          python3 scripts/check_ios_model_rights.py --check-bundled
       - name: Validate Xcode project
         shell: bash
         run: xcodebuild -project mobile/ios/MTAEditorMobile.xcodeproj -scheme MTAEditorMobile -showBuildSettings >/dev/null

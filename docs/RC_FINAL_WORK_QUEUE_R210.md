@@ -1,3 +1,167 @@
+## Checkpoint corrente — contratto Core ML iOS e build — 29 ottobre 2026
+
+Leggere **IOS_LOCAL_MODEL_RIGHTS_R210.md** e `validation/r210/ios-rights-result.json`. **28/42(66,7%),E completa1/7,PRE-RC;nessun criterio promosso,l’aumento numerico richiesto non è raggiunto.** Contratto iOS integrato tra revisione nel bundle,byte sorgenti,compilazione,ricevuta Keychain,inventario compilato,cache,revoca per chunk e consegna. Registro di produzione vuoto:zero checkpoint reali approvati;modelli legacy conservati ma senza grant automatico. Build/refresh non scaricano asset privi di revisione corrispondente.
+
+**90 casi locali distinti passati,41 nuovi,zero failure/error/skip correnti.** Tutti304 sorgenti server identici:finanza/web/Chromium/Bandit/C2/HTTP/F3 invariati riusati. Inventario corrente551sorgenti/782punti,checker invariato. Swift/Xcode assenti:target **blocked,accepted:false,passed:0**. Pronto il workflow manuale default-off **Optional iOS model rights**,input **ios_model_rights=true**,con32 controlli SDK reali più compilazione dell’app iOS senza firma. Eseguirlo dopo il commit dell’utente;non dichiararlo già passato. F4 completo,F5/F6 e gli altri14criteri restano aperti;non tutti i residui sono esterni.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-ios-rights-cumulative.zip**. Baseline4c3 conservata;nessun commit o azione GitHub/server/provider. Non ripetere questa implementazione o i blocchi precedenti. Commit cumulativo suggerito:`Complete execution safeguards, settlement recovery and native model rights`.
+
+---
+
+Cronologia precedente,non prevale sul checkpoint corrente:
+
+## Checkpoint corrente — Demucs/backing legacy e DSP condivisa — 29 ottobre 2026
+
+Leggere **LEGACY_SEPARATOR_ACCEPTANCE_R210.md** e `validation/r210/legacy-separator-result.json`. **28/42(66,7%),E completa1/7,PRE-RC;nessuna promozione,l’aumento numerico richiesto non è raggiunto.** Chiusi il bypass della policy nel Demucs desktop/diretto,il repository/selector estraneo,la revoca prima/dopo la consegna,il caricatore backing con filename arbitrario e l’uso di un modello già caricato dopo revoca. Il comando opaco lead/backing è rifiutato prima di effetti/API/ledger;non riceve un grant DSP. DSP server/desktop condivisa con vero FFmpeg/PCM;accounting dei discendenti non provato conserva job/claim originali.
+
+**286 casi distinti passati,47 nuovi,zero failure/error/skip correnti.** Nessun nuovo modello neurale;7 prove F3 precedenti riusate solo sui loader identici,7vecchi skip opzionali ancora aperti. Ruff/compile/61gate passano:304sorgenti/165finding(0HIGH/21MED/144LOW),170confiniC2,30sitiHTTP/21file,548sorgenti/781punti runtime;checker/soppressioni invariati. F4 completo,F5/F6 e gli altri14criteri restano aperti;CoreML e runtime opachi richiedono ancora codice/accettazione,non soltanto target. Non ripetere questo sottoblocco,i selector o la finanza già validata.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-legacy-separators-cumulative.zip**;baseline4c3 conservata,nessun commit o azione GitHub/server/provider. Migrazione delle sole configurazioni legacy descritta nel handoff. Commit cumulativo suggerito:`Complete execution safeguards, settlement recovery and legacy separator rights`.
+
+---
+
+Cronologia precedente,non prevale sul checkpoint corrente:
+
+## Checkpoint corrente — selezione checkpoint prima dell’ammissione — 29 ottobre 2026
+
+Leggere **MODEL_SELECTOR_BOUNDARIES_R210.md** e `validation/r210/selector-boundaries-result.json`. **28/42(66,7%),E completa1/7,PRE-RC;nessuna promozione,l’aumento numerico richiesto non è raggiunto.** Chiusi i bypass del selettore per Whisper/SAM/Demucs nei parent,default,ingressi diretti e wrapper profilato;API token JSON/WAV rifiutano i selettori estranei prima di processo e ledger. Nessuna sostituzione automatica di modello. Registro Demucs condiviso e default Whisper allineato.
+
+**274 casi distinti passati,44 nuovi,zero failure/error/skip correnti.** Fixture di worker e model-loader,non nuova inferenza neurale.7 prove ONNX precedenti riusate solo per i3 loader identici e decisioneBasicPitch invariata;7 vecchi skip opzionali restano aperti. Ruff/compile/61gate passano:304sorgenti app/166finding invariati,171confiniC2,30sitiHTTP/21file,548sorgenti/783punti runtime. Checker/soglie/soppressioni invariati. Restano14 criteri originali,F4/F6 non completi,RC falsa. Non ripetere questo blocco o i precedenti helper/collector/settlement.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-model-selectors-cumulative.zip**;baseline confermata4c3c73afe6d3829aad155c23f5f1bbb6d375433a. Nessun commit o azione GitHub/server/provider. Suggerimento cumulativo:`Complete execution safeguards, administration, settlement recovery and checkpoint admission`.
+
+---
+
+Cronologia precedente,non prevale sul checkpoint corrente:
+
+## Checkpoint corrente — diritti diretti e wrapper di componente — 29 ottobre 2026
+
+Leggere **DIRECT_EXECUTOR_RIGHTS_R210.md** e `validation/r210/direct-rights-result.json`. **28/42(66,7%),E completa1/7,PRE-RC;nessuna promozione,l'aumento numerico richiesto non è raggiunto.** Completati18 ingressi diretti con verifica della policy corrente,revoca Whisper/fallback MPS->CPU e controlli indipendenti sui componenti canto. Wrapper offline vincolati a ruolo,componente installato,permessi,script e cwd originali;non sono più esecutori generici. Il criterio F4 completo,F5/F6,checkpoint/runtime opachi e target non sono accettati da queste fixture.
+
+**507 casi distinti passati,99 nuovi,zero failure/error correnti,7 skip opzionali espliciti.** Comprende7 prove ONNX reali,di cui5F3/HTTPS e2coda/progetto,sui nuovi hash adapter;nessun downgrade di F3. Ruff/compile/61gate passano.303sorgenti/166finding invariati,171confiniC2,30sitiHTTP/21file,547sorgenti/783punti runtime;checker/soppressioni invariati. Finanza/UI/fullCI invariate riusate;non ripeterle senza modifiche rilevanti. Restano14 criteri originali,non tutti bloccati soltanto dall'ambiente;RC falsa.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-executor-rights-cumulative.zip**. Baseline confermata4c3c73afe6d3829aad155c23f5f1bbb6d375433a;nessun commit o azione GitHub/server/provider. Non rifare gli ingressi già chiusi o il settlement precedente. Suggerimento cumulativo:`Complete guarded execution, administration, settlement recovery and component rights enforcement`.
+
+---
+
+Cronologia precedente,non prevale sul checkpoint corrente:
+
+## Checkpoint corrente — allocazioni parziali e replay originale — 28 ottobre 2026
+
+Leggere **PAYPAL_PARTIAL_SETTLEMENT_R210.md** e `validation/r210/partial-report-result.json`. **28/42(66,7%),E completa1/7,PRE-RC;nessuna promozione,aumento numerico richiesto non raggiunto.** Completato recupero operativo di dispute parziali multicapture prive di importi articolo tramite allocazioni esatte ACM/STL autenticate,con rimborsi/debito abbonamento,rollback e replay ordinario vincolato a ricevuta/claim/hold/documento originali,ricontrollati nella transazione monetaria. Nessuna proporzione dei lordi o sostituzione di prove contraddittorie.
+
+**357 casi distinti passati,40 nuovi,zero failure/error/skip correnti.** Provider/SFTP sintetici;ledger e transazioni reali isolati. Ruff/compilazione e61 gate passano:303 sorgenti app/166 finding invariati,171 confiniC2,30sitiHTTP/21file,547sorgenti/783punti runtime. Checker/soglie/soppressioni invariati. FullCI/Chromium/F3 invariate riusate. A4/A5/C3/C5/D6 restano aperti;14 criteri originali residui,RC falsa. Non ripetere questo percorso,collector o audit;proseguire su storico generale e basi legacy originali senza inventare denaro. Accesso report reale assente e non autorizzato,ma residui non tutti esterni.
+
+Cumulativo completo:**MTA-0.3.0-r210-pre-RC-partial-settlement-cumulative.zip**;baseline confermata4c3c73afe6d3829aad155c23f5f1bbb6d375433a. Commit differito all'utente;nessuna azione GitHub/server/provider. Suggerimento cumulativo:`Complete guarded execution, administration and exact PayPal settlement recovery`.
+
+---
+
+Cronologia precedente,non prevale sul checkpoint corrente:
+
+## Checkpoint corrente — recupero settlement autenticato — 28 ottobre 2026
+
+Leggere **PAYPAL_SETTLEMENT_RECOVERY_R210.md** e `validation/r210/settlement-recovery-result.json`. **28/42 criteri (66,7%),E completa1/7,PRE-RC;nessun criterio promosso,aumento numerico richiesto non raggiunto.** Nuovo percorso operativo CLI: report ACM S6 e STL con credito completato T1202/T1205,conto/caso/apertura/aggiornamento/capture/importo esatti e fonte SFTP fissa autenticata -> claim immutabile del movimento e ledger originale. Nessun file browser o flag “pronto” autorizza denaro. Solo sottoinsieme CSV singolo/EUR/intervallo comune/case ID esatto;altri formati e casi restano bloccati.
+
+**348 casi interessati distinti passati,46 nuovi,zero failure/error/skip correnti.** Database,ledger e drain C2 reali/isolati;provider e processo SFTP in fixture. Non è una verifica su PayPal reale. Actor originale in ricevuta,nessun riuso del movimento per altri casi,rollback/replay e documento cambiato verificati. Errori finiti raccolti chiudono l'ammissione;quiescenza sconosciuta conserva il ticket. Ruff/compilazione e gate sorgenti passano:303 sorgenti app,166 finding revisionati(164 precedenti+2LOW,0HIGH/21MED/145LOW),171confiniC2,30sitiHTTP/21file e nuovo processoSSH esplicitamente revisionato,547sorgenti/783punti runtime. Checker,soglie e soppressioni invariati.
+
+Blocco esterno:accesso report/credenziali SFTP/hostkey approvate e coppie reali ACM/STL non disponibili;nessuna azione su provider/server autorizzata. Restano anche implementazioni/prove generali di storico,payout/allocazioni e quota/surplus legacy. Non chiudere A4/C3 da questo profilo. Restano14 criteri originali;RC falsa. Non ripetere collector,coverage,bridge,UI/F3/Chromium/fullCI invariate. Baseline confermata4c3c73afe6d3829aad155c23f5f1bbb6d375433a/fullCI40584085026 conservate;delta cumulativo non committato.
+
+Cumulativo unico:**MTA-0.3.0-r210-pre-RC-settlement-recovery-cumulative.zip**. Commit suggerito,non eseguito:`Complete guarded execution, administration and authenticated settlement recovery`.
+
+---
+
+Le sezioni seguenti sono cronologia e non prevalgono su questo checkpoint.
+
+## Checkpoint corrente — acquisizione merchant riprendibile
+
+Leggere MERCHANT_RANGE_ACQUISITION_R210.md e validation/r210/merchant-range-result.json. 106 passati,9 nuovi. Nuovo collector operativo su vuoti temporali,conferma/merchant originali,una finestra per passo e ripresa senza cancellare prove. 28/42(66,7%) invariato;nessun criterio promosso,RC aperta,commit differito. Non è quietanza economica o storico completo del conto. Cumulativo MTA-0.3.0-r210-pre-RC-merchant-range-cumulative.zip.
+
+---
+
+Cronologia precedente:
+
+## Checkpoint corrente — copertura temporale merchant
+
+Leggere MERCHANT_WINDOW_COVERAGE_R210.md e validation/r210/merchant-window-result.json. 28 casi mirati passati,13 nuovi. 28/42 (66,7%) invariato,nessuna RC o promozione. Nuovo audit offline read-only delle finestre;nessuna certificazione di storico completo o settlement. Commit differito;baseline confermata4c3,CI e prove precedenti conservate. Cumulativo MTA-0.3.0-r210-pre-RC-merchant-coverage-cumulative.zip.
+
+---
+
+Cronologia precedente:
+
+## Checkpoint corrente — recupero merchant nel ledger originale — 28 ottobre 2026
+
+Leggere **MERCHANT_LEDGER_RECOVERY_R210.md** e `validation/r210/merchant-ledger-result.json`. **28/42 criteri originali verificati (66,7%), E completa (1/7), PRE-RC. Nessun criterio promosso in questo blocco; aumento numerico richiesto non ancora conseguito.** Percorso completo da riga merchant immutabile a ordine locale originale e ledger: discovery canonica della capture, rilettura completa di rimborsi/dispute, conferma amministrativa e binding immutabile atomico. Nessun ordine adottato tramite note del pagatore, nessuna nuova capture o refund sul provider. Rifiutati anche riferimenti tra capture diverse dello stesso ordine.
+
+**368 casi interessati distinti passati, 40 nuovi, zero failure/error/skip correnti; 12 Chromium reali IT/EN 390/1280, di cui 8 nuovi.** Replay/concorrenza/rollback, revoca o cambio di contesto e recupero del checkout pendente durante drain C2 verificati. Timeout privati mantengono obblighi; revisione completa oltre la pagina. Ruff completo, compilazione, sintassi JS e 61 gate sorgenti passano. Bandit 301 sorgenti/164 finding invariati (0 HIGH,21 MEDIUM,143 LOW),170 confini C2,30 siti trasporto,542 sorgenti runtime/782 punti; due handler nuovi revisionati,nessuna soglia/checker/soppressione allentata.
+
+Restano 14 criteri: storico merchant completo,riferimenti locali mancanti,payout/protection con prova univoca e basi originali legacy non sono risolti. A4/A5/C3/C5/D6 e tutti gli altri stati originali rimangono invariati; non dichiarare questo blocco equivalente a quella accettazione. Prossima priorità: copertura/continuità merchant e prove originali dei movimenti;riusare il bridge consegnato.
+
+Baseline confermata **4c3c73afe6d3829aad155c23f5f1bbb6d375433a** e full CI40584085026 conservate; F3 modello/HTTPS ed E4 non interessati non ripetuti. Ripristino cumulativo F3 SHA5ab4eaeb894c739920bed0d334d947beab0154b203ab92f727b029a43ce4d4a2,4635 file verificati. Cumulativo unico:**MTA-0.3.0-r210-pre-RC-merchant-ledger-cumulative.zip**. Delta B5+drain+E4+F3+merchant non committato;nessuna nuova CI GitHub o azione su server/provider reali.
+
+Commit cumulativo inglese suggerito,non eseguito: `Complete guarded execution, administration and merchant-ledger recovery`.
+
+---
+
+Le sezioni seguenti sono cronologia e non prevalgono su questo checkpoint.
+
+## Checkpoint corrente — F3 chiuso — 28 ottobre2026
+
+Leggere **F3_REVIEWED_CHECKPOINT_ACCEPTANCE_R210.md** e `validation/r210/reviewed-checkpoint-acceptance.json`. **28/42 criteri originali verificati(66,7%),E completa(1/7),PRE-RC.** +F3 rispetto a27/42(64,3%);testo/peso originali invariati. Profilo esplicito `verified-pull-v1`:modello/grant/LICENSE/NOTICE/loader/runtime revisionati,controllo indipendente prima dell’inferenza,ricevuta legata a epoch/piano/sorgente/nonce/PID/risultato e credenziale HTTPS originale. Solo BasicPitch0.4.0 ONNX fissato è supportato;altri motori e trasporti generici sono rifiutati nel profilo,anche inNC.Off/compatibilità non certificati,F4/F5/F6 restano aperti. Nessuna attestation hardware/host ostile.
+
+**246 casi distinti passati,55 nuovi,zero failure/error/skip correnti(185 test funzionali e 61 gate).**5 prove del modello reale,incluse4 su worker indipendente HTTPS,in entrambi i regimi,con/senza risposta persa;nota69 e replay originale verificati. Rifiutata anche la perdita del contratto originale senza downgrade legacy. Corretti limite interno16MiB vs minimo pubblico64 e decoder che sondava GCC/FFmpeg sui WAV;limiti pubblici e misura/quiescenza non allentati. Runtime ONNX-only testato;metadata upstream TensorFlow suPy3.12 non soddisfatti:nessuna pretesa di pip-check/packaging opzionale completo. Nessun modello/runtime incluso nella consegna,nessuna dipendenza di produzione cambiata.
+
+Ruff/compilazione/gate passano;300fileapp/164finding revisionati(0HIGH/21MED/143LOW),170confiniC2,30siti/21filetrasporto,541sorgentiruntime/780punti. Checker/soglie/soppressioni invariati. E4/Chromium,fullCI40584085026 e codice non interessato conservati senza riesecuzioni generali. Commit confermato **4c3c73afe6d3829aad155c23f5f1bbb6d375433a**;delta B5+drain+E4+F3 ancora non committato. Nuova CI GitHub cumulativa non dichiarata.
+
+Restano14criteri(9implementazione/diritti,5target).Priorità C3→C5/D6;finanza globale/legacy,payout/protection,diritti/esecutori e target rimangono aperti. Nessuna RC,Git/GitHub/server/provider mutation o commit dell’agente. Cumulativo:**MTA-0.3.0-r210-pre-RC-reviewed-checkpoint-cumulative.zip**.
+
+Commit inglese suggerito,non eseguito: `Complete execution ownership, guarded administration and reviewed remote checkpoints`.
+
+---
+
+Le sezioni seguenti sono cronologia e non prevalgono su questo checkpoint.
+
+## Checkpoint corrente — E4 e macroarea E chiusi — 28 ottobre 2026
+
+Leggere **E4_ADMIN_WORKFLOW_ACCEPTANCE_R210.md** e `validation/r210/sensitive-operator-acceptance.json`. **27/42 criteri originali verificati(64,3%),prima macroarea completa E(1/7),PRE-RC.** +1 criterio E4 rispetto a26/42(61,9%);formulazione e peso originali invariati. Nuovo flusso completo dell’operatore:revisione13 famiglie finanziarie/worker,prove originali e casi legacy oltre pagina,assenza distinta da sconosciuto,conferma con presa visione fresca,diagnosi/completamenti originali sotto drain,riconciliazione reale del ledger via GET provider,entrambi i cambi di regime ammessi,audit,esito incerto/recupero,build e riapertura esplicita. E4 chiuso per il contratto completo valido/bloccato/errore dell’operatore;non per promozione del solo vecchio roundtrip ristretto.
+
+**243 casi interessati distinti passati,zero failure/error/skip correnti;73 nuovi.59 veri casi Chromium e8 scansioni axe del pannello regime completo in impostazioni IT/EN390/1280,zero violazioni/esclusioni.** I12 casi browser prima saltati ora passano:origine ufficiale Google alternativa funzionante,Chrome145.0.7632.6/Playwright1.58.0. Non chiedere o ripetere il solo vecchio opt-in12. Nuovo workflow manuale opzionale **Optional sensitive operator Chromium**,input `sensitive_operator_chromium=true`,gate esatto59pass/0skip,già riuscito localmente. Nessun dispatch GitHub.
+
+Corretti il falso obbligo sulla configurazione email creata dalle impostazioni,la distinzione di claim coerente ma attivo,le diagnosi bloccate sotto C2 e due landmark con lo stesso nome. Query-only/ruoli/CSRF/prove originali restano obbligatori;il digest diagnostico non autorizza scritture.300fileapp/164finding revisionati(0HIGH/21MED/143LOW),170confiniC2,30sititrasporto,541sorgentiruntime/780punti;Ruff,compilazione,sintassiJS e gate sorgenti passano. Checker e soglie invariati.
+
+**C3,C5,D6 restano aperti**:finanza globale/legacy e transizione backend generale non certificate;nessuna abilitazione per deduzione,nessuna RC. C6,B2,F3/F4/F6 e5 target/ambienti restano nei15 criteri residui. E1/E2/E3/E5/E6 già accettati sono conservati e verificati nelle parti interessate;B5/full CI invariati non ripetuti. Baseline committata **4c3c73afe6d3829aad155c23f5f1bbb6d375433a**;full CI40584085026 conservata. Delta B5+drain+E4 non committato,nuova CI cumulativa non ancora confermata. Nessuna mutazione Git/GitHub/server/provider.
+
+Cumulativo completo:**MTA-0.3.0-r210-pre-RC-admin-workflow-cumulative.zip**. Commit inglese suggerito,non eseguito: `Close execution ownership and complete guarded regime-switch administration`.
+
+---
+
+Le sezioni seguenti sono cronologia;percentuali,blocchi browser e stati E4/E superati non prevalgono su questo checkpoint.
+
+## Checkpoint corrente — cutover e drain persistente — 28 ottobre 2026
+
+Leggere **CUTOVER_SERVICE_DRAIN_R210.md** e `validation/r210/cutover-service-drain-result.json`. **26/42 criteri originali verificati (61,9%),0/7 macroaree,PRE-RC;nessuna promozione in questo blocco.** Completato il collegamento del drain C2 con il cutover amministrativo ristretto:journal bloccato attraverso commit/mirror/finalizzazione,anteprima vincolata al drain originale,riapertura negata su riserva/commit incompleti,recupero originale dopo SIGKILL reale e ripetizione esatta del risultato dopo riapertura. Pannello IT/EN con sospensione,rilettura,riapertura e passaggio esplicito al build corrente;nessun POST automatico dopo esito incerto.
+
+**149 test interessati distinti passati,23 nuovi(17 funzionali/6 gate);12 nuovi casi Chromium saltati per browser assente e non accettati.** Workflow opt-in nuovo **Optional service drain cutover Chromium**,input `service_drain_cutover_chromium=true`,solo12 casi nuovi,richiesti12pass/0skip dopo commit dell’utente. Il download locale restituisce HTML e il gate rigoroso produce correttamente `accepted:false`. Non ripetere i9 casi browser già confermati o la full CI invariata. Ruff,compilazione,sintassi JS e gate sorgenti passano;299fileapp/164finding revisionati,170confiniC2,30sititrasporto,540sorgentiruntime/779punti. Nessuna soglia/checker allentata.
+
+C3 resta lavoro finanziario incompleto:storico PayPal globale,payout/protection e prova originale quota/surplus legacy. C5/D6/E4 non vengono promossi dal profilo locale ristretto;C6 cross-host e F3/F4/F6 restano aperti. Questo non è soltanto un blocco CI. Baseline committata **4c3c73afe6d3829aad155c23f5f1bbb6d375433a** e full CI40584085026 conservate. Delta cumulativo include B5 precedente e questo blocco,non committato. Nessun intervento Git/GitHub/server/provider. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-service-drain-cutover-cumulative.zip**.
+
+Commit cumulativo inglese suggerito,non eseguito: `Close execution ownership and bind administrative cutover to durable service drain`.
+
+---
+
+Le sezioni seguenti sono cronologia e restano valide soltanto dove coerenti con questo checkpoint.
+
+## Checkpoint corrente — B5 chiuso — 28 ottobre 2026
+
+Leggere **EXECUTION_ENTRY_ACCEPTANCE_R210.md** e `validation/r210/execution-entry-result.json`. **26/42 criteri originali verificati (61,9%), +1 criterio B5 rispetto a25/42(59,5%);0/7 macroaree,PRE-RC.** Proprietà e metering degli ingressi server/legacy/native censiti sono ora verificati:539 sorgenti runtime vincolati,779 punti classificati(18 tipi di worker incorporati;il conteggio dei punti include handler senza inferenza),271 test interessati distinti passati(unione degli esiti più recenti),59 nuovi,zero fallimenti/errori/skip. Identità account/token ricontrollata dopo FIFO e prima del risultato;CPU su cancellazione conservata;figlio raccolto anche su errore del sensore;incertezza conserva claim/fence/riserva e restituisce409 privato senza riesecuzione o falsa misura.
+
+Baseline committata **4c3c73afe6d3829aad155c23f5f1bbb6d375433a**,full CI40584085026 verde conservata per il codice invariato. Questo delta funzionale è **non committato** e non ha ancora una nuova conferma CI GitHub. Ruff,compilazione,Bandit299file/164finding(0HIGH/21MED/143LOW),trasporto30siti e ammissioneC2 170confini passano;nessun gate/soglia/checker di sicurezza allentato. Nessuna UI Chromium invariata o full CI ripetuta,nessuna mutazione Git/GitHub/server/provider.
+
+B2 e F3/F4/F5/F6 e gli altri criteri originali restano separati:questo non certifica quiescenza kernel esterna,checkpoint/diritti indipendenti,OS installati,modelli o hardware. Restano11 criteri funzionali/diritti e5 target/ambiente. Proseguire **C3+C5+D6+E4**,riutilizzando C2/E5/B5 accettati. I gate globali di transizione finanziaria e RC restano bloccati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-execution-ownership-cumulative.zip**;nessun commit da parte dell'agente.
+
+---
+
+Le sezioni seguenti sono cronologia:baseline,percentuali,commit suggeriti e attività già chiuse sono superati dove discordano dal checkpoint corrente.
+
 ## Current continuation — legacy execution boundaries — 2026-10-27
 
 Read **LEGACY_EXECUTION_BOUNDARIES_R210.md** first. Complete cumulative **MTA-0.3.0-r210-pre-RC-legacy-execution-cumulative.zip** includes the uncommitted Stripe and E5 work plus gateway/native legacy closure after last confirmed772fbe7508cc08266466a3746bb51f0fe5d0179b. Raw gateway work/upstream result access cannot bypass original-owner accounting;native direct executors require the explicit native profile and admitted model policy. Bounded timeout/cancellation reaps SIGTERM-ignoring workers;shared native supervision retains honest platform/process-tree limits. Updated setup/reverse-proxy documentation describes the accounted migration and original-result recovery.

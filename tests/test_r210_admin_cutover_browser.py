@@ -4,6 +4,7 @@ import json
 
 import pytest
 from app import auth, regime_admin_cutover as cutover
+from test_r210_noncommercial_collection_browser import nc_browser_config as nc_browser_config  # noqa: F401
 from test_r210_admin_cutover_e2e import ready as ready, account as account, BASE  # noqa: F401
 
 
@@ -52,13 +53,14 @@ def check_and_change(page, language, target):
     page.get_by_role('button', name='Verifica prima del cambio' if language == 'it' else 'Check before changing', exact=True).click()
     confirm = page.get_by_role('button', name='Conferma cambio di regime' if language == 'it' else 'Confirm regime change', exact=True)
     from playwright.sync_api import expect
+    page.locator('[data-cutover-acknowledged]').check()
     expect(confirm).to_be_enabled()
     confirm.click()
 
 
 @pytest.mark.parametrize('language', ['it', 'en'])
 @pytest.mark.parametrize('width', [390, 1280])
-def test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit(ready, chromium_capability, language, width):
+def test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit(ready, nc_browser_config, language, width):
     from playwright.sync_api import sync_playwright, expect
     from app.regime_balance_continuity import snapshot
     client, uid, _ = ready
@@ -66,7 +68,7 @@ def test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit(ready, chrom
         con.execute('BEGIN IMMEDIATE')
         before = snapshot(con)
     with sync_playwright() as api:
-        browser = api.chromium.launch(headless=True, args=['--no-sandbox'])
+        browser = api.chromium.launch(**nc_browser_config)
         page, errors, posts = browser_session(client, language, browser, width)
         page.on('dialog', lambda dialog: dialog.accept())
         page.locator('#maintenanceCutoverTarget').focus()
@@ -88,7 +90,7 @@ def test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit(ready, chrom
 
 
 @pytest.mark.parametrize('language', ['it', 'en'])
-def test_actual_committed_recovery_requires_confirmation_and_preserves_wallet(ready, monkeypatch, chromium_capability, language):
+def test_actual_committed_recovery_requires_confirmation_and_preserves_wallet(ready, monkeypatch, nc_browser_config, language):
     from playwright.sync_api import sync_playwright, expect
     from app import resource_accounts
     client, uid, _ = ready
@@ -102,7 +104,7 @@ def test_actual_committed_recovery_requires_confirmation_and_preserves_wallet(re
         return result
     monkeypatch.setattr(cutover, 'reconcile_mirror', fail_once)
     with sync_playwright() as api:
-        browser = api.chromium.launch(headless=True, args=['--no-sandbox'])
+        browser = api.chromium.launch(**nc_browser_config)
         page, errors, posts = browser_session(client, language, browser, 1280)
         page.on('dialog', lambda dialog: dialog.accept())
         check_and_change(page, language, 'NON_COMMERCIAL')
@@ -119,11 +121,11 @@ def test_actual_committed_recovery_requires_confirmation_and_preserves_wallet(re
 
 
 @pytest.mark.parametrize('language', ['it', 'en'])
-def test_lost_response_reload_retries_only_original_identity_without_second_cutover(ready, chromium_capability, language):
+def test_lost_response_reload_retries_only_original_identity_without_second_cutover(ready, nc_browser_config, language):
     from playwright.sync_api import sync_playwright, expect
     client, _, _ = ready
     with sync_playwright() as api:
-        browser = api.chromium.launch(headless=True, args=['--no-sandbox'])
+        browser = api.chromium.launch(**nc_browser_config)
         page, errors, posts = browser_session(client, language, browser, 390, lost_reply=True)
         page.on('dialog', lambda dialog: dialog.accept())
         check_and_change(page, language, 'NON_COMMERCIAL')
@@ -141,13 +143,13 @@ def test_lost_response_reload_retries_only_original_identity_without_second_cuto
         browser.close()
 
 
-def test_unknown_financial_history_cannot_enable_confirmation(ready, chromium_capability):
+def test_unknown_financial_history_cannot_enable_confirmation(ready, nc_browser_config):
     from playwright.sync_api import sync_playwright, expect
     client, _, _ = ready
     with auth.db() as con:
         con.execute("INSERT INTO paypal_events VALUES('unknown-browser-history',1)")
     with sync_playwright() as api:
-        browser = api.chromium.launch(headless=True, args=['--no-sandbox'])
+        browser = api.chromium.launch(**nc_browser_config)
         page, errors, posts = browser_session(client, 'en', browser, 390)
         page.get_by_role('button', name='Check before changing', exact=True).click()
         expect(page.locator('[data-cutover-status]')).to_contain_text('Change unavailable')

@@ -1,0 +1,22 @@
+{
+  "model_loader_sources": [
+    {
+      "path": "app/ai_studio_adapter.py",
+      "sha256": "62856cb1a67a669d56e9b875ef13890460db349a74c59cf36260b0c8684f9423",
+      "unchanged": true
+    },
+    {
+      "path": "app/ai_model_bytes.py",
+      "sha256": "fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
+      "unchanged": true
+    },
+    {
+      "path": "app/ai_model_attestation.py",
+      "sha256": "640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
+      "unchanged": true
+    }
+  ],
+  "basic_pitch_policy_decision_unchanged": true,
+  "Demucs_registry_values_unchanged": true,
+  "scope": "Reuse prior F3 ONNX/HTTPS and native/UI evidence for unchanged loader sources and branch;no new neural inference or target acceptance in this block."
+}

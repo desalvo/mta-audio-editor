@@ -65,9 +65,13 @@ def test_pdf_chord_color_and_mp4_ui_are_exposed():
     assert "/karaoke-export-jobs" in main
 
 
-def test_accuracy_defaults_prefer_large_whisper_and_chordino():
+def test_accuracy_defaults_prefer_large_whisper_and_chordino(monkeypatch):
     music = (ROOT / "app/music_text.py").read_text(encoding="utf-8")
-    assert 'MTA_LYRICS_WHISPER_MODEL' in music and '"turbo"' in music
+    from app.model_selectors import whisper_model
+    monkeypatch.delenv('MTA_LYRICS_WHISPER_MODEL',raising=False)
+    assert whisper_model()=='turbo'
+    monkeypatch.setenv('MTA_LYRICS_WHISPER_MODEL','large-v3')
+    assert whisper_model()=='large-v3'
     assert '"word_timestamps": True' in music
     assert '"beam_size": max(1, int(os.getenv("MTA_LYRICS_BEAM_SIZE", "8")))' in music
     assert "vamp:nnls-chroma:chordino:simplechord" in music

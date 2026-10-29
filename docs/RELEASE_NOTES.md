@@ -1,3 +1,17 @@
+## 0.3.0-r210 PRE-RC — iOS local model rights contract
+
+- Bind local bootstrap/update/install/load and per-prediction use to the exact signed-bundle review,source bytes,license/notice evidence and protected Keychain installation receipt.
+- Preserve unreviewed caches for removal;serialize model replacement and inference,with rollback and compiled inventory checks. No real checkpoint is approved by the shipped empty registry.
+- Gate default iOS build downloads/bundled assets on reviewed bytes. Add default-off Optional iOS model rights for32 real Apple SDK checks and unsigned app compilation;not yet executed here.
+-90 distinct local passes,41new. Original acceptance stays28/42(66.7%),RCfalse;F4/F5/F6 are still open. See IOS_LOCAL_MODEL_RIGHTS_R210.md.
+
+## 0.3.0-r210 PRE-RC — legacy separator admission
+
+- Enforce current rights in direct/frozen/external Demucs and before result delivery;reject unreviewed selectors/repository overrides.
+- Bind backing loaders to declared filenames and recheck permission after loading,inference and before each ROCm chunk.
+- Refuse legacy opaque lead/backing commands before admission;share the explicit center/side DSP route across desktop/server with bounded process cleanup.
+- 286 distinct affected passes,47 new. Original acceptance remains28/42(66.7%),RC false;full F4/native/checkpoint acceptance is still open. See LEGACY_SEPARATOR_ACCEPTANCE_R210.md for migration and exact limits.
+
 ## 0.3.0-r210 — Stage recovery key invalidation (uncommitted follow-up)
 
 - Recompute inference dependency fingerprint at each recovery boundary even when the same StageCache object is reused; do not reuse stale model/runtime/policy stage results after environment changes.

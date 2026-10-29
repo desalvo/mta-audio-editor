@@ -1,0 +1,9 @@
+{
+  "scope": "New failure diagnostics only;expired synthetic worker credential values redacted,outcomes unchanged,all baseline logs preserved",
+  "files": [
+    {
+      "path": "docs/validation/r210/reviewed-checkpoint-diagnosis-full.xml",
+      "redacted_test_credentials": 1
+    }
+  ]
+}

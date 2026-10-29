@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="31" time="6.833" timestamp="2026-10-28T07:12:28.454353+01:00" hostname="1a6e92dfee30"><testcase classname="tests.test_r210_operator_preflight" name="test_actual_complete_review_has_original_preview_and_never_changes_money" time="0.684" /><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[target-unknown]" time="0.222" /><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[limit-0]" time="0.213" /><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[limit-101]" time="0.237" /><testcase classname="tests.test_r210_operator_preflight" name="test_invalid_review_input_never_opens_cutover[offset--1]" time="0.282" /><testcase classname="tests.test_r210_operator_preflight" name="test_financial_review_never_discloses_to_non_administrator[anonymous]" time="0.251" /><testcase classname="tests.test_r210_operator_preflight" name="test_financial_review_never_discloses_to_non_administrator[owner]" time="0.243" /><testcase classname="tests.test_r210_operator_preflight" name="test_financial_review_never_discloses_to_non_administrator[inactive-admin]" time="0.213" /><testcase classname="tests.test_r210_operator_preflight" name="test_unavailable_financial_family_is_isolated_private_and_not_zero" time="0.254" /><testcase classname="tests.test_r210_operator_preflight" name="test_unproven_history_and_schemas_remain_visible_blockers[provider]" time="0.245" /><testcase classname="tests.test_r210_operator_preflight" name="test_unproven_history_and_schemas_remain_visible_blockers[unknown-schema]" time="0.248" /><testcase classname="tests.test_r210_operator_preflight" name="test_unproven_history_and_schemas_remain_visible_blockers[missing-schema]" time="0.284" /><testcase classname="tests.test_r210_operator_preflight" name="test_actual_settings_notification_default_is_not_an_economic_obligation" time="0.372" /><testcase classname="tests.test_r210_operator_preflight" name="test_drain_allows_exact_private_review_reads_but_no_new_financial_dispatch" time="0.413" /><testcase classname="tests.test_r210_operator_preflight" name="test_preflight_digest_is_diagnostic_and_never_a_write_permit" time="0.349" /><testcase classname="tests.test_r210_operator_preflight" name="test_late_page_legacy_cases_are_all_audited_without_guessing_basis" time="0.250" /><testcase classname="tests.test_r210_operator_preflight" name="test_running_original_worker_is_pending_not_merely_consistent" time="0.225" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/reconcile-payment-POST-True]" time="0.001" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/recover-checkout-reference-POST-True]" time="0.001" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-processes/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/quiesce-POST-True]" time="0.001" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-losses/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/resolve-POST-True]" time="0.000" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-losses/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/recover-frozen-POST-True]" time="0.000" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/worker-losses/foreign/resolve-POST-False]" time="0.000" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/reconcile-payment/extra-POST-False]" time="0.000" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/service-regime/payment-ledger-POST-False]" time="0.000" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/payment-refunds/dispatch-POST-False]" time="0.000" /><testcase classname="tests.test_r210_operator_preflight" name="test_only_exact_original_recovery_and_read_routes_bypass_new_admission[/api/admin/paypal/merchant-history-POST-False]" time="0.000" /><testcase classname="tests.test_r210_operator_drain_reconcile_browser" name="test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[390-it]" time="0.292"><failure message="ValueError: Wait one second before replacing this contract">tests/test_r210_operator_drain_reconcile_browser.py:20: in test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance
+    order = purchase(ready[1], monkeypatch)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_r210_payment_reconciliation_e2e.py:13: in purchase
+    prepare(account,monkeypatch)
+tests/test_r210_credit_checkout.py:22: in prepare
+    plan(account);shop.settings({'secret_key':'sk_test_test','webhook_secret':'whsec_test'})
+    ^^^^^^^^^^^^^
+tests/test_r210_subscriptions.py:29: in plan
+    r.configure({'enabled':True,'credits_enabled':True,'plans':[p]});return r.assign(uid,{'plan':'day','overage':True},1)
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/resource_accounts.py:219: in assign
+    if prior:raise ValueError('Wait one second before replacing this contract')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Wait one second before replacing this contract</failure></testcase><testcase classname="tests.test_r210_operator_drain_reconcile_browser" name="test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[390-en]" time="0.316"><failure message="ValueError: Wait one second before replacing this contract">tests/test_r210_operator_drain_reconcile_browser.py:20: in test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance
+    order = purchase(ready[1], monkeypatch)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_r210_payment_reconciliation_e2e.py:13: in purchase
+    prepare(account,monkeypatch)
+tests/test_r210_credit_checkout.py:22: in prepare
+    plan(account);shop.settings({'secret_key':'sk_test_test','webhook_secret':'whsec_test'})
+    ^^^^^^^^^^^^^
+tests/test_r210_subscriptions.py:29: in plan
+    r.configure({'enabled':True,'credits_enabled':True,'plans':[p]});return r.assign(uid,{'plan':'day','overage':True},1)
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/resource_accounts.py:219: in assign
+    if prior:raise ValueError('Wait one second before replacing this contract')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Wait one second before replacing this contract</failure></testcase><testcase classname="tests.test_r210_operator_drain_reconcile_browser" name="test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[1280-it]" time="0.266"><failure message="ValueError: Wait one second before replacing this contract">tests/test_r210_operator_drain_reconcile_browser.py:20: in test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance
+    order = purchase(ready[1], monkeypatch)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_r210_payment_reconciliation_e2e.py:13: in purchase
+    prepare(account,monkeypatch)
+tests/test_r210_credit_checkout.py:22: in prepare
+    plan(account);shop.settings({'secret_key':'sk_test_test','webhook_secret':'whsec_test'})
+    ^^^^^^^^^^^^^
+tests/test_r210_subscriptions.py:29: in plan
+    r.configure({'enabled':True,'credits_enabled':True,'plans':[p]});return r.assign(uid,{'plan':'day','overage':True},1)
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/resource_accounts.py:219: in assign
+    if prior:raise ValueError('Wait one second before replacing this contract')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Wait one second before replacing this contract</failure></testcase><testcase classname="tests.test_r210_operator_drain_reconcile_browser" name="test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance[1280-en]" time="0.264"><failure message="ValueError: Wait one second before replacing this contract">tests/test_r210_operator_drain_reconcile_browser.py:20: in test_actual_financial_reconciliation_closes_original_checkout_under_drain_without_general_clearance
+    order = purchase(ready[1], monkeypatch)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_r210_payment_reconciliation_e2e.py:13: in purchase
+    prepare(account,monkeypatch)
+tests/test_r210_credit_checkout.py:22: in prepare
+    plan(account);shop.settings({'secret_key':'sk_test_test','webhook_secret':'whsec_test'})
+    ^^^^^^^^^^^^^
+tests/test_r210_subscriptions.py:29: in plan
+    r.configure({'enabled':True,'credits_enabled':True,'plans':[p]});return r.assign(uid,{'plan':'day','overage':True},1)
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/resource_accounts.py:219: in assign
+    if prior:raise ValueError('Wait one second before replacing this contract')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Wait one second before replacing this contract</failure></testcase></testsuite></testsuites>

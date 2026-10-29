@@ -398,6 +398,8 @@ def _whisper_transcribe(model, source: str, *, language: str | None, device: str
     Apple MPS. Keep the model in float32 and transparently retry on CPU if MPS still
     rejects a float64 conversion.
     """
+    from .model_license_policy import evaluate_model
+    evaluate_model('whisper')
     try:
         if hasattr(model, "float"):
             model.float()
@@ -407,6 +409,7 @@ def _whisper_transcribe(model, source: str, *, language: str | None, device: str
         if device != "mps" or ("float64" not in message and "mps" not in message):
             raise
         logger.warning("Whisper MPS float64 incompatibility; retrying transcription on CPU: %s", exc)
+        evaluate_model('whisper')
         try:
             if hasattr(model, "to"):
                 model = model.to("cpu")
@@ -446,7 +449,10 @@ def extract_lyrics_progressive(
     prioritize accuracy over incremental text preview: run a single complete
     Whisper pass and publish only status updates until the final result is ready.
     """
-    model_name = (model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL", "turbo")).strip() or "turbo"
+    from .model_license_policy import evaluate_model
+    evaluate_model('whisper')
+    from .model_selectors import whisper_model
+    model_name = whisper_model(model_name)
     language = (language or os.getenv("MTA_LYRICS_LANGUAGE", "")).strip() or None
     device = native_ai_device()
     if cancelled and cancelled():
@@ -470,7 +476,10 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
     download it from the upstream Whisper model source/cache rather than the MTA
     model repository.
     """
-    model_name = (model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL", "turbo")).strip() or "turbo"
+    from .model_license_policy import evaluate_model
+    evaluate_model('whisper')
+    from .model_selectors import whisper_model
+    model_name = whisper_model(model_name)
     language = (language or os.getenv("MTA_LYRICS_LANGUAGE", "")).strip() or None
     cache_dir = Path(os.getenv("MTA_LYRICS_MODEL_DIR", str(Path(os.getenv("MTA_DATA_DIR", "/data/projects")) / ".cache" / "lyrics-models"))).expanduser()
     cache_dir.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,1687 @@
+{
+  "schema_version": 1,
+  "observed_client_date": "2026-10-28",
+  "timezone": "Europe/Rome",
+  "repository": "desalvo/mta-audio-editor",
+  "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40584085026",
+  "run_id": 40584085026,
+  "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "head_commit_message": "Fix Stripe refund test fixtures for canonical paid history [full-ci]",
+  "head_commit_created_utc": "2026-10-27T21:07:11Z",
+  "user_confirmed_commit": true,
+  "access": "Read-only GitHub connector: jobs, artifacts, commit, selected job logs and committed fixture",
+  "full_ci": true,
+  "full_ci_evidence": "Commit contains [full-ci]; Quality and all non-tag full build, container and publication jobs completed successfully.",
+  "job_summary": {
+    "success": 14,
+    "skipped": 1,
+    "failure": 0,
+    "cancelled": 0,
+    "skipped_job": "Publish desktop/mobile installers to GitHub Release (tag-only)"
+  },
+  "jobs": [
+    {
+      "id": 122470833363,
+      "name": "SAST and dependency audit",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run pip install -r requirements-dev.txt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run pip check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "License redistribution guard",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Bandit SAST",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Python dependency audit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Secret scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Trivy filesystem scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Post Trivy filesystem scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        }
+      ]
+    },
+    {
+      "id": 122470833556,
+      "name": "Quality and unit tests",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Build sample-accurate VST3 host runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run pip install -r requirements-dev.txt -r requirements-vst3.txt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run pip check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Compile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build documentation PDFs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Install FFmpeg for DSP preset validation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Select Quality validation scope",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Prepare real browser server VST3 regression",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Validate audio presets against FFmpeg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Compile isolated C++20 VST3 probe without SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Ruff",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Fetch hash-pinned live VST3 test effect",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Unit tests and coverage gate",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Upload test diagnostics (including failed runs)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        },
+        {
+          "name": "Upload coverage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37
+        }
+      ]
+    },
+    {
+      "id": 122470833726,
+      "name": "VST3 SDK compile (Linux)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Checkout official Steinberg VST3 SDK with submodules",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verify Steinberg SDK license and mandatory submodules",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Compile and link VST3 probe with real SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build Steinberg ADelay reference plugin and exercise 128 offline blocks and verify delayed audio",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Checkout official Steinberg VST3 SDK with submodules",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 122484485902,
+      "name": "Build Windows Chordino runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Install cross-compiler dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Cross-compile NNLS-Chroma / Chordino x64",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Upload Windows Chordino runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 122484485910,
+      "name": "Container production gate",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run docker/setup-buildx-action@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Generate build id",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Resolve application identity",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build local validation image",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Verify container OS",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Verify security-sensitive Python packages in image",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Verify CPU-only PyTorch image",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Audit installed Python environment in image",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Trivy image OS scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Smoke test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Post Trivy image OS scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        },
+        {
+          "name": "Post Build local validation image",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Post Run docker/setup-buildx-action@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        }
+      ]
+    },
+    {
+      "id": 122484485912,
+      "name": "Linux native (x86_64) DEB/RPM",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install Linux native dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Compile portable native audio meter",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Compile isolated VST3 factory probe (without SDK)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Freeze local native application",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build Debian and RPM packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Verify packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        }
+      ]
+    },
+    {
+      "id": 122484485931,
+      "name": "Native macOS installer (arm64)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install application and native build dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install FFmpeg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Provision bundled Chordino runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "macOS native project save regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Generate native build id",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Stamp native release channel",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Generate native application metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Build and verify macOS C++ audio DSP",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Build macOS native application",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Native single-user smoke test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Build macOS DMG installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Checksum macOS installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Upload macOS installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 32
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 33
+        }
+      ]
+    },
+    {
+      "id": 122484485945,
+      "name": "Android APK / AAB",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-java@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run android-actions/setup-android@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run gradle/actions/setup-gradle@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Install Android API 37 SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Bundle default Demucs ONNX model when release asset is available",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Configure optional Android release signing",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Compile Android sources preflight",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Build Android debug APK and release AAB",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Package Android artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Post Run gradle/actions/setup-gradle@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Post Run actions/setup-java@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        }
+      ]
+    },
+    {
+      "id": 122484485963,
+      "name": "Linux native (arm64) DEB/RPM",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install Linux native dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Compile portable native audio meter",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Compile isolated VST3 factory probe (without SDK)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Freeze local native application",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build Debian and RPM packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Verify packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        }
+      ]
+    },
+    {
+      "id": 122484486026,
+      "name": "iOS / iPadOS archive",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Bundle default Demucs Core ML model when release asset is available",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Validate Xcode project",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Compile iOS sources preflight",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build unsigned iOS archive",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Build signed IPA when Apple signing secrets are configured",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Optional upload to TestFlight on tags",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8
+        },
+        {
+          "name": "Checksums",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        }
+      ]
+    },
+    {
+      "id": 122484486053,
+      "name": "Native macOS installer (x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install application and native build dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install FFmpeg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Provision bundled Chordino runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "macOS native project save regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Generate native build id",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Stamp native release channel",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Generate native application metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Build and verify macOS C++ audio DSP",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Build macOS native application",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Native single-user smoke test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Build macOS DMG installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Checksum macOS installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Upload macOS installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 32
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 33
+        }
+      ]
+    },
+    {
+      "id": 122484900899,
+      "name": "Native Windows installer",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install application and native build dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install FFmpeg and Inno Setup",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Download prebuilt Chordino x64 runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Provision bundled Chordino runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Windows AI publication and lock regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Generate native build id",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Stamp native release channel",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Generate native application metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Build and verify Windows C++ audio DSP",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Build Windows native application",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Native single-user smoke test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Build Windows installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Checksum Windows installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Upload Windows installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 33
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 34
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35
+        }
+      ]
+    },
+    {
+      "id": 122489814164,
+      "name": "Publish Docker Hub image",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run docker/setup-qemu-action@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run docker/setup-buildx-action@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Docker Hub login",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Generate metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Generate build id",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Resolve application identity",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Build and push multi-arch",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Build and push multi-arch",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Post Docker Hub login",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Post Run docker/setup-buildx-action@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Post Run docker/setup-qemu-action@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        }
+      ]
+    },
+    {
+      "id": 122496522996,
+      "name": "Publish rolling early-main packages",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/download-artifact@v8",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run actions/download-artifact@v8",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Build early source package and manifest",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Update rolling early-main GitHub prerelease",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 122496525145,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40584085026,
+      "logs_url": null,
+      "steps": null
+    }
+  ],
+  "quality": {
+    "job_id": 122470833556,
+    "passed": 6887,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 114,
+    "warnings": 1016,
+    "seconds": 1331.27,
+    "coverage_percent": 76.88,
+    "required_coverage_percent": 70,
+    "log_evidence": [
+      "2026-10-27T21:34:59.6056226Z Required test coverage of 70% reached. Total coverage: 76.88%",
+      "2026-10-27T21:34:59.6112998Z ======== 6887 passed, 114 skipped, 1016 warnings in 1331.27s (0:22:11) ========="
+    ]
+  },
+  "ios": {
+    "job_id": 122484486026,
+    "unsigned_archive": "success",
+    "signed_IPA": false,
+    "signed_IPA_log": "2026-10-27T21:36:09.7752160Z Apple signing secrets not configured; skipping signed IPA.",
+    "testflight_step": "skipped",
+    "app_store_distribution_verified": false
+  },
+  "artifacts": [
+    {
+      "id": 12780640288,
+      "name": "desalvo~mta-audio-editor~KG7UV5.dockerbuild",
+      "size_in_bytes": 421719,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12780640288",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12780640288/zip",
+      "expired": false,
+      "created_at": "2026-10-27T23:41:02Z",
+      "expires_at": "2027-01-25T21:07:31Z",
+      "updated_at": "2026-10-27T23:41:02Z",
+      "digest": "sha256:55f5fe07ba7f3e1626428edc8d31667630d45af1f68382d9ba5ada49d901f8d9",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12774455080,
+      "name": "native-linux-arm64",
+      "size_in_bytes": 1373714958,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12774455080",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12774455080/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:52:39Z",
+      "expires_at": "2026-11-26T21:52:00Z",
+      "updated_at": "2026-10-27T21:52:39Z",
+      "digest": "sha256:4eaf16048746acbe99c2210a01b3381cce31fe79f4ca5a92345b3c080a47ee40",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12774151933,
+      "name": "native-linux-x86_64",
+      "size_in_bytes": 1510535676,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12774151933",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12774151933/zip",
+      "expired": false,
+      "created_at": "2026-10-27T22:01:00Z",
+      "expires_at": "2026-11-26T22:00:11Z",
+      "updated_at": "2026-10-27T22:01:00Z",
+      "digest": "sha256:19135d2c059ccd92affa6ae82f45439eb8a1745f7a1c3b1d93fc2a503c85fa73",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12773356939,
+      "name": "native-macos-x64-main",
+      "size_in_bytes": 522165076,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12773356939",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12773356939/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:49:46Z",
+      "expires_at": "2026-11-26T21:49:25Z",
+      "updated_at": "2026-10-27T21:49:46Z",
+      "digest": "sha256:fb30ac47808f30adecc79acbcbac626f60731fd9c66d31604a0f4555b5a9c792",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12773351305,
+      "name": "native-macos-arm64-main",
+      "size_in_bytes": 503644835,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12773351305",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12773351305/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:45:13Z",
+      "expires_at": "2026-11-26T21:44:52Z",
+      "updated_at": "2026-10-27T21:45:13Z",
+      "digest": "sha256:8adfb5df3f8aa65f52ff6a521c2fc59fce6b50dfe3edeb86d1947fbc0aaaa448",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12773286335,
+      "name": "desalvo~mta-audio-editor~RWG3Y4.dockerbuild",
+      "size_in_bytes": 182184,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12773286335",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12773286335/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:46:02Z",
+      "expires_at": "2027-01-25T21:07:31Z",
+      "updated_at": "2026-10-27T21:46:02Z",
+      "digest": "sha256:0963a7dfbe1876deb217b943007ef6f4a6ab3a040aa2cd687fab29c03802dc9d",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12772969669,
+      "name": "native-windows-main",
+      "size_in_bytes": 374152787,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12772969669",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12772969669/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:56:04Z",
+      "expires_at": "2026-11-26T21:55:51Z",
+      "updated_at": "2026-10-27T21:56:04Z",
+      "digest": "sha256:f5caffe93100872df9821198bd7deadbf50b9ee21a21264b142d240c2ecdc12f",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12772533846,
+      "name": "mobile-android-main",
+      "size_in_bytes": 166951740,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12772533846",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12772533846/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:36:28Z",
+      "expires_at": "2026-11-26T21:36:20Z",
+      "updated_at": "2026-10-27T21:36:28Z",
+      "digest": "sha256:1761049040f702b6370d05cddeadbb9af28f5b7317a6464f330dcd49e528b018",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12772138961,
+      "name": "coverage",
+      "size_in_bytes": 139427,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12772138961",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12772138961/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:35:04Z",
+      "expires_at": "2027-01-25T21:07:31Z",
+      "updated_at": "2026-10-27T21:35:04Z",
+      "digest": "sha256:bec8d17eb9257b12a90bd9bf2214b8f175e20d1b8b294932122c309b3afe90db",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12771917929,
+      "name": "mobile-ios-main",
+      "size_in_bytes": 1102223,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771917929",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771917929/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:36:13Z",
+      "expires_at": "2026-11-26T21:36:10Z",
+      "updated_at": "2026-10-27T21:36:13Z",
+      "digest": "sha256:b8aafdc18a630751dcd59f6a353e05b8a9b11f49c4caa52420adebd1f8bae4cc",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12771902924,
+      "name": "chordino-windows-x64-runtime",
+      "size_in_bytes": 753596,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771902924",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771902924/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:35:57Z",
+      "expires_at": "2026-11-03T21:35:55Z",
+      "updated_at": "2026-10-27T21:35:57Z",
+      "digest": "sha256:d05143a11d0205904018111735c6d7580ea5aa470f7685c67e28d342f6b5fe74",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12771185817,
+      "name": "gitleaks-results.sarif",
+      "size_in_bytes": 6796,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771185817",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771185817/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:10:05Z",
+      "expires_at": "2027-01-25T21:07:31Z",
+      "updated_at": "2026-10-27T21:10:05Z",
+      "digest": "sha256:6153e0abb0539f4c185ae7abbbee9e3a681f35a9b5cc0c01eea36f908808e463",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    },
+    {
+      "id": 12771168917,
+      "name": "quality-test-diagnostics",
+      "size_in_bytes": 281799,
+      "url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771168917",
+      "archive_download_url": "https://api.github.com/repos/desalvo/mta-audio-editor/actions/artifacts/12771168917/zip",
+      "expired": false,
+      "created_at": "2026-10-27T21:35:02Z",
+      "expires_at": "2027-01-25T21:07:31Z",
+      "updated_at": "2026-10-27T21:35:02Z",
+      "digest": "sha256:471bb7d1ae14388846a72de9d0bbe88b714883451a481628e94da4c2ad3e8946",
+      "workflow_run": {
+        "id": 40584085026,
+        "repository_id": 1398839854,
+        "head_repository_id": 1398839854,
+        "head_branch": "main",
+        "head_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a"
+      }
+    }
+  ],
+  "regression_resolution": {
+    "previous_run": 40550957081,
+    "previous_sha": "5891082820d3d69bd8bd3ea0be06117d5639c135",
+    "previous_failed_cases": 60,
+    "fixture_only_repair_sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+    "previous_local_distinct_passes": 156,
+    "new_negative_cases": 9,
+    "production_code_changed_by_repair": false,
+    "new_github_confirmation_pending": false,
+    "test_count_reconciliation": "6818 previous passes + 60 repaired failures + 9 new negative cases = 6887 passes; 114 skips unchanged."
+  },
+  "scope_limits": [
+    "CI build/package success does not establish original hardware, GPU/model, real provider, Kubernetes/multihost, native NC or signing acceptance.",
+    "No skipped case counted as positive acceptance.",
+    "No local tests rerun, no commit/staging/push/tag/release/workflow dispatch/server/provider mutation performed in this update."
+  ],
+  "progress": {
+    "numerator": 25,
+    "denominator": 42,
+    "percent": 59.5,
+    "accepted_macroareas": 0,
+    "macroarea_denominator": 7
+  },
+  "release_candidate": false
+}

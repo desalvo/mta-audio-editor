@@ -37,8 +37,9 @@ def test_transcribe_passes_exact_verified_bytes_to_runtime_and_keeps_cpu_limits(
         return None,None,[(0.,.5,60,.8,None)]
     monkeypatch.setitem(sys.modules,'soundfile',SimpleNamespace(info=lambda _:SimpleNamespace(channels=1,duration=1.,samplerate=44100)))
     monkeypatch.setitem(sys.modules,'onnxruntime',SimpleNamespace(SessionOptions=SimpleNamespace,InferenceSession=session,disable_telemetry_events=lambda:None))
-    monkeypatch.setitem(sys.modules,'basic_pitch',SimpleNamespace())
-    monkeypatch.setitem(sys.modules,'basic_pitch.inference',SimpleNamespace(Model=Model,predict=predict))
+    inference=SimpleNamespace(Model=Model,predict=predict,get_audio_input=lambda *a:None)
+    monkeypatch.setitem(sys.modules,'basic_pitch',SimpleNamespace(inference=inference))
+    monkeypatch.setitem(sys.modules,'basic_pitch.inference',inference)
     result=adapter.transcribe('synthetic.wav',{})
     assert seen==[original]
     assert len(result.parts)==1 and result.parts[0].notes[0].pitch==60
@@ -64,6 +65,8 @@ def test_changed_or_unsafe_model_never_reaches_runtime(checkpoint,monkeypatch,ch
 
 @pytest.mark.parametrize('component',['acoustic','vocoder'])
 def test_diffsinger_loader_passes_verified_bytes_and_refuses_replacement(checkpoint,monkeypatch,component):
+    from model_rights_fixtures import authorize_singing_fixture
+    authorize_singing_fixture(monkeypatch,checkpoint.parent)
     from app import diffsinger_onnx
     original=checkpoint.read_bytes();calls=[]
     def load(data,**kwargs):

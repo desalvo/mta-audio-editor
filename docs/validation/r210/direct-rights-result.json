@@ -1,0 +1,3254 @@
+{
+  "schema": "mta-direct-executor-rights-1",
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-partial-settlement-cumulative.zip",
+  "baseline_sha256": "e518810f084570f480181444fe284f6a0fb4a584ff018b337c4607b37dec2ab2",
+  "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+  "passed": 507,
+  "new_cases": 99,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 7,
+  "reports": [
+    {
+      "path": "docs/validation/r210/direct-rights-affected-final.xml",
+      "sha256": "af6242c22aa6a3e2af0e8dc8b16a171c363a66ecb098594d842997a98c506b36"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-fixture-correction.xml",
+      "sha256": "68877534a756f1ba0f18d59cc96c268f1cc82a2afeb4da02f8032b89afd94668"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-adapters-first.xml",
+      "sha256": "465fc40c6558049361f4b00ef716a64688aeae152c6355e0b013ab92480e4b4e"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-adapter-corrections.xml",
+      "sha256": "f56085194bf941933e2357c645708414bd37d3421714172a75cee0e19b46c8b0"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-reviewed-real.xml",
+      "sha256": "f62dd675d5d0d73dc8d8e324bc8ebb3161d9dcb288d8d7f54fa36ccb6d436c07"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-reviewed-real-final.xml",
+      "sha256": "7ff42b860fc00ff522c5b0172eab26f0b37c392c35a22204f8d707b95376b676"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-real-backend.xml",
+      "sha256": "8fe4ec8b4fb6da716a8d854e885c29469aee93c1102ef28eaee779d5c4b80609"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-offline-final.xml",
+      "sha256": "d66f4a4babf93001d08066f578f2200a2fd7af117594e993b89f3dfda4f54e5f"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-boundaries-final.xml",
+      "sha256": "eb7915dfb3083c099aee5f9449bee88f49a6b624bb99e4a4a3bea04e30bceb47"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-source-gates.xml",
+      "sha256": "e0c82eefd6d1a57adcb4a2866a80d4f08dc2f2245b49a854d4bdea79d4acbaed"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-lightweight-final.xml",
+      "sha256": "0e5265ff9498cd4ecb2fecbce24f8efd8d8c29d2a7ddb5fb86ec43c84604efa2"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-regime-paths.xml",
+      "sha256": "f719280ceff9c9fc0da10467d89ccae1c9dd6e031c213a390e099dd28a7ad421"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-real-paths-final.xml",
+      "sha256": "2ad51ede11ac92faa994803fdacc9404435f47a102909032d34b252acc34c0f0"
+    },
+    {
+      "path": "docs/validation/r210/direct-rights-source-gates-lightweight.xml",
+      "sha256": "62877de105f55aa54cf34f9d3f20fa1b34b370a580944f1265297cb12956be01"
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-whisper_progressive]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-loaded_whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-basic_pitch]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-studio]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-yourmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-mrmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-mrmt3_selftest]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-transkun]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-transkun_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-sam_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-profile_demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-profile_sam]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-oddvoices]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_bridge]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_session]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-whisper_progressive]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-loaded_whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-basic_pitch]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-studio]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-yourmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-mrmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-mrmt3_selftest]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-transkun]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-transkun_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-sam_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-profile_demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-profile_sam]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-oddvoices]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_bridge]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_session]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-whisper_progressive]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-loaded_whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-basic_pitch]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-studio]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-yourmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-mrmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-mrmt3_selftest]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-transkun]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-transkun_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-sam_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-profile_demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-profile_sam]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-oddvoices]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_bridge]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_session]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-whisper_progressive]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-loaded_whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-basic_pitch]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-studio]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-yourmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-mrmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-mrmt3_selftest]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-transkun]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-transkun_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-sam_cli]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-profile_demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-profile_sam]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-oddvoices]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_bridge]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_session]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_loaded_whisper_revocation_denies_mps_cpu_fallback",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_permitted_loaded_whisper_retains_original_fallback_and_timestamps",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_bridge]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_session]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_independent_actual_cli_denies_before_optional_runtime_import[sam]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_independent_actual_cli_denies_before_optional_runtime_import[demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_independent_actual_cli_denies_before_optional_runtime_import[drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_independent_actual_cli_denies_before_optional_runtime_import[transkun]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_reimbursement_is_not_an_automatic_license_exception",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_review_requires_permission_and_free_access_acknowledgement",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_free_resources_remain_accounted_without_billing_or_quota_use",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_model_license_policy",
+      "name": "test_license_snapshot_is_idempotent_but_not_mutable",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_transcribe_passes_exact_verified_bytes_to_runtime_and_keeps_cpu_limits",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-fixture-correction.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_changed_or_unsafe_model_never_reaches_runtime[replace]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_changed_or_unsafe_model_never_reaches_runtime[same-size]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_changed_or_unsafe_model_never_reaches_runtime[empty]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_changed_or_unsafe_model_never_reaches_runtime[symlink]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_changed_or_unsafe_model_never_reaches_runtime[hardlink]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_changed_or_unsafe_model_never_reaches_runtime[directory]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_changed_or_unsafe_model_never_reaches_runtime[oversized]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_diffsinger_loader_passes_verified_bytes_and_refuses_replacement[acoustic]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_identity",
+      "name": "test_diffsinger_loader_passes_verified_bytes_and_refuses_replacement[vocoder]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_bridge",
+      "name": "test_ds_with_rest_and_pitch",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_bridge",
+      "name": "test_ds_rejects_overlap_or_undocumented_phonemes",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_bridge",
+      "name": "test_asset_requires_digest",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_bridge",
+      "name": "test_runtime_rejects_checkpoint_outside_experiment",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_bridge",
+      "name": "test_reject_oversized_duration_score",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_onnx",
+      "name": "test_onnx_inventory_keeps_independent_component_policies_and_pins",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_onnx",
+      "name": "test_language_embedding_is_used_only_for_cross_language_shared_tokens",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_diffsinger_onnx",
+      "name": "test_frame_durations_share_one_cumulative_clock_and_f0_remains_score_control",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_matching_configuration_reaches_both_pinned_sessions_and_real_wav",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_configuration_changed_after_inventory_check_cannot_reach_model[config]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_configuration_changed_after_inventory_check_cannot_reach_model[vocoder_config]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_configuration_changed_after_inventory_check_cannot_reach_model[phones]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_configuration_changed_after_inventory_check_cannot_reach_model[languages]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_inventory_parser_never_reads_substituted_bytes",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_lexicon_parser_rejects_swap_after_legacy_path_verification",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singing_loaded_configuration",
+      "name": "test_inventory_retains_uppercase_digest_compatibility",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-boundaries-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_optional_backend_has_no_basic_pitch_fallback",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_verified_interpreter_is_delegated_without_changing_default",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_dispatch_preserves_programs_in_worker_result[audio-to-midi-mr-mt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_dispatch_preserves_programs_in_worker_result[audio-to-midi]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_model_rights_are_independent_and_disabled_by_default",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_explicit_request_reaches_own_policy_and_queue",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_classifier_rejects_basic_pitch_overrides_before_queue[overrides0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_classifier_rejects_basic_pitch_overrides_before_queue[overrides1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_recovery_fingerprint_tracks_mr_runtime_receipt",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_fast_selector_does_not_replace_ensemble_dependencies[accurate]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_fast_selector_does_not_replace_ensemble_dependencies[maximum]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_integration",
+      "name": "test_selector_readiness_and_fast_only_settings_in_javascript",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_synthesis",
+      "name": "test_settings_refuse_unverified_language_and_parameters",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_synthesis",
+      "name": "test_real_singing_queue_atomic_midi_audio_reopen",
+      "status": "skipped",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml",
+      "reason": "Requires explicitly installed, hash-verified CC0 voicebank and compiled core"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_independent_singer_lyrics_settings",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_singer_lyrics_refused[payload0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_singer_lyrics_refused[payload1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_singer_lyrics_refused[payload2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_per_singer_alignment_handles_different_melody_lengths",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_lyrics_follow_notes_when_input_order_differs_from_timeline",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_overlap_and_overlong_part_refused_before_voicebank_loading",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_vocal_notes_rejected_before_loading_bank[patch0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_vocal_notes_rejected_before_loading_bank[patch1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_vocal_notes_rejected_before_loading_bank[patch2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_vocal_notes_rejected_before_loading_bank[patch3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_vocal_notes_rejected_before_loading_bank[patch4]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_invalid_vocal_notes_rejected_before_loading_bank[patch5]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_multisinger_lyrics",
+      "name": "test_independent_generation_metadata_survives_audio_midi_publication_and_reopen",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singer_lyrics_contract",
+      "name": "test_independent_lyrics_kept_by_track_identifier",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singer_lyrics_contract",
+      "name": "test_lyrics_budget_rejects_too_many_tracks",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_singer_lyrics_contract",
+      "name": "test_ui_and_worker_both_support_per_singer_lyrics",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_program_nine_is_not_drum_and_drum_duration_is_explicit",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_ties_preserve_note_across_windows_without_duplicates",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_untied_notes_close_at_next_source_window",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_invalid_and_outside_window_events_are_audited_not_invented",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_no_configured_runtime_is_unavailable",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_runtime_requires_actual_tested_receipt_and_pinned_identity",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_full_runtime_hash_and_path_checks",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_checkpoint_unknown_bytes_rejected_before_deserialization",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_manual_program_override_cannot_relabel_model_output",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_mrmt3_runtime",
+      "name": "test_required_source_omission_cannot_be_hidden_by_extra_inventory_files",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-affected-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_loader_uses_verified_stream_after_path_replacement",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_config_is_private_exact_copy_removed_after_parse",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[checkpoint]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[config]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[kind]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[digest]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[review-type]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[duplicate]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_child_rejects_missing_changed_or_malformed_original_policy[schema]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_actual_child_entry_rejects_before_reading_score_or_loading_models",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_registered_parent_overwrites_inherited_policy_and_real_child_verifies",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_pull_parent_propagates_original_assignment_to_actual_child",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_native_parent_actual_studio_adapter_preserves_output_and_no_server_invoice",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "name": "test_registered_child_cannot_adopt_different_current_policy",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_independent_voicebanks",
+      "name": "test_independent_voicebank_selection",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_independent_voicebanks",
+      "name": "test_voicebank_mismatch_rejected_before_load",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_independent_voicebanks",
+      "name": "test_unrecognized_voicebank_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_live_windows_are_cumulative_and_removed_after_generation",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_other_thread_cannot_stop_inference_capture",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_checkpoint_failure_does_not_retry_or_break_audio",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_partial_report_has_same_evidence_gates_as_final[gpu_active_seconds-nan]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_partial_report_has_same_evidence_gates_as_final[wall_seconds-0.01]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_partial_report_has_same_evidence_gates_as_final[device_id--1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_partial_report_has_same_evidence_gates_as_final[kernel_count-0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_general_worker_sequential_reports_accumulate_without_billing",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_adapter_reports_partial_profiler_not_idle_host",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_diagnostic_endpoint_requires_administrator",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_diagnostic_storage_does_not_update_billing",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_demucs_and_sam_commands_profile_actual_child",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_hook_registration_failure_keeps_final_capture",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_compiler_capture_skips_live_control_but_retains_final_result",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_actual_worker_diagnostic_identity_and_gpu_billing_gate[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_actual_worker_diagnostic_identity_and_gpu_billing_gate[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_live_adapter_delivers_partial_before_completion",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_live_ui_marks_partial_and_retains_final_result_on_reopen",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_profiled_child_cli_runs_fixed_demucs_entrypoint_once[0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_live_gpu_profiles",
+      "name": "test_profiled_child_cli_runs_fixed_demucs_entrypoint_once[3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_empty_results_preserve_strict_score_schema",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_completed_stage_recovers_without_execution_or_double_usage",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_same_stage_cache_object_invalidates_when_runtime_changes",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_corrupt_stage_is_recomputed_but_links_are_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_schema_invalid_checkpoint_recomputes_real_stage",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_invalid_computed_music_is_not_persisted_or_acknowledged",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_failed_stage_is_never_cached",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_conversion_real_pcm_io_and_exact_model_arguments[seed-vc]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_conversion_real_pcm_io_and_exact_model_arguments[rvc]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_conversion_failure_never_replaces_original_audio",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_transkun_contract_reads_actual_midi_velocity_and_sustain",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_text_alignment_melismas_word_ids_and_missing_count",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_dynamic_curves_reach_f0_dynamics_and_neural_inputs",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_contracts",
+      "name": "test_offline_runner_blocks_python_network_downloads",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_neural_external_adapter",
+      "name": "test_settings_neural_explicit",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_neural_external_adapter",
+      "name": "test_model_policy_not_oddvoices",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_neural_external_adapter",
+      "name": "test_missing_neural_assets_fail_closed",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_neural_external_adapter",
+      "name": "test_invalid_checkpoint_detected",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[0-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[1-False]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_load_contract_keeps_auth_revision_cache_and_restores_bindings[1-True]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_bridge_does_not_retry_or_swallow_model_failures",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_actual_sam_worker_reaches_inference_and_writes_wav[False]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_actual_sam_worker_reaches_inference_and_writes_wav[True]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_sam_import_failure_emits_only_fixed_stage_marker",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_safe_sam_failure_and_backing_categories",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_backing_same_onnx_checkpoint_runs_on_rocm_and_returns_expected_numpy",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_other_backing_devices_and_models_keep_existing_route[None-True-model.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_other_backing_devices_and_models_keep_existing_route[7.2-False-model.onnx]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_other_backing_devices_and_models_keep_existing_route[7.2-True-model.ckpt]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_backing_conversion_failure_does_not_fall_back_to_cpu",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_installer_exercises_model_loader_without_huggingface_download",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_sam_hub_backing_rocm",
+      "name": "test_native_bundle_contains_sam_bridge_source",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_checkpoint_rejects_untrusted_size_and_symlink",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_yourmt3_requires_operator_runtime",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_real_yourmt3_piano_prediction",
+      "status": "skipped",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml",
+      "reason": "Opt-in real model/runtime and authorized musical fixture"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_pinned_download_does_not_publish_corrupt_bytes",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_routing_driver_errors_are_normalized",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_offline_source_cache_has_no_network_fallback",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_frozen_harmony_never_launches_application_as_python",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_readonly_bundled_adapter_keeps_external_executable_boundary",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_checkpoint",
+      "name": "test_checkpoint_allowlists_legacy_numpy_globals_without_unsafe_pickle",
+      "status": "skipped",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml",
+      "reason": "could not import 'torch': No module named 'torch'"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_f0_absolute_pitch_rests_and_timing",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_vibrato_delay_frequency_depth_and_gate",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_presets_allow_explicit_overrides",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_expression_refuses_invalid_values[settings0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_expression_refuses_invalid_values[settings1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_expression_refuses_invalid_values[settings2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_expression_refuses_invalid_values[settings3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_neural_dynamics_are_real_sample_envelope",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_reviewed_profile_is_pinned_and_inventory_checked",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_map_preserves_ipa_units_not_guessed_phones",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_ipa_bank_mapping_and_multiphone_duration[it-cia-t\\u0283\\u02c8a-expected0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_ipa_bank_mapping_and_multiphone_duration[fr-bon-b\\u02c8\\u0254\\u0303-expected1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_ipa_bank_mapping_and_multiphone_duration[en-la-l\\u02c8\\u0251\\u02d0-expected2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_real_espeak_g2p_languages[it-la]",
+      "status": "skipped",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml",
+      "reason": "could not import 'espeakng_loader': No module named 'espeakng_loader'"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_real_espeak_g2p_languages[en-la]",
+      "status": "skipped",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml",
+      "reason": "could not import 'espeakng_loader': No module named 'espeakng_loader'"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_real_espeak_g2p_languages[fr-bon]",
+      "status": "skipped",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml",
+      "reason": "could not import 'espeakng_loader': No module named 'espeakng_loader'"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_g2p_rejects_markup",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_it_fr_settings_and_note_alignment",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_ds_optional_embedding_curves_and_native_legacy",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_vocoder_has_independent_policy_and_free_only_is_stricter",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_vocal_expression_phonemizer",
+      "name": "test_full_diffsinger_bridge_uses_exact_config_checkpoint_and_score",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-offline-final.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_gpu_device",
+      "name": "test_cpu_default_and_bad_choice",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_gpu_device",
+      "name": "test_unavailable_backend_fails_closed[cuda]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_gpu_device",
+      "name": "test_unavailable_backend_fails_closed[rocm]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_gpu_device",
+      "name": "test_unavailable_backend_fails_closed[gpu]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_gpu_device",
+      "name": "test_rocm_detection",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_gpu_device",
+      "name": "test_nvidia_detection",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_yourmt3_gpu_device",
+      "name": "test_unknown_backend_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r272_drumsep_hybrid",
+      "name": "test_stft_input_matches_onnx_manifest",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r272_drumsep_hybrid",
+      "name": "test_frequency_branch_is_combined_with_temporal_branch",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r272_drumsep_hybrid",
+      "name": "test_drumsep_does_not_copy_demucs_drums_as_kit",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r272_drumsep_hybrid",
+      "name": "test_separate_nonkit_percussion_requires_sam",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r271_drumsep_adapter",
+      "name": "test_drumsep_model_metadata_and_layout",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r271_drumsep_adapter",
+      "name": "test_drumsep_requires_model_file",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r271_drumsep_adapter",
+      "name": "test_drumsep_selective_output",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r271_drumsep_adapter",
+      "name": "test_drumsep_ui_and_native_bundle",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_real_backend",
+      "name": "test_real_basic_pitch_global_queue_cpu_and_artifacts",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-real-paths-final.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_real_backend",
+      "name": "test_real_project_two_sources_then_vocal_harmony",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-real-paths-final.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_requirement_frozen_at_admission_and_nonpilot_denied_before_ledger",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[model]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[job]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[instance]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[nonce]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[pid-bool]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_bad_loaded_receipt_never_freezes_settles_or_publishes[schema]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_valid_authenticated_receipt_frozen_with_result_and_replay_conflict_denied",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_wrong_authenticated_node_cannot_submit_receipt",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_opaque_adapter_refused_before_process",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_real_receipt_writer_is_exclusive_and_bound_to_actual_pid",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_record_is_not_emitted_if_onnx_constructor_fails",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_https_attested_completion_lost_ack_recovers_exact_receipt_without_reexecution",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_receipt_pid_matches_reaped_process_before_output_is_accepted",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[matching]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[foreign-pid]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_revoked_rights_before_freeze_hold_original_assignment",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_attested_retention_erases_receipt_but_preserves_exact_lost_ack",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_receipt_writer_runs_without_site_packages_or_server_imports",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation",
+      "name": "test_pilot_availability_matches_actual_new_admission",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_basic_pitch_loaded_runtime",
+      "name": "test_real_onnx_runtime_loads_verified_bytes_despite_path_replacement",
+      "status": "skipped",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml",
+      "reason": "could not import 'onnx': No module named 'onnx'"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_profiles_explicitly_disclose_cross_language_projection",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[it-t\\u0283\\u02c8a-phones0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[it-\\u0272\\u02c8\\u0254k\\u02d0i-phones1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[it-\\u028e\\u02c8i-phones2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[it-r\\u02c8o\\u02d0so-phones3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[fr-b\\u0254\\u0303\\u0292\\u02c8u\\u0281-phones4]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[fr-k\\u02c8\\u0153\\u0281-phones5]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[fr-l\\u02c8yn-phones6]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[fr-p\\u02c8\\u025b\\u0303-phones7]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_ipa_corpus[fr-bl\\u02c8\\u0251\\u0303-phones8]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_normalized_nasal_diacritics",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_unknown_phone_does_not_silently_fallback",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_profile_pinning_and_disclosures",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_text_and_syllables_keep_projection_metadata",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_legacy_profile_metadata_stays_absent",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_upgrade_rejects_unpinned_source",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_projection_is_visible_before_generation",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_italian_glide_and_hiatus_alignment[ciao-t\\u0283\\u02c8ao-1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_italian_glide_and_hiatus_alignment[cuore-k\\u028a\\u02c8\\u0254re-2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_italian_glide_and_hiatus_alignment[paura-pa\\u02c8\\u028ara-3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_italian_glide_and_hiatus_alignment[gioia-d\\u0292\\u02c8\\u0254ia-2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_italian_glide_and_hiatus_alignment[mio-m\\u02c8io-2]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_italian_glide_and_hiatus_alignment[buongiorno-b\\u028aond\\u0292\\u02c8\\u0254rno-3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_italian_glide_and_hiatus_alignment[aiuto-a\\u02c8iuto-3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_literal_rewrites_have_bounded_expansion",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_explicit_real_bank_phone_prefixes_are_editable_but_not_commands",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_qixuan_itfr_profiles",
+      "name": "test_default_vocalise_uses_pinned_vowel_map",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_karaoke_111",
+      "name": "test_import_separate_exposes_lyrics_chords_options_and_backend_flags",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_karaoke_111",
+      "name": "test_word_timestamps_are_shifted_with_track_timeline",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_karaoke_111",
+      "name": "test_karaoke_ass_uses_word_level_karaoke",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_karaoke_111",
+      "name": "test_pdf_chord_color_and_mp4_ui_are_exposed",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_karaoke_111",
+      "name": "test_accuracy_defaults_prefer_large_whisper_and_chordino",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_revision_154_regressions",
+      "name": "test_text_analysis_renders_before_persisting_extracted_timed_text",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_revision_154_regressions",
+      "name": "test_youtube_import_posts_json_and_paste_buttons_are_readable",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_revision_154_regressions",
+      "name": "test_sidebar_project_file_precedes_edit_import_mix",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_revision_154_regressions",
+      "name": "test_bpm_preserves_decimals_in_transport_ui",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_revision_154_regressions",
+      "name": "test_whisper_mps_float64_failure_retries_on_cpu",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_workers_coverage",
+      "name": "test_drumsep_small_real_stft_and_inverse",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_workers_coverage",
+      "name": "test_drumsep_worker_end_to_end_small_onnx",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapter-corrections.xml"
+    },
+    {
+      "module": "tests.test_r276_workers_coverage",
+      "name": "test_drumsep_worker_resample_and_validation",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapter-corrections.xml"
+    },
+    {
+      "module": "tests.test_r276_workers_coverage",
+      "name": "test_sam_audio_adapter_validation_and_subprocess",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_workers_coverage",
+      "name": "test_sam_audio_worker_temporal_anchor_cli",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_multi_singer_validated_and_selective",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[!-sam-audio-small-all-JSON]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[]-sam-audio-small-all-2 to 8]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, {\"name\": \"Voce B\", \"start\": 29.5, \"end\": 34.5}, {\"name\": \"Voce C\", \"start\": 46, \"end\": 52}]-invalid-model-all-model]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, {\"name\": \"Voce B\", \"start\": 29.5, \"end\": 34.5}, {\"name\": \"Voce C\", \"start\": 46, \"end\": 52}]-sam-audio-small-singer_4-not defined]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, {\"name\": \"Voce A\", \"start\": 12, \"end\": 16}]-sam-audio-small-all-unique]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, {\"name\": \"Z\", \"start\": 13, \"end\": 15}]-sam-audio-small-all-overlap]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, {\"name\": \"Z\", \"start\": 20, \"end\": 20.1}]-sam-audio-small-all-0.5-60]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, {\"name\": \"Z\", \"start\": \"oops\", \"end\": 30}]-sam-audio-small-all-numeric]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, 7]-sam-audio-small-all-reference]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_invalid_singer_references[[{\"name\": \"Voce A\", \"start\": 12, \"end\": 16}, {\"name\": \"Z\", \"start\": NaN, \"end\": 20}]-sam-audio-small-all-0.5-60]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_sam_temporal_anchors_separate_every_or_one_singer",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_multi_singer_ui_and_sam_worker_contract",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r276_multi_singer",
+      "name": "test_multi_singer_job_keeps_synchronized_tracks_and_selective_replacement",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_installer_choices_resolve_to_torch_devices[auto-False-None-cpu]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_installer_choices_resolve_to_torch_devices[auto-True-7.2-cuda]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_installer_choices_resolve_to_torch_devices[rocm-True-7.2-cuda]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_installer_choices_resolve_to_torch_devices[cpu-True-7.2-cpu]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_installer_choices_resolve_to_torch_devices[cuda:0-True-None-cuda:0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_explicit_rocm_unavailable_fails_without_cpu_fallback",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_whisper_load_receives_resolved_auto_device",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_notices_require_explicit_early_close[open-0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_notices_require_explicit_early_close[redraw-0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_notices_require_explicit_early_close[unknown-0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_notices_require_explicit_early_close[closed-1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_notices_require_explicit_early_close[closed_after_terminal-0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_notices_require_explicit_early_close[already_completed-0]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_lyrics_device_notices",
+      "name": "test_model_download_uses_close_aware_polling",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-adapters-first.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_contract_binds_rights_loader_plan_and_original_epoch_before_dispatch",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[rights]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[runtime]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[model]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[plan]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[epoch]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[policy]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_incomplete_or_substituted_checkpoint_evidence_cannot_publish_or_settle[pid]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_failed_measured_execution_also_requires_its_original_load_rights_receipt",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_revoked_contract_never_rebinds_an_original_dispatched_job",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_missing_original_requirement_never_downgrades_to_unattested_completion",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[ace-step]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[arranger]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi-mr-mt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi-transkun]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[audio-to-midi-yourmt3]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[backing-vocals]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[chords-ml]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[demucs]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[drumsep]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[markers]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[remix]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[sam-audio]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[singer-separation]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[vocal-harmony]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[vocal-synthesis]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_mode_flag_does_not_authorize_an_unreviewed_checkpoint[whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-reviewed-real.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[False-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-real-paths-final.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[False-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-real-paths-final.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[True-NON_COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-real-paths-final.xml"
+    },
+    {
+      "module": "tests.test_r210_reviewed_checkpoint",
+      "name": "test_real_checkpoint_independent_worker_https_rights_receipt_and_original_replay[True-COMMERCIAL]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-real-paths-final.xml"
+    },
+    {
+      "module": "tests.test_r210_pull_model_attestation_real",
+      "name": "test_real_basic_pitch_load_receipt_original_ledger_and_no_repeat",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-real-paths-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_original_installed_component_executes_under_actual_child_policy",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[role]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[missing_role]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[asset]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[foreign_script]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[changed_script]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[cwd]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[disabled]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[revoked]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_wrong_original_component_or_permission_never_executes[guard]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_actual_singing_child_cannot_be_used_as_generic_script_runner[role]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_actual_singing_child_cannot_be_used_as_generic_script_runner[script]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_actual_singing_child_cannot_be_used_as_generic_script_runner[singer]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_actual_singing_child_cannot_be_used_as_generic_script_runner[vocoder]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_component_rights",
+      "name": "test_actual_singing_child_cannot_be_used_as_generic_script_runner[format]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_offline_runner_imports",
+      "name": "test_runtime_namespace_is_not_shadowed_by_mta_i18n",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_singing_component_policy_cannot_be_bypassed_by_allowed_singer_and_vocoder",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_actual_source_bound_service_admission_review",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-source-gates-lightweight.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_model_only_interpreter_reads_current_policy_without_web_dependencies[disabled]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_direct_executor_rights",
+      "name": "test_model_only_interpreter_reads_current_policy_without_web_dependencies[cost_recovery]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_commercial_rights_catalog_gate",
+      "name": "test_catalog_reports_disabled_and_available_models",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_r210_commercial_rights_catalog_gate",
+      "name": "test_restored_noncommercial_rights_cannot_bypass_commercial_gate",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_enrollment_atomic_and_retry",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_rollback",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_refuses_regime_drift",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_verified_payment_requires_commercial_origin",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_paypal_refund_receipt_rejects_noncommercial_origin",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_settlement_requires_confirmed_dispatch[stripe]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_settlement_requires_confirmed_dispatch[paypal]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_checkout_fence",
+      "name": "test_confirmed_dispatch_cannot_settle_during_transition",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_atomic_action",
+      "name": "test_atomic_action_and_idempotency",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_atomic_action",
+      "name": "test_rollback_removes_admission_and_mutation",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_atomic_action",
+      "name": "test_no_callback_when_regime_wrong",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_atomic_action",
+      "name": "test_retries_survive_restart",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_regime_atomic_action",
+      "name": "test_no_nested_transaction",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-lightweight-final.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_missing_defaults_nc",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_initialization_is_preserving",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_legacy_commercial_not_overwritten",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_invalid_records_fail_closed[not json]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_invalid_records_fail_closed[[]]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_invalid_records_fail_closed[{}]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_invalid_records_fail_closed[{\"regime\":\"INVALID\",\"revision\":0}]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_invalid_records_fail_closed[{\"regime\":\"COMMERCIAL\",\"revision\":true}]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_symlink_refused",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_transition_plan_blocks_financial_ambiguity",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_core",
+      "name": "test_transition_plan_has_no_side_effects",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_epoch_gate",
+      "name": "test_default_noncommercial_without_db",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_epoch_gate",
+      "name": "test_commercial_without_fence_fails_closed",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_epoch_gate",
+      "name": "test_matching_commercial_fence",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_epoch_gate",
+      "name": "test_mismatch_refuses_commercial[transition]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_epoch_gate",
+      "name": "test_mismatch_refuses_commercial[revision]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_epoch_gate",
+      "name": "test_mismatch_refuses_commercial[regime]",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_commercial_gates",
+      "name": "test_nc_rejects_commercial_without_creating_db",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_commercial_gates",
+      "name": "test_commercial_gate_can_be_read_from_explicit_existing_mode",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    },
+    {
+      "module": "tests.test_service_regime_commercial_gates",
+      "name": "test_corrupt_configuration_fails_closed",
+      "status": "passed",
+      "report": "docs/validation/r210/direct-rights-regime-paths.xml"
+    }
+  ],
+  "aggregation": "Latest result per module/name. Preserve intermediate failures;never sum reruns or count skipped prerequisites as passes.",
+  "source_sha256": {
+    "app/ai_profiled_backend.py": "f3231f91a566e226bd216a214767bc2c79b21bca1773942849b8f5fdf038701c",
+    "app/ai_studio_adapter.py": "62856cb1a67a669d56e9b875ef13890460db349a74c59cf36260b0c8684f9423",
+    "app/diffsinger_bridge.py": "27055c93551c2abee3b1925cf406d1a3c6ffb6a3a07d3cee73dea2bd9cb195ef",
+    "app/diffsinger_onnx.py": "8dac6440e42a18978ea46326079c81394e73d51599799b8d9c6e9ee5f4c49b12",
+    "app/drumsep_onnx_worker.py": "0858dd1b003942654ae0da859fa36e26a3d646e8bf0afffc4a4b595e90e07412",
+    "app/model_license_policy.py": "e357f93fa4afb3909688bf85aac95baac1c51b171d5b881042d3d4dba9978ba3",
+    "app/mrmt3_adapter.py": "f6817b71cd21089e1c8eb8cfd41389546a853bb28f836aecb53d5a823b9b258e",
+    "app/music_text.py": "1404edcc402a17f868a15a3d8371427bbb29bbf1bf389013b772a15cd43099b0",
+    "app/runtime_paths.py": "52faed738879a23272f17dfa8030d739740b6240a9771f93d2df6dd1060bbf2d",
+    "app/sam_audio_worker.py": "95cfccbc42f2cde4edd6212cefbf51f3a24b2e5c97eddea81412f36bbb60ae52",
+    "app/service_regime.py": "a537a8a7b502c9ad4c54a65c10543b2faedaead3a16bd8b19f2551ca50f12f83",
+    "app/studio_catalog.py": "b856ef157392ef09710f12e7621569b693c63a4a9a511180c8380b3ebed978f2",
+    "app/studio_offline_runner.py": "a976a0552f97a74eeb73d3b0c7ac59dd78252fc2a2c0d062d39a348c988f8f96",
+    "app/transkun_adapter.py": "ce0037850b775fb0184f2a7fadcd9233164290d6474185e4084bca8eb7e2859f",
+    "app/transkun_runner.py": "7671b1a8bb28d918182ab2bdc373cd4b34f80c1f4c131710cda27bb5811c22f6",
+    "app/vocal_conversion.py": "60e659e0f788b9915f22e4e72329643cd8b1370ba4810c587cafc11108aa4505",
+    "app/vocal_synthesis.py": "ddde8c8ffd1aa81ff834ac00f9ea71381baaf5777b12dd41c9851fc8a06f26c1",
+    "app/yourmt3_adapter.py": "dd52171e63aab2512693e963c945fec52dea5f5e59367d268573c1cdac0c681b",
+    "tests/test_r210_direct_executor_rights.py": "811586354fccdb4a192fe22e39a3d6e9f45f87ecf6e7e914f98eee9a889ba032",
+    "tests/test_r210_offline_component_rights.py": "ccc75b3c96a8f75952364897d705783a993b002c34e5646f2a6cef3bf6735b8b"
+  },
+  "lightweight_policy_reader": {
+    "scope": "Same injected running-authority root/db paths or standalone configured root and read-only SQLite fence;no web-stack import required for policy.",
+    "proof": "Two actual Python -S processes without site-packages plus20 regime core/epoch tests and7 current real ONNX paths.",
+    "production_requirements_changed": false
+  },
+  "app_modules_changed": 18,
+  "direct_entry_paths": 18,
+  "actual_independent_direct_CLIs": 4,
+  "real_model_passes": 7,
+  "real_model_scope": "5 Basic Pitch load/rights/original-ledger and independent HTTPS worker tests plus2 actual registered/project pipeline tests. New loader source hashes admitted and checked;local ONNX CPU and generated musical fixtures only. Not every optional model or native/hardware target.",
+  "initial_failures": [
+    {
+      "report": "direct-rights-first.xml",
+      "cause": "18 commercial cases lacked the actual initialized commercial fence;fixture now provisions it,without mocking current_regime."
+    },
+    {
+      "report": "direct-rights-affected-first.xml",
+      "cause": "Synthetic singing/MR-MT3 fixtures had no explicit component permission after direct checks;scoped generated-byte approvals added. Basic Pitch dependency double omitted its inference namespace/get_audio_input attributes;fixed to actual adapter contract."
+    },
+    {
+      "report": "direct-rights-reviewed-real.xml",
+      "cause": "New separate ONNX-only interpreter initially lacked qrcode and FastAPI app imports. Installed only local test prerequisites;self-test and all5 originally failing real cases rerun successfully."
+    },
+    {
+      "report": "direct-rights-adapters-first.xml",
+      "cause": "Four generated Transkun/DrumSep/DiffSinger cases lacked scoped fixture permissions;four exact cases rerun green."
+    }
+  ],
+  "security": {
+    "Bandit_sources": 303,
+    "findings": 166,
+    "HIGH": 0,
+    "MEDIUM": 21,
+    "LOW": 145,
+    "new_findings": 0,
+    "review_notes": "Four original finding line identities relocated;two fixed DiffSinger subprocess calls now explicitly bind child role in env and were re-reviewed. No checker,suppression,threshold or ignore change.",
+    "C2_sites": 171,
+    "http_sites": 30,
+    "http_files": 21,
+    "runtime_sources": 547,
+    "runtime_boundaries": 783
+  },
+  "unchanged_evidence_reused": [
+    "Full CI40584085026 at4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+    "E4 Chromium/axe",
+    "Prior financial recovery/ledger/settlement suites"
+  ],
+  "current_f3_real_proof": "docs/validation/r210/direct-rights-real-paths-final.xml",
+  "secret_scan": {
+    "tool": "Gitleaks8.24.3",
+    "report": "docs/validation/r210/direct-rights-gitleaks.json",
+    "scope": "Introduced/replaced UTF8 lines in final cumulative payload,including full manifest;unchanged scanner configuration and ignore lists.",
+    "findings": 0
+  },
+  "progress": {
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ],
+    "promoted": [],
+    "requested_numeric_progress_achieved": false,
+    "release_candidate": false
+  },
+  "remaining_F4": "Full every-legacy/native/opaque and dynamic-runtime bypass acceptance remains open beyond the reviewed direct/managed child stream. Independent exact optional checkpoint rights are F6;installed OS guarantees are F5. Do not call all these residuals external-only or certify operator/native binaries from these fixtures.",
+  "no_commit_or_remote_mutation": true
+}

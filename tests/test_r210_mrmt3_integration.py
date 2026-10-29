@@ -57,6 +57,8 @@ def test_verified_interpreter_is_delegated_without_changing_default(adapter_cont
 
 @pytest.mark.parametrize('kind',['audio-to-midi-mr-mt3','audio-to-midi'])
 def test_dispatch_preserves_programs_in_worker_result(adapter_contract,monkeypatch,tmp_path,kind):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'mr-mt3-assets')
     monkeypatch.setenv('MTA_STUDIO_TRANSCRIBER','mr-mt3')
     source=tmp_path/'source.wav';source.write_bytes(b'contract-only source, not neural audio')
     expected=music();expected.parts[0].program=40;calls=[]

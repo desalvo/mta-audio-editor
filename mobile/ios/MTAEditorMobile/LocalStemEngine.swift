@@ -2,7 +2,6 @@ import Foundation
 import UIKit
 import AVFoundation
 import CoreML
-import CryptoKit
 
 struct LocalStemCapabilities: Codable {
     let installedStemCounts: [Int]
@@ -42,7 +41,14 @@ final class LocalStemEngine {
     }
 
     private let fm = FileManager.default
-    private var cancellationRequested = false
+    private let modelLock = NSRecursiveLock()
+    private let cancellationLock = NSLock()
+    private var cancelled = false
+    private var cancellationRequested: Bool {
+        get { cancellationLock.lock(); defer { cancellationLock.unlock() }; return cancelled }
+        set { cancellationLock.lock(); defer { cancellationLock.unlock() }; cancelled = newValue }
+    }
+    private let rights = LocalModelRights.bundled()
     private let queue = DispatchQueue(label: "com.desalvo.mtaaudioeditor.localstems", qos: .userInitiated)
 
     private init() {}
@@ -55,9 +61,7 @@ final class LocalStemEngine {
     }
 
     private func safeModelId(_ modelId: String) -> String {
-        let allowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-")
-        let cleaned = modelId.unicodeScalars.map { allowed.contains($0) ? Character(String($0)) : Character("-") }
-        return String(cleaned).trimmingCharacters(in: CharacterSet(charactersIn: "-."))
+        LocalModelRights.safeID(modelId) ? modelId : "invalid-model-id"
     }
 
     func compiledModelURL(modelId: String, stemCount: Int) -> URL {
@@ -68,7 +72,34 @@ final class LocalStemEngine {
     func compiledModelURL(stemCount: Int) -> URL { compiledModelURL(modelId: "demucs", stemCount: stemCount) }
 
     func isModelInstalled(modelId: String, stemCount: Int) -> Bool {
+        LocalModelRights.safeID(modelId) && Self.supports(stemCount: stemCount) &&
+        rights.hasReviewedReceipt(modelID: modelId, stemCount: stemCount) &&
         fm.fileExists(atPath: compiledModelURL(modelId: modelId, stemCount: stemCount).path)
+    }
+
+    func hasStoredModel(modelId: String, stemCount: Int) -> Bool {
+        LocalModelRights.safeID(modelId) && Self.supports(stemCount: stemCount) &&
+        fm.fileExists(atPath: compiledModelURL(modelId: modelId, stemCount: stemCount).path)
+    }
+
+    func reviewedSourceFingerprint(modelId: String, stemCount: Int) throws -> String {
+        try rights.review(modelID: modelId, stemCount: stemCount).sourceSHA256
+    }
+
+    func hasModelReview(modelId: String, stemCount: Int) -> Bool {
+        (try? reviewedSourceFingerprint(modelId: modelId, stemCount: stemCount)) != nil
+    }
+
+    func reviewedDownloadFingerprint(modelId: String, stemCount: Int) throws -> String {
+        let review = try rights.review(modelID: modelId, stemCount: stemCount)
+        guard review.sourceFormat == "mlmodel" else {
+            throw LocalModelRightsError.denied("this checkpoint requires the reviewed bundled compiled model")
+        }
+        return review.sourceSHA256
+    }
+
+    func hasDownloadReview(modelId: String, stemCount: Int) -> Bool {
+        (try? reviewedDownloadFingerprint(modelId: modelId, stemCount: stemCount)) != nil
     }
 
     func isModelInstalled(stemCount: Int) -> Bool {
@@ -78,7 +109,8 @@ final class LocalStemEngine {
     private func fingerprintKey(modelId: String, stemCount: Int) -> String { "mta.demucs.coreml.sha256.\(safeModelId(modelId)).\(stemCount)" }
 
     func modelFingerprint(modelId: String, stemCount: Int) -> String {
-        UserDefaults.standard.string(forKey: fingerprintKey(modelId: modelId, stemCount: stemCount)) ?? ""
+        guard isModelInstalled(modelId: modelId, stemCount: stemCount) else { return "" }
+        return (try? reviewedSourceFingerprint(modelId: modelId, stemCount: stemCount)) ?? ""
     }
 
     func modelFingerprint(stemCount: Int) -> String { modelFingerprint(modelId: "demucs", stemCount: stemCount) }
@@ -87,29 +119,18 @@ final class LocalStemEngine {
         UserDefaults.standard.set(value, forKey: fingerprintKey(modelId: modelId, stemCount: stemCount))
     }
 
-    private func sha256(of url: URL) -> String {
-        guard let data = try? Data(contentsOf: url, options: .mappedIfSafe) else { return "" }
-        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-    }
-
     @discardableResult
     func installBundledDefaultModelIfNeeded() -> Bool {
         let stemCount = 4, modelId = "demucs-4"
+        guard hasModelReview(modelId: modelId, stemCount: stemCount) else { return false }
         if isModelInstalled(modelId: modelId, stemCount: stemCount) { return true }
         do {
             if let compiled = Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodelc", subdirectory: "Models") ?? Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodelc") {
-                let destination = compiledModelURL(modelId: modelId, stemCount: stemCount)
-                try? fm.removeItem(at: destination)
-                try fm.copyItem(at: compiled, to: destination)
-                setModelFingerprint("bundled-default", modelId: modelId, stemCount: stemCount)
+                try installReviewedModel(compiled, modelId: modelId, stemCount: stemCount, format: "mlmodelc")
                 return true
             }
             if let source = Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodel", subdirectory: "Models") ?? Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodel") {
-                let compiled = try MLModel.compileModel(at: source)
-                let destination = compiledModelURL(modelId: modelId, stemCount: stemCount)
-                try? fm.removeItem(at: destination)
-                try fm.copyItem(at: compiled, to: destination)
-                setModelFingerprint(sha256(of: source), modelId: modelId, stemCount: stemCount)
+                try installReviewedModel(source, modelId: modelId, stemCount: stemCount, format: "mlmodel")
                 return true
             }
         } catch { return false }
@@ -124,17 +145,24 @@ final class LocalStemEngine {
             guard let match = regex?.firstMatch(in: name, range: NSRange(name.startIndex..., in: name)),
                   let range = Range(match.range(at: 1), in: name),
                   let count = Int(name[range]), Self.supports(stemCount: count) else { return nil }
-            return count
+            let id = String(name.dropLast("-\(count).mlmodelc".count))
+            return isModelInstalled(modelId: id, stemCount: count) ? count : nil
         })).sorted()
     }
 
     func installedModelIds() -> [String] {
+        storedModelSelections().map { $0.id }.sorted()
+    }
+
+    func storedModelSelections() -> [(id: String, stemCount: Int)] {
         guard let entries = try? fm.contentsOfDirectory(at: modelsDirectory, includingPropertiesForKeys: nil) else { return [] }
         return entries.filter { $0.pathExtension == "mlmodelc" }.compactMap { url in
             let base = url.deletingPathExtension().lastPathComponent
-            guard let dash = base.lastIndex(of: "-") else { return nil }
-            return String(base[..<dash])
-        }.sorted()
+            guard let dash = base.lastIndex(of: "-"), let count = Int(base[base.index(after: dash)...]),
+                  Self.supports(stemCount: count) else { return nil }
+            let id = String(base[..<dash])
+            return LocalModelRights.safeID(id) ? (id: id, stemCount: count) : nil
+        }
     }
 
     func recommendedStemCount() -> Int {
@@ -160,12 +188,46 @@ final class LocalStemEngine {
     func cancel() { cancellationRequested = true }
 
     func installDownloadedModel(_ modelURL: URL, modelId: String, stemCount: Int, fingerprint: String = "") throws {
-        guard Self.supports(stemCount: stemCount) else { throw LocalStemError.unsupportedStemCount(stemCount) }
-        let compiled = try MLModel.compileModel(at: modelURL)
+        try installReviewedModel(modelURL, modelId: modelId, stemCount: stemCount, format: "mlmodel", fingerprint: fingerprint)
+    }
+
+    private func installReviewedModel(_ source: URL, modelId: String, stemCount: Int, format: String, fingerprint: String = "") throws {
+        _ = try rights.review(modelID: modelId, stemCount: stemCount)
+        guard modelLock.try() else { throw LocalModelRightsError.denied("model is in use") }
+        defer { modelLock.unlock() }
+        let stage = modelsDirectory.appendingPathComponent(".install-\(UUID().uuidString)", isDirectory: true)
+        try fm.createDirectory(at: stage, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+        let snapshot = stage.appendingPathComponent("source.\(format)")
+        let candidate = stage.appendingPathComponent("compiled.mlmodelc", isDirectory: true)
+        let backup = stage.appendingPathComponent("previous.mlmodelc", isDirectory: true)
         let destination = compiledModelURL(modelId: modelId, stemCount: stemCount)
-        try? fm.removeItem(at: destination)
-        try fm.copyItem(at: compiled, to: destination)
-        setModelFingerprint(fingerprint.isEmpty ? sha256(of: modelURL) : fingerprint, modelId: modelId, stemCount: stemCount)
+        var movedOld = false, published = false
+        // Preserve an old model in the private stage if an OS rollback fails.
+        defer { if !fm.fileExists(atPath: backup.path) { try? fm.removeItem(at: stage) } }
+        try fm.copyItem(at: source, to: snapshot)
+        let ticket = try rights.beginInstallation(source: snapshot, modelID: modelId, stemCount: stemCount,
+                                                 format: format, advertisedFingerprint: fingerprint)
+        if format == "mlmodelc" { try fm.copyItem(at: snapshot, to: candidate) }
+        else {
+            let compiled = try MLModel.compileModel(at: snapshot)
+            defer { try? fm.removeItem(at: compiled) }
+            try fm.copyItem(at: compiled, to: candidate)
+        }
+        try rights.finishInstallation(ticket, compiled: candidate, publish: {
+            if self.fm.fileExists(atPath: destination.path) {
+                try self.fm.moveItem(at: destination, to: backup); movedOld = true
+            }
+            try self.fm.moveItem(at: candidate, to: destination); published = true
+        }, rollback: {
+            if published { try self.fm.removeItem(at: destination) }
+            if movedOld { try self.fm.moveItem(at: backup, to: destination) }
+        })
+        if movedOld { try? fm.removeItem(at: backup) }
+        setModelFingerprint(ticketFingerprint(modelId: modelId, stemCount: stemCount), modelId: modelId, stemCount: stemCount)
+    }
+
+    private func ticketFingerprint(modelId: String, stemCount: Int) -> String {
+        (try? reviewedSourceFingerprint(modelId: modelId, stemCount: stemCount)) ?? ""
     }
 
     func installDownloadedModel(_ modelURL: URL, stemCount: Int, fingerprint: String = "") throws {
@@ -173,13 +235,17 @@ final class LocalStemEngine {
     }
 
     func deleteInstalledModel(modelId: String, stemCount: Int) throws {
+        guard LocalModelRights.safeID(modelId), Self.supports(stemCount: stemCount) else { throw LocalStemError.modelContract("invalid model selection") }
+        guard modelLock.try() else { throw LocalModelRightsError.denied("model is in use") }
+        defer { modelLock.unlock() }
+        try rights.forget(modelID: modelId, stemCount: stemCount)
         let url = compiledModelURL(modelId: modelId, stemCount: stemCount)
         if fm.fileExists(atPath: url.path) { try fm.removeItem(at: url) }
         UserDefaults.standard.removeObject(forKey: fingerprintKey(modelId: modelId, stemCount: stemCount))
     }
 
     func deleteInstalledModel(stemCount: Int) throws {
-        for id in installedModelIds() where isModelInstalled(modelId: id, stemCount: stemCount) { try deleteInstalledModel(modelId: id, stemCount: stemCount) }
+        for id in installedModelIds() where hasStoredModel(modelId: id, stemCount: stemCount) { try deleteInstalledModel(modelId: id, stemCount: stemCount) }
     }
 
     func separate(
@@ -202,11 +268,15 @@ final class LocalStemEngine {
     }
 
     private func separateSync(inputURL: URL, modelId: String, stemCount: Int, progress: @escaping (Int, String) -> Void) throws -> [URL] {
+        modelLock.lock(); defer { modelLock.unlock() }
         guard Self.supports(stemCount: stemCount) else { throw LocalStemError.unsupportedStemCount(stemCount) }
+        _ = try rights.review(modelID: modelId, stemCount: stemCount)
         let modelURL = compiledModelURL(modelId: modelId, stemCount: stemCount)
         guard fm.fileExists(atPath: modelURL.path) else { throw LocalStemError.modelMissing(stemCount) }
 
+        let admission = try rights.authorizeInstalled(modelURL, modelID: modelId, stemCount: stemCount)
         progress(3, "Caricamento modello Core ML")
+        try rights.recheck(admission)
         let configuration = MLModelConfiguration()
         configuration.computeUnits = .all
         let model = try MLModel(contentsOf: modelURL, configuration: configuration)
@@ -276,7 +346,9 @@ final class LocalStemEngine {
                 }
 
                 let provider = try MLDictionaryFeatureProvider(dictionary: [inputName: input])
+                try rights.recheck(admission)
                 let prediction = try model.prediction(from: provider)
+                try rights.recheck(admission)
                 guard let output = prediction.featureValue(for: outputName)?.multiArrayValue else {
                     throw LocalStemError.modelContract("output '\(outputName)' assente")
                 }
@@ -327,12 +399,12 @@ final class LocalStemEngine {
                 let pct = 10 + Int(Double(chunkIndex + 1) / Double(chunkStarts.count) * 82.0)
                 progress(pct, "Separazione locale \(chunkIndex + 1)/\(chunkStarts.count)")
             }
+            progress(96, "Stem locali pronti")
+            try rights.recheck(admission)
         } catch {
             try? fm.removeItem(at: outputDirectory)
             throw error
         }
-
-        progress(96, "Stem locali pronti")
         return urls
     }
 

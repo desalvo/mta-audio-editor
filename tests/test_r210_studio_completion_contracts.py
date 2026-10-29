@@ -131,6 +131,8 @@ def test_conversion_real_pcm_io_and_exact_model_arguments(tmp_path,monkeypatch,k
     def inference(argv,**kwargs):
         assert Path(argv[1]).name==('seed_vc_runner.py' if kind=='seed-vc' else 'studio_offline_runner.py')
         assert kwargs['env']['HF_HUB_OFFLINE']=='1'
+        assert kwargs['env']['MTA_STUDIO_OFFLINE_KIND']==kind
+        assert kwargs['env']['MTA_STUDIO_CONVERSION_ASSET_ID']=='fixture'
         if kind=='seed-vc':
             assert argv[argv.index('--f0-condition')+1]=='True' and argv[argv.index('--length-adjust')+1]=='1.0'
             out=Path(argv[argv.index('--output')+1])/'converted.wav'
@@ -156,6 +158,8 @@ def test_conversion_failure_never_replaces_original_audio(tmp_path,monkeypatch):
 
 
 def test_transkun_contract_reads_actual_midi_velocity_and_sustain(tmp_path,monkeypatch):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'transkun-assets')
     import mido
     from app import transkun_adapter as tk
     value={'id':'piano','kind':'transkun','folder':tmp_path,'bindings':{'runtime_root':'runtime','checkpoint':'model.pt','config':'config.conf'},'files':{'model.pt':{'sha256':'a'*64},'config.conf':{'sha256':'b'*64}}}
@@ -202,6 +206,8 @@ def test_dynamic_curves_reach_f0_dynamics_and_neural_inputs():
 
 def test_offline_runner_blocks_python_network_downloads(tmp_path):
     import subprocess
-    script=tmp_path/'download.py';script.write_text("import socket\nsocket.create_connection(('example.com',443),timeout=1)\n")
-    result=subprocess.run([sys.executable,'app/studio_offline_runner.py',str(script)],capture_output=True,text=True)
+    from model_rights_fixtures import offline_singing_fixture
+    runtime,environment=offline_singing_fixture(tmp_path)
+    script=runtime/'scripts/infer.py';script.write_text("import socket\nsocket.create_connection(('example.com',443),timeout=1)\n")
+    result=subprocess.run([sys.executable,'app/studio_offline_runner.py',str(script)],env=environment,capture_output=True,text=True,timeout=10)
     assert result.returncode!=0 and 'inference is offline' in result.stderr

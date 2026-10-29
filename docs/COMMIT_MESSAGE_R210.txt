@@ -1,1 +1,1 @@
-Fix Stripe refund test fixtures for canonical paid history
+Close AI execution entry coverage and preserve cancellation metering

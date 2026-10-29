@@ -185,13 +185,16 @@ def safe_file(path,expected_digest):
 
 
 def run(request_path,output_path):
+    from app.model_license_policy import evaluate_singing_components
+    evaluate_singing_components()
+    environment={**os.environ,'MTA_STUDIO_OFFLINE_KIND':'diffsinger'}
     model_format=os.getenv('MTA_DIFFSINGER_FORMAT','native')
     if model_format=='openutau-onnx':
         python=safe_file(os.environ['MTA_DIFFSINGER_PYTHON'],os.environ['MTA_DIFFSINGER_PYTHON_SHA256'])
         subprocess.run([str(python),str(Path(__file__).with_name('studio_offline_runner.py')),
                         str(Path(__file__).with_name('diffsinger_onnx.py')),
                         '--request',str(request_path),'--output',str(output_path)],
-                       check=True,timeout=540,stdin=subprocess.DEVNULL)
+                       check=True,timeout=540,stdin=subprocess.DEVNULL,env=environment)
         return
     if model_format!='native':raise ValueError('Unsupported DiffSinger runtime format')
     root=Path(os.environ['MTA_DIFFSINGER_ROOT']).resolve(strict=True)
@@ -248,7 +251,7 @@ def run(request_path,output_path):
         tmp=Path(tmp);project=tmp/'singer.ds';project.write_text(json.dumps(ds))
         out=tmp/'render';out.mkdir()
         subprocess.run([str(python),str(Path(__file__).with_name('studio_offline_runner.py')),str(script),'acoustic',str(project),'--exp',exp,'--ckpt',checkpoint_match[1],'--out',str(out),'--title','singer'],
-                       cwd=root,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                       cwd=root,env=environment,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
                        timeout=540,check=True)
         files=list(out.glob('*.wav'))
         if len(files)!=1 or files[0].is_symlink() or not files[0].is_file():

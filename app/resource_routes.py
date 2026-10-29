@@ -317,6 +317,20 @@ def admin_cutover_preview(request: Request, target: str):
         raise HTTPException(409, 'Local-authority cutover prerequisites unavailable') from exc
 
 
+@router.get('/api/admin/service-regime/cutovers/preflight')
+def admin_cutover_preflight(request: Request, target: str, limit: int = 50, offset: int = 0):
+    actor = auth.require_admin(request)
+    from .regime_operator_preflight import read
+    from fastapi.responses import JSONResponse
+    try:
+        return JSONResponse(read(actor=int(actor['id']), target=target, limit=limit, offset=offset),
+                            headers={'Cache-Control': 'private, no-store', 'Pragma': 'no-cache'})
+    except ValueError as exc:
+        raise HTTPException(422, 'Invalid operator review target or page') from exc
+    except (FenceBlocked, sqlite3.DatabaseError, OSError) as exc:
+        raise HTTPException(409, 'Original operator review unavailable') from exc
+
+
 @router.get('/api/admin/service-regime/cutovers')
 def admin_cutover_history(request: Request, limit: int = 25, offset: int = 0):
     actor = auth.require_admin(request)
@@ -877,14 +891,33 @@ def merchant_history_detail(snapshot_id:str,request:Request,offset:int=0,limit:i
     return _merchant_history_response(lambda:details(actor['id'],snapshot_id,offset=offset,limit=limit))
 
 
+@router.get('/api/admin/paypal/merchant-history/{snapshot_id}/review')
+def merchant_history_review(snapshot_id:str,request:Request,offset:int=0,limit:int=50):
+    actor=auth.require_admin(request)
+    from .paypal_merchant_reconcile import review
+    return _merchant_history_response(lambda:review(actor['id'],snapshot_id,offset=offset,limit=limit))
+
+
+@router.post('/api/admin/paypal/merchant-history/{snapshot_id}/reconcile')
+def merchant_history_reconcile(snapshot_id:str,request:Request,body:dict):
+    actor=auth.require_admin(request)
+    if set(body)!={'observation_sha256','confirm'}:
+        raise HTTPException(422,'Exact observation and confirmation required')
+    from .paypal_merchant_reconcile import reconcile
+    return _merchant_history_response(lambda:reconcile(actor['id'],snapshot_id,**body))
+
+
 def _merchant_history_response(fn):
     from fastapi.responses import JSONResponse
+    import httpx
     try:
         return JSONResponse(call(fn),headers={'Cache-Control':'no-store','Pragma':'no-cache'})
     except PermissionError as exc:
         raise HTTPException(403,'Active administrator required') from exc
     except sqlite3.DatabaseError as exc:
         raise HTTPException(409,'Merchant history unavailable') from exc
+    except httpx.HTTPError:
+        raise HTTPException(409,'Merchant readback unavailable;original obligations retained') from None
 
 
 @router.get('/api/admin/service-regime/subscription-evidence')

@@ -1,0 +1,8 @@
+{
+  "baseline_archive_sha256": "e518810f084570f480181444fe284f6a0fb4a584ff018b337c4607b37dec2ab2",
+  "baseline_module_sha256": "3ba472dafe9f7bcef5cd6340a755ebb712e05aa9193a859b0824880dd830df1b",
+  "baseline_disabled_model_calls": 1,
+  "current_disabled_model_calls": 0,
+  "current_denial": "Model disabled pending license review: whisper. Contact the administrator; cost recovery alone does not grant permission.",
+  "scope": "Original function AST with unchanged argument helper and synthetic cached model. Actual policy file disabled Whisper. No neural runtime, provider or money action."
+}
