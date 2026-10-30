@@ -183,6 +183,63 @@ def test_read_snapshot_blocks_resume_until_pending_audit_has_finished(authority,
     else:assert len(results)==2 and results[1]['phase']=='open'
 
 
+def test_active_drain_poll_does_not_exclude_original_worker_database(authority,monkeypatch):
+    from contextlib import contextmanager
+    from app import regime_service_lease,service_drain_obligations
+    original_lease=regime_service_lease.lease
+    original_audit=service_drain_obligations.audit
+    audits=[]
+    # Observe acquisition, rather than replacing the actual flock protocol.
+    @contextmanager
+    def observed_lease(*,exclusive=False):
+        if exclusive:exclusive_calls.append(True)
+        with original_lease(exclusive=exclusive):yield
+    exclusive_calls=[]
+    monkeypatch.setattr(regime_service_lease,'lease',observed_lease)
+    def audit():
+        audits.append(True)
+        return original_audit()
+    monkeypatch.setattr(service_drain_obligations,'audit',audit)
+    with gate.operation('original-worker'):
+        held=change(authority)
+        assert not held['drained'] and held['active_count']==1
+        assert not exclusive_calls and not audits
+        assert not held['pending']['verified'] and held['pending']['count'] is None
+        with auth.db() as con:
+            assert con.execute('SELECT count(*) FROM users').fetchone()[0]
+        assert not status(authority)['drained']
+    assert status(authority)['drained']
+    assert exclusive_calls==[True] and audits==[True]
+
+
+def test_drain_observer_cannot_interrupt_an_admitted_database_entry(authority,monkeypatch):
+    from app import service_drain_obligations
+    original=service_drain_obligations.audit
+    entered=threading.Event();attempt=threading.Event();attempted=threading.Event()
+    errors=[];reads=[]
+    def worker():
+        entered.set()
+        try:
+            assert attempt.wait(4)
+            with gate.control(),auth.db() as con:reads.append(con.execute('SELECT count(*) FROM users').fetchone()[0])
+        except Exception as exc:errors.append(type(exc).__name__)
+        finally:attempted.set()
+    def audit():
+        # Force the database entry inside the observer's lease window. On
+        # the old code its exclusive flock rejects the original participant.
+        attempt.set();assert attempted.wait(4)
+        return original()
+    monkeypatch.setattr(service_drain_obligations,'audit',audit)
+    thread=gate.worker_thread(target=worker,name='original-database-entry')
+    thread.start();assert entered.wait(2)
+    try:
+        assert not change(authority)['drained']
+    finally:
+        attempt.set();thread.join(5)
+    assert not thread.is_alive() and not errors and reads
+    assert status(authority)['drained']
+
+
 @pytest.mark.parametrize('source',['scheduler','sampler'])
 def test_timer_entry_is_denied_before_any_work_when_barrier_held(authority,monkeypatch,source):
     from app import ai_billing_scheduler,ai_storage_sampler

@@ -1,0 +1,111 @@
+{
+  "schema": "mta-ci-observation-2",
+  "observed_date": "2026-10-30",
+  "run_id": 41125188767,
+  "attempt": 1,
+  "commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
+  "tree": "558c52e759b5b9dc72aa821e37779f260f29080c",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41125188767",
+  "quality": {
+    "job_id": 124301626818,
+    "passed": 7686,
+    "failed": 1,
+    "skipped": 50,
+    "warnings": 1028,
+    "seconds": 974.8,
+    "coverage_percent": 76.57,
+    "required_percent": 70,
+    "failure": "test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[arranger]"
+  },
+  "sast": {
+    "job_id": 124301626141,
+    "conclusion": "success"
+  },
+  "vst3_sdk": {
+    "job_id": 124301626537,
+    "conclusion": "success"
+  },
+  "jobs": [
+    {
+      "id": 124301626141,
+      "name": "SAST and dependency audit",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 124301626537,
+      "name": "VST3 SDK compile (Linux)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 124301626818,
+      "name": "Quality and unit tests",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 124311556105,
+      "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311556198,
+      "name": "Container production gate",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311556206,
+      "name": "iOS / iPadOS archive",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311556259,
+      "name": "Native macOS installer (${{ matrix.arch }})",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311556333,
+      "name": "Android APK / AAB",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311556402,
+      "name": "Build Windows Chordino runtime",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311556425,
+      "name": "Native Windows installer",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311557796,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311557816,
+      "name": "Publish Docker Hub image",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124311557942,
+      "name": "Publish rolling early-main packages",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "fix_remote_ci_executed": false
+}

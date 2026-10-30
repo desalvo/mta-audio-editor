@@ -1,0 +1,36 @@
+{
+  "schema": "mta-cumulative-preservation-1",
+  "parent": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
+  "parent_sha256": "ff2160c18cb0df512ce7eafa841d5256e7840c217b7c1b5f1142831ee945b8c0",
+  "original_entries": 5075,
+  "changed_original_paths": [
+    "app/service_admission.py",
+    "docs/DEVELOPMENT_COMPONENTS_R210.json",
+    "docs/DEVELOPMENT_HANDOFF_R210.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/RC_ACCEPTANCE_REPORT.md",
+    "docs/RC_EXECUTION_STRATEGY_R210.json",
+    "docs/RC_FINAL_WORK_QUEUE_R210.md",
+    "docs/security/AI_EXECUTION_REVIEW_R210.json",
+    "docs/security/APP_SECURITY_REVIEW_R210.json",
+    "docs/security/SERVICE_ADMISSION_REVIEW_R210.json",
+    "tests/test_r210_service_admission_acceptance.py"
+  ],
+  "new_paths": [
+    "docs/validation/r210/ci-41125/baseline.json",
+    "docs/validation/r210/ci-41125/diagnosis.log",
+    "docs/validation/r210/ci-41125/gates.log",
+    "docs/validation/r210/ci-41125/observation.json",
+    "docs/validation/r210/ci-41125/pytest-results.xml",
+    "docs/validation/r210/ci-41125/pytest.log",
+    "docs/validation/r210/ci-41125/race-repeats.json",
+    "docs/validation/r210/ci-41125/red.log",
+    "docs/validation/r210/ci-41125/remote-failure.log",
+    "docs/validation/r210/ci-41125/result.json",
+    "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
+    "docs/validation/r210/ci-41125/preservation.json"
+  ],
+  "removed_paths": [],
+  "all_other_original_bytes_and_zip_metadata_preserved": true,
+  "original_areas_and_progress_unchanged": true
+}

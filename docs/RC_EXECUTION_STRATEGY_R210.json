@@ -10,10 +10,10 @@
     "whole_macroareas_accepted": 1
   },
   "accepted_this_cycle": [],
-  "latest_handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
-  "latest_proof": "docs/validation/r210/ci-41104/result.json",
-  "code_resume_handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
-  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
+  "latest_handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
+  "latest_proof": "docs/validation/r210/ci-41125/result.json",
+  "code_resume_handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
+  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
   "remaining_original_criteria": [
     "A4",
     "A5",
@@ -378,7 +378,7 @@
     "Every user-facing status/final includes verified/42 and RC percent;promote only original fully satisfied criteria with linked evidence.",
     "If no criterion closes,report percent unchanged and what prevents closure;do not estimate full-product completion or remaining iteration counts."
   ],
-  "delivery": "Full CI41104 diagnostic hotfix cumulative after user commit2273dc4; original criteria unchanged.",
+  "delivery": "Full CI41125 drain observer cumulative afterd3b17b6;original RC criteria unchanged.",
   "guardrails": {
     "commit_deferred": true,
     "staging": false,
@@ -389,13 +389,13 @@
     "release_candidate": false,
     "general_transition_enabled": false
   },
-  "parent_code_archive_sha256": "19ea28833d50becf9f828f2cbdc6904defc77b9a07257b4a499c14c60aca1219",
+  "parent_code_archive_sha256": "ff2160c18cb0df512ce7eafa841d5256e7840c217b7c1b5f1142831ee945b8c0",
   "latest_functional_checkpoint": {
     "date": "2026-10-30",
-    "handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
-    "proof": "docs/validation/r210/ci-41104/result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
-    "base_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+    "handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41125/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
+    "base_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
@@ -403,6 +403,6 @@
     "commit_deferred": true,
     "release_candidate": false,
     "fix_remote_ci_executed": false,
-    "local_passed": 31
+    "local_distinct_passed": 114
   }
 }

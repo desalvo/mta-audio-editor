@@ -1,0 +1,65 @@
+{
+  "schema": "mta-ci-41125-drain-observer-fix-1",
+  "base_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
+  "cause": "Status inspect acquired exclusive service flock while original admissions were open, racing guardian registration and heartbeat shared database leases.",
+  "reproduction": "Original failure reproduced locally; instrumented stack resolves guardian register -> auth.db -> nonblocking shared flock rejected by active exclusive status audit. Two deterministic regressions fail on original source.",
+  "red": {
+    "failed": 2,
+    "passed": 0
+  },
+  "green": {
+    "distinct_passed": 114,
+    "failed": 0,
+    "skipped": 0,
+    "new_cases": 2,
+    "python": "3.12.14"
+  },
+  "repeat_checks": {
+    "fresh_process_runs": 10,
+    "cases_per_run": 4,
+    "passed_executions": 40,
+    "failed": 0,
+    "distinct_cases_already_in_114": true
+  },
+  "gates": {
+    "ruff": "passed",
+    "py_compile": "passed",
+    "bandit": {
+      "passed": true,
+      "sources": 308,
+      "findings": 168,
+      "high": 0,
+      "medium": 21,
+      "low": 147,
+      "new_finding_ids": 0,
+      "removed_finding_ids": 0
+    },
+    "execution_inventory": {
+      "passed": true,
+      "sources": 555,
+      "boundaries": 780
+    },
+    "service_inventory": {
+      "passed": true,
+      "sources": 308,
+      "sites": 173
+    },
+    "transport_inventory": {
+      "passed": true,
+      "sources": 21,
+      "sites": 30
+    }
+  },
+  "review_refresh": "Only app/service_admission.py digest refreshed in three source-bound reviews. One unchanged middleware AST boundary moved line492->499. No new boundary/disposition, checker, suppression or threshold.",
+  "semantics": "While active_count>0, pending remains explicitly unverified and drained false; no exclusive audit is attempted. With zero admissions retain original journal lock, exclusive lease, full obligation audit and build match before drained.",
+  "workflow_dependency_timeout_changes": false,
+  "original_admissions_expired_or_deleted": false,
+  "new_full_ci": false,
+  "remote_ci_dispatch": false,
+  "remote_fix_verified": false,
+  "accepted_criteria": 29,
+  "original_total": 42,
+  "percent": 69.0,
+  "criteria_promoted": [],
+  "commit_push_tag_release_or_provider_action": false
+}

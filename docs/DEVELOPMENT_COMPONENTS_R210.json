@@ -3,15 +3,15 @@
   "project": "MTA Audio Editor",
   "release": "0.3.0-r210",
   "updated_utc": "2026-10-30T17:59:54.036101+00:00",
-  "baseline_archive": "MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip",
-  "baseline_sha256": "19ea28833d50becf9f828f2cbdc6904defc77b9a07257b4a499c14c60aca1219",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
+  "baseline_sha256": "ff2160c18cb0df512ce7eafa841d5256e7840c217b7c1b5f1142831ee945b8c0",
   "git_baseline": {
     "repository": "https://github.com/desalvo/mta-audio-editor",
     "branch": "main",
-    "verified_head": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
-    "tree": "000302756c7651e5f5467bd7d67d828c6f53bf2f",
-    "matching_tracked_blobs": 4315,
-    "comparison": "docs/validation/r210/ci-41104/baseline.json"
+    "verified_head": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
+    "tree": "558c52e759b5b9dc72aa821e37779f260f29080c",
+    "matching_tracked_blobs": 4321,
+    "comparison": "docs/validation/r210/ci-41125/baseline.json"
   },
   "commit_deferred": true,
   "release_candidate": false,
@@ -988,10 +988,10 @@
   },
   "resume_checkpoint": {
     "date": "2026-10-30",
-    "handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
-    "proof": "docs/validation/r210/ci-41104/result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
-    "base_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+    "handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41125/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
+    "base_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
@@ -999,14 +999,14 @@
     "commit_deferred": true,
     "release_candidate": false,
     "fix_remote_ci_executed": false,
-    "local_passed": 31
+    "local_distinct_passed": 114
   },
   "latest_checkpoint": {
     "date": "2026-10-30",
-    "handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
-    "proof": "docs/validation/r210/ci-41104/result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
-    "base_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+    "handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41125/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
+    "base_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
@@ -1014,7 +1014,7 @@
     "commit_deferred": true,
     "release_candidate": false,
     "fix_remote_ci_executed": false,
-    "local_passed": 31
+    "local_distinct_passed": 114
   },
   "publication_recovery_checkpoint": {
     "handoff": "docs/TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md",
@@ -1023,9 +1023,9 @@
     "transition_enabled": false
   },
   "current_committed_baseline": {
-    "sha": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
-    "source": "User CI link, exact GitHub tree and 4315 matching tracked blobs.",
-    "pending_delta": "Windows-host-only Authenticode diagnostics, four regression cases and source review/status evidence."
+    "sha": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
+    "source": "User commit confirmation and all4321GitHub tracked blobs matching prior cumulative.",
+    "pending_delta": "Drain observer skips exclusive audit during original active admissions;two regressions,source-bound review/status evidence."
   },
   "work_organization": {
     "date": "2026-10-30",
@@ -1046,17 +1046,17 @@
     "active_workstream": "finance",
     "work_in_progress_limit": 1,
     "mandatory_status": "Always report RC percent and verified/42;29/42=69.0 until original criteria fully close.",
-    "delivery": "Full CI41104 cumulative based on committed CI41098 archive; original RC criteria unchanged.",
-    "uncommitted_scope": "Windows-host-only Authenticode diagnostics, four regression cases and source review/status evidence.",
+    "delivery": "Full CI41125 cumulative;prior Authenticode fix is committed atd3b17b6.",
+    "uncommitted_scope": "Drain observer skips exclusive audit during original active admissions;two regressions,source-bound review/status evidence.",
     "latest_concrete_blockers": "docs/validation/r210/legacy-collection-result.json"
   },
-  "latest_confirmed_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+  "latest_confirmed_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
   "latest_continuation": {
     "date": "2026-10-30",
-    "handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
-    "proof": "docs/validation/r210/ci-41104/result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
-    "base_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+    "handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41125/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
+    "base_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
@@ -1064,7 +1064,7 @@
     "commit_deferred": true,
     "release_candidate": false,
     "fix_remote_ci_executed": false,
-    "local_passed": 31
+    "local_distinct_passed": 114
   },
   "latest_confirmed_cutover_chromium": {
     "date": "2026-10-27",
@@ -1201,7 +1201,7 @@
     "new_delta_ci_executed": false,
     "release_candidate": false
   },
-  "next_commit_scope": "Run installed Authenticode diagnostics only on Windows",
+  "next_commit_scope": "Keep drain status polling from interrupting admitted workers",
   "legacy_execution_continuation": {
     "handoff": "docs/LEGACY_EXECUTION_BOUNDARIES_R210.md",
     "result": "docs/validation/r210/legacy-executor-result.json",
@@ -1248,141 +1248,113 @@
   "latest_observed_ci": {
     "schema": "mta-ci-observation-2",
     "observed_date": "2026-10-30",
-    "run_id": 41104088648,
-    "attempt": 2,
-    "commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
-    "tree": "000302756c7651e5f5467bd7d67d828c6f53bf2f",
-    "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41104088648/job/124272437758",
+    "run_id": 41125188767,
+    "attempt": 1,
+    "commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
+    "tree": "558c52e759b5b9dc72aa821e37779f260f29080c",
     "status": "completed",
     "conclusion": "failure",
-    "jobs": [
-      {
-        "id": 124272437373,
-        "name": "VST3 SDK compile (Linux)",
-        "status": "completed",
-        "conclusion": "success",
-        "run_attempt": 2
-      },
-      {
-        "id": 124272437758,
-        "name": "Quality and unit tests",
-        "status": "completed",
-        "conclusion": "failure",
-        "run_attempt": 2
-      },
-      {
-        "id": 124272437791,
-        "name": "SAST and dependency audit",
-        "status": "completed",
-        "conclusion": "success",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283583999,
-        "name": "iOS / iPadOS archive",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283584074,
-        "name": "Container production gate",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283584383,
-        "name": "Native macOS installer (${{ matrix.arch }})",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283584413,
-        "name": "Build Windows Chordino runtime",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283584570,
-        "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283584606,
-        "name": "Android APK / AAB",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283585038,
-        "name": "Native Windows installer",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283585237,
-        "name": "Publish desktop/mobile installers to GitHub Release",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283585614,
-        "name": "Publish Docker Hub image",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      },
-      {
-        "id": 124283585680,
-        "name": "Publish rolling early-main packages",
-        "status": "completed",
-        "conclusion": "skipped",
-        "run_attempt": 2
-      }
-    ],
+    "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41125188767",
     "quality": {
-      "job_id": 124272437758,
-      "conclusion": "failure",
-      "passed": 7682,
+      "job_id": 124301626818,
+      "passed": 7686,
       "failed": 1,
       "skipped": 50,
       "warnings": 1028,
-      "seconds": 983.52,
+      "seconds": 974.8,
       "coverage_percent": 76.57,
       "required_percent": 70,
-      "failure": "tests/test_r208_installed_diagnostics.py::test_windows_installed_executable_without_powershell",
-      "exception": "subprocess.TimeoutExpired after 25 seconds",
-      "python": "3.14.9"
+      "failure": "test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[arranger]"
     },
     "sast": {
-      "job_id": 124272437791,
-      "conclusion": "success",
-      "gitleaks": "no leaks found",
-      "trivy": "success"
-    },
-    "vst3_sdk": {
-      "job_id": 124272437373,
+      "job_id": 124301626141,
       "conclusion": "success"
     },
-    "earlier_attempt": {
-      "attempt": 1,
-      "quality_job_id": 124228662612,
-      "quality_conclusion": "success",
-      "sast_conclusion": "success",
-      "cancelled_jobs": [
-        "Native macOS installer (arm64)",
-        "iOS / iPadOS archive"
-      ]
+    "vst3_sdk": {
+      "job_id": 124301626537,
+      "conclusion": "success"
     },
-    "remote_fix_run": false
+    "jobs": [
+      {
+        "id": 124301626141,
+        "name": "SAST and dependency audit",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 124301626537,
+        "name": "VST3 SDK compile (Linux)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 124301626818,
+        "name": "Quality and unit tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "id": 124311556105,
+        "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311556198,
+        "name": "Container production gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311556206,
+        "name": "iOS / iPadOS archive",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311556259,
+        "name": "Native macOS installer (${{ matrix.arch }})",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311556333,
+        "name": "Android APK / AAB",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311556402,
+        "name": "Build Windows Chordino runtime",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311556425,
+        "name": "Native Windows installer",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311557796,
+        "name": "Publish desktop/mobile installers to GitHub Release",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311557816,
+        "name": "Publish Docker Hub image",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124311557942,
+        "name": "Publish rolling early-main packages",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ],
+    "fix_remote_ci_executed": false
   },
   "ci_refund_fixture_repair": {
     "proof": "docs/validation/r210/ci-5891082-result.json",
@@ -2015,5 +1987,85 @@
     "percent": 69.0,
     "promoted": [],
     "commit_push_tag_dispatch_or_provider_action": false
+  },
+  "previous_ci_41104_checkpoint": {
+    "date": "2026-10-30",
+    "handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41104/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
+    "base_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "criteria_promoted": [],
+    "commit_deferred": true,
+    "release_candidate": false,
+    "fix_remote_ci_executed": false,
+    "local_passed": 31
+  },
+  "ci_41125_drain_observer_fix": {
+    "schema": "mta-ci-41125-drain-observer-fix-1",
+    "base_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
+    "cause": "Status inspect acquired exclusive service flock while original admissions were open, racing guardian registration and heartbeat shared database leases.",
+    "reproduction": "Original failure reproduced locally; instrumented stack resolves guardian register -> auth.db -> nonblocking shared flock rejected by active exclusive status audit. Two deterministic regressions fail on original source.",
+    "red": {
+      "failed": 2,
+      "passed": 0
+    },
+    "green": {
+      "distinct_passed": 114,
+      "failed": 0,
+      "skipped": 0,
+      "new_cases": 2,
+      "python": "3.12.14"
+    },
+    "repeat_checks": {
+      "fresh_process_runs": 10,
+      "cases_per_run": 4,
+      "passed_executions": 40,
+      "failed": 0,
+      "distinct_cases_already_in_114": true
+    },
+    "gates": {
+      "ruff": "passed",
+      "py_compile": "passed",
+      "bandit": {
+        "passed": true,
+        "sources": 308,
+        "findings": 168,
+        "high": 0,
+        "medium": 21,
+        "low": 147,
+        "new_finding_ids": 0,
+        "removed_finding_ids": 0
+      },
+      "execution_inventory": {
+        "passed": true,
+        "sources": 555,
+        "boundaries": 780
+      },
+      "service_inventory": {
+        "passed": true,
+        "sources": 308,
+        "sites": 173
+      },
+      "transport_inventory": {
+        "passed": true,
+        "sources": 21,
+        "sites": 30
+      }
+    },
+    "review_refresh": "Only app/service_admission.py digest refreshed in three source-bound reviews. One unchanged middleware AST boundary moved line492->499. No new boundary/disposition, checker, suppression or threshold.",
+    "semantics": "While active_count>0, pending remains explicitly unverified and drained false; no exclusive audit is attempted. With zero admissions retain original journal lock, exclusive lease, full obligation audit and build match before drained.",
+    "workflow_dependency_timeout_changes": false,
+    "original_admissions_expired_or_deleted": false,
+    "new_full_ci": false,
+    "remote_ci_dispatch": false,
+    "remote_fix_verified": false,
+    "accepted_criteria": 29,
+    "original_total": 42,
+    "percent": 69.0,
+    "criteria_promoted": [],
+    "commit_push_tag_release_or_provider_action": false
   }
 }

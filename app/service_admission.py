@@ -351,10 +351,17 @@ def inspect(*, actor):
         state = dict(con.execute('SELECT generation,phase,drain_id,build AS pinned_build FROM state WHERE singleton=1').fetchone())
         counts = {r[0]:r[1] for r in con.execute("SELECT source,COUNT(*) FROM admissions WHERE state='open' GROUP BY source")}
         history = [dict(r) for r in con.execute('SELECT drain_id,action,actor,generation,created FROM events ORDER BY seq DESC LIMIT 100')]
-        try:
-            with control(), lease(exclusive=True): pending = audit()
-        except FenceBlocked:
-            pending = {'verified':False,'count':None,'reasons':['service_activity_or_cutover_lease']}
+        if counts:
+            # Original workers still need shared database leases to heartbeat,
+            # register their guardian and settle. A status poll must not take
+            # an exclusive lease away from them. Their admissions already
+            # prove the service is not drained; audit only after they close.
+            pending = {'verified':False,'count':None,'reasons':['active_admissions']}
+        else:
+            try:
+                with control(), lease(exclusive=True): pending = audit()
+            except FenceBlocked:
+                pending = {'verified':False,'count':None,'reasons':['service_activity_or_cutover_lease']}
         return {**state,'enabled':True,'current_build':build(),'build_matches':state['pinned_build']==build(),
                 'active_by_source':counts,'active_count':sum(counts.values()),
                 'pending':pending,'drained':state['phase']=='draining' and state['pinned_build']==build() and not counts and pending['verified'] and not pending['count'],

@@ -1,3 +1,13 @@
+## Checkpoint corrente — CI41125188767: drain senza interferenze — 30 ottobre 2026
+
+**RC69,0% (29/42),invariata;nessun criterio promosso.** Baseline utente **d3b17b6ebed8e512e5d6edb043b2a9f336d2b597**,4321blob verificati identici prima del fix. Leggere **CI_41125_DRAIN_OBSERVER_FIX_R210.md** e `validation/r210/ci-41125/result.json`.
+
+SAST e VST3 SDK riusciti;Quality7686pass/1fallimento/50skip,copertura76,57%. Causa riprodotta:lo snapshot drain prendeva flock esclusivo durante lavoro originale,respingeva guardian/heartbeat al database. Ora con ammissioni attive restituisce pending non verificato e drainedfalse;solo dopo tutte le chiusure esegue l'audit esclusivo originale.114test distinti passano,0skip,2nuove regressioni rosse sull'originale;10processi/40ripetizioni riuscite. Ruff/compilazione/Bandit/treinventari passano,nessun nuovo finding o checker/soglia cambiato. Nuova CI remota ancora da confermare.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip**. Solo questo fix/test/revisione/stato segue il commitd3b17b6;il precedente Authenticode è già committato. Commit suggerito:`Keep drain status polling from interrupting admitted workers`. Nessuna azione remota. Cronologia sotto superata dove incompatibile.
+
+---
+
 ## Checkpoint corrente — correzione diagnostica CI41104088648 — 30 ottobre 2026
 
 **RC69,0% (29/42),invariata;nessun criterio promosso.** Baseline utente **2273dc4f6a797a09ae2762b3545ed351c6111e74**,4315blob verificati identici prima del fix. Leggere **CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md** e `validation/r210/ci-41104/result.json`.

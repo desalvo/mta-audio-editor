@@ -1,0 +1,52 @@
+[
+  {
+    "run": 1,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.51s"
+  },
+  {
+    "run": 2,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.43s"
+  },
+  {
+    "run": 3,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.80s"
+  },
+  {
+    "run": 4,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 4.93s"
+  },
+  {
+    "run": 5,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 4.00s"
+  },
+  {
+    "run": 6,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.70s"
+  },
+  {
+    "run": 7,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.70s"
+  },
+  {
+    "run": 8,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.58s"
+  },
+  {
+    "run": 9,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.28s"
+  },
+  {
+    "run": 10,
+    "exit_code": 0,
+    "summary": "4 passed, 29 deselected, 1 warning in 3.13s"
+  }
+]
