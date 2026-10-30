@@ -1,0 +1,45 @@
+{
+  "schema": "mta-ci-41104-fix-1",
+  "base_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+  "original_regression": {
+    "failed": 2,
+    "passed": 6
+  },
+  "fixed_regression": {
+    "passed": 31,
+    "failed": 0,
+    "skipped": 0,
+    "new_cases": 4,
+    "python": "3.12"
+  },
+  "ruff": "passed",
+  "py_compile": "passed",
+  "inventories": {
+    "execution": {
+      "sources": 555,
+      "boundaries": 780,
+      "passed": true
+    },
+    "service_admission": {
+      "sources": 308,
+      "sites": 173,
+      "passed": true
+    },
+    "remote_transport": {
+      "sources": 21,
+      "sites": 30,
+      "passed": true
+    }
+  },
+  "review_delta": "Only installed_diagnostics source digest and its existing operator_diagnostic rationale/evidence refreshed. No boundary, checker or threshold changed.",
+  "application_source_changed": false,
+  "workflows_changed": false,
+  "dependencies_changed": false,
+  "new_full_ci": false,
+  "real_windows_authenticode_executed": false,
+  "accepted_criteria": 29,
+  "total_criteria": 42,
+  "percent": 69.0,
+  "promoted": [],
+  "commit_push_tag_dispatch_or_provider_action": false
+}

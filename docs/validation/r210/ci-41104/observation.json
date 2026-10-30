@@ -1,0 +1,139 @@
+{
+  "schema": "mta-ci-observation-2",
+  "observed_date": "2026-10-30",
+  "run_id": 41104088648,
+  "attempt": 2,
+  "commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
+  "tree": "000302756c7651e5f5467bd7d67d828c6f53bf2f",
+  "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41104088648/job/124272437758",
+  "status": "completed",
+  "conclusion": "failure",
+  "jobs": [
+    {
+      "id": 124272437373,
+      "name": "VST3 SDK compile (Linux)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 2
+    },
+    {
+      "id": 124272437758,
+      "name": "Quality and unit tests",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_attempt": 2
+    },
+    {
+      "id": 124272437791,
+      "name": "SAST and dependency audit",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283583999,
+      "name": "iOS / iPadOS archive",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283584074,
+      "name": "Container production gate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283584383,
+      "name": "Native macOS installer (${{ matrix.arch }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283584413,
+      "name": "Build Windows Chordino runtime",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283584570,
+      "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283584606,
+      "name": "Android APK / AAB",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283585038,
+      "name": "Native Windows installer",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283585237,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283585614,
+      "name": "Publish Docker Hub image",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    },
+    {
+      "id": 124283585680,
+      "name": "Publish rolling early-main packages",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 2
+    }
+  ],
+  "quality": {
+    "job_id": 124272437758,
+    "conclusion": "failure",
+    "passed": 7682,
+    "failed": 1,
+    "skipped": 50,
+    "warnings": 1028,
+    "seconds": 983.52,
+    "coverage_percent": 76.57,
+    "required_percent": 70,
+    "failure": "tests/test_r208_installed_diagnostics.py::test_windows_installed_executable_without_powershell",
+    "exception": "subprocess.TimeoutExpired after 25 seconds",
+    "python": "3.14.9"
+  },
+  "sast": {
+    "job_id": 124272437791,
+    "conclusion": "success",
+    "gitleaks": "no leaks found",
+    "trivy": "success"
+  },
+  "vst3_sdk": {
+    "job_id": 124272437373,
+    "conclusion": "success"
+  },
+  "earlier_attempt": {
+    "attempt": 1,
+    "quality_job_id": 124228662612,
+    "quality_conclusion": "success",
+    "sast_conclusion": "success",
+    "cancelled_jobs": [
+      "Native macOS installer (arm64)",
+      "iOS / iPadOS archive"
+    ]
+  },
+  "remote_fix_run": false
+}

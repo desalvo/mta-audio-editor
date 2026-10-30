@@ -75,6 +75,11 @@ def inspect_windows(results,target):
         return
     check(results,'native_application','PASS',str(exe))
     check(results,'executable_signature','PASS' if exe.stat().st_size>4096 else 'FAIL',f'size={exe.stat().st_size}')
+    # PowerShell is also available on Unix, where Windows Authenticode is
+    # unsupported. Cross-host inspection must not start that native probe.
+    if platform.system() != 'Windows':
+        check(results,'authenticode','SKIP','Requires a Windows host')
+        return
     if shutil.which('powershell') or shutil.which('pwsh'):
         shell=shutil.which('pwsh') or shutil.which('powershell')
         # Explicit static script; user-controlled path travels as an environment variable.

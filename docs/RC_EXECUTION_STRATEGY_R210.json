@@ -10,10 +10,10 @@
     "whole_macroareas_accepted": 1
   },
   "accepted_this_cycle": [],
-  "latest_handoff": "docs/CI_41098_GITLEAKS_FIX_R210.md",
-  "latest_proof": "docs/validation/r210/ci-41098-gitleaks/result.json",
-  "code_resume_handoff": "docs/ACE_OBSERVER_ISOLATION_R210.md",
-  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip",
+  "latest_handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
+  "latest_proof": "docs/validation/r210/ci-41104/result.json",
+  "code_resume_handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
+  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
   "remaining_original_criteria": [
     "A4",
     "A5",
@@ -378,7 +378,7 @@
     "Every user-facing status/final includes verified/42 and RC percent;promote only original fully satisfied criteria with linked evidence.",
     "If no criterion closes,report percent unchanged and what prevents closure;do not estimate full-product completion or remaining iteration counts."
   ],
-  "delivery": "Full CI41098 hotfix cumulative;prior user cumulative is now committed atd6ca286. New delta is scanner configuration/documentation only.",
+  "delivery": "Full CI41104 diagnostic hotfix cumulative after user commit2273dc4; original criteria unchanged.",
   "guardrails": {
     "commit_deferred": true,
     "staging": false,
@@ -389,22 +389,20 @@
     "release_candidate": false,
     "general_transition_enabled": false
   },
-  "parent_code_archive_sha256": "a7e29723435e4e106072c4951719d354c00d52edab3c448f07511667b867f3c5",
+  "parent_code_archive_sha256": "19ea28833d50becf9f828f2cbdc6904defc77b9a07257b4a499c14c60aca1219",
   "latest_functional_checkpoint": {
     "date": "2026-10-30",
-    "handoff": "docs/CI_41098_GITLEAKS_FIX_R210.md",
-    "proof": "docs/validation/r210/ci-41098-gitleaks/result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip",
-    "base_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+    "handoff": "docs/CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41104/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip",
+    "base_commit": "2273dc4f6a797a09ae2762b3545ed351c6111e74",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
     "criteria_promoted": [],
     "commit_deferred": true,
     "release_candidate": false,
-    "new_production_source_changes": false,
     "fix_remote_ci_executed": false,
-    "local_exact_digest_positive_checks": 3,
-    "negative_control_findings": 4
+    "local_passed": 31
   }
 }

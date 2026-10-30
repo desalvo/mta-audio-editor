@@ -6,6 +6,9 @@ import subprocess
 import sys
 import zipfile
 
+import pytest
+from scripts import installed_diagnostics_r208 as diagnostics
+
 ROOT=Path(__file__).resolve().parents[1]
 SCRIPT=ROOT/'scripts'/'installed_diagnostics_r208.py'
 
@@ -29,12 +32,53 @@ def test_linux_installed_executable(tmp_path):
     assert any(c['name']=='executable_access' and c['status']=='PASS' for c in report['checks'])
 
 
-def test_windows_installed_executable_without_powershell(tmp_path):
+def test_windows_installed_executable_without_powershell(tmp_path, monkeypatch):
+    monkeypatch.setenv('PATH', str(tmp_path/'empty-path'))
     exe=tmp_path/'MTA Audio Editor.exe'
     exe.write_bytes(b'MZ'+b'0'*8192)
     p,report=invoke(tmp_path,'windows','--app',exe)
     assert p.returncode==0
     assert any(c['name']=='executable_signature' and c['status']=='PASS' for c in report['checks'])
+
+
+@pytest.mark.skipif(sys.platform == 'win32', reason='Foreign-host CLI regression')
+@pytest.mark.parametrize('shell', ['pwsh', 'powershell'])
+def test_windows_inspection_does_not_run_foreign_host_powershell(tmp_path, monkeypatch, shell):
+    exe = tmp_path/'MTA Audio Editor.exe'
+    exe.write_bytes(b'MZ'+b'0'*8192)
+    marker = tmp_path/'shell-started'
+    command = tmp_path/shell
+    command.write_text('#!/bin/sh\n: > "'+str(marker)+'"\nexit 42\n')
+    command.chmod(0o755)
+    monkeypatch.setenv('PATH', str(tmp_path))
+    result, report = invoke(tmp_path, 'windows', '--app', exe)
+    assert result.returncode == 0
+    assert any(c['name'] == 'host_platform' and c['status'] == 'WARN' for c in report['checks'])
+    assert any(c['name'] == 'authenticode' and c['status'] == 'SKIP' for c in report['checks'])
+    assert not marker.exists()
+
+
+@pytest.mark.parametrize('response,status', [({'exit_code': 0, 'output': 'Valid\n'}, 'PASS'),
+                                           ({'error': 'TimeoutExpired'}, 'WARN')])
+def test_windows_host_retains_bounded_authenticode_check(tmp_path, monkeypatch, response, status):
+    exe = tmp_path/'MTA Audio Editor.exe'
+    exe.write_bytes(b'MZ'+b'0'*8192)
+    monkeypatch.setattr(diagnostics.platform, 'system', lambda: 'Windows')
+    monkeypatch.setattr(diagnostics.shutil, 'which', lambda name: 'pwsh' if name == 'pwsh' else None)
+    monkeypatch.setenv('MTA_DIAGNOSTIC_TARGET', 'original-value')
+    calls = []
+    def run(argv, timeout):
+        import os
+        calls.append((argv, timeout, os.environ['MTA_DIAGNOSTIC_TARGET']))
+        return response
+    monkeypatch.setattr(diagnostics, 'run_command', run)
+    checks = []
+    diagnostics.inspect_windows(checks, exe)
+    assert len(calls) == 1 and calls[0][1:] == (25, str(exe))
+    assert calls[0][0][:3] == ['pwsh', '-NoProfile', '-Command']
+    assert any(c['name'] == 'authenticode' and c['status'] == status for c in checks)
+    import os
+    assert os.environ['MTA_DIAGNOSTIC_TARGET'] == 'original-value'
 
 
 def test_macos_bundle_metadata(tmp_path):

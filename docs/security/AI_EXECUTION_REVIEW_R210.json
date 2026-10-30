@@ -495,7 +495,7 @@
     "scripts/install_studio_mrmt3.py": "sha256:1223fef71cd9a021a923c6cf3feea14feac2d4b09f6315c29897736351bd4330",
     "scripts/install_studio_yourmt3.py": "sha256:7bb2644eaf78e4820e3358682afbfe19c39bf72d16fdeee7daf607221832549b",
     "scripts/install_studio_yourmt3_ps.py": "sha256:5648bca5bf837a507fb6c044dea74f8215d23d8fd84d84098fb4491979adab32",
-    "scripts/installed_diagnostics_r208.py": "sha256:2965af4903711ecfcf047fa7d9858d9a5be270177b171a9cd810082ba5f5bf98",
+    "scripts/installed_diagnostics_r208.py": "sha256:06aacadc763ae1b3bc9490ea35b2432c77bbf2654d6f912e507d9dd29e6ccbb4",
     "scripts/k8s-wizard.py": "sha256:61866afe3ae8f4bab4466cd2970aeadd77df217d838280ac62025813dcc4fdf9",
     "scripts/license_gate.py": "sha256:d205669b8ec236ecec22111d262f63bfae4573f1744219f44f8647c9ae702e78",
     "scripts/manage_studio_assets.py": "sha256:68e14d1b83c30682447c1f322c7a47a9667572983f30009e783571927560ebef",
@@ -10962,10 +10962,11 @@
       "call": "subprocess.run",
       "shape_sha256": "fa11d9c7809424e8107e7daa81c61be29937745c4b4c750a15e6a6009d0ad2e4",
       "family": "operator_diagnostic",
-      "boundary": "Installation/build/self-test/benchmark is explicitly launched by the authenticated administrator/native owner or local operating-system operator. It cannot submit a user-selected executable via inference API and never supplies user-billable usage. Model/GPU diagnostic success is not original rights or target acceptance.",
+      "boundary": "Installation/build/self-test/benchmark is explicitly launched by the authenticated administrator/native owner or local operating-system operator. It cannot submit a user-selected executable via inference API and never supplies user-billable usage. Model/GPU diagnostic success is not original rights or target acceptance. Authenticode is Windows-host-only; foreign-host inspection skips it before PowerShell discovery. Windows retains bounded static-script execution and restores the target environment variable.",
       "evidence": [
         "docs/validation/r210/ci-4c3c73a-observation.json",
-        "tests/test_r210_global_ai_execution.py"
+        "tests/test_r210_global_ai_execution.py",
+        "tests/test_r208_installed_diagnostics.py"
       ]
     },
     {
