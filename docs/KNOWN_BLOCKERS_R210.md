@@ -1,3 +1,37 @@
+## Checkpoint corrente — riscossione legacy e prove originali — 30 ottobre 2026
+
+**RC69,0% (29/42),invariata:nessun criterio promosso;l'aumento richiesto non è ottenuto.** Leggere **LEGACY_SUBSCRIPTION_COLLECTION_R210.md** e `validation/r210/legacy-collection-result.json`. Rimborsi senza base originale registrati senza debiti ipotetici;riscossioni legacy preesistenti non verificate sospese prima del provider e dell'allocazione;account IT/EN e aggregati mostrano importi da verificare,revisione privata per proprietario. **779 casi distinti correnti passati,24 nuovi,10 skip Playwright;nessun nuovo collaudo Chromium/provider reale.** Ruff/sintassi/compilazione e quattro gate passano,senza nuovi finding o checker modificati.
+
+A5/C3 restano aperti per prove originali quota/surplus mancanti e migrazione completa non certificata;A4 mantiene anche software/storia/movimenti da completare.Coda operativa in RC_DELIVERY_PLAN_R210.md,senza ripetere i blocchi già verificati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip**,include ACE e la riorganizzazione;non riapplicare il vecchio patch. Tutti i delta da4014a1f restano non committati. Nessuna azione remota.
+
+---
+
+Cronologia precedente,superata dove incompatibile:
+
+## Stato corrente e nuovo ordine RC — 30 ottobre 2026
+
+**69,0% verso RC: 29/42 criteri originali verificati, 13 aperti, E completa (1/7). Nessuna promozione in questa riorganizzazione.** Leggere **RC_DELIVERY_PLAN_R210.md** e `RC_EXECUTION_STRATEGY_R210.json`: primo blocco A4/A5/C3, poi C5/D6; F4/F6 come coda indipendente, campagna target con prerequisiti espliciti. Un solo blocco funzionale; passare a un altro scenario quando manca una prova/ambiente preciso. Ogni resoconto deve riportare percentuale e verificati/42.
+
+Ultimo codice completo: **MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip**; delta documentale successivo, senza nuovo ZIP intermedio. Nessun codice/test/gate/criterio modificato o nuovo collaudo applicativo dichiarato. Tutti i delta da4014a1f restano non committati; nessuna azione remota. Prova del riordino: `validation/r210/rc-reorganization-result.json`. Le priorità e i numeri storici sotto sono superati dove incompatibili.
+
+---
+
+## Checkpoint corrente — B2 verificato con recupero indipendente — 30 ottobre 2026
+
+Leggere **INDEPENDENT_WORKER_RECOVERY_R210.md** e `validation/r210/independent-guardian-result.json`. **29/42 criteri originali verificati (69,0%), da28/42(66,7%);+B2,nessun testo/peso/denominatore modificato.E completa,PRE-RC.** Processo Linux indipendente per albero,subreaper/pidfd e prova kernel ECHILD;scope/claim originali prima del modello,cleanup dopo SIGKILL,CPU reale dell'albero e API amministrative di perdita senza misura inventata o riesecuzione.
+
+**628 casi distinti correnti passati,16nuovi,zero failure/error/skip correnti.** Include serverHTTP reale/token/SIGKILL/recupero originale in entrambi i regimi,vero FFmpeg e figli/nipoti setsid,drain durante cleanup,guardian perso con claim trattenuto e rifiuto di usare il solo client ACE per liberare il servizio esterno.Guardian/quiescenza non effettuano addebiti automatici;esterno ignoto resta sospeso.Cgroup configurati conservano il percorso precedente;nessun requisito di privilegi/cgroup simulato.
+
+Ruff completo e gate passano:307sorgenti app/168finding(0HIGH/21MED/147LOW),C2173,runtime554/780,HTTP30/21.Checker/soglie/soppressioni invariati;5 nuovi LOW revisionati.Nessuna nuova inferenza neurale,fullCI,prova OS/hardware/host remoti.Le prove sorgente-identiche precedenti restano conservate.
+
+Restano **A4,A5,A6,B6,C3,C5,C6,D6,F4,F5,F6,G5,G6**:8 implementazione/review e5 target.B2non richiede di ripetere un'altra campagna preparatoria;proseguire F4 su interpreti/runtime/checkpoint e finanza generale/legacy per C3/C5/D6.B6/F5/F6/G5/G6 mantengono i requisiti originali.Transizione finanziaria globale e RC restano bloccate.
+
+Baseline dichiarata4014a1f;delta restored-rights+adapter-identity+guardian non committato.Cumulativo:**MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip**;conservati4939percorsi/694log input.Nessun commit/staging/push/dispatchCI o intervento reale server/provider/modelli.Commit suggerito cumulativo:`Enforce model rights and recover crashed workers with independent Linux guardians`.Dopo il commit dell'utente verificare Quality/SAST standard;le16 nuove prove sono nella selezione unit ordinaria,senza nuovi opt-in.
+
+---
+
+## Cronologia precedente — superata dove incompatibile con il checkpoint corrente
+
 > Chromium follow-up: manual workflow **Optional merchant history Chromium**, input **merchant_history_chromium=true**;requires4 real passes/zero skips. See current handoff for exact dispatch/artifact procedure. No GitHub write or CI run was performed here.
 
 ## Current checkpoint — merchant-wide observations — 2026-10-25

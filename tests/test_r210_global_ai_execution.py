@@ -62,14 +62,14 @@ def test_orphan_remote_admission_does_not_block_fifo(isolated_queue,monkeypatch)
     assert queue.get('orphan')['state']=='interrupted'
 
 
-def test_operator_registry_supports_future_engine_and_rejects_bad_config(tmp_path,monkeypatch):
+def test_operator_registry_keeps_unsupported_future_engine_unavailable(tmp_path,monkeypatch):
     from app import ai_worker_registry as registry
     runner=tmp_path/'trusted.py';runner.write_text('');runner.chmod(0o700)
     config=tmp_path/'engines.json';monkeypatch.setenv('MTA_AI_ENGINE_REGISTRY_FILE',str(config))
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED','true')
     config.write_text(json.dumps([{'kind':'future-engine','executable':str(runner),'gpu_capable':True}]))
-    assert registry.resolve_worker('future-engine')==runner
-    assert registry.available_workers()['future-engine']
+    assert registry.resolve_worker('future-engine') is None
+    assert not registry.available_workers()['future-engine']
     config.write_text(json.dumps([{'kind':'future-engine','executable':['unsafe']}]))
     with pytest.raises(ValueError):registry.extensions()
 
@@ -103,7 +103,7 @@ def test_production_server_requires_authenticated_queue_identity(monkeypatch):
     with pytest.raises(ValueError,match='Authenticated'):server.identity()
 
 
-def test_authenticated_token_worker_uses_global_queue_and_owner_receipt(isolated_queue,tmp_path,monkeypatch):
+def test_authenticated_token_worker_uses_global_queue_and_owner_receipt(isolated_queue,tmp_path,monkeypatch,synthetic_worker_resolution):
     from app import ai_access,ai_billing,auth
     from app.ai_billing_routes import router
     from fastapi import FastAPI

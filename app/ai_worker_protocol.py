@@ -34,9 +34,11 @@ def configured_worker() -> Path | None:
     if not value or not Path(value).is_absolute():
         return None
     path = Path(value)
-    if path.is_symlink() or not path.is_file() or not os.access(path, os.X_OK):
+    internal_ace = path == Path(__file__).with_name('ace_step_http_worker.py').resolve()
+    if path.is_symlink() or not path.is_file() or (not internal_ace and not os.access(path, os.X_OK)):
         return None
-    return path
+    from .ai_adapter_identity import supported_worker
+    return path if supported_worker('ace-step', path) else None
 
 
 def worker_command(worker: Path) -> list[str]:
@@ -105,6 +107,16 @@ def _run_supervised_legacy_worker(command: list[str], directory: Path, timeout_s
     The legacy protocol does not provide trusted CPU/GPU usage and must not be
     promoted to a billable, metered inference execution merely by this runner.
     """
+    if sys.platform == 'linux':
+        from .ai_process_guard import run
+        try:
+            result = run(command, cwd=directory, timeout_seconds=timeout_seconds,
+                         cancel_check=cancel_event.is_set if cancel_event is not None else None, env=env)
+        except RuntimeError as exc:
+            raise WorkerUnavailable(str(exc)) from exc
+        if result.exit_code:
+            raise WorkerUnavailable('AI worker exited unsuccessfully or timed out')
+        return
     if cancel_event is not None and cancel_event.is_set():
         raise WorkerUnavailable('AI worker cancelled')
     try:
@@ -369,9 +381,9 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
             # Use the same bounded supervisor as registered jobs. The former
             # SIGTERM + blocking wait4 could hang forever on a worker ignoring
             # SIGTERM, preventing cancellation and leaving the queue occupied.
-            from .ai_metering_agent import run_metered_process
+            from .ai_metering_agent import run_supervised_process
             try:
-                result = run_metered_process(command, cwd=str(directory), timeout_seconds=timeout_seconds,
+                result = run_supervised_process(command, cwd=str(directory), timeout_seconds=timeout_seconds,
                     cancel_check=cancel_event.is_set if cancel_event is not None else None, env=environment)
             except RuntimeError as exc:
                 raise WorkerUnavailable(str(exc)) from exc

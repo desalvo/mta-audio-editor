@@ -254,7 +254,7 @@ def _run(command: list[str], *, cwd: Path, timeout: int = 1800) -> None:
 
 
 def extract_btc_hcqt(audio: Path) -> list[Chord]:
-    from .model_license_policy import evaluate_model
+    from .model_license_policy import evaluate_model,guarded_model_call
     evaluate_model('btc-hcqt')
     root = model_dir("btc-hcqt")
     if not engine_available("btc-hcqt"):
@@ -265,7 +265,7 @@ def extract_btc_hcqt(audio: Path) -> list[Chord]:
         manifest.write_text(json.dumps({"tracks": [{"id": "mta", "title": "MTA", "audioUrl": audio.resolve().as_uri()}]}), encoding="utf-8")
         out = td / "out"
         out.mkdir()
-        _run([sys.executable, "hcqt_eval.py", "btc_hcqt_beatlesft.pt", str(manifest), str(out)], cwd=root)
+        guarded_model_call('btc-hcqt',_run,[sys.executable, "hcqt_eval.py", "btc_hcqt_beatlesft.pt", str(manifest), str(out)], cwd=root)
         json_files = sorted(out.rglob("*.json"))
         for candidate in json_files:
             events = _json_to_events(candidate)
@@ -280,7 +280,7 @@ def extract_btc_hcqt(audio: Path) -> list[Chord]:
 
 
 def extract_chordformer(audio: Path) -> list[Chord]:
-    from .model_license_policy import evaluate_model
+    from .model_license_policy import evaluate_model,guarded_model_call
     evaluate_model('chordformer')
     root = model_dir("chordformer")
     if not engine_available("chordformer"):
@@ -289,7 +289,7 @@ def extract_chordformer(audio: Path) -> list[Chord]:
         output = Path(raw) / "chords.lab"
         # 'extended' enables the broad structural vocabulary included by the
         # upstream repository (root/triad/bass/7th/9th/11th/13th heads).
-        _run([sys.executable, "chord_recognition.py", str(audio.resolve()), str(output), "extended"], cwd=root)
+        guarded_model_call('chordformer',_run,[sys.executable, "chord_recognition.py", str(audio.resolve()), str(output), "extended"], cwd=root)
         events = _lab_to_events(output)
         if events:
             return events

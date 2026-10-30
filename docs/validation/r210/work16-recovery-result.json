@@ -1,0 +1,1014 @@
+{
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip",
+  "baseline_sha256": "5a4738d737e15fe2badda0b1b67a2a8307d45035bddbc291b8eed854c3b83524",
+  "last_user_confirmed_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "date": "2026-10-30",
+  "distinct_latest_passed": 245,
+  "new_cases": 52,
+  "latest_failures": 0,
+  "latest_skipped": 0,
+  "reports": {
+    "work16-isolated-final.xml": "f5112d615afff8324c9292f33edd2daf262f8795985a5e1d35a84ccdd972e52b",
+    "work16-guardian-final.xml": "ec213a47ad5189e6f553c223f9b0096b58f59bc52df89fa4d5214e92a11d25a6"
+  },
+  "cases": {
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-ace-step]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-arranger]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-basic-pitch]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-mr-mt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-transkun]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-yourmt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-backing-vocals]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-chords-ml]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-demucs]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-drumsep]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-markers]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-remix]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-sam-audio]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-singer-separation]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-vocal-harmony]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-vocal-synthesis]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-whisper]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-ace-step]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-arranger]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-basic-pitch]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-mr-mt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-transkun]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-yourmt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-backing-vocals]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-chords-ml]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-demucs]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-drumsep]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-markers]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-remix]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-sam-audio]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-singer-separation]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-vocal-harmony]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-vocal-synthesis]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-whisper]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[copy]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[symlink]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[hardlink]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[venv]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[relative]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_current_installation_interpreter_is_preserved": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_actual_token_api_cannot_launch_substituted_python_or_create_ledger[json]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_configured_interpreter_identity::test_actual_token_api_cannot_launch_substituted_python_or_create_ledger[upload]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_closed_intact_guardian_history_allows_two_way_cutover_and_replay": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[missing-receipt]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[bad-receipt]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[bad-scope]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[missing-journal]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[count]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[open-operation]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[uncertain-job]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[normal-leader-exit]": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[cancel]": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[callback-error]": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[timeout]": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_precancel_never_starts_a_worker_or_guard": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_actual_supervisor_sigkill_leaves_complete_kernel_receipt_and_original_claim": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_original_supervisor_cannot_forge_a_guardian_receipt": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_guard_never_signals_a_sibling_unrelated_to_its_job": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_short_lived_child_cpu_is_collected_even_without_proc_samples": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_empty_proc_samples_cannot_turn_a_live_child_into_quiescence": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_lost_guardian_is_not_replaced_by_a_pid_guess_or_fabricated_cpu": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_ace_external_service_cannot_be_cleared_with_only_a_local_tree_receipt": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_real_registered_ffmpeg_tree_settles_only_after_guardian_kernel_receipt": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution[COMMERCIAL]": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution[NON_COMMERCIAL]": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_independent_process_guard::test_guardian_can_finish_original_cleanup_during_drain_without_releasing_its_debt": {
+      "result": "passed",
+      "report": "work16-guardian-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[ace-step]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[arranger]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-basic-pitch]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-mr-mt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-transkun]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-yourmt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[backing-vocals]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[chords-ml]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[demucs]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[drumsep]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[markers]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[remix]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[sam-audio]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[singer-separation]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[vocal-harmony]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[vocal-synthesis]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[whisper]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[ace-step]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[arranger]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-basic-pitch]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-mr-mt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-transkun]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-yourmt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[backing-vocals]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[chords-ml]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[demucs]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[drumsep]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[markers]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[remix]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[sam-audio]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[singer-separation]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[vocal-harmony]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[vocal-synthesis]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[whisper]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[copy]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[symlink]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[parent-symlink]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[hardlink]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[opaque]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[ai_unified_adapter.py]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[ai_studio_adapter.py]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-basic-pitch]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-mr-mt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-transkun]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-yourmt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[vocal-harmony]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[vocal-synthesis]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[legacy]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[project]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[probe]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[none]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[entry]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[sibling]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[missing]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[link]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[parent]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_raw_ace_launcher_denial_has_no_cache_or_process_side_effect[False]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_raw_ace_launcher_denial_has_no_cache_or_process_side_effect[True]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_actual_raw_launcher_cli_cannot_bypass_with_download_consent": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_pinned_checkpoint_and_operator_policy_name_do_not_attest_generic_singer": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_direct_generic_singer_is_denied_before_score_or_output_access": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_generic_singer_executable_alone_cannot_advertise_synthesis": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-ace-step]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-arranger]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-basic-pitch]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-mr-mt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-transkun]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-yourmt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-backing-vocals]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-chords-ml]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-demucs]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-drumsep]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-markers]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-remix]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-sam-audio]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-singer-separation]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-vocal-harmony]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-vocal-synthesis]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-whisper]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-ace-step]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-arranger]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-basic-pitch]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-mr-mt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-transkun]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-yourmt3]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-backing-vocals]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-chords-ml]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-demucs]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-drumsep]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-markers]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-remix]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-sam-audio]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-singer-separation]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-vocal-harmony]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-vocal-synthesis]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-whisper]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_registration_commits_original_binding_without_exposing_token": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_live_or_unknown_supervisor_never_stopped[]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_live_or_unknown_supervisor_never_stopped[same]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_recovery_preserves_actual_contract_reservations_and_money": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_recursive_kernel_stop_persists_only_after_empty": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_failed_kernel_stop_keeps_financial_claim_and_no_false_receipt": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_uncertain_scope_blocks_every_financial_finalization[finish]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_uncertain_scope_blocks_every_financial_finalization[idempotent]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_uncertain_scope_blocks_every_financial_finalization[fence]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_original_owner_clean_exit_then_normal_billing_works": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_bootstrap_enters_before_exec_under_original_scope": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[dead]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[unknown]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[quiesced]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_recovery_receipt_blocks_delayed_spawn_even_if_supervisor_is_reused": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_bootstrap_join_and_recovery_cannot_cross_the_write_barrier": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_pagination_and_invalid_windows_are_explicit": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_original_supervisor_ownership_cannot_be_reused_by_new_process": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_missing_history_refuses_new_launch_before_any_effect": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_missing_proof_blocks_second_scope_even_if_one_is_quiescent": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_reused_supervisor_pid_proves_old_process_death_without_signaling_new_one": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_crash_before_audit_commit_retries_without_changing_money": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_real_supervisor_crash_after_durable_registration_before_spawn": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_changed_host_boot_namespace_cannot_reinterpret_scope[boot]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_changed_host_boot_namespace_cannot_reinterpret_scope[machine]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_changed_host_boot_namespace_cannot_reinterpret_scope[namespace]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_recreated_cgroup_inode_is_not_the_original_worker_scope": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_group_symlink_refused_without_signaling": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_non_kernel_directory_is_refused_even_with_similar_files": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_recovery_request_is_durable_idempotent_under_concurrency": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_lost_journal_schema_is_not_recreated[worker_cgroup_scopes]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_lost_journal_schema_is_not_recreated[worker_cgroup_receipts]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_tampered_binding_fails_closed[binding_json]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_tampered_binding_fails_closed[sha256]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_missing_counted_scope_does_not_look_quiescent": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_immutable_rows_and_scoped_retired_owner_erasure": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_foreign_owner_cannot_erase_worker_evidence": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_actual_admin_api_requires_auth_csrf_confirmation_and_hides_claim_token": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_registered_runner_commits_scope_before_spawn_and_cleanup_before_measurement[True]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_registered_runner_commits_scope_before_spawn_and_cleanup_before_measurement[False]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_durable_cgroup_recovery::test_metering_failure_with_unknown_cleanup_keeps_gpu_lease_and_claim": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_actual_two_way_cutover_keeps_original_drain_until_explicit_resume": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_open_service_cannot_preview_or_execute_old_confirmation": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_resume_and_new_drain_invalidate_unchanged_financial_preview": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_original_predrain_ticket_blocks_cutover_even_without_financial_work": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_committed_crash_cannot_resume_and_only_original_forward_recovery_clears_it": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-journal]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-instance]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[build]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[event]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[active]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[schema]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_removed_configuration_cannot_bypass_persisted_drain": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_financial_history_is_still_blocked_after_successful_service_drain": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_held_original_reservation_requires_abort_before_service_resume": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_forward_recovery_cannot_waive_an_unrelated_unfinished_publication": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_actual_process_sigkill_releases_os_locks_but_preserves_original_drain_and_cutover": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_cutover_service_drain::test_resume_waits_until_financial_commit_mirror_and_finalization_release_original_guard": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[False]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[True]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[provider]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[history]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[credit]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[priced-plan]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[missing-schema]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unknown-journal]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unprefixed-legacy-schema]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[running-job]": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_preview_staleness_auth_csrf_default_off_and_confirmation_are_not_bypassable": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_live_accounting_connection_blocks_exclusive_cutover": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_independent_process_lease_blocks_api_and_sigkill_releases_only_os_lock": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_changed_original_receipt_cannot_rebaseline_or_abort_committed_transition": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    },
+    "tests.test_r210_admin_cutover_e2e::test_forward_recovery_records_the_actual_second_administrator": {
+      "result": "passed",
+      "report": "work16-isolated-final.xml"
+    }
+  },
+  "earlier_intermittent_failure": {
+    "report": "work16-isolated-final.xml",
+    "case": "test_guardian_can_finish_original_cleanup_during_drain_without_releasing_its_debt",
+    "error": "sqlite3.OperationalError: no such table: worker_cgroup_receipts",
+    "followup": "Single case passed, then entire independent guardian file16/16 passed. Cause not established; retain diagnostics rather than claim it was fixed."
+  },
+  "recovery_limits": [
+    "Original unpackaged F4 code not available; this is a reconstruction of a subset, not byte-for-byte recovery.",
+    "Prior reported1697passed/9skipped not independently available and not reused as current evidence.",
+    "Explicit interpreter overrides guarded; automatic managed runtime imports, upstream roots and native dynamic libraries still require F4 work."
+  ],
+  "progress": {
+    "numerator": 29,
+    "denominator": 42,
+    "percent": 69.0,
+    "scope": "original RC acceptance criteria, not full product completion"
+  },
+  "release_candidate": false
+}

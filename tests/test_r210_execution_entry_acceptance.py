@@ -23,8 +23,8 @@ KINDS = sorted({
 
 
 @pytest.fixture
-def registered(env, tmp_path, monkeypatch):
-    """Real operator-selected process; no model/network/measurement doubles."""
+def registered(env, tmp_path, monkeypatch, synthetic_worker_resolution):
+    """Real generated process for ownership/metering; no model identity claim."""
     from app import ai_worker_registry, studio_catalog
     worker = tmp_path / 'owned_worker.py'
     marker = tmp_path / 'executions.jsonl'
@@ -211,7 +211,11 @@ def test_malformed_wav_never_creates_a_ledger_or_claim(env, registered):
 
 
 def test_unverifiable_process_tree_keeps_original_claim_without_publication(env, registered, monkeypatch):
-    monkeypatch.setattr(agent, '_descendants', lambda pid: {pid})
+    from dataclasses import replace
+    original = agent.run_supervised_process
+    def unverified(*args, **kwargs):
+        return replace(original(*args, **kwargs), isolated=False, tree_complete=False)
+    monkeypatch.setattr(agent, 'run_supervised_process', unverified)
     with pytest.raises(agent.WorkerUncertain, match='original owner retained'):
         agent.execute_registered_worker(env, 'markers', {})
     assert len(registered[1].read_text().splitlines()) == 1
@@ -251,19 +255,15 @@ def test_running_token_revocation_stops_actual_process_and_retains_measured_cpu(
 def test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes(env, registered, monkeypatch, transport, uncertainty):
     token = ai_access.issue(env, 'uncertain worker')
     if uncertainty == 'tree':
-        monkeypatch.setattr(agent, '_descendants', lambda pid: {pid})
+        from dataclasses import replace
+        original = agent.run_supervised_process
+        monkeypatch.setattr(agent, 'run_supervised_process', lambda *a, **kw: replace(original(*a, **kw), isolated=False, tree_complete=False))
     else:
-        run = agent.run_metered_process
+        run = agent.run_supervised_process
         def broken_probe(argv, **kwargs):
-            original = kwargs['cancel_check']
-            def probe():
-                if registered[1].exists(): raise RuntimeError('Measurement observer lost')
-                return original()
-            return run(argv, **{**kwargs, 'cancel_check': probe})
-        monkeypatch.setattr(agent, 'run_metered_process', broken_probe)
-        # Stay alive until the observer sees the actual dispatch marker.
-        registered[0].write_text('import pathlib,os,json,time\npathlib.Path(' + repr(str(registered[1]))
-            + ').write_text(json.dumps({"pid":os.getpid()})+"\\n")\nwhile True:sum(range(1000))\n')
+            run(argv, **kwargs)
+            raise agent.WorkerUncertain('Original guardian result channel lost')
+        monkeypatch.setattr(agent, 'run_supervised_process', broken_probe)
     key = 'pending-evidence-' + transport + '-' + uncertainty
     headers = {'Authorization': 'Bearer ' + token['token'], 'X-MTA-AI-Idempotency-Key': key}
     with api() as client:

@@ -137,7 +137,7 @@ def _run(client, journal, state):
     from .ai_model_attestation import authorize,verify_contract,VERIFIED_SCHEMA
     from .ai_worker_registry import resolve_worker, worker_python
     from .ai_worker_artifacts import package_artifacts, _verify_wav_bytes
-    from .ai_metering_agent import run_metered_process
+    from .ai_metering_agent import run_supervised_process
     from .ai_execution_policy import KEY
     decision,local_requirement = authorize(task['kind'], task['plan'])
     if asdict(decision) != task['policy']:
@@ -206,7 +206,7 @@ def _run(client, journal, state):
         state['phase'] = 'dispatched'
         state['task'] = {k: task[k] for k in ('job_id', 'instance', 'nonce')}
         _write(journal, state)
-        measurement = run_metered_process(command, cwd=folder, timeout_seconds=task['timeout'], cancel_check=heartbeat,
+        measurement = run_supervised_process(command, cwd=folder, timeout_seconds=task['timeout'], cancel_check=heartbeat,
             env={**os.environ,CONTEXT:protocol.encode(context(task)) if model_requirement else '',RECEIPT:str(directory/'model-receipt.json') if model_requirement else '', **{KEY:protocol.encode({'schema':'mta-execution-policy-1','kind':task['kind'],'decision':task['policy']})}, 'MTA_AI_PROGRESS_FILE': str(directory / 'progress.json'),
                  'MTA_AI_JOB_MAX_ARTIFACT_MIB': '16'})
         if not measurement.isolated:

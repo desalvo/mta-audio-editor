@@ -23,6 +23,8 @@ def test_live_inference(*, seconds: float = 5.0, timeout_seconds: int = 1200) ->
     """Generate an original synthetic input WAV and demand a decodable WAV output."""
     if not 1 <= seconds <= 15:
         raise ValueError('smoke input must last 1-15 seconds')
+    from .model_license_policy import evaluate_model
+    evaluate_model('ace-step')
     if configured_worker() is None:
         return {'attempted': False, 'verified': False, 'reason': 'worker_not_configured'}
     rate = 44100
@@ -44,12 +46,14 @@ def test_live_inference(*, seconds: float = 5.0, timeout_seconds: int = 1200) ->
         worker = configured_worker()
         output = Path(tmp) / 'generated.wav'
         try:
+            evaluate_model('ace-step')
             completed = subprocess.run(([sys.executable, str(worker)] if worker.suffix == '.py' else [str(worker)]) + ['--smoke-input', str(source), '--output', str(output)],
                 cwd=tmp, capture_output=True, timeout=timeout_seconds, check=False)
         except subprocess.TimeoutExpired:
             return {'attempted': True, 'verified': False, 'reason': 'timeout'}
         if completed.returncode != 0:
             return {'attempted': True, 'verified': False, 'reason': 'worker_smoke_failed'}
+        evaluate_model('ace-step')
         from .ai_worker_protocol import verify_preview_wav
         try:
             meta = verify_preview_wav(output)

@@ -73,7 +73,14 @@ def cli(authority, https, name, *, credential=None):
     config.chmod(0o600)
     env = {**os.environ, 'MTA_DATA_DIR': str(folder / 'worker-private-config'),
            'PYTHONPATH': str(Path(__file__).resolve().parents[1])}
-    args = [sys.executable, '-m', 'app.ai_pull_worker', '--config', str(config), '--state', str(folder / 'state')]
+    # Explicit dependency injection in this generated protocol test process.
+    # Synthetic WAV writers have no checkpoint and are not production plugins.
+    bootstrap = ('from pathlib import Path; import runpy; from app import ai_adapter_identity as identity; '
+                 'original=identity.supported_worker; root=Path(' + repr(str(authority[2])) + '); '
+                 'identity.supported_worker=lambda kind,path: '
+                 '(Path(path).is_file() and Path(path).resolve().is_relative_to(root.resolve())) or original(kind,path); '
+                 'runpy.run_module("app.ai_pull_worker",run_name="__main__")')
+    args = [sys.executable, '-c', bootstrap, '--config', str(config), '--state', str(folder / 'state')]
     return args, env, folder
 
 

@@ -4,7 +4,6 @@ Runtime source and tensor weights must be installed and integrity-checked by the
 operator recipe. This adapter never downloads or unpickles a checkpoint.
 """
 import hashlib
-import json
 import os
 from pathlib import Path
 import sys
@@ -31,23 +30,26 @@ def part_identity(drums,program):
     return f'GM {program+1}','gm-'+str(program),program
 
 
-def verified_runtime():
+def verified_runtime(*,full=True):
     path=Path(os.environ.get('MTA_STUDIO_YOURMT3_RUNTIME',''))
     if not path.is_absolute() or path.is_symlink():raise ValueError('Configure the installed YourMT3 runtime path')
     model,_,receipt_name=selected_variant()
     receipt=path/receipt_name
     if receipt.is_symlink() or receipt.stat().st_size>131072:raise ValueError('Unsafe YourMT3 runtime receipt')
-    value=json.loads(receipt.read_text())
+    from .transcription_source_contract import read_json, verify_sources
+    value=read_json(receipt)
     if value.get('model')!=model or value.get('commit')!='5e66c1ea173a8186e0d20432b841d3180cc015b5':raise ValueError('YourMT3 runtime identity mismatch')
     files=value.get('files',{})
     if not isinstance(files,dict) or not 100<=len(files)<=150:raise ValueError('Incomplete YourMT3 runtime manifest')
+    verify_sources(path, files, 'yourmt3', model=model)
     for name,digest in files.items():
         target=path/name
         if not isinstance(name,str) or Path(name).is_absolute() or not target.resolve().is_relative_to(path.resolve()) or target.is_symlink():raise ValueError('Unsafe runtime manifest path')
-        h=hashlib.sha256()
-        with target.open('rb') as stream:
-            for block in iter(lambda:stream.read(1024*1024),b''):h.update(block)
-        if h.hexdigest()!=digest:raise ValueError('YourMT3 runtime integrity mismatch: '+name)
+        if full:
+            h=hashlib.sha256()
+            with target.open('rb') as stream:
+                for block in iter(lambda:stream.read(1024*1024),b''):h.update(block)
+            if h.hexdigest()!=digest:raise ValueError('YourMT3 runtime integrity mismatch: '+name)
     return path
 
 
@@ -77,6 +79,25 @@ def transcribe(source,options):
 
 
 def _transcribe(source,options):
+    if not isinstance(options,dict) or set(options)-{'name','program'}:
+        raise ValueError('YourMT3 accepts name only; isolated-source Basic Pitch thresholds do not apply')
+    if 'program' in options:
+        raise ValueError('YourMT3 classifies instrument programs; remove the manual program override')
+    from .model_license_policy import evaluate_model
+    evaluate_model('yourmt3')
+    root=verified_runtime()
+    from .transcription_source_contract import read_json, imports
+    _,_,receipt_name=selected_variant()
+    files=read_json(root/receipt_name)['files']
+    with imports(root,files,'yourmt3','yourmt3'):
+        from .transcription_source_contract import tensor_loader
+        with tensor_loader(root,files,'yourmt3',selected_variant()[0]):
+            result=_transcribe_verified(source,options,root)
+        evaluate_model('yourmt3')
+        return result
+
+
+def _transcribe_verified(source,options,root):
     from .music_interchange import MusicResult,MusicPart
     from .models import MidiNote
     from .ai_studio_adapter import progress
@@ -87,7 +108,6 @@ def _transcribe(source,options):
     import soundfile as sf
     info=sf.info(str(source))
     if info.channels not in (1,2) or not 0<info.duration<=600 or info.samplerate>192000:raise ValueError('YourMT3 accepts mono/stereo regions up to 10 minutes and 192 kHz')
-    root=verified_runtime()
     model_id,experiment,_=selected_variant()
     os.environ.update({'WANDB_MODE':'disabled','WANDB_SILENT':'true','HF_HUB_OFFLINE':'1','TRANSFORMERS_OFFLINE':'1',
                        'HF_HUB_DISABLE_TELEMETRY':'1','OTEL_SDK_DISABLED':'true','DO_NOT_TRACK':'1'})
@@ -112,7 +132,8 @@ def _transcribe(source,options):
         for index in range(len(segments)):
             progress('transcribing',f'YourMT3 audio window {index+1}/{len(segments)}; decoding time varies')
             inputs=segments[index:index+1].to(device)
-            tokens,_=model.inference_file(bsz=1,audio_segments=inputs);batches.extend(tokens)
+            from .model_license_policy import guarded_model_call
+            tokens,_=guarded_model_call('yourmt3',model.inference_file,bsz=1,audio_segments=inputs);batches.extend(tokens)
     starts=[size*i/rate for i in range(len(segments))];voices=[]
     for channel in range(model.task_manager.num_decoding_channels):
         sequence=[arr[:,channel,:] for arr in batches]

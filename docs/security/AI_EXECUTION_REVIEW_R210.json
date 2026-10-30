@@ -14,10 +14,10 @@
     "app/ace_gpu_profiler.py": "sha256:7fbc1690578ca45088bf10c92d7fef13417d8fe4114644a017e6381db6388925",
     "app/ace_model_cache.py": "sha256:fb41e1be65741ed13761d5792d5f14f8a878afc469c7d3ad1ce1e9d5b079c3c2",
     "app/ace_profile_server.py": "sha256:92aa99c3ea428cdcacac103cbbc45223954a2ae08f5f088519b3732d8f24c93f",
-    "app/ace_step_desktop_manager.py": "sha256:e2d5e575febb9ec016251de4cc64683385c458f7254338ae6c398e593a474720",
+    "app/ace_step_desktop_manager.py": "sha256:0d62f1d60181e204838869e321daf860f958cfd47b3cd78501ee00008927b551",
     "app/ace_step_http_worker.py": "sha256:b3e453cb558843b7f79431a7130968842a0bfd03a602d0afae0018233b9835fe",
-    "app/ace_step_live_smoke.py": "sha256:53ac6d65d1401b3fa27dddce6f6b629dd91da71aa532f5c05990548eaf1d5d7d",
-    "app/ace_step_local.py": "sha256:66e766cdc71b64468773a600b478a5cbe2f0cfda09fe2484417d16965a1bd8a3",
+    "app/ace_step_live_smoke.py": "sha256:c829ab335f1d3fe6af6cda1bcda67529cff46392d448c26275dcce94addae0bc",
+    "app/ace_step_local.py": "sha256:6af9a076d429a7aea95cfee448f7a12051604732c62d7d1f48351a2074d1580c",
     "app/ace_step_readiness.py": "sha256:2e065faa004b6492573a2d98b9fbc060c3f81ceb54ac3c4a57e7ce5557a9fa27",
     "app/ace_task_control.py": "sha256:d41ce8f69d1470e2fd22ab008e8f7f3275c375d8881022f1469980e5277ffc24",
     "app/ace_task_progress.py": "sha256:dc94627cc3a1aba22cf86cc40d9f2c265607bed18660fd95a2cb0d2fb1337b69",
@@ -25,6 +25,7 @@
     "app/admin_dump_routes.py": "sha256:aecf5f7e83457dccf5db05d53d1fff5ef27458ff33dc6e6978627eee57824679",
     "app/admin_navigation.py": "sha256:1b559c7fef7a74168c4d2c169db4886213b9aaeb75f1812c813a72722df22970",
     "app/ai_access.py": "sha256:8ca028716c25ef3a677bf26f096868e65fc1793185f090acd3d26697051e9b35",
+    "app/ai_adapter_identity.py": "sha256:2556274ea29305b189e58b54c88b8d3955fa26cf258e03364f97b2eb2ab8f8ce",
     "app/ai_amd_smi_collector.py": "sha256:1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b",
     "app/ai_arranger.py": "sha256:4542cfa2668487c1ab309a5758aa593d37a8c18e60ee91b8a73e681047cabbc3",
     "app/ai_arranger_runtime.py": "sha256:c9da0bbbf3a8f795275646a5c599d9752a56b546e2ce5bbc89d37bc3019c64e6",
@@ -59,7 +60,7 @@
     "app/ai_job_queue.py": "sha256:1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
     "app/ai_job_views.py": "sha256:d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
     "app/ai_media_identity.py": "sha256:c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "sha256:17aa26e623a473b83f2b1c5c6696e284a5f42c54acc3b4626df0b48f5e04dfbc",
+    "app/ai_metering_agent.py": "sha256:65cc65a6a1251174440e4206bc1907befbdcb892a37c1fd9051e7200a761d19c",
     "app/ai_metering_bridge.py": "sha256:792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
     "app/ai_model_attestation.py": "sha256:640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "sha256:fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
@@ -70,13 +71,14 @@
     "app/ai_notifications.py": "sha256:c2645a42a7aa798d733a31927e01d13d52b13bec156fa4b6de6889ae725afa63",
     "app/ai_payload_limits.py": "sha256:4ed1c2ab2567005161245df0c55f411e8a36f02697fc5264dc8cc84ad857bc33",
     "app/ai_planning_sqlite.py": "sha256:8ffc8a2083b6f1c1d463ad1d881aed0ed1f24cc7aefd70b7e67971d0afaf8722",
-    "app/ai_profiled_backend.py": "sha256:5b8951e5cdbca3258db7f6a66082dc56a9ba6b7f0e19ed75463a3e85dd4b25e4",
+    "app/ai_process_guard.py": "sha256:cf995860913a81f79a02b988b306fc41df50108778af9b6138d4b0675dc4c5fd",
+    "app/ai_profiled_backend.py": "sha256:8b36bc7880804fdb6b1b3274b26a7d77e0b43f772c939f08990cdef76333ccde",
     "app/ai_project_lock.py": "sha256:98f68f2f60581a861f468a928339841a3aba250e155510752c1ecc08127289b1",
     "app/ai_proxmox_gpu_agent_client.py": "sha256:f0818b79fcca6561fb7f9863a0ccf9cd3bbcf0643314c9836946de9e8aa6e8b6",
     "app/ai_publish_outbox.py": "sha256:4bf5069c14559fefe768c00c829b2b30ed6ea932e68f8558113f7a85866d88bb",
     "app/ai_pull_coordinator.py": "sha256:7bb7816746393a44b44fcadb2fe7527aa7aed6c29b3e823c8453c311b1beb6ab",
     "app/ai_pull_routes.py": "sha256:f9bf4e9e1f0e3e92097399b4239a0f70ddfb14a4e17423a09e8d9c9965ca8452",
-    "app/ai_pull_worker.py": "sha256:d2ac8882117daa13884909d784c249e24d791ae15b4342909f73f31ca78c9d5d",
+    "app/ai_pull_worker.py": "sha256:619a63069a8c3073d71679c0732aa03d7337ce0d6672f2cb4dca8c28987fffc4",
     "app/ai_queue_admin.py": "sha256:19a02a2451a931722e4d28fbac21fb83f4f0483842b645e59bf46fe82250976d",
     "app/ai_queue_usage.py": "sha256:e03c04980049f3582055123e0236dc3679265acf13ab0db00af5b40302fd222b",
     "app/ai_recovered_stem_transaction.py": "sha256:5799a9f78b9ec07cedb9be2109d8b5d0fa02b996a6355623267a5c52c63b9be2",
@@ -87,7 +89,7 @@
     "app/ai_remote_transport.py": "sha256:21f727505bfe14d97ae80d80099f85e7fd1c1aab73f00f5c1f803eed4408e141",
     "app/ai_request_dedup.py": "sha256:a31b0bca32439ba887c3d0c87178442e49307e5117b150d3038e097419fcb4b2",
     "app/ai_result_cache.py": "sha256:44b24c96a4c30f4a43ff7ca1379af9651085363b47e4f6358be5e5aed453acf1",
-    "app/ai_server_execution.py": "sha256:b108e0318c2e23b7e6ae336c3f9a9ba3442b4a98044aee6e5522589d4d4c531c",
+    "app/ai_server_execution.py": "sha256:dcb911e336cac91ea670c5ad10fff5f5577c21c492a2edb01300ce5e77668ca1",
     "app/ai_storage_sampler.py": "sha256:03e700ce4fe6b799a75959ac4bfd4ce4185f06c0a8fc5e98718d2421a72168b6",
     "app/ai_studio_adapter.py": "sha256:62856cb1a67a669d56e9b875ef13890460db349a74c59cf36260b0c8684f9423",
     "app/ai_token_routes.py": "sha256:c437a893c2bbb76bdaf53e27b46ace1fb006a834c35469c272332fee26956177",
@@ -97,8 +99,8 @@
     "app/ai_upload_transaction.py": "sha256:2fbaf2ad0b181a20827f681c8fbe2f40bc076e3eef9e92cf1a3d748b13580ed5",
     "app/ai_usage_reporting.py": "sha256:6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
     "app/ai_worker_artifacts.py": "sha256:9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28",
-    "app/ai_worker_protocol.py": "sha256:963c626e5f4613e1f2ce79c5b5ba96305ff71f626b8d8dd0806d0912a09eb3d4",
-    "app/ai_worker_registry.py": "sha256:32704ece263e9003fb9af86d7e69ccf12ecf5c9161e4156a281b07d73aef7b30",
+    "app/ai_worker_protocol.py": "sha256:e5b691039b607a991844c3c811c59b6d0cf518686e90e9b231f4bf3566820cf0",
+    "app/ai_worker_registry.py": "sha256:92a13311444b82298b815ef41c51cf0c60d0c612f48c0b94c882f5e1e7e95b55",
     "app/audio_backend.py": "sha256:4d91382bcd6eb8e6c7792c52e440df2dd50a01db1cb31eeee4ebaf1835cc064c",
     "app/audio_capture.py": "sha256:3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a",
     "app/audio_engine.py": "sha256:1b7579278628d91bc9b019e101e30ff4462fe0a8ca6ec7334b5ec5af2d77040d",
@@ -108,7 +110,7 @@
     "app/bounce.py": "sha256:64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61",
     "app/checkout_reference_recovery.py": "sha256:1ac3a548b8a59c5c2301c0c5fb99f6502b6d737578756c83b7c6fcd3190a08e8",
     "app/checkout_terminal_outcomes.py": "sha256:3e5790f8fc7ac22002e04ba0b5f972e147cb141b63f3a9a4a49759dd01ed2eae",
-    "app/chord_ml.py": "sha256:86ba5a55507dd13bb80936ed610d3fe1eef20ec786fd765734733c3c66ff02af",
+    "app/chord_ml.py": "sha256:dad908b9b8d0f43b6bff995388e84a977e27f4753acfd80e7fb44c70c1e23f58",
     "app/chordino_runtime.py": "sha256:1f68de3b0d7c4b4a50f7b509941b4e55e5b31f788727e7b2f75ed0cc745b29c4",
     "app/codec.py": "sha256:a67fe5d5390db89c24bb4c7b5c1c52b68e066db098badfdd700695cba2919d4c",
     "app/configure_ace_gpu_profiler.py": "sha256:5a5554a196c01e12d9ad1812f9b8efc157a90832d7d674a02da89ed209b44967",
@@ -134,7 +136,7 @@
     "app/live_mixer.py": "sha256:c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291",
     "app/live_sources.py": "sha256:729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
     "app/main.py": "sha256:b42393500b23f15c14b7e8b3b1ce41d5875e01d9d904156d060c31f989e8b997",
-    "app/mega53_runtime.py": "sha256:bdbe09d28be536419f308dc8b448d5f1a552d9ce37168724ca19bbf013b35947",
+    "app/mega53_runtime.py": "sha256:14f862c31db8153972313411f38373de83d53ce2558f9e69c74a76cd88044c52",
     "app/metronome_grid.py": "sha256:65c3e06fd4215ac561a5cb085d0c92fada782a519331e76f861fd01124f0cf02",
     "app/midi.py": "sha256:bfc599a17318a7dfccd050ec430de588420df2f4fe6dded4fd8d7e69e82bad1c",
     "app/midi_devices.py": "sha256:dd19f0d76871b9d93d37f35a35d03c1f7b072892c851a6155497fd6ecc3d5284",
@@ -147,14 +149,14 @@
     "app/mlive_mp3.py": "sha256:d83e56a2142fed65fe0ad85053c18aa0af293186f271619b22bb3ca3b557fe31",
     "app/model_asset_admin.py": "sha256:d435e1bb234cb7b95de4fcbb1aa369f527505fa151c0334799407e0428f0009f",
     "app/model_asset_admin_routes.py": "sha256:82151d07e47b67087bc7694a71eb1812bfc32b454b573f84c44330a9e39fb29d",
-    "app/model_license_policy.py": "sha256:5348282dc65f64afe3a692a803bb0d90afcd19cf07138657a9517549a42165a0",
+    "app/model_license_policy.py": "sha256:bf59c12014850db763c47d703d72b33fb9ba7a001fd0661fa9d589f67b59d12c",
     "app/model_rights_dossiers.py": "sha256:2fb23833835874c23885c22dfb03cc22aa52748f4494f83c506d7e6c86783605",
     "app/model_selectors.py": "sha256:5af81aea974cc537ddb63ef5b4e2390b165e91dff789a6babca39bb95bc37b9a",
     "app/model_storage.py": "sha256:99a7c255f886ae7bf1cd6a9506455592f2efd0da9aaba8327a8940a916b1da6b",
     "app/model_updater.py": "sha256:2ceb9df25b17d70d46427bda86fc5a52a9adabe0587b6af944d469306d0ce977",
     "app/models.py": "sha256:662df5d8644d050ac61dd5367ec72b0a6dbc1fa8e5defcf78f07c15bdb2ee615",
     "app/mp3g.py": "sha256:8cf260e75c2fee4ab397008d9f5aa36186791002082f723da9673d28e75c6a3a",
-    "app/mrmt3_adapter.py": "sha256:f6817b71cd21089e1c8eb8cfd41389546a853bb28f836aecb53d5a823b9b258e",
+    "app/mrmt3_adapter.py": "sha256:9c8179fe122d3dfd000fd1c269b654ae45d55b2edd3894011d9016d7ec41bb83",
     "app/mrmt3_checkpoint.py": "sha256:1d22fa45ccdadbf2aec366f8457daf519d6de2c0362aadcae339b91486e6f305",
     "app/mrmt3_decode.py": "sha256:f23b8655b2cb7dafe947049870047e8d55eff5f8bf0a504d418a1e74aaafec26",
     "app/mta_reverse.py": "sha256:bf12e048a68b5ed8a8a92c50e7ff77a7fb270b134215ed00db0cb5b57991baab",
@@ -163,7 +165,7 @@
     "app/music_interchange.py": "sha256:e8b5a5d4468f88ddf6f330b2710ee2b0a14f1f503140207916579bb14a08c12b",
     "app/music_publication.py": "sha256:2ebd385691c6969e8c909e5083fe5e069fba4e56bc4ef292a1e02203675374cd",
     "app/music_reconciliation.py": "sha256:87c3775cfaa3672415222b3a93bb1424b540b752fce364741b4c531570e64aed",
-    "app/music_text.py": "sha256:705fc71f4d50fe66557ef95e29375003c3ccac5bf69ba46939280ee3872b6b44",
+    "app/music_text.py": "sha256:361dda626feec55bea6c528cbd683762969cb3912748983c3fe4a371ccc6aca6",
     "app/musical_clock.py": "sha256:0798fc9c58ebc36a0478fe36981d6963a53fd1755ad2ee9c264dd5b782a24557",
     "app/native_ai_account.py": "sha256:2883d422e7098469f7a9464d5652f26a7600288dfe29f448165e4cfc2fe60f63",
     "app/native_ai_routing.py": "sha256:3902bd322ad0b7563cf9c357e9889c1c6990dc35e8098476de813d317d667919",
@@ -172,7 +174,7 @@
     "app/native_dsp.py": "sha256:de96e9e6a81b9af61e83d10eb666e382235ea646b0e85bf5abaa60a11178d1ae",
     "app/native_midi.py": "sha256:250b4fd5d76c4947520ed787343d69dd0574ba939f7e0be28fb560ce047166e2",
     "app/native_transport.py": "sha256:5afb6d300825eb62aa949e8ee7cf79e8fddb1c6e7ae351a6eac6f8c50e5e95bb",
-    "app/neural_vocal_adapter.py": "sha256:2f1924a1938726cb03f5166886fc3448400756931df440fb1ff06b586c01804e",
+    "app/neural_vocal_adapter.py": "sha256:89ba88b79b30e90741ca9cb31d3befc3e20fc3b3dd41ee816d8de80525eb6810",
     "app/noncommercial_allocation.py": "sha256:f1c5fb384951b5442fbde94d14578b0caa3f0167b0079d8364ec6c6746e958df",
     "app/noncommercial_contributions.py": "sha256:936b65925764e6638d004a719ccfcf5180dd0adece4a1151d2add91e0c465d32",
     "app/noncommercial_period_guard.py": "sha256:ddad79e3d14ab96b62f44ca6b2bae769f3d1ff620796a726122891b7cbc1adaf",
@@ -182,12 +184,12 @@
     "app/optional_plugins.py": "sha256:9e00f0044bada305564ccf63c3d2949ba8b6299793cb2eee285d6b775cf505a1",
     "app/owner_payments.py": "sha256:8183773f0f13da9022e6111963e063d67ca96852e179b21d150de05948fd5331",
     "app/payment_reconcile_service.py": "sha256:359d631353e79ba12a9aac62ce4f4fe4febde72b35c4d8df67a67e6c5e1963e9",
-    "app/payment_reconciliation.py": "sha256:bf1dcbf57b3052685572f77e3f0fd702a55a47d65c74425539f09e4596b2b6e5",
+    "app/payment_reconciliation.py": "sha256:05ffdd8c833336218305f70f69e12770b1a72c89a11645e115b4ffafc3243196",
     "app/paypal_dispute_details.py": "sha256:e81dbc26dfddafa4b35b743be3d7a1ad3c272716be3eefd16d8e1e31821ca36a",
     "app/paypal_dispute_history.py": "sha256:4b1882fcd7f0b2f7598301206ed7f558d02180a5d1aca7a632a85590393c5306",
     "app/paypal_merchant_history.py": "sha256:6a64b4cc8998a3c855cfceb42ecec8d5f235d43504a069291678285f9cd1b293",
     "app/paypal_merchant_reconcile.py": "sha256:1dbde889203cded042e0760264418012ea1296b0cedec6104289dc656c611a5d",
-    "app/paypal_payments.py": "sha256:91b2aa0b4818ecd8c924424c939e917e109a2ef85d9753282026814426e0f17b",
+    "app/paypal_payments.py": "sha256:f76c37955a028c5f5e5bda3e9ba69b317db7da2df4ef12cf3c6a5c7c4620fd6c",
     "app/paypal_reconciliation.py": "sha256:23521a2ca55147063873bec9c5b829c0fa827b129c07fe04b74d5bd3f11e1dfc",
     "app/paypal_report_reconciliation.py": "sha256:bd7214c1ca515fb2602a8e2c68e529b9d3e1e8b6245c244d5b5cc1ec03b43766",
     "app/paypal_settlement_reports.py": "sha256:9aeff3f43ad10b61097ae8c17688c62bb699c94fec667bf6cc5cdf4590e4c8eb",
@@ -210,7 +212,7 @@
     "app/regime_financial_evidence.py": "sha256:039d56f0258a21b51c835dd2a2c2f577c4838cb55142aab0fbb8b674ebf58315",
     "app/regime_inbox_coverage.py": "sha256:edeb9db36433d2e39a1739302e71046521dd7fb930b361363afcdeb824d7dd5a",
     "app/regime_job_fence.py": "sha256:1ffda4238676db30f1912dfd37ebf6d052243ff8744e3720d0fe2a50069843de",
-    "app/regime_local_readiness.py": "sha256:276c5703725bf219d2762331ce8c28468b6d62f042777f4a8f751c98d39fee43",
+    "app/regime_local_readiness.py": "sha256:1a6bcbb25a98dce8711ac9f30be17de2a2a1346ebd92f93f621916a3500470e9",
     "app/regime_maintenance.py": "sha256:d21b237683307a88c5dfe2b9745989874ad04a5e0c111bba54e85edb809fbb46",
     "app/regime_operation_fence.py": "sha256:8b3f282dca97f2dfd76d219bb07db9d3f612a2f7b457826b7331f233e1822484",
     "app/regime_operator_preflight.py": "sha256:c2710003dbd04c837fa528946c7b8c3ff774b4906ecd62f0245f395a703eff20",
@@ -232,7 +234,7 @@
     "app/regime_worker_claims.py": "sha256:3132cadb943f3c8b53562a39af882b58adcc7e29c97ee7225c71a4531bfbcd8f",
     "app/regime_worker_completion.py": "sha256:4892ae71dce9005a74a373b08ae7926eade68aab4e99d834050e4176e697ba81",
     "app/resource_access.py": "sha256:84b77b08a5996deedd904075c9ae434e3be502276c18ad76341d4edeb352817f",
-    "app/resource_accounts.py": "sha256:2dc800e315afe726f9a9caef777a97f387ce04245de2755cacc21da3d3c662da",
+    "app/resource_accounts.py": "sha256:0770812c5ed8e6bb0573cbd5d6b34689198acbe3a49cf107c90f8e9daefc011f",
     "app/resource_contracts.py": "sha256:2391fc86d1a57f5441a3a0b34336782e02331a69d033150f0ed2e0f4fdec6343",
     "app/resource_entitlements.py": "sha256:eacd7fac7f0ae7d4c892bf6656e41f963e1db4d715cb7aeb6237fd761d3d7297",
     "app/resource_routes.py": "sha256:01da9980413a58cc13bb35e457f83e1e294eeb89d2c88b264b6e9e43992d3c53",
@@ -268,10 +270,10 @@
     "app/static/admin_dump.js": "sha256:52e0b2246c11d48420ea89ca8d2e71489cc0a5e84bf44fe4978f9344e8ee54cf",
     "app/static/admin_links.js": "sha256:8e1dd507f478503081b04c9e7f5a408e78134cbd859e62d00c295cf0c72e9568",
     "app/static/ai_jobs.js": "sha256:9f458e0714d882d63f3926a35a0a35d470c9d83d9e3b12ff5166ee3c2918a843",
-    "app/static/ai_studio.js": "sha256:99d653233fb56492e58caef1c3ccb4577d5e0868b4a4cc01d7f60a538cb5736f",
+    "app/static/ai_studio.js": "sha256:694262fee1455acfa4a6f3dc717d071d83c97f32084737a363a8bb28487b4bc0",
     "app/static/ai_tokens.js": "sha256:b8230165ed07196489bbe892829d7e0d760c61f23b08f80d454411626770e009",
     "app/static/ai_usage_panel.js": "sha256:36948517e3daed898ad776e2f7239f5f30faa59ae4493c6d46d5fe5c9b9b2ed6",
-    "app/static/app.js": "sha256:2bd36638528d10884d0ff3bdcd9028cda1f76391725cc934d218b1381f30b9fe",
+    "app/static/app.js": "sha256:ee0fc2c9f0adb0b68772a9f3a036533c8d129a777b95e157255c55c85fc30c2e",
     "app/static/audio_capture.js": "sha256:35bced64b929beb014dc96d37906200518959773365aa9e1c300cf258acb6328",
     "app/static/audio_capture_worklet.js": "sha256:9a7e53d96f016f7446f38f1545ba371049e31d5d65b858497b43f0a2ff70627d",
     "app/static/credit_notice.js": "sha256:a890accb63ab1b03570530c5ecfa067ed33c77261f1231352b2b5ab9ec813007",
@@ -308,7 +310,7 @@
     "app/static/server_vst3_editor.js": "sha256:2d4ffdb6cf7260c64cf58522ddb36be7fe49dda843c6ca1b2763cc2560a583e7",
     "app/static/service_drain_panel.js": "sha256:4f488c289f455329dc133f38d642f2b36deac04589bc202e3c611cdfc071536b",
     "app/static/studio_extended.js": "sha256:f213b86460587892675009b63fa05b5033643145b6f26dc6e7cf92f5abf3daa7",
-    "app/static/subscriptions.js": "sha256:95fe2ca1ee0408c4cddc1df33114ae4bbe5aa07df3bd0f72d466ec1513af8e23",
+    "app/static/subscriptions.js": "sha256:edc11e89cb80c1bf7d56e39b36da1407db9cd4094fc44f6eb5911d04ecc13ace",
     "app/static/timeline_rules.js": "sha256:a28080b2d310a171e26a1f30161b38e35ba1a9a0947481b5242efeda51863594",
     "app/static/user_preferences.js": "sha256:6a878b968106b96bd81c7c86c44ed009151d95c7a7f471dacb0a3b2e74a15433",
     "app/static/worker_loss_admin.js": "sha256:71986d0c229ff55a95988d165f450f8e561587d851d3cba5169cda9e1fe8bdc8",
@@ -321,9 +323,9 @@
     "app/studio_asset_registry.py": "sha256:38b5a865090bd157765f6534255a90afb169baf03c500f2f6cd42fff98e1559d",
     "app/studio_assets/yourmt3_t5_compat.py": "sha256:71a3617401c0af3f87affedc882efce2b8fd4dac7fa355b78b709659eb9fcd21",
     "app/studio_audio.py": "sha256:1711c4e0728abee69b841b44d5697df58aa8329514626dec62aaa86a8d6083e8",
-    "app/studio_catalog.py": "sha256:b856ef157392ef09710f12e7621569b693c63a4a9a511180c8380b3ebed978f2",
+    "app/studio_catalog.py": "sha256:8ad0c20808fdb82dc36824d4263aa44049423afd1eb04b0aacb40aa9fd5e087b",
     "app/studio_checkpoint.py": "sha256:cf11e27d4bbbceb26f384ed1b8b060aeb25c8da41da060d3452d0b12252beb6e",
-    "app/studio_compute.py": "sha256:79f4e4722a84c95eb8505033c9ec53abd44133bfd35023e111a768fc39cd98ce",
+    "app/studio_compute.py": "sha256:c88cc2dd6a6d4dccd5b2ebb7e45b39103466728bcf74cf4a0f02a592a63abbf0",
     "app/studio_jobs.py": "sha256:c178405eada5504d2909036ff166f09f92aad0129dd8fcd0cbc5a57853eb06bd",
     "app/studio_midi_benchmark.py": "sha256:1dda9eb9be209a6f3798f8b45eb3a3a254f76aa665bd47060f26ce46e5a03e8b",
     "app/studio_multitrack.py": "sha256:b423000390da122cdcf006e4c386d9c80b3bd8f7ef932ec8c953517523fdc3d3",
@@ -331,9 +333,10 @@
     "app/studio_parameters.py": "sha256:279b5d76516c67a8770d0d85fbbc1117b28b292a98835013a4f6688008bffac9",
     "app/studio_score.py": "sha256:b667d6e54287b3959b44d1b8cd2b8126505df396340aec2cd12a0839338f21b4",
     "app/studio_stage_cache.py": "sha256:4bde92832321b0494d3ce9be72e28d429a833692d993c61cf01f2da82603dea7",
-    "app/subscription_basis_audit.py": "sha256:48c20571e0bebee009a8fe4ddaa58d7d5b9d446af99aec35df1e85b91267e27a",
-    "app/subscription_receivables.py": "sha256:6d4027e9898365a39f859df7d21cdb739f9c6246185850f35494bde4d1f1f112",
+    "app/subscription_basis_audit.py": "sha256:0b30d3c945ad2774a49ab343239c4fc352eaf70976d0e409bf329edbe72ebb7e",
+    "app/subscription_receivables.py": "sha256:fa33c97517e0ce23d3895609b6763bebd9dde097a9f0c108eddb09984344b38b",
     "app/timeline_editing.py": "sha256:5bfbe968ba505ca7f393d4e8046ad94e7c6f05d1dbf108cc3909239ec95758a1",
+    "app/transcription_source_contract.py": "sha256:2f87dfd312a74b1922a47e86c0882513ea581a63033b581d9cb7547cd85a49f5",
     "app/transcription_timing.py": "sha256:b70274158cf7e9d5a8fcaf09957a3858620fd1b63d1858967c8a54cf8091f50d",
     "app/transkun_adapter.py": "sha256:ce0037850b775fb0184f2a7fadcd9233164290d6474185e4084bca8eb7e2859f",
     "app/transkun_runner.py": "sha256:7671b1a8bb28d918182ab2bdc373cd4b34f80c1f4c131710cda27bb5811c22f6",
@@ -358,9 +361,10 @@
     "app/vst3_transport.py": "sha256:0bf998c832e88b3939905b83875da337c7bf2afe463021ca4d7df774606db940",
     "app/vst3_x11.py": "sha256:c26bf4acf33165d110a8467bf39cff757c5060a7a91048482191a5e3c2bce3ad",
     "app/windows_process_identity.py": "sha256:8074c582663855a295354ce565b99f6310302e32551f10d96373b813080b9d90",
-    "app/worker_cgroup_recovery.py": "sha256:ff5dded11e2d45f77fe93bee1f2d6464273a823b1eebf10e5c2d773f4b96f7d3",
-    "app/worker_loss_resolution.py": "sha256:7ebb16374c5188f69d536f38e7937dd2c663b58f319b496dc9830a02fa6f467c",
-    "app/yourmt3_adapter.py": "sha256:dd52171e63aab2512693e963c945fec52dea5f5e59367d268573c1cdac0c681b",
+    "app/worker_cgroup_recovery.py": "sha256:894cbb8204c4e0a2b78506a6b30ba7c77e28c9f3b69e2a53efd1219fc5e8d061",
+    "app/worker_loss_resolution.py": "sha256:1a1feb50f3f361b7346c0027c68dfa293b6b0f5b5fb55ec88260f1959f38f496",
+    "app/worker_process_guard.py": "sha256:ee28573002e819c413e879cefc72e1d327cb434bfcd86eb8f7d734db233a6b08",
+    "app/yourmt3_adapter.py": "sha256:fd33e8f940f53890d1c355ba3b3f9e33a618a903f4eeed6d98b78633594abb63",
     "mobile/android/app/src/main/java/com/desalvo/mtaaudioeditor/mobile/DemucsModelManager.java": "sha256:9678b44a761ba17841ff1facce3198e176559d507a09c95a28a11117a8cec31a",
     "mobile/android/app/src/main/java/com/desalvo/mtaaudioeditor/mobile/GitHubUpdateManager.java": "sha256:8167e830ba78ad728dc68efcf64d1f750adea42304cbcc4ed7fe9d12ee1e8ab6",
     "mobile/android/app/src/main/java/com/desalvo/mtaaudioeditor/mobile/MainActivity.java": "sha256:79a880580597353998377fbfac0bb342dc7911e956fb481bff895b6d1e503660",
@@ -445,7 +449,7 @@
     "native/vst3_probe/state_store.py": "sha256:7748ab2493546a39af224c7c6936f993636ab5efd9052aa09be1b21c692da2d6",
     "native/vst3_probe/stream_worker.py": "sha256:6a4132b1c1804c1a117cd4b43ab8d943ae4c285ba88abd2f4c785ed9f49594ec",
     "native/vst3_probe/supervised_worker.py": "sha256:3f40ea0952ff46b1ea8b4706b046e65350b9a075a65f06bc9b26a9dedbbcbb4d",
-    "scripts/ace_gpu_benchmark.py": "sha256:90cafb5384621e7d4769c6968a2157fec45235a1382c627590ccc7ecc5e8c440",
+    "scripts/ace_gpu_benchmark.py": "sha256:a84a3f38f48d0a0c2ac5054e81dab999b5f9a5f98fdd5853fd649a50212c8486",
     "scripts/acquire_merchant_range.py": "sha256:3ffc5b07ab9ff105449336c2d982ce2081e60324c9eb790937d7aab3b5bd871a",
     "scripts/audit_merchant_coverage.py": "sha256:07cc2ee768ac99abfe80326b895e13aa85d4a3f6cd3702805580a4649208516a",
     "scripts/audit_multitrack_acceptance.py": "sha256:d3e99522c5777a2de69b58019a61f613802823532617c544886e2d5563247d71",
@@ -522,7 +526,7 @@
     "scripts/run_ios_model_rights_acceptance.py": "sha256:a48e75d7809013e0845f73b0f22abf8aed970f70b45acc19b617f485dcb6d33e",
     "scripts/run_merchant_history_chromium.py": "sha256:9787e28521fbec9e701c26a55e1b59b2654137bf1f8bc4af099ee815f04dbd8a",
     "scripts/run_mrmt3_gpu_benchmark.py": "sha256:6e4062b0640df956427e7820d649cb9de7fa75c331f369fd1081afc86a63b091",
-    "scripts/run_mrmt3_resumable.py": "sha256:4139e70fad409bae1d910f232f1de2df76a2e6c6a9786f33de3dc8eb4d3b599b",
+    "scripts/run_mrmt3_resumable.py": "sha256:e7425631977768e907f87eb1bc3701d9855d53b27620b4662767675a38ac9b63",
     "scripts/run_quality_tests.py": "sha256:07b0c3cf72b6b508dc76b1b323fc1fdc79d092cf73ab28b317645a10c1d0ec3d",
     "scripts/run_r210_browser_acceptance.py": "sha256:c1b61a4d331a838a1a69114d90b46477ece3fee89ba59bd0596699e1a72d4eee",
     "scripts/run_transition_progress_chromium.py": "sha256:f2cbea218a9e84d8dc20452478e85771b46b3c1c208c113f81d1cdbe6a52ca2a",
@@ -563,7 +567,8 @@
       "evidence": [
         "tests/test_r210_execution_entry_acceptance.py",
         "tests/test_r210_active_execution_owner.py",
-        "tests/test_r208_unified_adapter_billing_e2e.py"
+        "tests/test_r208_unified_adapter_billing_e2e.py",
+        "tests/test_r210_independent_process_guard.py"
       ]
     },
     "web_project": {
@@ -588,7 +593,8 @@
       "evidence": [
         "tests/test_r210_pull_coordinator.py",
         "tests/test_r210_service_admission_pull.py",
-        "tests/test_r210_managed_execution_identity.py"
+        "tests/test_r210_managed_execution_identity.py",
+        "tests/test_r210_independent_process_guard.py"
       ]
     },
     "native_local": {
@@ -596,7 +602,8 @@
       "evidence": [
         "tests/test_r210_legacy_executor_closure.py",
         "tests/test_r210_active_execution_owner.py",
-        "tests/test_r210_execution_policy_binding.py"
+        "tests/test_r210_execution_policy_binding.py",
+        "tests/test_r210_independent_process_guard.py"
       ]
     },
     "native_remote": {
@@ -612,7 +619,8 @@
       "evidence": [
         "tests/test_r210_execution_policy_binding.py",
         "tests/test_r210_legacy_executor_closure.py",
-        "tests/test_r210_execution_entry_acceptance.py"
+        "tests/test_r210_execution_entry_acceptance.py",
+        "tests/test_r210_independent_process_guard.py"
       ]
     },
     "native_mobile": {
@@ -907,7 +915,7 @@
     {
       "path": "app/ace_step_desktop_manager.py",
       "function": "start_server",
-      "line": 330,
+      "line": 333,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "32d9b6ef5ccb6967075aeb074abad13883bbab4c27007698131b1aabc4ac2620",
@@ -921,24 +929,10 @@
     {
       "path": "app/ace_step_live_smoke.py",
       "function": "test_live_inference",
-      "line": 47,
+      "line": 50,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "6662813f0b2b075f2c4c79d61a0bf87a0734a832b90f085a383fc77378f41d9b",
-      "family": "operator_diagnostic",
-      "boundary": "Installation/build/self-test/benchmark is explicitly launched by the authenticated administrator/native owner or local operating-system operator. It cannot submit a user-selected executable via inference API and never supplies user-billable usage. Model/GPU diagnostic success is not original rights or target acceptance.",
-      "evidence": [
-        "docs/validation/r210/ci-4c3c73a-observation.json",
-        "tests/test_r210_global_ai_execution.py"
-      ]
-    },
-    {
-      "path": "app/ace_step_local.py",
-      "function": "launch",
-      "line": 27,
-      "kind": "process_boundary",
-      "call": "subprocess.call",
-      "shape_sha256": "501967fa7361b5d8a73f2795db186e0521504636ff28b3df5976b06ac205e423",
       "family": "operator_diagnostic",
       "boundary": "Installation/build/self-test/benchmark is explicitly launched by the authenticated administrator/native owner or local operating-system operator. It cannot submit a user-selected executable via inference API and never supplies user-billable usage. Model/GPU diagnostic success is not original rights or target acceptance.",
       "evidence": [
@@ -1712,7 +1706,7 @@
     {
       "path": "app/ai_metering_agent.py",
       "function": "run_metered_process",
-      "line": 155,
+      "line": 156,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "73f85c67d1ee19e1fb08ec894a61451a99f0983872e7da6cd9e92042abf4e846",
@@ -1727,8 +1721,22 @@
     },
     {
       "path": "app/ai_metering_agent.py",
+      "function": "run_supervised_process",
+      "line": 239,
+      "kind": "inference_call",
+      "call": "run_metered_process",
+      "shape_sha256": "8205818c2683029d47b58309a6180d9210c29ffcd826aa86d7da9fb7e062e134",
+      "family": "adapter_child",
+      "boundary": "Fixed installed Linux guardian bootstrap per original job/native/pull command. No model before original durable guard admission when billed; only kernel wait4 ECHILD proves the entire local adopted tree empty. Parent death never settles billing or replays output.",
+      "evidence": [
+        "tests/test_r210_independent_process_guard.py",
+        "tests/test_r210_execution_entry_acceptance.py"
+      ]
+    },
+    {
+      "path": "app/ai_metering_agent.py",
       "function": "_execute_registered_worker",
-      "line": 418,
+      "line": 429,
       "kind": "inference_call",
       "call": "ai_cgroup_metering.run_cgroup_process",
       "shape_sha256": "f3e85a6ec02b97523de0a7d310170a0ccb4efa09cef639bd0da3cb1036a68e2b",
@@ -1743,24 +1751,8 @@
     },
     {
       "path": "app/ai_metering_agent.py",
-      "function": "_execute_registered_worker",
-      "line": 420,
-      "kind": "inference_call",
-      "call": "run_metered_process",
-      "shape_sha256": "a1254fc5b2024066c0ba0f8934aac757f7f3177ec837051945eb4e904ad5aba0",
-      "family": "registered_server",
-      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero. Known internal child-spawning routes now require cgroup tree measurement despite empty proc samples;normal/cancelled direct-child accounting remains held.",
-      "evidence": [
-        "tests/test_r210_execution_entry_acceptance.py",
-        "tests/test_r210_active_execution_owner.py",
-        "tests/test_r208_unified_adapter_billing_e2e.py",
-        "tests/test_r210_known_worker_tree_accounting.py"
-      ]
-    },
-    {
-      "path": "app/ai_metering_agent.py",
       "function": "execute_registered_worker",
-      "line": 505,
+      "line": 516,
       "kind": "inference_call",
       "call": "_execute_registered_worker",
       "shape_sha256": "7268d8dcee611bd4ba6d2510338a929fb82213c3e16869df6fae80c1ff39faeb",
@@ -1929,6 +1921,34 @@
       "evidence": [
         "docs/validation/r210/ci-4c3c73a-observation.json",
         "docs/security/SERVICE_ADMISSION_REVIEW_R210.json"
+      ]
+    },
+    {
+      "path": "app/ai_process_guard.py",
+      "function": "_guardian",
+      "line": 138,
+      "kind": "process_boundary",
+      "call": "subprocess.Popen",
+      "shape_sha256": "5c57e4a393abfd3f5d10bf1f5342b8bbe7ff4d9f08184e1d940a21f7fb7bf425",
+      "family": "adapter_child",
+      "boundary": "Fixed installed Linux guardian bootstrap per original job/native/pull command. No model before original durable guard admission when billed; only kernel wait4 ECHILD proves the entire local adopted tree empty. Parent death never settles billing or replays output.",
+      "evidence": [
+        "tests/test_r210_independent_process_guard.py",
+        "tests/test_r210_execution_entry_acceptance.py"
+      ]
+    },
+    {
+      "path": "app/ai_process_guard.py",
+      "function": "run",
+      "line": 193,
+      "kind": "process_boundary",
+      "call": "subprocess.Popen",
+      "shape_sha256": "fc675b5e539a05aca4124b774b289a3c5caeac90e2004ccee64ad1562ea20b13",
+      "family": "adapter_child",
+      "boundary": "Fixed installed Linux guardian bootstrap per original job/native/pull command. No model before original durable guard admission when billed; only kernel wait4 ECHILD proves the entire local adopted tree empty. Parent death never settles billing or replays output.",
+      "evidence": [
+        "tests/test_r210_independent_process_guard.py",
+        "tests/test_r210_execution_entry_acceptance.py"
       ]
     },
     {
@@ -2124,36 +2144,6 @@
         "tests/test_r210_pull_coordinator.py",
         "tests/test_r210_service_admission_pull.py",
         "tests/test_r210_managed_execution_identity.py"
-      ]
-    },
-    {
-      "path": "app/ai_pull_worker.py",
-      "function": "_run",
-      "line": 209,
-      "kind": "inference_call",
-      "call": "ai_metering_agent.run_metered_process",
-      "shape_sha256": "400215953e40075a913608cf7530ddc709d7d9cac751494b0655aad4ba4060ed",
-      "family": "pull_worker",
-      "boundary": "Single pinned authority binds actor/ledger to original node credential, task, source, nonce and completion. HTTPS worker has private no-reexecution state; descendants/unavailable observation are not settled as measured. Physical multihost/kernel acceptance is separate B2/B6.",
-      "evidence": [
-        "tests/test_r210_pull_coordinator.py",
-        "tests/test_r210_service_admission_pull.py",
-        "tests/test_r210_managed_execution_identity.py"
-      ]
-    },
-    {
-      "path": "app/ai_server_execution.py",
-      "function": "infer",
-      "line": 42,
-      "kind": "inference_call",
-      "call": "ai_metering_agent.run_metered_process",
-      "shape_sha256": "b85ae147cbc52f1c2de8a5d5c76a9c9e47a566cfce7928176d06125eb7efcd34",
-      "family": "web_project",
-      "boundary": "Project ACL and durable actor bind asynchronous text/stem/Arranger/Remix/Studio work to the common registered owner. Old synchronous server generation is refused. Source preparation and non-ML DSP do not claim a separate AI measurement.",
-      "evidence": [
-        "tests/test_r210_queue_identity_stem_metering.py",
-        "tests/test_r210_global_ai_execution.py",
-        "tests/test_r210_legacy_executor_closure.py"
       ]
     },
     {
@@ -2542,7 +2532,7 @@
     {
       "path": "app/ai_worker_protocol.py",
       "function": "_run_supervised_legacy_worker",
-      "line": 111,
+      "line": 123,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "b53ec91a9a98c086182c593034e68ef49343dd274f26261f2ce5a4c65c72714d",
@@ -2557,7 +2547,7 @@
     {
       "path": "app/ai_worker_protocol.py",
       "function": "run_worker_with_project_audio",
-      "line": 359,
+      "line": 371,
       "kind": "inference_call",
       "call": "ai_cgroup_metering.run_cgroup_process",
       "shape_sha256": "65f166c9ca2d1b1c3123032ec58f8efecc0c6931ac44c0d24c3cf6eaba3641ed",
@@ -2572,22 +2562,7 @@
     {
       "path": "app/ai_worker_protocol.py",
       "function": "run_worker_with_project_audio",
-      "line": 374,
-      "kind": "inference_call",
-      "call": "ai_metering_agent.run_metered_process",
-      "shape_sha256": "bb8ddaa9d7323d60ec2e3fa3079a7e1c0d86f6f2a4d06e68c7616bc739dda1be",
-      "family": "native_local",
-      "boundary": "Explicit native single-user profile owns local execution; local actor zero cannot become a server actor or bill. Admitted model policy precedes source/worker dispatch; bounded supervision stops/reaps the worker. Native platform execution guarantees remain F5/G6.",
-      "evidence": [
-        "tests/test_r210_legacy_executor_closure.py",
-        "tests/test_r210_active_execution_owner.py",
-        "tests/test_r210_execution_policy_binding.py"
-      ]
-    },
-    {
-      "path": "app/ai_worker_protocol.py",
-      "function": "run_worker_with_project_audio",
-      "line": 385,
+      "line": 397,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "059177c9d1f530f9ae643dea78b2284cb1a0797cfa3e9a7c4bdd33ef84aaf6f6",
@@ -2602,7 +2577,7 @@
     {
       "path": "app/ai_worker_protocol.py",
       "function": "run_worker_with_project_audio",
-      "line": 390,
+      "line": 402,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "815d34474e3bbf617b8ec62c484f8b2309ea9df3d003a296071b295b9c916d61",
@@ -2617,7 +2592,7 @@
     {
       "path": "app/ai_worker_protocol.py",
       "function": "probe_worker",
-      "line": 432,
+      "line": 444,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "df5312b624e4659c06712c0d1b0cd0d075e097896fc818eecf520b955e3c378a",
@@ -7330,7 +7305,7 @@
     {
       "path": "app/music_text.py",
       "function": "_extract_profile_base",
-      "line": 1123,
+      "line": 1125,
       "kind": "inference_call",
       "call": "extract_chords",
       "shape_sha256": "debaee50fd97c700dcc15831c19c94988a1f2e691b8e98251f10b452e158e9cb",
@@ -7345,7 +7320,7 @@
     {
       "path": "app/music_text.py",
       "function": "_extract_profile_base",
-      "line": 1134,
+      "line": 1136,
       "kind": "inference_call",
       "call": "extract_chords",
       "shape_sha256": "debaee50fd97c700dcc15831c19c94988a1f2e691b8e98251f10b452e158e9cb",
@@ -7360,7 +7335,7 @@
     {
       "path": "app/music_text.py",
       "function": "extract_chords_progressive",
-      "line": 1171,
+      "line": 1173,
       "kind": "inference_call",
       "call": "extract_chords",
       "shape_sha256": "debaee50fd97c700dcc15831c19c94988a1f2e691b8e98251f10b452e158e9cb",
@@ -7433,7 +7408,7 @@
     {
       "path": "app/neural_vocal_adapter.py",
       "function": "render_neural",
-      "line": 87,
+      "line": 79,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "d84bda149cee39712eb087fbe4a0ba41ad6fd4691a1650746527b3bbc1e8a2be",
@@ -9838,21 +9813,6 @@
     {
       "path": "app/studio_compute.py",
       "function": "_compute",
-      "line": 87,
-      "kind": "inference_call",
-      "call": "ai_metering_agent.run_metered_process",
-      "shape_sha256": "5b8231c36211ba0193b4721ba687d75600fd76302d609df880548a9764d46850",
-      "family": "native_local",
-      "boundary": "Explicit native single-user profile owns local execution; local actor zero cannot become a server actor or bill. Admitted model policy precedes source/worker dispatch; bounded supervision stops/reaps the worker. Native platform execution guarantees remain F5/G6.",
-      "evidence": [
-        "tests/test_r210_legacy_executor_closure.py",
-        "tests/test_r210_active_execution_owner.py",
-        "tests/test_r210_execution_policy_binding.py"
-      ]
-    },
-    {
-      "path": "app/studio_compute.py",
-      "function": "_compute",
       "line": 93,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
@@ -10147,6 +10107,20 @@
       ]
     },
     {
+      "path": "app/worker_process_guard.py",
+      "function": "launch",
+      "line": 73,
+      "kind": "process_boundary",
+      "call": "subprocess.Popen",
+      "shape_sha256": "5c57e4a393abfd3f5d10bf1f5342b8bbe7ff4d9f08184e1d940a21f7fb7bf425",
+      "family": "adapter_child",
+      "boundary": "Fixed installed Linux guardian bootstrap per original job/native/pull command. No model before original durable guard admission when billed; only kernel wait4 ECHILD proves the entire local adopted tree empty. Parent death never settles billing or replays output.",
+      "evidence": [
+        "tests/test_r210_independent_process_guard.py",
+        "tests/test_r210_execution_entry_acceptance.py"
+      ]
+    },
+    {
       "path": "mobile/ios/MTAEditorMobile/LocalStemEngine.swift",
       "function": "<native>",
       "line": 251,
@@ -10353,7 +10327,7 @@
     {
       "path": "scripts/ace_gpu_benchmark.py",
       "function": "run",
-      "line": 22,
+      "line": 24,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "034723d13a825674f38573a7ead25d5eb207334331bce603f55cf9c9c3866187",
@@ -10367,7 +10341,7 @@
     {
       "path": "scripts/ace_gpu_benchmark.py",
       "function": "main",
-      "line": 132,
+      "line": 136,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "b6003593fbda93f48a68bfe1c99fc47558713bdaac001c2919bbec1beeaf995f",
@@ -10381,7 +10355,7 @@
     {
       "path": "scripts/ace_gpu_benchmark.py",
       "function": "main",
-      "line": 137,
+      "line": 142,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "7934760b2857805c838d06be8d1a9b2f7e710703ef8270a8b786ae68a05fa1b7",
@@ -11207,8 +11181,8 @@
     },
     {
       "path": "scripts/run_mrmt3_resumable.py",
-      "function": "main",
-      "line": 145,
+      "function": "_run_verified",
+      "line": 163,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "a0916bd7af13e31e745d6eb0dc1c4436552aff8a1706fd93d491148894756e36",
@@ -11830,5 +11804,170 @@
     "date": "2026-10-29",
     "scope": "Only queue.get observation retries,3 attempts for typed retryable barrier BUSY/LOCKED;fresh validation each time. No worker admission/execution/payment replay or missing-fence acceptance. Unknown/maintenance errors remain immediate failures.",
     "proof": "docs/validation/r210/queue-busy-result.json"
+  },
+  "restored_review_20261030": {
+    "scope": "Strict recorded permission admission;BTC/ChordFormer/Mega53/Madmom/profile callbacks and ACE/MRMT3 diagnostics recheck current model rights. All scanner call shapes unchanged;source hashes and line positions refreshed after manual delta review. Entire F4 remains unaccepted:operator-selected opaque runtimes and dynamic/library/native exhaustiveness still require acceptance.",
+    "evidence": [
+      "tests/test_r210_legacy_rights_acceptance.py",
+      "tests/test_r210_direct_executor_rights.py",
+      "tests/test_r210_legacy_separator_rights.py"
+    ],
+    "original_criteria_promoted": []
+  },
+  "opaque_adapter_review": {
+    "date": "2026-10-30",
+    "removed_boundary": "Opaque ACE subprocess removed rather than whitelisted;existing remaining process/command boundaries retain reviewed dispositions.",
+    "proof": "tests/test_r210_opaque_adapter_identity.py",
+    "scope": "No new subprocess,service,HTTP or executable approval;configured interpreter and model-runtime acceptance remain incomplete."
+  },
+  "independent_guardian_review": {
+    "date": "2026-10-30",
+    "proof": "tests/test_r210_independent_process_guard.py",
+    "new_or_relocated_boundaries": [
+      {
+        "path": "app/ai_metering_agent.py",
+        "function": "run_supervised_process",
+        "line": 239,
+        "kind": "inference_call",
+        "call": "run_metered_process",
+        "shape_sha256": "8205818c2683029d47b58309a6180d9210c29ffcd826aa86d7da9fb7e062e134"
+      },
+      {
+        "path": "app/ai_process_guard.py",
+        "function": "_guardian",
+        "line": 138,
+        "kind": "process_boundary",
+        "call": "subprocess.Popen",
+        "shape_sha256": "5c57e4a393abfd3f5d10bf1f5342b8bbe7ff4d9f08184e1d940a21f7fb7bf425"
+      },
+      {
+        "path": "app/ai_process_guard.py",
+        "function": "run",
+        "line": 193,
+        "kind": "process_boundary",
+        "call": "subprocess.Popen",
+        "shape_sha256": "fc675b5e539a05aca4124b774b289a3c5caeac90e2004ccee64ad1562ea20b13"
+      },
+      {
+        "path": "app/worker_process_guard.py",
+        "function": "launch",
+        "line": 73,
+        "kind": "process_boundary",
+        "call": "subprocess.Popen",
+        "shape_sha256": "5c57e4a393abfd3f5d10bf1f5342b8bbe7ff4d9f08184e1d940a21f7fb7bf425"
+      }
+    ],
+    "removed_direct_calls": [
+      {
+        "path": "app/ai_metering_agent.py",
+        "function": "_execute_registered_worker",
+        "line": 420,
+        "kind": "inference_call",
+        "call": "run_metered_process",
+        "shape_sha256": "a1254fc5b2024066c0ba0f8934aac757f7f3177ec837051945eb4e904ad5aba0",
+        "family": "registered_server",
+        "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero. Known internal child-spawning routes now require cgroup tree measurement despite empty proc samples;normal/cancelled direct-child accounting remains held.",
+        "evidence": [
+          "tests/test_r210_execution_entry_acceptance.py",
+          "tests/test_r210_active_execution_owner.py",
+          "tests/test_r208_unified_adapter_billing_e2e.py",
+          "tests/test_r210_known_worker_tree_accounting.py"
+        ]
+      },
+      {
+        "path": "app/ai_pull_worker.py",
+        "function": "_run",
+        "line": 209,
+        "kind": "inference_call",
+        "call": "ai_metering_agent.run_metered_process",
+        "shape_sha256": "400215953e40075a913608cf7530ddc709d7d9cac751494b0655aad4ba4060ed",
+        "family": "pull_worker",
+        "boundary": "Single pinned authority binds actor/ledger to original node credential, task, source, nonce and completion. HTTPS worker has private no-reexecution state; descendants/unavailable observation are not settled as measured. Physical multihost/kernel acceptance is separate B2/B6.",
+        "evidence": [
+          "tests/test_r210_pull_coordinator.py",
+          "tests/test_r210_service_admission_pull.py",
+          "tests/test_r210_managed_execution_identity.py"
+        ]
+      },
+      {
+        "path": "app/ai_server_execution.py",
+        "function": "infer",
+        "line": 42,
+        "kind": "inference_call",
+        "call": "ai_metering_agent.run_metered_process",
+        "shape_sha256": "b85ae147cbc52f1c2de8a5d5c76a9c9e47a566cfce7928176d06125eb7efcd34",
+        "family": "web_project",
+        "boundary": "Project ACL and durable actor bind asynchronous text/stem/Arranger/Remix/Studio work to the common registered owner. Old synchronous server generation is refused. Source preparation and non-ML DSP do not claim a separate AI measurement.",
+        "evidence": [
+          "tests/test_r210_queue_identity_stem_metering.py",
+          "tests/test_r210_global_ai_execution.py",
+          "tests/test_r210_legacy_executor_closure.py"
+        ]
+      },
+      {
+        "path": "app/ai_worker_protocol.py",
+        "function": "run_worker_with_project_audio",
+        "line": 376,
+        "kind": "inference_call",
+        "call": "ai_metering_agent.run_metered_process",
+        "shape_sha256": "bb8ddaa9d7323d60ec2e3fa3079a7e1c0d86f6f2a4d06e68c7616bc739dda1be",
+        "family": "native_local",
+        "boundary": "Explicit native single-user profile owns local execution; local actor zero cannot become a server actor or bill. Admitted model policy precedes source/worker dispatch; bounded supervision stops/reaps the worker. Native platform execution guarantees remain F5/G6.",
+        "evidence": [
+          "tests/test_r210_legacy_executor_closure.py",
+          "tests/test_r210_active_execution_owner.py",
+          "tests/test_r210_execution_policy_binding.py"
+        ]
+      },
+      {
+        "path": "app/studio_compute.py",
+        "function": "_compute",
+        "line": 87,
+        "kind": "inference_call",
+        "call": "ai_metering_agent.run_metered_process",
+        "shape_sha256": "5b8231c36211ba0193b4721ba687d75600fd76302d609df880548a9764d46850",
+        "family": "native_local",
+        "boundary": "Explicit native single-user profile owns local execution; local actor zero cannot become a server actor or bill. Admitted model policy precedes source/worker dispatch; bounded supervision stops/reaps the worker. Native platform execution guarantees remain F5/G6.",
+        "evidence": [
+          "tests/test_r210_legacy_executor_closure.py",
+          "tests/test_r210_active_execution_owner.py",
+          "tests/test_r210_execution_policy_binding.py"
+        ]
+      }
+    ],
+    "change": "Linux model/preparation/native/pull callers now use run_supervised_process; native non-Linux direct wait4 remains the explicit fallback, not a Linux tree certificate. Dedicated guardian prctl/wait(-1) is never installed in the web process. No checker/threshold changes."
+  },
+  "work16_recovery_review": {
+    "date": "2026-10-30",
+    "scope": "Reconstructed Work16 subset: reject explicit alternate Python/import contexts before availability and ledger; allow fully settled original process history only after complete journal integrity and zero pending scopes. Managed runtimes/dynamic imports remain F4 residuals.",
+    "evidence": [
+      "tests/test_r210_configured_interpreter_identity.py",
+      "tests/test_r210_guardian_cutover_history.py"
+    ],
+    "limits": "Not the lost full F4 delta; no criterion promotion, checker changes, suppression or new finding approval."
+  },
+  "transcription_contract_review": {
+    "date": "2026-10-30",
+    "scope": "Deployment-pinned YourMT3/MRMT3 sources and tensor identities, exact-byte source loader bypassing pyc, owned import namespace, exact-byte tensor snapshots and per-forward rights. PS is unavailable without independent tensor identity. No new process/network/checker boundary. External interpreter/dependency and other legacy contracts remain F4 residuals.",
+    "evidence": [
+      "tests/test_r210_transcription_source_contract.py",
+      "tests/test_r210_mrmt3_runtime.py",
+      "tests/test_r210_yourmt3_ps_variant.py"
+    ],
+    "criteria_promoted": [],
+    "resumable_entry": "The diagnostic CLI now verifies the same source/tensor contract and exact original model path before output/FFmpeg; its private inference helper stays inside the verified import context.",
+    "handoff": "docs/PINNED_TRANSCRIPTION_LOADERS_R210.md",
+    "proof": "docs/validation/r210/source-contract-result.json"
+  },
+  "ace_observer_review": {
+    "scope": "Only app/static/app.js changes: discard stale project status/error responses and recheck observer epoch after asynchronous project reconciliation before modal close. No backend or execution boundary changed.",
+    "evidence": [
+      "tests/test_r210_arranger_terminal_status.py"
+    ]
+  },
+  "legacy_collection_review": {
+    "date": "2026-10-30",
+    "scope": "Legacy subscription refunds and collection;no new network/process/admission boundary. Exact original basis/captures/funding and original liability cap gate repayment. Owner-scoped evidence and unknown amounts are private diagnostics;no global cutover or RC acceptance.",
+    "verification": "tests/test_r210_legacy_subscription_collection.py;actual FastAPI/SQLite/provider-I/O fixtures and shipped JS in Node;not actual sandbox/Chromium acceptance."
   }
 }

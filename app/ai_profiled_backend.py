@@ -24,6 +24,7 @@ def main():
         demucs_arguments(arguments)
 
     def call():
+        evaluate_model(args.backend)
         previous = sys.argv
         try:
             sys.argv = [args.backend, *arguments]
@@ -37,6 +38,7 @@ def main():
                     raise
         finally:
             sys.argv = previous
+        evaluate_model(args.backend)
 
     profile_call(args.report_dir, args.task_id, call)
 

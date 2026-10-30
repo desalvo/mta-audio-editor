@@ -14,7 +14,7 @@ def test_not_configured_does_not_claim_inference(monkeypatch):
     assert not state['inference_verified']
 
 
-def test_mock_worker_capabilities_not_inference(monkeypatch, tmp_path):
+def test_mock_worker_capabilities_not_inference(monkeypatch, tmp_path, synthetic_worker_resolution):
     worker = tmp_path / 'worker'
     worker.write_text('#!/usr/bin/env python3\nimport json\nprint(json.dumps({"protocol":"mta.ai.worker.v1","supports_audio_input":True}))\n')
     worker.chmod(0o700)

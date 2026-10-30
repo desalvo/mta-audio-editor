@@ -1,30 +1,27 @@
 #!/usr/bin/env python3
-"""User-managed ACE-Step local service launcher; model downloads happen upstream on first use.
+"""Compatibility CLI for unsupported opaque ACE-Step launchers.
 
-Never runs arbitrary shell scripts from the network. An operator installs upstream
-ACE-Step in a dedicated environment first; only an absolute executable is accepted.
+Use MTA's managed desktop integration instead; a supplied executable has no
+verifiable checkpoint loader contract, even with model download consent.
 """
 from __future__ import annotations
 import argparse
-import os
 from pathlib import Path
-import subprocess
 import sys
+
+if not __package__:sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 
 
 def launch(executable: str, *, model_dir: str, confirm_download: bool = False) -> int:
+    from app.model_license_policy import evaluate_model
+    evaluate_model('ace-step')
     path = Path(executable)
     if not path.is_absolute() or not path.is_file() or path.is_symlink():
         raise ValueError("Use an absolute, installed ACE-Step executable (no symlinks)")
-    root = Path(model_dir).expanduser().resolve()
-    root.mkdir(mode=0o700, parents=True, exist_ok=True)
-    if not confirm_download and not any(root.iterdir()):
-        raise RuntimeError("Models may download on first use; accept explicitly with --allow-model-download")
-    env = dict(os.environ)
-    env['HF_HOME'] = str(root / 'huggingface')
-    env['ACESTEP_MODE'] = 'api'
-    # Official CLI reads its model paths and downloads missing checkpoints itself.
-    return subprocess.call([str(path)], env=env)
+    # A launcher's pathname or consent to download cannot identify its loader
+    # or model. The managed desktop service is a separate fixed integration.
+    from app.ai_adapter_identity import deny_opaque_executor
+    deny_opaque_executor()
 
 
 def main() -> int:

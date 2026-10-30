@@ -176,7 +176,7 @@ def test_compiler_capture_skips_live_control_but_retains_final_result():
 
 
 @pytest.mark.parametrize('trusted',[False,True])
-def test_actual_worker_diagnostic_identity_and_gpu_billing_gate(tmp_path, monkeypatch,trusted):
+def test_actual_worker_diagnostic_identity_and_gpu_billing_gate(tmp_path, monkeypatch,trusted,synthetic_worker_resolution):
     monkeypatch.setenv('MTA_TRUST_AI_DIAGNOSTIC_ESTIMATES','true' if trusted else 'false')
     from app import ai_metering_agent, ai_torch_diagnostics
     from app.auth import init_auth_db, db

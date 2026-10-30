@@ -25,7 +25,8 @@ def test_catalog_reports_configured_worker_not_static_disabled(monkeypatch, tmp_
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
     monkeypatch.setenv('MTA_AI_WORKER_EXECUTABLE', str(worker))
     entry = next(x for x in catalog()['models'] if x['id'] == 'ace-step-1.5')
-    assert entry['available'] is True
+    # A script that exits successfully is not an installed ACE model adapter.
+    assert entry['available'] is False
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'false')
     entry = next(x for x in catalog()['models'] if x['id'] == 'ace-step-1.5')
     assert entry['available'] is False

@@ -1,5 +1,7 @@
 """Tests that a real permitted model replaces blocked defaults, never forced requests."""
 import pytest
+import json
+from model_rights_fixtures import synthetic_review
 from app import model_license_policy as p
 
 
@@ -14,7 +16,7 @@ def test_primary_falls_back_to_licensed_mega53(monkeypatch, tmp_path):
 def test_approved_primary_wins(monkeypatch, tmp_path):
     monkeypatch.setattr(p, '_path', lambda: tmp_path/'policy.json')
     monkeypatch.delenv('MTA_LEAD_BACKING_DEFAULT_MODEL', raising=False)
-    (tmp_path/'policy.json').write_text('{"uvr-kara-2":{"mode":"free_only","evidence_url":"https://example.org/permission"}}')
+    (tmp_path/'policy.json').write_text(json.dumps({'uvr-kara-2':synthetic_review('free_only')}))
     assert p.effective_backing_model({}) == 'uvr_mdxnet_kara_2'
     assert not p.evaluate('backing-vocals', {}).billable
 

@@ -24,7 +24,8 @@ def test_ps_is_available_only_after_its_own_inference_receipt(tmp_path,monkeypat
     path=tmp_path/'mta-runtime-ps.json';path.write_text(json.dumps({'model':selected_variant()[0],'tested':False}))
     assert studio_catalog.python_for('audio-to-midi-yourmt3') is None
     path.write_text(json.dumps({'model':selected_variant()[0],'tested':True}))
-    assert studio_catalog.python_for('audio-to-midi-yourmt3')==sys.executable
+    # Metadata alone cannot authorize the upstream source selected by PS.
+    assert studio_catalog.python_for('audio-to-midi-yourmt3') is None
 
 
 def test_ps_converter_does_not_accept_arbitrary_checkpoints(tmp_path):

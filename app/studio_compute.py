@@ -83,8 +83,8 @@ def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,ti
             env={**os.environ,**admitted_env(kind,decision),'MTA_AI_PROGRESS_FILE':str(progress or root/'progress.json')}
             usage={}
             if hasattr(os,'wait4'):
-                from .ai_metering_agent import run_metered_process
-                result=run_metered_process(args,cwd=folder,timeout_seconds=timeout,cancel_check=cancelled,env=env)
+                from .ai_metering_agent import run_supervised_process
+                result=run_supervised_process(args,cwd=folder,timeout_seconds=timeout,cancel_check=cancelled,env=env)
                 if result.isolated:usage={k:v for k,v in result.usage.items() if k=='cpu_seconds'}
                 if progress:_atomic_json_write(Path(progress),{'phase':'worker-exited',**usage})
                 if result.exit_code:raise RuntimeError('Local studio worker failed, was cancelled or timed out')

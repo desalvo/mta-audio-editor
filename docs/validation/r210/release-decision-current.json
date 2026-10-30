@@ -1,14 +1,14 @@
 {
-  "date": "2026-10-29",
+  "date": "2026-10-30",
   "target": "MTA0.3.0-r210 Release Candidate",
   "decision": "BLOCKED_PRE_RC",
   "candidate": false,
   "cutover_authorized": false,
   "progress": {
     "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
-    "numerator": 28,
+    "numerator": 29,
     "denominator": 42,
-    "percent": 66.7,
+    "percent": 69.0,
     "accepted_macroareas": 1,
     "macroarea_denominator": 7,
     "historical_dual_regime_estimate_percent": 70,
@@ -22,7 +22,7 @@
       "id": "A4",
       "criterion": "Complete PayPal historical discovery, refunded initial captures, ambiguous payout and multicapture dispute allocation",
       "state": "implementation_pending",
-      "evidence": "Partial implementation: tests/test_r210_paypal_history_reconciliation.py; complete dispute/payout discovery and allocation still pending New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Exact partial multicapture allocation is now supported when canonical item amounts uniquely bind every capture and sum to the dispute total;private movement observations are operator-visible but never settlement authority.392 distinct affected cases/30 Chromium;PAYPAL_ITEM_MOVEMENT_HANDOFF_R210.md. Missing/ambiguous item allocation,global history and actual payout/protection transaction proof remain open. MERCHANT_HISTORY_HANDOFF_R210.md:merchant-wide requested-window stable acquisition/private admin API/IT-EN panel implemented;61 affected cases pass,23 new,4 browser prerequisite skips. No complete account-history,actual cash settlement,global conservation or whole A4 acceptance.",
+      "evidence": "Partial implementation: tests/test_r210_paypal_history_reconciliation.py; complete dispute/payout discovery and allocation still pending New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Exact partial multicapture allocation is now supported when canonical item amounts uniquely bind every capture and sum to the dispute total;private movement observations are operator-visible but never settlement authority.392 distinct affected cases/30 Chromium;PAYPAL_ITEM_MOVEMENT_HANDOFF_R210.md. Missing/ambiguous item allocation,global history and actual payout/protection transaction proof remain open. MERCHANT_HISTORY_HANDOFF_R210.md:merchant-wide requested-window stable acquisition/private admin API/IT-EN panel implemented;61 affected cases pass,23 new,4 browser prerequisite skips. No complete account-history,actual cash settlement,global conservation or whole A4 acceptance. 2026-10-28: MERCHANT_LEDGER_RECOVERY_R210.md;immutable reporting principal -> exact canonical history -> atomic original ledger and private IT/EN API/UI;368distinct passes/40new/12actualChromium. Full merchant coverage,payout/protection allocation and legacy proof remain incomplete;original criterion NOT promoted. PAYPAL_SETTLEMENT_RECOVERY_R210.md: scoped operator-only authenticated ACM/STL S6 exact completed credit -> original ledger,one-case immutable movement,actor audit and same-document replay;348distinct passes/46new. Broader account/payout/legacy proof and actual report target remain unaccepted;original state unchanged. 2026-10-28:PAYPAL_PARTIAL_SETTLEMENT_R210.md;exact partial multicapture report allocation,claim-bound ordinary replay and refund/subscription conservation implemented;357 distinct passes/40new. Whole historical/general financial criterion remains open;no target provider acceptance.",
       "weight": 1
     },
     {
@@ -43,14 +43,6 @@
     },
     {
       "area": "B",
-      "id": "B2",
-      "criterion": "Actual supervisor-crash recovery with external worker quiescence proof",
-      "state": "implementation_pending",
-      "evidence": "Partial local cgroup workflow implemented: prelaunch original supervisor/claim binding, transactional bootstrap admission, immutable kernel quiescence receipts, admin API/IT-EN UI, financial finalization and GPU-lease barrier. Actual prelaunch supervisor SIGKILL and synthetic kernel/API/browser fixtures pass. Actual delegated nested-cgroup crash test is prepared but skipped; post-crash economic resolution and other executor coverage remain pending. docs/DURABLE_WORKER_RECOVERY_HANDOFF_R210.md; docs/validation/r210/cgroup-journal-summary.json.; partial extension: original frozen recovery and explicit operator-funded unknown loss resolution, immutable audit, reservation/lease release and evidence barriers, IT/EN API/browser/NC privacy checks; docs/WORKER_LOSS_RESOLUTION_HANDOFF_R210.md. Real delegated-kernel acceptance and complete executor coverage remain pending. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open.",
-      "weight": 1
-    },
-    {
-      "area": "B",
       "id": "B6",
       "criterion": "Multi-host worker loss, partition, drain and no duplicate execution acceptance",
       "state": "environment_blocked",
@@ -62,7 +54,7 @@
       "id": "C3",
       "criterion": "Resolve every financial obligation before cutover",
       "state": "implementation_pending",
-      "evidence": " Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged. 2026-10-26: complete-set original subscription basis audit before losses, private admin-only no-store API/IT-EN paged error/retry panel, ledger/combined-readiness blocker. Historical split proof missing, no guessed migration/debt. SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md; whole criterion remains open. 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Strict local profile refuses configured providers,any provider/ambiguous financial history,unreviewed schemas,priced/negative/unsettled obligations and unknown execution. This does not resolve missing general provider/legacy obligations or accept C3. 2026-10-27: STRIPE_CHECKOUT_HISTORY_R210.md:stable complete known-intent attempts/refunds/disputes,webhook serialization and empty-terminal rereads integrated through owner/admin APIs;global/legacy obligations remain unaccepted. 2026-10-28:CUTOVER_SERVICE_DRAIN_R210.md;actual C2 guard held through commit/mirror/finalize,original drain-bound preview,postcommit resume refusal,17 new functional passes including actual SIGKILL;149 distinct affected passes/12 new browser prerequisites skipped. Restricted local profile only;complete financial transition and unchanged original C3/C5/C6/D6/E4 remain unaccepted.",
+      "evidence": " Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged. 2026-10-26: complete-set original subscription basis audit before losses, private admin-only no-store API/IT-EN paged error/retry panel, ledger/combined-readiness blocker. Historical split proof missing, no guessed migration/debt. SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md; whole criterion remains open. 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Strict local profile refuses configured providers,any provider/ambiguous financial history,unreviewed schemas,priced/negative/unsettled obligations and unknown execution. This does not resolve missing general provider/legacy obligations or accept C3. 2026-10-27: STRIPE_CHECKOUT_HISTORY_R210.md:stable complete known-intent attempts/refunds/disputes,webhook serialization and empty-terminal rereads integrated through owner/admin APIs;global/legacy obligations remain unaccepted. 2026-10-28:CUTOVER_SERVICE_DRAIN_R210.md;actual C2 guard held through commit/mirror/finalize,original drain-bound preview,postcommit resume refusal,17 new functional passes including actual SIGKILL;149 distinct affected passes/12 new browser prerequisites skipped. Restricted local profile only;complete financial transition and unchanged original C3/C5/C6/D6/E4 remain unaccepted. 2026-10-28: MERCHANT_LEDGER_RECOVERY_R210.md;immutable reporting principal -> exact canonical history -> atomic original ledger and private IT/EN API/UI;368distinct passes/40new/12actualChromium. Full merchant coverage,payout/protection allocation and legacy proof remain incomplete;original criterion NOT promoted. PAYPAL_SETTLEMENT_RECOVERY_R210.md: scoped operator-only authenticated ACM/STL S6 exact completed credit -> original ledger,one-case immutable movement,actor audit and same-document replay;348distinct passes/46new. Broader account/payout/legacy proof and actual report target remain unaccepted;original state unchanged. 2026-10-28:PAYPAL_PARTIAL_SETTLEMENT_R210.md;exact partial multicapture report allocation,claim-bound ordinary replay and refund/subscription conservation implemented;357 distinct passes/40new. Whole historical/general financial criterion remains open;no target provider acceptance.",
       "weight": 1
     },
     {
@@ -94,7 +86,7 @@
       "id": "F4",
       "criterion": "Rights and bypass acceptance for every legacy executor",
       "state": "implementation_pending",
-      "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open.",
+      "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending. 2026-10-29:CI_40858_REPAIR_R210.md;actual Apple40858613243 supersedes the earlier SDK block:32exact checks,real Keychain,unsigned iOS app build and13current source hashes verified. No real neural or installed-device/full-F4 acceptance;criterion remains open. 2026-10-30:RESTORED_MODEL_RIGHTS_R210.md;strict imported-review contract,cached chord/Madmom/Mega53/profile and ACE/MRMT3 diagnostics guarded;1104distinct affected passes,305new,7explicit prerequisite skips.72actual token API denials cover18registered kinds/two transports before worker/ledger. Opaque executable/model identity and dynamic/native universal acceptance remain open;criterion not promoted.",
       "weight": 1
     },
     {
@@ -130,8 +122,8 @@
       "weight": 1
     }
   ],
-  "current_delivery": "MTA-0.3.0-r210-pre-RC-ios-rights-cumulative.zip",
-  "not_external_only": "9 criteria still need implementation/functional or independent rights review;5 are target/environment blocked.",
+  "current_delivery": "MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip",
+  "not_external_only": "8criteria still need implementation/functional or independent rights review;5remain target/environment blocked.",
   "baseline_ci": "Confirmed full run40584085026 on4c3c73afe6d3829aad155c23f5f1bbb6d375433a:6887passed114skipped,zero failures,76.88%coverage;14jobs succeed,one tag-only publication skipped;iOS unsigned. Prior proofs preserved.",
   "evidence": [
     "docs/validation/r210/transition-progress-result.json",
@@ -144,29 +136,25 @@
     "docs/validation/r210/execution-entry-result.json",
     "docs/validation/r210/sensitive-operator-acceptance.json",
     "docs/validation/r210/reviewed-checkpoint-acceptance.json",
-    "docs/validation/r210/merchant-ledger-result.json"
+    "docs/validation/r210/merchant-ledger-result.json",
+    "docs/validation/r210/independent-guardian-result.json"
   ],
   "no_criteria_removed": true,
   "commits_or_remote_mutations": 0,
   "accepted_E5_provenance": "Existing accepted E5 from prior checkpoint;no criterion promoted in the export recovery turn.",
-  "latest_user_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
-  "latest_CI": "Confirmed full40584085026 on4c3c73a retained for that committed revision and unchanged boundaries. Uncommitted cumulativeB5/drain/E4/F3 validated by affected selections;F3 current246distinct passes,55new,zero currentfailure/error/skip. No new GitHubCIclaim or dispatch.",
+  "latest_user_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "latest_CI": "Historical standard40972934180 on4014a1f is retained;no new remote CI for the uncommitted rights/adapter/guardian delta.",
   "commits_or_remote_mutations_by_agent_this_update": 0,
-  "criteria_promoted_this_update": [],
+  "criteria_promoted_this_update": [
+    "B2"
+  ],
   "previous_progress_this_update": {
-    "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
-    "numerator": 28,
-    "denominator": 42,
-    "percent": 66.7,
-    "accepted_macroareas": 1,
-    "macroarea_denominator": 7,
-    "historical_dual_regime_estimate_percent": 70,
-    "historical_estimate_is_comparable": false,
-    "full_product_completion_percent": null,
-    "production_validation_percent": 0
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7
   },
-  "current_handoff": "docs/IOS_LOCAL_MODEL_RIGHTS_R210.md",
-  "current_proof": "docs/validation/r210/ios-rights-result.json",
+  "current_handoff": "docs/INDEPENDENT_WORKER_RECOVERY_R210.md",
+  "current_proof": "docs/validation/r210/independent-guardian-result.json",
   "cutover_service_drain": {
     "handoff": "docs/CUTOVER_SERVICE_DRAIN_R210.md",
     "proof": "docs/validation/r210/cutover-service-drain-result.json",
@@ -200,7 +188,7 @@
     "requested_numeric_progress_achieved": false,
     "remaining": "Complete merchant coverage,unbound original records,exact completed payout/protection allocations and legacy original fee/surplus basis;A4/A5/C3/C5/D6 remain open."
   },
-  "requested_numeric_progress_achieved": false,
+  "requested_numeric_progress_achieved": true,
   "release_candidate": false,
   "merchant_window_coverage": {
     "passed": 28,

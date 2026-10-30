@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="2.303" timestamp="2026-10-30T18:04:22.047452+01:00" hostname="b76fa112956d"><testcase classname="tests.test_r210_legacy_subscription_collection" name="test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus[0]" time="0.354"><failure message="assert 1 == 0">paid = ('2928c557d07342d4b1ae7ad990120719', {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '2...': 'REFUND111', 'links': [{'rel': 'up', 'href': 'https://api-m.sandbox.paypal.com/v2/payments/captures/CAPTURE111'}]}})
+surplus = 0
+
+    @pytest.mark.parametrize('surplus', [0, 1_000_000, 5_000_000])
+    def test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus(paid, surplus):
+        with auth.db() as c:
+            c.execute('DROP TABLE subscription_payment_basis')
+            c.execute('UPDATE paypal_orders SET refund_due_micro=? WHERE id=?', (surplus, paid[0]))
+        result = paypal.webhook(json.dumps(paid[2]).encode(), HEADERS)
+        assert result['received']
+        with auth.db() as c:
+            assert c.execute('SELECT count(*) FROM paypal_refunds').fetchone()[0] == 1
+&gt;           assert c.execute('SELECT count(*) FROM paypal_subscription_reversals').fetchone()[0] == 0
+E           assert 1 == 0
+
+tests/test_r210_legacy_subscription_collection.py:23: AssertionError</failure></testcase><testcase classname="tests.test_r210_legacy_subscription_collection" name="test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus[1000000]" time="0.340"><failure message="assert 1 == 0">paid = ('effe7a03d7024d95b9ae527d435833a8', {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': 'e...': 'REFUND111', 'links': [{'rel': 'up', 'href': 'https://api-m.sandbox.paypal.com/v2/payments/captures/CAPTURE111'}]}})
+surplus = 1000000
+
+    @pytest.mark.parametrize('surplus', [0, 1_000_000, 5_000_000])
+    def test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus(paid, surplus):
+        with auth.db() as c:
+            c.execute('DROP TABLE subscription_payment_basis')
+            c.execute('UPDATE paypal_orders SET refund_due_micro=? WHERE id=?', (surplus, paid[0]))
+        result = paypal.webhook(json.dumps(paid[2]).encode(), HEADERS)
+        assert result['received']
+        with auth.db() as c:
+            assert c.execute('SELECT count(*) FROM paypal_refunds').fetchone()[0] == 1
+&gt;           assert c.execute('SELECT count(*) FROM paypal_subscription_reversals').fetchone()[0] == 0
+E           assert 1 == 0
+
+tests/test_r210_legacy_subscription_collection.py:23: AssertionError</failure></testcase><testcase classname="tests.test_r210_legacy_subscription_collection" name="test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus[5000000]" time="0.425"><failure message="assert 1 == 0">paid = ('c0f9058ac0f144ffb5ade46132ff651c', {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': 'c...': 'REFUND111', 'links': [{'rel': 'up', 'href': 'https://api-m.sandbox.paypal.com/v2/payments/captures/CAPTURE111'}]}})
+surplus = 5000000
+
+    @pytest.mark.parametrize('surplus', [0, 1_000_000, 5_000_000])
+    def test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus(paid, surplus):
+        with auth.db() as c:
+            c.execute('DROP TABLE subscription_payment_basis')
+            c.execute('UPDATE paypal_orders SET refund_due_micro=? WHERE id=?', (surplus, paid[0]))
+        result = paypal.webhook(json.dumps(paid[2]).encode(), HEADERS)
+        assert result['received']
+        with auth.db() as c:
+            assert c.execute('SELECT count(*) FROM paypal_refunds').fetchone()[0] == 1
+&gt;           assert c.execute('SELECT count(*) FROM paypal_subscription_reversals').fetchone()[0] == 0
+E           assert 1 == 0
+
+tests/test_r210_legacy_subscription_collection.py:23: AssertionError</failure></testcase><testcase classname="tests.test_r210_legacy_subscription_collection" name="test_preexisting_unproved_legacy_receivable_cannot_start_another_payment" time="0.467"><failure message="Failed: DID NOT RAISE ValueError">paid = ('a9c0008a774243429a0b11b0950d4480', {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': 'a...': 'REFUND111', 'links': [{'rel': 'up', 'href': 'https://api-m.sandbox.paypal.com/v2/payments/captures/CAPTURE111'}]}})
+account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': 'a9c0008a774243429a0b11b..., ...}], 'payment_source': {'paypal': {'experience_context': {...}}}}, 'mta-create-83826b4246ed443e8d069ad234050a91')])
+
+    def test_preexisting_unproved_legacy_receivable_cannot_start_another_payment(paid, account, provider):
+        paypal.webhook(json.dumps(paid[2]).encode(), HEADERS)
+        with auth.db() as c:
+            c.execute('DROP TABLE subscription_payment_basis')
+        before = len(provider[1])
+&gt;       with pytest.raises(ValueError, match='original|Original|evidence'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_r210_legacy_subscription_collection.py:36: Failed</failure></testcase></testsuite></testsuites>

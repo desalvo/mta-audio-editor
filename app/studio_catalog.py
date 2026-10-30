@@ -43,7 +43,7 @@ def python_for(kind):
         from .vocal_banks import status
         from .studio_asset_registry import catalog as managed
         has_neural=any(v.get('admitted') and v.get('kind')=='diffsinger' for v in managed())
-        if not has_neural and not any(v['installed'] for v in status()) and not os.getenv('MTA_NEURAL_SINGER_EXECUTABLE') and not os.getenv('MTA_DIFFSINGER_ROOT'):return None
+        if not has_neural and not any(v['installed'] for v in status()) and not os.getenv('MTA_DIFFSINGER_ROOT'):return None
         return sys.executable if not getattr(sys,'frozen',False) else os.getenv('MTA_AI_DEFAULT_PYTHON')
     if kind=='vocal-harmony':
         if not getattr(sys,'frozen',False):return sys.executable
@@ -56,13 +56,13 @@ def python_for(kind):
         interpreter=mrmt3_python()
         return str(interpreter) if interpreter else None
     if kind=='audio-to-midi-yourmt3' or (kind=='audio-to-midi' and os.getenv('MTA_STUDIO_TRANSCRIBER')=='yourmt3'):
-        from .yourmt3_adapter import selected_variant
-        model,_,receipt_name=selected_variant()
-        configured=Path(os.getenv('MTA_STUDIO_YOURMT3_RUNTIME',''))
-        path=configured/receipt_name
-        if not configured.is_absolute() or configured.is_symlink() or path.is_symlink() or not path.is_file() or path.stat().st_size>131072:return None
-        value=json.loads(path.read_text())
-        if value.get('model')!=model or value.get('tested') is not True:return None
+        from .yourmt3_adapter import selected_variant, verified_runtime
+        try:
+            configured=verified_runtime(full=False)
+            _,_,receipt_name=selected_variant()
+            from .transcription_source_contract import read_json
+            if read_json(configured/receipt_name).get('tested') is not True:return None
+        except (ValueError,OSError,KeyError):return None
         return os.getenv('MTA_AI_WORKER_AUDIO_TO_MIDI_PYTHON')
     installed=receipt()
     return installed['python'] if installed and installed.get('enabled') else None

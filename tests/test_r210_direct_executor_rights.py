@@ -7,6 +7,7 @@ import sys
 
 import pytest
 from app import model_license_policy as policy
+from model_rights_fixtures import synthetic_review
 
 ENTRIES={
     'whisper':'whisper','whisper_progressive':'whisper','loaded_whisper':'whisper',
@@ -134,14 +135,14 @@ def test_permitted_loaded_whisper_retains_original_fallback_and_timestamps(right
 
 @pytest.mark.parametrize('entry',['singer_bridge','singer_onnx','singer_session'])
 def test_acoustic_permission_cannot_replace_separate_vocoder_permission(rights,tmp_path,monkeypatch,entry):
-    rights.write_text('{"diffsinger-nishiren":{"mode":"cost_recovery"},"diffsinger-vocoder":{"mode":"disabled"}}')
+    rights.write_text(json.dumps({'diffsinger-nishiren':synthetic_review(),'diffsinger-vocoder':{'mode':'disabled'}}))
     with pytest.raises(policy.LicenseDenied,match='diffsinger-vocoder'):
         dispatch(entry,tmp_path,monkeypatch)
 
 
 def test_singing_component_policy_cannot_be_bypassed_by_allowed_singer_and_vocoder(rights,tmp_path,monkeypatch):
     from app import diffsinger_onnx
-    rights.write_text(json.dumps({model:{'mode':'cost_recovery'} for model in ('diffsinger-nishiren','diffsinger-vocoder')}))
+    rights.write_text(json.dumps({model:synthetic_review() for model in ('diffsinger-nishiren','diffsinger-vocoder')}))
     monkeypatch.setattr(diffsinger_onnx,'inventory',lambda:({'bindings':{},'licenses':[{'policy_model':'unreviewed-engine'}]},None))
     with pytest.raises(policy.LicenseDenied,match='unreviewed-engine'):
         diffsinger_onnx.run(tmp_path/'missing',tmp_path/'output')
@@ -169,7 +170,7 @@ def test_independent_actual_cli_denies_before_optional_runtime_import(tmp_path,k
 @pytest.mark.parametrize('mode',['disabled','cost_recovery'])
 def test_model_only_interpreter_reads_current_policy_without_web_dependencies(tmp_path,mode):
     folder=tmp_path/'.studio-models';folder.mkdir()
-    (folder/'license-policy.json').write_text(json.dumps({'sam-audio':{'mode':mode}}))
+    (folder/'license-policy.json').write_text(json.dumps({'sam-audio':synthetic_review(mode)}))
     root=Path(__file__).resolve().parents[1]
     # -S removes site-packages: no FastAPI,qrcode,Pydantic,Torch or SAM package.
     result=subprocess.run([sys.executable,'-S',str(root/'app/sam_audio_worker.py'),

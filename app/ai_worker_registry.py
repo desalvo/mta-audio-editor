@@ -17,6 +17,7 @@ WORKER_KINDS = frozenset({
 
 
 def extensions():
+    from .studio_catalog import KINDS
     value=os.getenv('MTA_AI_ENGINE_REGISTRY_FILE','')
     if not value:return {}
     path=Path(value)
@@ -28,7 +29,7 @@ def extensions():
     for item in document:
         if (not isinstance(item,dict) or set(item)-{'kind','executable','python','gpu_capable','label','metering_method'}
                 or not isinstance(item.get('kind'),str) or not re.fullmatch(r'[a-z][a-z0-9-]{0,63}',item['kind'])
-                or item['kind'] in WORKER_KINDS or item['kind'] in result):
+                or item['kind'] in WORKER_KINDS | KINDS or item['kind'] in result):
             raise ValueError('Invalid or duplicate AI engine')
         if any(not isinstance(item.get(k,''),str) or len(item.get(k,''))>4096 for k in ('python','executable','label')):raise ValueError('Invalid registry field')
         if type(item.get('gpu_capable',False)) is not bool:raise ValueError('Invalid GPU capability')
@@ -47,6 +48,10 @@ def worker_python(kind):
     item=extensions().get(kind,{})
     from .studio_catalog import KINDS,python_for
     configured=os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON')
+    override=item.get('python') or configured or os.getenv('MTA_AI_DEFAULT_PYTHON')
+    if override:
+        from .ai_adapter_identity import require_current_interpreter
+        require_current_interpreter(override)
     studio_python=python_for(kind) if kind in KINDS and not item.get('python') and not configured else None
     value=item.get('python') or configured or studio_python or os.getenv('MTA_AI_DEFAULT_PYTHON') or sys.executable
     path=Path(value)
@@ -61,6 +66,16 @@ def resolve_worker(kind: str) -> Path | None:
     from .studio_catalog import KINDS,available
     if not isinstance(kind, str) or kind not in WORKER_KINDS|extra.keys()|KINDS:
         raise ValueError('Unsupported AI worker kind')
+    # Before availability/admission/ledger, including the legacy ACE fallback.
+    override=(extra.get(kind,{}).get('python')
+              or os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON')
+              or os.getenv('MTA_AI_DEFAULT_PYTHON'))
+    if override:
+        from .ai_adapter_identity import require_current_interpreter
+        try:
+            require_current_interpreter(override)
+        except (ValueError, OSError):
+            return None
     env_name = 'MTA_AI_WORKER_' + re.sub(r'[^A-Z0-9]', '_', kind.upper()) + '_EXECUTABLE'
     value = os.environ.get(env_name, '') or extra.get(kind,{}).get('executable','')
     if not value and kind in {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals','markers'} and os.environ.get('MTA_AI_UNIFIED_WORKERS_ENABLED') == 'true':
@@ -75,12 +90,14 @@ def resolve_worker(kind: str) -> Path | None:
         return None
     path = Path(value)
     # Frozen bundles may extract data .py files without Unix execute bits.
-    # Only our fixed internal Studio adapter is launched through the validated
+    # Only our fixed internal Studio/ACE adapter is launched through the validated
     # Python interpreter; external configured executables keep the X_OK check.
-    internal_studio=kind in KINDS and path==Path(__file__).with_name('ai_studio_adapter.py').resolve()
-    if not path.is_absolute() or path.is_symlink() or not path.is_file() or (not internal_studio and not os.access(path, os.X_OK)):
+    internal_adapter=(kind in KINDS and path==Path(__file__).with_name('ai_studio_adapter.py').resolve()) or (
+        kind in {'ace-step','arranger','remix'} and path==Path(__file__).with_name('ace_step_http_worker.py').resolve())
+    if not path.is_absolute() or path.is_symlink() or not path.is_file() or (not internal_adapter and not os.access(path, os.X_OK)):
         return None
-    return path
+    from .ai_adapter_identity import supported_worker
+    return path if supported_worker(kind, path) else None
 
 
 def available_workers() -> dict[str, bool]:

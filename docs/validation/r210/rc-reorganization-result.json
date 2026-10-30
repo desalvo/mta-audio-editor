@@ -1,0 +1,80 @@
+{
+  "schema": "mta-rc-reorganization-result-1",
+  "date": "2026-10-30",
+  "scope": "Documentation and work ordering only;no application source/test/security/target validation rerun or new acceptance.",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip",
+  "input_sha256": "ff08b5549904981ffb1950c87987feabb6bfa6fd1d6490e3e2af73614cf860f0",
+  "original_criteria_exactly_unchanged": true,
+  "criteria": {
+    "verified": 29,
+    "total": 42,
+    "percent": 69.0,
+    "newly_accepted": [],
+    "remaining": [
+      "A4",
+      "A5",
+      "A6",
+      "B6",
+      "C3",
+      "C5",
+      "C6",
+      "D6",
+      "F4",
+      "F5",
+      "F6",
+      "G5",
+      "G6"
+    ]
+  },
+  "remaining_classification_unchanged": {
+    "implementation_or_review_pending": 8,
+    "environment_blocked": 5
+  },
+  "all_13_pending_criteria_mapped_exactly_once": true,
+  "dependency_graph_acyclic": true,
+  "referenced_production_and_evidence_paths_exist": true,
+  "all_input_archive_files_preserved": true,
+  "existing_changed_files": [
+    "docs/DEVELOPMENT_COMPONENTS_R210.json",
+    "docs/DEVELOPMENT_HANDOFF_R210.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/KNOWN_BLOCKERS_R210.md",
+    "docs/RC_ACCEPTANCE_REPORT.md",
+    "docs/RC_CLOSURE_PLAN_R210.md",
+    "docs/RC_EXECUTION_STRATEGY_R210.json",
+    "docs/RC_EXTERNAL_ACCEPTANCE_R210.md",
+    "docs/RC_FINAL_WORK_QUEUE_R210.md"
+  ],
+  "all_existing_non_documentation_bytes_unchanged": true,
+  "history_preserved": [
+    "docs/development-history/RC_EXECUTION_STRATEGY_R210_BEFORE_REORGANIZATION_20261030.json",
+    "docs/development-history/RC_FINAL_WORK_QUEUE_R210_BEFORE_REORGANIZATION_20261030.md"
+  ],
+  "application_tests_run": false,
+  "target_tests_run": false,
+  "remote_ci_dispatched": false,
+  "commit_performed": false,
+  "release_candidate": false,
+  "general_transition_enabled": false,
+  "active_workstream": "finance",
+  "critical_path": {
+    "A4": [],
+    "A5": [],
+    "C3": [
+      "A4",
+      "A5"
+    ],
+    "C5": [
+      "C2",
+      "C3"
+    ],
+    "D6": [
+      "C5"
+    ],
+    "C6": [
+      "C5",
+      "B6"
+    ]
+  },
+  "delivery": "Existing complete ACE cumulative plus this documentation delta;no intermediate cumulative ZIP."
+}

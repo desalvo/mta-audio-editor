@@ -173,7 +173,7 @@ def test_worker_receipt_gate_and_durable_completion_with_explicit_process_double
         from app.ai_unified_adapter import _artifacts
         _artifacts(Path(cwd),[(model,'application/json')])
         return ai_metering_agent.Measurement(0,.1,{'cpu_seconds':.1},'worker',True,pid=os.getpid()+(1 if receipt_state=='foreign-pid' else 0))
-    monkeypatch.setattr(ai_metering_agent,'run_metered_process',process)
+    monkeypatch.setattr(ai_metering_agent,'run_supervised_process',process)
     assert worker.run_once(client,folder)
     assert economic(job)==(('done','finished','closed') if receipt_state=='matching' else ('failed','finished','closed'))
     proof=json.loads(task(job)['completion_json'])

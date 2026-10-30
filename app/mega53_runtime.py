@@ -47,7 +47,7 @@ def configured():
 
 def infer(source, output_dir, cancel_event=None, drum_targets=None):
     """Return canonical (lead, backing) WAVs; fail closed on ambiguous outputs."""
-    from .model_license_policy import evaluate_model
+    from .model_license_policy import evaluate_model,guarded_model_call
     evaluate_model('mvsep-mega53')
     root = _verified_directory(os.getenv('MTA_MEGA53_ROOT', ''))
     config = _verified_file(os.getenv('MTA_MEGA53_CONFIG', ''), 'config')
@@ -65,7 +65,7 @@ def infer(source, output_dir, cancel_event=None, drum_targets=None):
                '--config_path', str(config), '--start_check_point', str(checkpoint),
                '--input_folder', str(inputs), '--store_dir', str(outputs)]
         from .separator_process import run
-        try:run(cmd,cwd=root,cancel_event=cancel_event)
+        try:guarded_model_call('mvsep-mega53',run,cmd,cwd=root,cancel_event=cancel_event)
         except (RuntimeError,subprocess.SubprocessError) as exc:
             raise RuntimeError('Mega 53 inference failed: '+str(exc)) from exc
         # Exact tokens prevent a source labelled "snare" matching some unrelated artifact.

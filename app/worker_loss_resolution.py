@@ -72,6 +72,8 @@ def _snapshot(c, job_id):
             or job['resource_source']!='unmetered'):
         raise FenceBlocked('Existing evidence, legacy uncertainty or settled work requires original recovery')
     if not job.get('worker_scope_count'):raise FenceBlocked('Durable registered worker scopes required')
+    if job['kind'] in {'ace-step','arranger','remix'}:
+        raise FenceBlocked('External ACE service quiescence is not proven by a local process-tree receipt')
     for table,query in (('ai_verified_gpu_evidence','SELECT 1 FROM ai_verified_gpu_evidence WHERE job_id=?'),
                         ('ai_gpu_evidence_claims','SELECT 1 FROM ai_gpu_evidence_claims WHERE job_id=?'),
                         ('ai_trusted_estimate_evidence','SELECT 1 FROM ai_trusted_estimate_evidence WHERE job_id=?')):

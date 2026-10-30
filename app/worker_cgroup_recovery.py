@@ -200,6 +200,8 @@ def enter_before_exec(scope_id, group):
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE')
         row, b = _scope(c, scope_id)
+        if b.get('method') == 'linux-subreaper-pidfd-1':
+            raise FenceBlocked('Independent guardian scope cannot enter a cgroup launcher')
         if _receipt(c, scope_id) or b['host'] != _host():
             raise FenceBlocked('Worker scope already quiesced or belongs to another host')
         if not b['supervisor_identity'] or _process_identity(b['supervisor_pid']) != b['supervisor_identity']:
@@ -243,6 +245,8 @@ def owner_quiescent(scope_id):
         row, b = _scope(c, scope_id)
         if _receipt(c, scope_id):
             return
+        if b.get('method') == 'linux-subreaper-pidfd-1':
+            raise FenceBlocked('Independent guardian quiescence evidence required')
         if (b['host'] != _host() or b['supervisor_pid'] != os.getpid()
                 or not b['supervisor_identity'] or _process_identity(os.getpid()) != b['supervisor_identity']):
             raise FenceBlocked('Only the original live supervisor may attest cleanup')
@@ -271,6 +275,8 @@ def recover(scope_id, actor, request_id):
         old = _receipt(c, scope_id)
         if old:
             return old  # Exact persisted quiescence; never kill twice.
+        if b.get('method') == 'linux-subreaper-pidfd-1':
+            raise FenceBlocked('Independent guardian receipt unavailable; original work remains held')
         if c.execute('SELECT 1 FROM worker_cgroup_receipts WHERE request_id=?', (request_id,)).fetchone():
             raise FenceBlocked('Recovery request identifier already used')
         if b['host'] != _host():

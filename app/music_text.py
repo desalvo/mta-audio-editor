@@ -1002,7 +1002,7 @@ def _normalize_madmom_chord(label: str) -> str:
 
 
 def _madmom_processor(engine: str):
-    from .model_license_policy import evaluate_model
+    from .model_license_policy import evaluate_model,guarded_model_call
     evaluate_model('madmom')
     device=native_ai_device()
     use_torch=device != "cpu"
@@ -1015,7 +1015,8 @@ def _madmom_processor(engine: str):
         except Exception as exc:
             logger.warning("Madmom accelerator %s unavailable, using NumPy backend: %s",device,exc)
             feature=DeepChromaProcessor()
-        return SequentialProcessor([feature,DeepChromaChordRecognitionProcessor()]),device if use_torch else "cpu"
+        processor=SequentialProcessor([feature,DeepChromaChordRecognitionProcessor()])
+        return lambda *a,**kw:guarded_model_call('madmom',processor,*a,**kw),device if use_torch else "cpu"
     if engine == "madmom-cnn-crf":
         from madmom_infer.features.chords import CNNChordFeatureProcessor, CRFChordRecognitionProcessor  # type: ignore
         from madmom_infer.processors import SequentialProcessor  # type: ignore
@@ -1024,7 +1025,8 @@ def _madmom_processor(engine: str):
         except Exception as exc:
             logger.warning("Madmom accelerator %s unavailable, using NumPy backend: %s",device,exc)
             feature=CNNChordFeatureProcessor()
-        return SequentialProcessor([feature,CRFChordRecognitionProcessor()]),device if use_torch else "cpu"
+        processor=SequentialProcessor([feature,CRFChordRecognitionProcessor()])
+        return lambda *a,**kw:guarded_model_call('madmom',processor,*a,**kw),device if use_torch else "cpu"
     raise ValueError("unsupported Madmom chord engine")
 
 

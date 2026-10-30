@@ -138,7 +138,7 @@ def test_worker_checkpoint_keeps_cpu_and_gpu_together(ledger, tmp_path, monkeypa
         Path(kw['env']['MTA_AI_PROGRESS_FILE']).write_text(json.dumps({'cpu_seconds_estimated':2,'phase':'inference'}))
         kw['cancel_check']()
         return agent.Measurement(0,1,{'cpu_seconds':2.5},'worker',True)
-    monkeypatch.setattr(agent,'run_metered_process',measured)
+    monkeypatch.setattr(agent,'run_supervised_process',measured)
     monkeypatch.delenv('MTA_AI_CGROUP_PARENT',raising=False)
     # A historical completed row is not an execution permit. This live worker
     # fixture must acquire the same real scheduler identity as production.

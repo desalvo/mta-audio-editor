@@ -13,15 +13,15 @@ def test_unknown_kind_fails_closed():
         resolve_worker('arbitrary-command')
 
 
-def test_per_kind_admin_configuration(monkeypatch, tmp_path):
+def test_per_kind_opaque_admin_configuration_is_unavailable(monkeypatch, tmp_path):
     worker = tmp_path / 'whisper.py'
     worker.write_text('#!/usr/bin/env python3\n')
     worker.chmod(0o700)
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
     monkeypatch.setenv('MTA_AI_WORKER_WHISPER_EXECUTABLE', str(worker))
-    assert resolve_worker('whisper') == worker
+    assert resolve_worker('whisper') is None
     assert resolve_worker('demucs') is None
-    assert available_workers()['whisper'] is True
+    assert available_workers()['whisper'] is False
     monkeypatch.setenv('MTA_AI_WORKER_WHISPER_EXECUTABLE', '/bin/does-not-exist')
     assert resolve_worker('whisper') is None
 

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="103" time="37.009" timestamp="2026-10-30T01:54:36.546417+01:00" hostname="fa16cbf55a36"><testcase classname="tests.test_r207_universal_worker_registry" name="test_all_known_model_families_have_registry_entries" time="0.001" /><testcase classname="tests.test_r207_universal_worker_registry" name="test_unknown_kind_fails_closed" time="0.003" /><testcase classname="tests.test_r207_universal_worker_registry" name="test_per_kind_opaque_admin_configuration_is_unavailable" time="0.013" /><testcase classname="tests.test_r207_universal_worker_registry" name="test_symlink_is_rejected" time="0.001" /><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_worker_requires_admin_opt_in" time="0.005" /><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_worker_file_contract_and_validation" time="0.108" /><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_worker_rejects_invalid_audio" time="0.001" /><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_native_pdc_mix_compiles_and_runs" time="0.937" /><testcase classname="tests.test_r183_worker_capabilities_meter" name="test_worker_probe_fail_closed_without_configuration" time="0.000" /><testcase classname="tests.test_r183_worker_capabilities_meter" name="test_worker_probe_does_not_claim_inference" time="0.041" /><testcase classname="tests.test_r183_worker_capabilities_meter" name="test_native_peak_meter_compiles_and_measures" time="0.389" /><testcase classname="tests.test_r184_ai_audio_transfer" name="test_worker_receives_audio_and_returns_preview" time="0.290" /><testcase classname="tests.test_r184_ai_audio_transfer" name="test_source_path_is_not_user_controlled" time="0.002" /><testcase classname="tests.test_r184_ai_audio_transfer" name="test_native_dsp_contract_is_present" time="0.000" /><testcase classname="tests.test_r184_ai_audio_transfer" name="test_native_preview_crossfade_compiles" time="0.331" /><testcase classname="tests.test_r189_ace_deploy" name="test_sidecar_allowlist" time="0.001" /><testcase classname="tests.test_r189_ace_deploy" name="test_manifests_do_not_embed_weights_or_publish_api" time="0.001" /><testcase classname="tests.test_r189_ace_deploy" name="test_opaque_launcher_is_denied_even_with_user_consent" time="0.002"><failure message="app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_opaque_launcher_is_denied0')
+
+    def test_opaque_launcher_is_denied_even_with_user_consent(tmp_path):
+        from app.ace_step_local import launch
+        executable = tmp_path / 'ace-api'
+        executable.write_text('#!/bin/sh\nexit 0\n')
+        executable.chmod(0o755)
+        with pytest.raises(RuntimeError, match='checkpoint loader contract'):
+&gt;           launch(str(executable), model_dir=str(tmp_path / 'models'))
+
+tests/test_r189_ace_deploy.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ace_step_local.py:24: in launch
+    deny_opaque_executor()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def deny_opaque_executor():
+        """No generic executable-to-checkpoint protocol is supported yet."""
+        from .model_license_policy import LicenseDenied
+&gt;       raise LicenseDenied('Configured executable has no verified checkpoint loader contract; use a supported MTA integration')
+E       app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration
+
+app/ai_adapter_identity.py:61: LicenseDenied</failure></testcase><testcase classname="tests.test_r190_ai_readiness_native" name="test_not_configured_does_not_claim_inference" time="0.000" /><testcase classname="tests.test_r190_ai_readiness_native" name="test_mock_worker_capabilities_not_inference" time="0.027" /><testcase classname="tests.test_r190_ai_readiness_native" name="test_native_noise_gate" time="0.301" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_single_file_contract" time="0.005" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_cache_absent_and_file_limit" time="0.001" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_cache_files_truncation_and_symlink" time="0.001" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_readiness_unconfigured" time="0.000" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_readiness_probes[fail-capability_probe_failed]" time="0.001" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_readiness_probes[json-probe_failed]" time="0.000" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_readiness_probes[invalid-invalid_capabilities]" time="0.000" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_readiness_probes[good-real_inference_not_verified]" time="0.004" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_readiness_probes[error-probe_failed]" time="0.000" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_readiness_server_and_timeout" time="0.000" /><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_local_launcher_guards" time="0.002"><failure message="app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_local_launcher_guards0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f7e03086cc0&gt;
+
+    def test_local_launcher_guards(tmp_path, monkeypatch):
+        from app import ace_step_local
+        with pytest.raises(ValueError):
+            ace_step_local.launch('relative-file', model_dir=str(tmp_path))
+        exe = tmp_path / 'run'; exe.write_text('#!/bin/sh\n'); exe.chmod(0o755)
+        alias = tmp_path / 'alias'; alias.symlink_to(exe)
+        with pytest.raises(ValueError):
+            ace_step_local.launch(str(alias), model_dir=str(tmp_path))
+        cache = tmp_path / 'cache'
+        with pytest.raises(RuntimeError):
+&gt;           ace_step_local.launch(str(exe), model_dir=str(cache))
+
+tests/test_r202_wizard_cache_coverage.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ace_step_local.py:24: in launch
+    deny_opaque_executor()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def deny_opaque_executor():
+        """No generic executable-to-checkpoint protocol is supported yet."""
+        from .model_license_policy import LicenseDenied
+&gt;       raise LicenseDenied('Configured executable has no verified checkpoint loader contract; use a supported MTA integration')
+E       app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration
+
+app/ai_adapter_identity.py:61: LicenseDenied</failure></testcase><testcase classname="tests.test_r202_wizard_cache_coverage" name="test_desktop_manager_cache_status_consent_and_install_guards" time="0.004" /><testcase classname="tests.test_r207_authenticated_worker_e2e" name="test_authenticated_worker_records_once_and_rejects_duplicate" time="0.721" /><testcase classname="tests.test_r207_authenticated_worker_e2e" name="test_remote_payload_paths_are_rejected" time="0.042" /><testcase classname="tests.test_r207_authenticated_worker_e2e" name="test_worker_failure_is_not_billable" time="0.598" /><testcase classname="tests.test_r207_authenticated_worker_e2e" name="test_gpu_slot_lifecycle_on_success" time="0.615" /><testcase classname="tests.test_r207_authenticated_worker_e2e" name="test_gpu_slot_lifecycle_on_failure" time="0.613" /><testcase classname="tests.test_r208_legacy_supervised_lifecycle" name="test_legacy_worker_precancel_skips_execution" time="0.002" /><testcase classname="tests.test_r208_legacy_supervised_lifecycle" name="test_legacy_worker_cancel_running" time="0.053" /><testcase classname="tests.test_r208_legacy_supervised_lifecycle" name="test_legacy_worker_timeout" time="1.004" /><testcase classname="tests.test_r208_legacy_supervised_lifecycle" name="test_legacy_worker_failed_exit" time="0.103" /><testcase classname="tests.test_r208_native_ace_worker_bridge" name="test_wizard_configures_trusted_worker_for_local_remote_and_disabled" time="0.001" /><testcase classname="tests.test_r208_native_ace_worker_bridge" name="test_server_payload_executable_for_rpm_and_deb" time="0.000" /><testcase classname="tests.test_r208_native_ace_worker_bridge" name="test_catalog_reports_configured_worker_not_static_disabled" time="0.016" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[whisper]" time="0.623" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[chords-ml]" time="0.617" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[demucs]" time="0.660" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[drumsep]" time="0.620" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[sam-audio]" time="0.608" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[singer-separation]" time="0.603" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[backing-vocals]" time="0.613" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting" time="0.616" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_cancellation_during_artifact_packaging_cannot_bill_success" time="0.600" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan" time="0.621" /><testcase classname="tests.test_r210_neural_external_adapter" name="test_settings_neural_explicit" time="0.001" /><testcase classname="tests.test_r210_neural_external_adapter" name="test_model_policy_not_oddvoices" time="0.000" /><testcase classname="tests.test_r210_neural_external_adapter" name="test_missing_neural_assets_fail_closed" time="0.000"><failure message="app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f7de91b19a0&gt;
+
+    def test_missing_neural_assets_fail_closed(monkeypatch):
+        for name in ('MTA_NEURAL_SINGER_EXECUTABLE','MTA_NEURAL_SINGER_CHECKPOINT','MTA_NEURAL_SINGER_SHA256'):
+            monkeypatch.delenv(name,raising=False)
+&gt;       with pytest.raises(RuntimeError):checked_assets()
+                                         ^^^^^^^^^^^^^^^^
+
+tests/test_r210_neural_external_adapter.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/neural_vocal_adapter.py:16: in checked_assets
+    deny_opaque_executor()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def deny_opaque_executor():
+        """No generic executable-to-checkpoint protocol is supported yet."""
+        from .model_license_policy import LicenseDenied
+&gt;       raise LicenseDenied('Configured executable has no verified checkpoint loader contract; use a supported MTA integration')
+E       app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration
+
+app/ai_adapter_identity.py:61: LicenseDenied</failure></testcase><testcase classname="tests.test_r210_neural_external_adapter" name="test_invalid_checkpoint_detected" time="0.001"><failure message="app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_invalid_checkpoint_detect0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f7de9180830&gt;
+
+    def test_invalid_checkpoint_detected(tmp_path,monkeypatch):
+        exe=tmp_path/'infer';exe.write_text('#!/bin/sh\nexit 0\n');exe.chmod(0o700)
+        model=tmp_path/'model.ckpt';model.write_bytes(b'invalid')
+        monkeypatch.setenv('MTA_NEURAL_SINGER_EXECUTABLE',str(exe))
+        monkeypatch.setenv('MTA_NEURAL_SINGER_CHECKPOINT',str(model))
+        monkeypatch.setenv('MTA_NEURAL_SINGER_SHA256','a'*64)
+&gt;       with pytest.raises(RuntimeError,match='checkpoint loader contract'):checked_assets()
+                                                                            ^^^^^^^^^^^^^^^^
+
+tests/test_r210_neural_external_adapter.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/neural_vocal_adapter.py:16: in checked_assets
+    deny_opaque_executor()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def deny_opaque_executor():
+        """No generic executable-to-checkpoint protocol is supported yet."""
+        from .model_license_policy import LicenseDenied
+&gt;       raise LicenseDenied('Configured executable has no verified checkpoint loader contract; use a supported MTA integration')
+E       app.model_license_policy.LicenseDenied: Configured executable has no verified checkpoint loader contract; use a supported MTA integration
+
+app/ai_adapter_identity.py:61: LicenseDenied</failure></testcase><testcase classname="tests.test_r210_global_ai_execution" name="test_token_and_nested_web_jobs_share_one_fifo_slot" time="0.846" /><testcase classname="tests.test_r210_global_ai_execution" name="test_queued_cancel_does_not_dispatch" time="0.537" /><testcase classname="tests.test_r210_global_ai_execution" name="test_orphan_remote_admission_does_not_block_fifo" time="0.443" /><testcase classname="tests.test_r210_global_ai_execution" name="test_operator_registry_keeps_unsupported_future_engine_unavailable" time="0.002" /><testcase classname="tests.test_r210_global_ai_execution" name="test_markers_and_chord_options_are_available_in_unified_protocol" time="0.032" /><testcase classname="tests.test_r210_global_ai_execution" name="test_native_future_engine_uses_shared_token_and_keeps_it_private" time="0.003" /><testcase classname="tests.test_r210_global_ai_execution" name="test_production_server_requires_authenticated_queue_identity" time="0.001" /><testcase classname="tests.test_r210_global_ai_execution" name="test_authenticated_token_worker_uses_global_queue_and_owner_receipt" time="0.495"><failure message="AssertionError: {&quot;detail&quot;:&quot;No trusted AI worker configured&quot;}&#10;assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">isolated_queue = None
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_authenticated_token_worke0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f7e00556e70&gt;
+
+    def test_authenticated_token_worker_uses_global_queue_and_owner_receipt(isolated_queue,tmp_path,monkeypatch):
+        from app import ai_access,ai_billing,auth
+        from app.ai_billing_routes import router
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        auth.init_auth_db()
+        with auth.db() as con:
+            for name in ('one','two'):
+                con.execute("INSERT INTO users(username,email,password_hash,active,email_confirmed,role,created_at,updated_at) VALUES(?,?,?,1,1,'user',1,1)",(name,name+'@example.org','fake'))
+            users=[r[0] for r in con.execute("SELECT id FROM users WHERE username IN ('one','two') ORDER BY username")]
+        token=ai_access.issue(users[0],'Mac')['token'];other=ai_access.issue(users[1],'Windows')['token']
+        runner=tmp_path/'markers.py'
+        runner.write_text('''import argparse,json,pathlib,hashlib
+    p=argparse.ArgumentParser();p.add_argument('--request');p.add_argument('--output');a=p.parse_args()
+    f=pathlib.Path(a.output).parent;r=f/'markers.json';r.write_text('{"markers":[]}')
+    (f/'output.manifest.json').write_text(json.dumps({'version':1,'files':[{'name':r.name,'type':'application/json','sha256':hashlib.sha256(r.read_bytes()).hexdigest()}]}))
+    ''');runner.chmod(0o700)
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED','true');monkeypatch.setenv('MTA_AI_WORKER_MARKERS_EXECUTABLE',str(runner))
+        monkeypatch.delenv('MTA_ALLOW_INSECURE_NO_AUTH',raising=False)
+        monkeypatch.delenv('MTA_AI_CGROUP_PARENT',raising=False)
+        app=FastAPI();app.include_router(router);client=TestClient(app)
+        headers={'Authorization':'Bearer '+token}
+        response=client.post('/api/ai-jobs/execute',headers=headers,json={'kind':'markers','plan':{'kind':'markers'}})
+&gt;       assert response.status_code==200,response.text
+E       AssertionError: {"detail":"No trusted AI worker configured"}
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_r210_global_ai_execution.py:129: AssertionError</failure></testcase><testcase classname="tests.test_r210_global_ai_execution" name="test_server_raw_wav_preserves_publication_metadata" time="0.566" /><testcase classname="tests.test_r210_global_ai_execution" name="test_server_runtime_configuration_is_private_and_preserves_settings" time="0.005" /><testcase classname="tests.test_r210_global_ai_execution" name="test_server_whisper_cannot_bill_an_unprofiled_cli" time="0.002" /><testcase classname="tests.test_r210_pull_coordinator" name="test_actual_executor_waits_for_worker_and_settles_real_ledger_once" time="0.705" /><testcase classname="tests.test_r210_pull_coordinator" name="test_atomic_capacity_rejection_leaves_no_ledger_fence_or_license_or_claim" time="0.097" /><testcase classname="tests.test_r210_pull_coordinator" name="test_two_independent_connections_never_assign_same_operation" time="0.101" /><testcase classname="tests.test_r210_pull_coordinator" name="test_claim_lost_response_recovers_same_attempt_but_not_new_instance" time="0.113" /><testcase classname="tests.test_r210_pull_coordinator" name="test_stale_epoch_receipt_and_policy_never_dispatch[epoch]" time="0.120" /><testcase classname="tests.test_r210_pull_coordinator" name="test_stale_epoch_receipt_and_policy_never_dispatch[claim]" time="0.092" /><testcase classname="tests.test_r210_pull_coordinator" name="test_stale_epoch_receipt_and_policy_never_dispatch[policy]" time="0.132" /><testcase classname="tests.test_r210_pull_coordinator" name="test_frozen_result_survives_accounting_failure_without_inference_replay" time="0.138" /><testcase classname="tests.test_r210_pull_coordinator" name="test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-True]" time="0.129" /><testcase classname="tests.test_r210_pull_coordinator" name="test_invalid_completion_cannot_mutate_economic_state[cpu_seconds--1]" time="0.095" /><testcase classname="tests.test_r210_pull_coordinator" name="test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-nan]" time="0.114" /><testcase classname="tests.test_r210_pull_coordinator" name="test_invalid_completion_cannot_mutate_economic_state[media_type-text/plain]" time="0.097" /><testcase classname="tests.test_r210_pull_coordinator" name="test_invalid_completion_cannot_mutate_economic_state[result_b64-bad!]" time="0.103" /><testcase classname="tests.test_r210_pull_coordinator" name="test_forged_assignment_and_frozen_sql_overwrite_are_rejected" time="0.109" /><testcase classname="tests.test_r210_pull_coordinator" name="test_pause_resume_revoke_do_not_claim_worker_quiescence" time="0.127" /><testcase classname="tests.test_r210_pull_coordinator" name="test_queued_cancel_settles_no_cpu_and_never_grants_source" time="0.138" /><testcase classname="tests.test_r210_pull_coordinator" name="test_running_cancel_remains_held_until_authenticated_completion" time="0.144" /><testcase classname="tests.test_r210_pull_coordinator" name="test_prune_preserves_unknown_execution_and_opaque_acknowledges_closed_result" time="0.115" /><testcase classname="tests.test_r210_pull_coordinator" name="test_authority_drain_rejects_new_admission_but_finishes_existing_queue" time="0.127" /><testcase classname="tests.test_r210_pull_coordinator" name="test_current_epoch_corruption_blocks_pull_readiness" time="0.089" /><testcase classname="tests.test_r210_pull_coordinator" name="test_copied_authority_database_cannot_become_second_active_coordinator" time="0.086" /><testcase classname="tests.test_r210_pull_coordinator" name="test_planned_offline_rebind_requires_closed_work_revoked_nodes_and_operator" time="0.138" /><testcase classname="tests.test_r210_pull_coordinator" name="test_deferred_generation_admission_is_atomic_with_authority_drain" time="0.280" /><testcase classname="tests.test_r210_pull_transport" name="test_two_separate_worker_processes_share_only_https_not_sqlite" time="2.361" /><testcase classname="tests.test_r210_pull_transport" name="test_partition_after_committed_claim_or_completion_never_reexecutes[claim]" time="1.851" /><testcase classname="tests.test_r210_pull_transport" name="test_partition_after_committed_claim_or_completion_never_reexecutes[complete]" time="1.743" /><testcase classname="tests.test_r210_pull_transport" name="test_untrusted_tls_never_transmits_worker_credential" time="0.487" /><testcase classname="tests.test_r210_pull_transport" name="test_redirect_cannot_forward_credential" time="0.767" /><testcase classname="tests.test_r210_pull_transport" name="test_journal_rejects_authority_key_and_trust_drift_before_network[credential]" time="0.915" /><testcase classname="tests.test_r210_pull_transport" name="test_journal_rejects_authority_key_and_trust_drift_before_network[trust]" time="1.145" /><testcase classname="tests.test_r210_pull_transport" name="test_dispatched_journal_never_reexecutes_after_actual_supervisor_sigkill" time="1.123" /><testcase classname="tests.test_r210_pull_transport" name="test_shared_worker_state_lock_serializes_two_processes" time="1.288" /><testcase classname="tests.test_r210_pull_transport" name="test_actual_authority_sigkill_after_frozen_result_recovers_without_new_inference" time="3.699" /></testsuite></testsuites>

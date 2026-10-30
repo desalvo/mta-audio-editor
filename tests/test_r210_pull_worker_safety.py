@@ -140,7 +140,7 @@ def test_failed_payload_reports_known_cpu_without_publishing_invalid_media(autho
 def test_unverified_descendants_never_freeze_publish_or_release_assignment(authority, monkeypatch):
     from app import ai_metering_agent as agent
     job = enqueue(authority)
-    monkeypatch.setattr(agent,'run_metered_process',lambda *a,**kw:agent.Measurement(0,1,{'cpu_seconds':1},'worker',False))
+    monkeypatch.setattr(agent,'run_supervised_process',lambda *a,**kw:agent.Measurement(0,1,{'cpu_seconds':1},'worker',False))
     folder = authority[2] / 'unknown-descendants'
     with pytest.raises(worker.WorkerUncertain):
         worker.run_once(DirectClient(authority[1]['credential']),folder)

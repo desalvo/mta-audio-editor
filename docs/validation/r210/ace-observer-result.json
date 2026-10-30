@@ -1,0 +1,18 @@
+{
+  "archive": "MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip",
+  "handoff": "docs/ACE_OBSERVER_ISOLATION_R210.md",
+  "proof": "docs/validation/r210/ace-observer-result.json",
+  "report_sha256": "174da311847697aa46b3f3b7bd1bf4868077df695e1e05a1ea889b58401443ed",
+  "passed": 57,
+  "skipped": 2,
+  "new_cases": 1,
+  "new_race_scenarios": 3,
+  "percent": 69.0,
+  "accepted_criteria": 29,
+  "original_criteria_total": 42,
+  "criteria_promoted": [],
+  "numeric_progress_requested_achieved": false,
+  "commit_deferred": true,
+  "release_candidate": false,
+  "base_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d"
+}

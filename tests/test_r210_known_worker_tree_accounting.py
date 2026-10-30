@@ -46,7 +46,7 @@ def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated
         measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
         if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
         return measurement
-    monkeypatch.setattr(agent,'run_metered_process',measured)
+    monkeypatch.setattr(agent,'run_supervised_process',measured)
     monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
     with pytest.raises(agent.WorkerUncertain) as error:
         agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
@@ -65,7 +65,7 @@ def test_known_tree_keeps_cgroup_runner_contract(operator,monkeypatch):
     monkeypatch.setenv('MTA_AI_WORKER_BACKING_VOCALS_PYTHON',sys.executable)
     monkeypatch.setenv('MTA_AI_CGROUP_PARENT','/synthetic-cgroup-fixture')
     monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
-    monkeypatch.setattr(agent,'run_metered_process',lambda *a,**kw:pytest.fail('Cgroup route fell back to wait4'))
+    monkeypatch.setattr(agent,'run_supervised_process',lambda *a,**kw:pytest.fail('Cgroup route fell back to wait4'))
     called=[]
     def grouped(args,**kwargs):
         called.append(kwargs['owner_receipt']['job_id'])

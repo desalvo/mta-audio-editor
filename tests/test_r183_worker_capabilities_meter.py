@@ -11,7 +11,7 @@ def test_worker_probe_fail_closed_without_configuration(monkeypatch):
     assert worker_capabilities()['ace_step_ready'] is False
 
 
-def test_worker_probe_does_not_claim_inference(monkeypatch,tmp_path):
+def test_worker_probe_does_not_claim_inference(monkeypatch,tmp_path,synthetic_worker_resolution):
     script=tmp_path/'worker'
     script.write_text('#!/usr/bin/env python3\nimport json,sys\nprint(json.dumps({"protocol":"mta.ai.worker.v1","models":["ace-step-1.5"],"supports_audio_input":True}))\n')
     script.chmod(0o700)

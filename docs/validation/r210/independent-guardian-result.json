@@ -1,0 +1,3315 @@
+{
+  "schema": "mta-independent-guardian-acceptance-1",
+  "date": "2026-10-30",
+  "criterion": "B2",
+  "criterion_text": "Actual supervisor-crash recovery with external worker quiescence proof",
+  "accepted_original_criterion": true,
+  "handoff": "docs/INDEPENDENT_WORKER_RECOVERY_R210.md",
+  "base_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-adapter-identity-cumulative.zip",
+  "input_sha256": "65f119b2c4194ecd84b7e582bfa9a98bd856eb251077638e0402b8c47bd2bf9c",
+  "input_entries": 4939,
+  "input_log_files": 694,
+  "current_results": {
+    "passed": 628
+  },
+  "new_cases": 16,
+  "reports_in_order": [
+    {
+      "path": "docs/validation/r210/guardian-integrated-final.xml",
+      "sha256": "03b6ff86c419b5cc17ec6a17090e7616a6edc3fcfb7403d2464034ffb17666c4",
+      "cases": 246
+    },
+    {
+      "path": "docs/validation/r210/guardian-boundaries-final.xml",
+      "sha256": "7a0442fc69163aa4026b35bd856f46fa0c69064c686531a6f01eeeab944b5e41",
+      "cases": 327
+    },
+    {
+      "path": "docs/validation/r210/guardian-http-initial.xml",
+      "sha256": "e7d0d0fcbf97da230381eca0f6c80459499c75ba9c5b6456b3eeb490e3739fb6",
+      "cases": 2
+    },
+    {
+      "path": "docs/validation/r210/guardian-kernel-final.xml",
+      "sha256": "533f7124b33a04be5c29b37a6a0a9fba8c3cfa7b46c897ab4926f4df6391975e",
+      "cases": 12
+    },
+    {
+      "path": "docs/validation/r210/guardian-gates-initial.xml",
+      "sha256": "d0ae5419d11817dfbae547a86ddd619e9be6ad946307eb5d56abf32648427fc6",
+      "cases": 61
+    },
+    {
+      "path": "docs/validation/r210/guardian-http-gate-final.xml",
+      "sha256": "86751407df1f54a5285372e3f76b755ea025f034d7cf3e11f5372c831fd1f9d8",
+      "cases": 1
+    },
+    {
+      "path": "docs/validation/r210/guardian-drain-final.xml",
+      "sha256": "8ce724637f87fde7ce20e7751cf6407befd00bb7e99d3a2008cd1dd01ae46ace",
+      "cases": 1
+    }
+  ],
+  "case_results": [
+    {
+      "id": "tests.test_r184_ai_audio_transfer::test_native_dsp_contract_is_present",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r184_ai_audio_transfer::test_native_preview_crossfade_compiles",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r184_ai_audio_transfer::test_source_path_is_not_user_controlled",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r184_ai_audio_transfer::test_worker_receives_audio_and_returns_preview",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r208_legacy_supervised_lifecycle::test_legacy_worker_cancel_running",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_legacy_supervised_lifecycle::test_legacy_worker_failed_exit",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_legacy_supervised_lifecycle::test_legacy_worker_precancel_skips_execution",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_legacy_supervised_lifecycle::test_legacy_worker_timeout",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_cancellation_during_artifact_packaging_cannot_bill_success",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_each_real_adapter_job_is_metered_billed_and_packaged[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_each_real_adapter_job_is_metered_billed_and_packaged[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_each_real_adapter_job_is_metered_billed_and_packaged[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_each_real_adapter_job_is_metered_billed_and_packaged[drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_each_real_adapter_job_is_metered_billed_and_packaged[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_each_real_adapter_job_is_metered_billed_and_packaged[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_each_real_adapter_job_is_metered_billed_and_packaged[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_billing_e2e::test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r208_unified_adapter_executable_mode::test_unified_worker_file_is_executable",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_cancellation_probe_failure_does_not_spawn_child",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_cancelled_context_rejects_new_stage_before_callback[callback]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_cancelled_context_rejects_new_stage_before_callback[event]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_cancelled_context_rejects_new_stage_before_callback[persisted]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_failed_or_unbounded_source_conversion_never_dispatches[empty]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_failed_or_unbounded_source_conversion_never_dispatches[failed]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_failed_or_unbounded_source_conversion_never_dispatches[oversized]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_independent_process_cannot_reuse_live_parent_scheduler_identity",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_inner_dispatch_rechecks_owner_after_outer_admission[local]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_inner_dispatch_rechecks_owner_after_outer_admission[pull]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_invalid_global_owner_never_creates_queue_job[-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_invalid_global_owner_never_creates_queue_job[0]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_invalid_global_owner_never_creates_queue_job[1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_invalid_global_owner_never_creates_queue_job[None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_invalid_global_owner_never_creates_queue_job[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_missing_queue_context_does_not_become_a_new_permit",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_native_fallback_pre_cancel_never_spawns",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_nested_cross_owner_rejected_but_same_owner_keeps_one_slot",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_pre_cancelled_process_does_not_execute_actual_child",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_public_worker_rejects_foreign_owner_before_routing_or_ledger[local]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_public_worker_rejects_foreign_owner_before_routing_or_ledger[pull]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_server_conversion_cancellation_reaps_child_and_never_enters_model",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_server_rejects_before_source_process[cancelled]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_server_rejects_before_source_process[engine_override]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_server_rejects_before_source_process[license_denied]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_server_source_conversion_rejects_inactive_context",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_source_preparation_uses_one_remaining_budget_and_preserves_bound_identity",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_terminal_or_unstarted_queue_context_never_dispatches[blocked]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_terminal_or_unstarted_queue_context_never_dispatches[cancelled]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_terminal_or_unstarted_queue_context_never_dispatches[completed]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_terminal_or_unstarted_queue_context_never_dispatches[failed]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_terminal_or_unstarted_queue_context_never_dispatches[interrupted]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_terminal_or_unstarted_queue_context_never_dispatches[queued]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_actor]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_identity]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_identity]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_active_execution_owner::test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_pid]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_claimed_inference_rejects_missing_or_forged_owner[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_claimed_inference_rejects_missing_or_forged_owner[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_crash_after_metering_or_publication_recovers_without_reexecution[arranger-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_crash_after_metering_or_publication_recovers_without_reexecution[arranger-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_crash_after_metering_or_publication_recovers_without_reexecution[remix-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_crash_after_metering_or_publication_recovers_without_reexecution[remix-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_ledger_commit_before_ack_retries_with_original_owner[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_ledger_commit_before_ack_retries_with_original_owner[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_lost_heartbeat_cancels_and_prevents_new_evidence_or_staging[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_lost_heartbeat_cancels_and_prevents_new_evidence_or_staging[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_real_scheduler_deferred_completion_has_one_owner_and_charge[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_real_scheduler_deferred_completion_has_one_owner_and_charge[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_removed_publication_owner_cannot_downgrade_to_legacy[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_removed_publication_owner_cannot_downgrade_to_legacy[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_unknown_or_changed_owner_blocks_publication_and_settlement[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_deferred_owner_e2e::test_unknown_or_changed_owner_blocks_publication_and_settlement[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_actual_admin_api_requires_auth_csrf_confirmation_and_hides_claim_token",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_bootstrap_enters_before_exec_under_original_scope",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_bootstrap_join_and_recovery_cannot_cross_the_write_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_changed_host_boot_namespace_cannot_reinterpret_scope[boot]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_changed_host_boot_namespace_cannot_reinterpret_scope[machine]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_changed_host_boot_namespace_cannot_reinterpret_scope[namespace]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_crash_before_audit_commit_retries_without_changing_money",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_failed_kernel_stop_keeps_financial_claim_and_no_false_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_foreign_owner_cannot_erase_worker_evidence",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_group_symlink_refused_without_signaling",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_immutable_rows_and_scoped_retired_owner_erasure",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[dead]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[quiesced]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_late_bootstrap_cannot_start_after_owner_loss_or_quiescence[unknown]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_live_or_unknown_supervisor_never_stopped[]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_live_or_unknown_supervisor_never_stopped[same]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_lost_journal_schema_is_not_recreated[worker_cgroup_receipts]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_lost_journal_schema_is_not_recreated[worker_cgroup_scopes]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_metering_failure_with_unknown_cleanup_keeps_gpu_lease_and_claim",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_missing_counted_scope_does_not_look_quiescent",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_missing_history_refuses_new_launch_before_any_effect",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_missing_proof_blocks_second_scope_even_if_one_is_quiescent",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_non_kernel_directory_is_refused_even_with_similar_files",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_original_owner_clean_exit_then_normal_billing_works",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_original_supervisor_ownership_cannot_be_reused_by_new_process",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_pagination_and_invalid_windows_are_explicit",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_real_supervisor_crash_after_durable_registration_before_spawn",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_recovery_preserves_actual_contract_reservations_and_money",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_recovery_receipt_blocks_delayed_spawn_even_if_supervisor_is_reused",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_recovery_request_is_durable_idempotent_under_concurrency",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_recreated_cgroup_inode_is_not_the_original_worker_scope",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_recursive_kernel_stop_persists_only_after_empty",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_registered_runner_commits_scope_before_spawn_and_cleanup_before_measurement[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_registered_runner_commits_scope_before_spawn_and_cleanup_before_measurement[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_registration_commits_original_binding_without_exposing_token",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_reused_supervisor_pid_proves_old_process_death_without_signaling_new_one",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_tampered_binding_fails_closed[binding_json]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_tampered_binding_fails_closed[sha256]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_uncertain_scope_blocks_every_financial_finalization[fence]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_uncertain_scope_blocks_every_financial_finalization[finish]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_durable_cgroup_recovery::test_uncertain_scope_blocks_every_financial_finalization[idempotent]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[foreign]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[inactive]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[revoke]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_actual_cancelled_child_preserves_reaped_cpu_and_no_artifact",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_cancel_between_ledger_admission_and_popen_has_typed_private_response[json]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_cancel_between_ledger_admission_and_popen_has_typed_private_response[wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[ace-step]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-basic-pitch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-mr-mt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-transkun]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-yourmt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[markers]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-harmony]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-synthesis]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_every_builtin_kind_actual_api_process_owner_meter_and_replay[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_internal_registered_entry_requires_actual_scheduler_owner",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[command]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[cwd]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[executable]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[input_path]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[output_path]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[shell]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[source_audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_json_entry_rejects_nested_worker_control_before_queue[source_score]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_malformed_wav_never_creates_a_ledger_or_claim",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_operator_extension_cannot_bypass_the_same_owner_metering_contract",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-json]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-json]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_revoked_token_cannot_dispatch_from_an_original_running_queue",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_running_revocation_returns_private_api_cancellation_instead_of_server_error[json]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_running_revocation_returns_private_api_cancellation_instead_of_server_error[wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_running_token_revocation_stops_actual_process_and_retains_measured_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_acceptance::test_unverifiable_process_tree_keeps_original_claim_without_publication",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_current_complete_execution_entry_review",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_native_and_operator_sources_are_part_of_complete_binding",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_sibling_local_imports_do_not_rewrite_other_functions",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_actual_child_entry_rejects_before_reading_score_or_loading_models",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_child_rejects_missing_changed_or_malformed_original_policy[digest]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_child_rejects_missing_changed_or_malformed_original_policy[duplicate]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_child_rejects_missing_changed_or_malformed_original_policy[kind]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_child_rejects_missing_changed_or_malformed_original_policy[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_child_rejects_missing_changed_or_malformed_original_policy[review-type]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_child_rejects_missing_changed_or_malformed_original_policy[schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_native_parent_actual_studio_adapter_preserves_output_and_no_server_invoice",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_pull_parent_propagates_original_assignment_to_actual_child",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_registered_child_cannot_adopt_different_current_policy",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_registered_parent_overwrites_inherited_policy_and_real_child_verifies",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_transkun_config_is_private_exact_copy_removed_after_parse",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_transkun_loader_uses_verified_stream_after_path_replacement",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[checkpoint]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_execution_policy_binding::test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[config]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_actual_diagnostic_web_job_cannot_execute_local_model",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_actual_native_local_analysis_still_publishes_without_server_invoice",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_auth_diagnostics_never_switch_server_to_unowned_local_inference[1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_auth_diagnostics_never_switch_server_to_unowned_local_inference[]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_auth_diagnostics_never_switch_server_to_unowned_local_inference[false]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_auth_diagnostics_never_switch_server_to_unowned_local_inference[on]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_auth_diagnostics_never_switch_server_to_unowned_local_inference[true]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_auth_diagnostics_never_switch_server_to_unowned_local_inference[yes]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[inner--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[inner-1.0]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[inner-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[inner-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[inner-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[inner-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[public--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[public-1.0]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[public-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[public-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[public-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_invalid_studio_actor_rejected_before_model_or_config[public-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_native_compat_license_denial_is_readable_and_has_no_upload_side_effect",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_server_sync_stem_compat_rejects_before_file_or_model_effects[account]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_server_sync_stem_compat_rejects_before_file_or_model_effects[diagnostic]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_server_zero_actor_cannot_read_native_token_or_launch[inner]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_server_zero_actor_cannot_read_native_token_or_launch[public]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_executor_boundaries::test_server_zero_actor_cannot_read_native_token_or_launch[remote]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_cache_and_remote_still_reject_oversized_results",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_native_upload_reads_beyond_old_32mib_limit",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_oversize_source_rejected_before_job_or_billing",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_server_manifest_is_not_charged_to_audio_budget",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_shared_source_and_result_limits_agree",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_six_stems_over_old_limits_roundtrip_server_cache_and_native",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_sparse_oversize_stem_rejected_before_read_or_manifest",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_worker_size_failure_has_specific_safe_diagnostic",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_full_length_stem_artifacts::test_zip_overhead_is_separate_from_uncompressed_budget",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_ace_external_service_cannot_be_cleared_with_only_a_local_tree_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_actual_supervisor_sigkill_leaves_complete_kernel_receipt_and_original_claim",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_empty_proc_samples_cannot_turn_a_live_child_into_quiescence",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_guard_never_signals_a_sibling_unrelated_to_its_job",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_guardian_can_finish_original_cleanup_during_drain_without_releasing_its_debt",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-drain-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[callback-error]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[cancel]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[normal-leader-exit]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[timeout]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_lost_guardian_is_not_replaced_by_a_pid_guess_or_fabricated_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_original_supervisor_cannot_forge_a_guardian_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_precancel_never_starts_a_worker_or_guard",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution[COMMERCIAL]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-http-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution[NON_COMMERCIAL]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-http-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_real_registered_ffmpeg_tree_settles_only_after_guardian_kernel_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_short_lived_child_cpu_is_collected_even_without_proc_samples",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-kernel-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_keeps_cgroup_runner_contract",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan4]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-demucs-plan0]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-drumsep-plan5]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-sam-audio-plan1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-singer-separation-plan2]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan4]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-demucs-plan0]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-drumsep-plan5]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-sam-audio-plan1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_known_worker_tree_accounting::test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-singer-separation-plan2]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[json]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_native_legacy_policy_denial_precedes_worker_and_source[external]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_native_legacy_policy_denial_precedes_worker_and_source[project]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[cancel]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[timeout]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_native_project_worker_receives_original_policy_and_actual_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_native_studio_no_wait4_fallback_stops_its_own_session",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[GET-v1/audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-query_result]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-release_task]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/init]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/models]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[1-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[1-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[1-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[1-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[false-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[false-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[false-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_legacy_executor_closure::test_server_cannot_use_native_credentials_or_legacy_worker[false-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_help_and_native_setup_markup_are_in_one_current_language",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_installer_watchdog_handles_silent_process",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_mac_supervisor_does_not_depend_on_linux_proc_or_fabricate_tree_metering",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_missing_runtime_reports_failure_and_does_not_start_server",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_native_adapter_uses_managed_python_and_not_frozen_gui_executable",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_no_install_without_selection_consent",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_ready_status_notification_follows_backend_readiness_even_without_dialog",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_select_local_installs_starts_and_waits_for_http_readiness",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_selecting_local_preserves_an_already_running_adapter",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_source_archive_rejects_unsafe_members[../../escape]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_native_local_setup::test_source_archive_rejects_unsafe_members[/absolute/file]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_actual_raw_launcher_cli_cannot_bypass_with_download_consent",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[ai_studio_adapter.py]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[ai_unified_adapter.py]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[opaque]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_direct_generic_singer_is_denied_before_score_or_output_access",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[ace-step]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-basic-pitch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-mr-mt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-transkun]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-yourmt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[markers]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[vocal-harmony]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[vocal-synthesis]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-basic-pitch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-mr-mt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-transkun]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-yourmt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[vocal-harmony]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[vocal-synthesis]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_generic_singer_executable_alone_cannot_advertise_synthesis",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[legacy]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[probe]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[project]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[entry]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[link]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[none]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[parent]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[sibling]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_pinned_checkpoint_and_operator_policy_name_do_not_attest_generic_singer",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_raw_ace_launcher_denial_has_no_cache_or_process_side_effect[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_raw_ace_launcher_denial_has_no_cache_or_process_side_effect[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-ace-step]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-basic-pitch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-mr-mt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-transkun]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-yourmt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-markers]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-vocal-harmony]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-vocal-synthesis]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-ace-step]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-basic-pitch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-mr-mt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-transkun]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-yourmt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-markers]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-vocal-harmony]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-vocal-synthesis]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[copy]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[hardlink]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[parent-symlink]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[symlink]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[ace-step]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-basic-pitch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-mr-mt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-transkun]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-yourmt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[markers]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[vocal-harmony]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[vocal-synthesis]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_actual_executor_waits_for_worker_and_settles_real_ledger_once",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_atomic_capacity_rejection_leaves_no_ledger_fence_or_license_or_claim",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_authority_drain_rejects_new_admission_but_finishes_existing_queue",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_claim_lost_response_recovers_same_attempt_but_not_new_instance",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_copied_authority_database_cannot_become_second_active_coordinator",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_current_epoch_corruption_blocks_pull_readiness",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_deferred_generation_admission_is_atomic_with_authority_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_forged_assignment_and_frozen_sql_overwrite_are_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_frozen_result_survives_accounting_failure_without_inference_replay",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_invalid_completion_cannot_mutate_economic_state[cpu_seconds--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-nan]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_invalid_completion_cannot_mutate_economic_state[media_type-text/plain]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_invalid_completion_cannot_mutate_economic_state[result_b64-bad!]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_pause_resume_revoke_do_not_claim_worker_quiescence",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_planned_offline_rebind_requires_closed_work_revoked_nodes_and_operator",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_prune_preserves_unknown_execution_and_opaque_acknowledges_closed_result",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_queued_cancel_settles_no_cpu_and_never_grants_source",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_running_cancel_remains_held_until_authenticated_completion",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_stale_epoch_receipt_and_policy_never_dispatch[claim]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_stale_epoch_receipt_and_policy_never_dispatch[epoch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_stale_epoch_receipt_and_policy_never_dispatch[policy]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_coordinator::test_two_independent_connections_never_assign_same_operation",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_attested_retention_erases_receipt_but_preserves_exact_lost_ack",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[job]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[model]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[nonce]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[pid-bool]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[policy]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_bad_loaded_receipt_never_freezes_settles_or_publishes[source]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_https_attested_completion_lost_ack_recovers_exact_receipt_without_reexecution",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_opaque_adapter_refused_before_process",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_pilot_availability_matches_actual_new_admission",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_real_receipt_writer_is_exclusive_and_bound_to_actual_pid",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_receipt_pid_matches_reaped_process_before_output_is_accepted",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_receipt_writer_runs_without_site_packages_or_server_imports",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_record_is_not_emitted_if_onnx_constructor_fails",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_requirement_frozen_at_admission_and_nonpilot_denied_before_ledger",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_revoked_rights_before_freeze_hold_original_assignment",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_valid_authenticated_receipt_frozen_with_result_and_replay_conflict_denied",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[foreign-pid]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[matching]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_worker_receipt_gate_and_durable_completion_with_explicit_process_double[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_model_attestation::test_wrong_authenticated_node_cannot_submit_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_actual_authority_sigkill_after_frozen_result_recovers_without_new_inference",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_dispatched_journal_never_reexecutes_after_actual_supervisor_sigkill",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_journal_rejects_authority_key_and_trust_drift_before_network[credential]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_journal_rejects_authority_key_and_trust_drift_before_network[trust]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_partition_after_committed_claim_or_completion_never_reexecutes[claim]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_partition_after_committed_claim_or_completion_never_reexecutes[complete]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_redirect_cannot_forward_credential",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_shared_worker_state_lock_serializes_two_processes",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_two_separate_worker_processes_share_only_https_not_sqlite",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_untrusted_tls_never_transmits_worker_credential",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_bad_success_ack_cannot_erase_frozen_result",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_completed_task_erasure_ack_clears_local_private_result_without_rerun",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_failed_payload_reports_known_cpu_without_publishing_invalid_media",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_lost_completion_reply_retains_frozen_result_and_clears_after_exact_ack",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_nonprivate_state_or_configuration_is_rejected[config]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_nonprivate_state_or_configuration_is_rejected[journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_nonprivate_state_or_configuration_is_rejected[state]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_policy_drift_on_node_fails_without_launch_or_fabricated_zero_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_uncertain_phase_never_launches_or_claims[dispatched]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_uncertain_phase_never_launches_or_claims[unknown]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_unverified_descendants_never_freeze_publish_or_release_assignment",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_worker_authority_url_cannot_select_untrusted_transport_or_paths[http://example.test]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_worker_authority_url_cannot_select_untrusted_transport_or_paths[https://example.test/?query=1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_worker_authority_url_cannot_select_untrusted_transport_or_paths[https://example.test/other]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_pull_worker_safety::test_worker_authority_url_cannot_select_untrusted_transport_or_paths[https://user:secret@example.test]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_current_inventory_matches_review",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-http-gate-final.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[category]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[checker]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[hash]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[rationale]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[reorder]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[source]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_actual_admin_api_auth_csrf_private_read_and_generation",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_actual_supervisor_sigkill_never_expires_original_work",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_drain_confirmation_types_are_not_coerced[confirm-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_drain_confirmation_types_are_not_coerced[draining-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_drain_confirmation_types_are_not_coerced[expected_generation--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_drain_confirmation_types_are_not_coerced[expected_generation-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_drain_confirmation_types_are_not_coerced[identifier-../foreign]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_full_drain_blocks_new_work_and_explicit_resume_preserves_generation",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_lookalike_continuation_paths_cannot_create_work[/api/admin/service-admissionevil]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_lookalike_continuation_paths_cannot_create_work[/api/billing/credits/stripe-webhook/evil]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_lookalike_continuation_paths_cannot_create_work[/api/projects/p/audio-capture/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/pcm]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_lookalike_continuation_paths_cannot_create_work[/api/pull-worker/ffffffffffffffffffffffffffffffff/dispatch]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_lookalike_continuation_paths_cannot_create_work[/api/pull-worker/foreign/complete]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_missing_or_foreign_journal_never_reopens_admission[corrupt]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_missing_or_foreign_journal_never_reopens_admission[foreign-instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_missing_or_foreign_journal_never_reopens_admission[missing-instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_missing_or_foreign_journal_never_reopens_admission[missing-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_missing_or_foreign_journal_never_reopens_admission[unknown-build]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_mode_removal_cannot_release_durable_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_pending_ledger_queue_and_original_file_receipts_block_ready",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_predrain_request_can_finish_nested_original_background_work",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_sleeping_periodic_cycle_cannot_mutate_after_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_stale_replay_foreign_actor_and_audit_immutability",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_streaming_and_background_response_keep_admission_until_finished",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_unexpected_exception_leaves_original_uncertain_admission",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission::test_websocket_lifetime_is_counted_and_new_connection_refused",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_actual_admin_upgrade_route_checks_csrf_exact_body_and_keeps_gate_closed",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_actual_main_restart_under_drain_skips_work_then_explicit_resume_bootstraps_once",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_independent_process_admission_and_drain_serialize_at_original_journal",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_missing_or_extra_executable_journal_schema_is_not_accepted[CREATE TRIGGER foreign_code AFTER INSERT ON admissions BEGIN DELETE FROM events;END]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_missing_or_extra_executable_journal_schema_is_not_accepted[CREATE VIEW forged_admissions AS SELECT * FROM admissions]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_missing_or_extra_executable_journal_schema_is_not_accepted[DROP TRIGGER immutable_admission]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_new_build_handoff_keeps_original_rows_and_gate_closed",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_online_backup_and_offline_restore_preserve_original_gate_instance_and_uncertain_work",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_original_http_capture_finishes_and_import_child_remains_tracked_under_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_original_legacy_side_effects_and_unknown_roots_block_drain[deleting-account]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_original_legacy_side_effects_and_unknown_roots_block_drain[purge-recovery]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_original_legacy_side_effects_and_unknown_roots_block_drain[sending-mail]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_original_legacy_side_effects_and_unknown_roots_block_drain[unsafe-project-root]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_read_snapshot_blocks_resume_until_pending_audit_has_finished",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_real_changed_source_build_handoff_in_independent_process_fences_old_replica",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_second_thread_start_cannot_replace_original_running_ticket",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_timer_entry_is_denied_before_any_work_when_barrier_held[sampler]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_timer_entry_is_denied_before_any_work_when_barrier_held[scheduler]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_truncated_or_unsafe_original_journal_never_reinitializes_open[empty]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_truncated_or_unsafe_original_journal_never_reinitializes_open[malformed-seal]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_truncated_or_unsafe_original_journal_never_reinitializes_open[public-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_truncated_or_unsafe_original_journal_never_reinitializes_open[public-seal]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_upgrade_never_discards_original_unfinished_or_foreign_work[active]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_upgrade_never_discards_original_unfinished_or_foreign_work[foreign]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_upgrade_never_discards_original_unfinished_or_foreign_work[open]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_upgrade_never_discards_original_unfinished_or_foreign_work[pending]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_upgrade_never_discards_original_unfinished_or_foreign_work[stale]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_vst3_lifetime_ticket_covers_real_child_and_failed_cleanup_is_never_drained[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_acceptance::test_vst3_lifetime_ticket_covers_real_child_and_failed_cleanup_is_never_drained[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_actual_source_bound_service_admission_review",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-gates-initial.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_pull::test_independent_authority_process_is_fenced_before_db_or_queue_mutation",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_pull::test_no_timeout_converts_a_dispatched_remote_worker_into_drained",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_pull::test_queued_original_work_finishes_over_tls_after_full_service_barrier[None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_pull::test_queued_original_work_finishes_over_tls_after_full_service_barrier[claim]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_service_admission_pull::test_queued_original_work_finishes_over_tls_after_full_service_barrier[complete]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_studio_large_remote_options::test_authenticated_endpoint_decodes_large_score_body_before_worker",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_studio_large_remote_options::test_duplicate_keys_wrong_kind_and_oversize_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_studio_large_remote_options::test_large_lyrics_curves_roundtrip_in_body_and_keep_header_small",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_studio_large_remote_options::test_large_transport_keeps_typed_and_path_validation[value0]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_studio_large_remote_options::test_large_transport_keeps_typed_and_path_validation[value1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_studio_large_remote_options::test_large_transport_keeps_typed_and_path_validation[value2]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-boundaries-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_ace_verified_values_preserved",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[future-adapter]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[markers]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_historical_all_adapters_in_queue_and_admin[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_live_cpu_preserves_progress_and_ace_backend",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_live_cpu_rejects_bad_values[-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_live_cpu_rejects_bad_values[2]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_live_cpu_rejects_bad_values[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_live_cpu_rejects_bad_values[inf]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_live_cpu_rejects_bad_values[nan]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_live_sidecar_does_not_replace_multistage_sum",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_multiple_components_and_running_diagnostics",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_process_cpu_uses_only_utime_and_stime",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_queue_ui_labels_missing_zero_and_diagnostic",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_real_worker_live_and_final_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_unverified_gpu_never_promoted[cgroup-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_unverified_gpu_never_promoted[gpu-kernel-verified-8]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_unverified_gpu_never_promoted[gpu-kernel-verified-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_unverified_gpu_never_promoted[unmetered-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_unverified_gpu_never_promoted[worker-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_worker_checkpoint_keeps_cpu_and_gpu_together",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_universal_queue_usage::test_zero_distinct_from_missing_and_owner_isolation",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_altered_request_cannot_reapprove_finished_job",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_approval_idempotent_and_concurrent",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_approval_is_immutable_and_journal_corruption_blocks_readiness",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_approved_reservation_outcome_cannot_change_silently",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_billing_report_retains_visible_unknown_loss_instead_of_silent_omission",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_each_approval_confirmation_is_required[confirm_no_customer_charge]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_each_approval_confirmation_is_required[confirm_no_reallocation]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_each_approval_confirmation_is_required[confirm_operator_loss]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_explicit_operator_loss_closes_original_contract_claim_fence_without_invented_usage",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_failed_close_rolls_back_contract_lease_and_approval",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_gpu_lease_release_and_credit_reservation_are_atomic",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_late_producer_transaction_cannot_commit_evidence_after_loss",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_late_receipt_or_new_billing_cannot_resurrect_approved_loss",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_legacy_admission_cannot_silently_gain_negative_evidence",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_live_supervisor_and_missing_quiescence_never_approved",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_loss_rows_follow_scoped_retired_owner_erasure",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_missing_approval_journal_is_not_recreated",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_nc_cost_basis_must_explicitly_exclude_operator_loss",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_new_api_auth_csrf_exact_fields_and_private_history",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_persisted_metering_cannot_be_discarded_even_if_marker_was_missing[estimate]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_persisted_metering_cannot_be_discarded_even_if_marker_was_missing[gpu]",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_registered_frozen_evidence_cannot_be_discarded",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_released_lease_without_journal_commit_is_rolled_back",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_scoped_approval_cannot_be_self_verified",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    },
+    {
+      "id": "tests.test_r210_worker_loss_resolution::test_stale_preview_cannot_release_changed_reservations",
+      "state": "passed",
+      "report": "docs/validation/r210/guardian-integrated-final.xml"
+    }
+  ],
+  "deduplication": "Last JUnit outcome per classname/name;initial stale HTTP source-hash failure superseded by exact final current-inventory case. Interrupted early fixture selections/logs are diagnostics,not completed acceptance runs.",
+  "kernel_method": {
+    "schema": "linux-subreaper-pidfd-1",
+    "actual_prctl_and_pidfds": true,
+    "actual_supervisor_sigkill": true,
+    "actual_setsid_descendants": true,
+    "actual_http_admin_recovery_regimes": [
+      "COMMERCIAL",
+      "NON_COMMERCIAL"
+    ],
+    "empty_proof": "wait4 ECHILD after all adopted children have been stopped/reaped",
+    "no_cgroup_or_privilege_simulation": true,
+    "measurement": "Exact wait4 child-tree CPU;guardian own CPU omitted;no invented GPU/disk counters"
+  },
+  "safety": {
+    "guardian_loss_keeps_original_claim": true,
+    "no_automatic_financial_settlement": true,
+    "unknown_usage_remains_unknown": true,
+    "operator_loss_requires_original_quiescence_and_explicit_admin_approval": true,
+    "ace_external_loss_refused_with_local_tree_receipt": true,
+    "no_process_global_subreaper_in_server": true,
+    "no_pid_expiry_takeover_or_reexecution": true,
+    "original_scope_count_and_retirement_protocol_reused": true
+  },
+  "checks": {
+    "ruff": "app native scripts tests passed",
+    "python_parse_modules": 9,
+    "bandit": {
+      "sources": 307,
+      "findings": 168,
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 147,
+      "new_reviewed_LOW": 5
+    },
+    "service_admission": 173,
+    "runtime": {
+      "sources": 554,
+      "points": 780
+    },
+    "http": {
+      "sites": 30,
+      "files": 21
+    },
+    "checkers_thresholds_and_suppressions_unchanged": true,
+    "secret_scan": {
+      "tool": "gitleaks",
+      "scope": "All new text files and added/replaced lines of existing text files, including the final result and preservation manifest; unchanged historical bytes are retained.",
+      "findings": 0,
+      "report": "docs/validation/r210/guardian-gitleaks.json",
+      "log": "docs/validation/r210/guardian-gitleaks.log",
+      "config_unchanged": true
+    }
+  },
+  "check_logs": [
+    "docs/validation/r210/guardian-security-final.log",
+    "docs/validation/r210/guardian-runtime-final.log",
+    "docs/validation/r210/guardian-admission-final.log",
+    "docs/validation/r210/guardian-http-final.log",
+    "docs/validation/r210/guardian-ruff.log"
+  ],
+  "reused": "Unchanged model-loader/Apple/financial/UI evidence retained only for unchanged boundaries;no new real neural/installed-OS/multi-host claim.",
+  "limitations": [
+    "Local process ancestry does not prove external ACE-service or remote-host quiescence;unknown external work remains held.",
+    "Missing guardian,unverifiable cleanup or legacy evidence cannot authorize another execution,charge or release.",
+    "B6 independent-host partition acceptance,F4/F5/F6 rights/native,and G5/G6 targets remain separate.",
+    "Configured cgroup kernel target skips remain historical,not silently promoted;B2 now has an alternative actual-kernel proof."
+  ],
+  "progress": {
+    "before": {
+      "accepted": 28,
+      "total": 42,
+      "percent": 66.7
+    },
+    "after": {
+      "accepted": 29,
+      "total": 42,
+      "percent": 69.0
+    },
+    "criteria_promoted": [
+      "B2"
+    ],
+    "complete_macroareas": [
+      "E"
+    ],
+    "release_candidate": false,
+    "global_transition_enabled": false
+  },
+  "open_original_criteria": [
+    "A4",
+    "A5",
+    "A6",
+    "B6",
+    "C3",
+    "C5",
+    "C6",
+    "D6",
+    "F4",
+    "F5",
+    "F6",
+    "G5",
+    "G6"
+  ],
+  "git_and_remote_actions": [],
+  "models_downloaded": [],
+  "suggested_cumulative_commit": "Enforce model rights and recover crashed workers with independent Linux guardians",
+  "kernel_environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "kernel": "6.18.55",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "privilege_escalation": false,
+    "sysfs_cgroup_delegation_used_for_guardian_tests": false,
+    "fixtures": "Only isolated generated audio/processes/accounts/HTTP servers;no installed models,real provider or production server."
+  },
+  "preservation_manifest": "docs/validation/r210/guardian-package-preservation.json"
+}

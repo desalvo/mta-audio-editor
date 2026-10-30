@@ -6,22 +6,55 @@ the original split between applied fee and surplus. Missing proof stays open.
 from __future__ import annotations
 
 
-def review(c, *, limit=50, offset=0):
+def review(c, *, limit=50, offset=0, user_id=None):
     if type(limit) is not int or not 1 <= limit <= 200 or type(offset) is not int or offset < 0:
         raise ValueError('Invalid subscription evidence pagination')
+    if user_id is not None and (type(user_id) is not int or user_id <= 0):
+        raise ValueError('Invalid subscription evidence owner')
     # A caller's write/read transaction is preserved. Standalone diagnostics use
     # one read snapshot and release it without committing any caller mutations.
     own_snapshot = not c.in_transaction
     if own_snapshot:
         c.execute('BEGIN')
     try:
-        return _review(c, limit, offset)
+        return _review(c, limit, offset, user_id)
     finally:
         if own_snapshot:
             c.rollback()
 
 
-def _review(c, limit, offset):
+def original_basis_issue(c, order, *, tables=None):
+    """One original payment's collection prerequisites; no reconstruction or writes."""
+    if (order['kind'] != 'subscription' or type(order['user_id']) is not int
+            or type(order['period_start']) is not int or type(order['amount_cents']) is not int
+            or order['amount_cents'] <= 0):
+        return 'original_payment_identity_invalid'
+    if tables is None:
+        tables = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    basis = c.execute('SELECT * FROM subscription_payment_basis WHERE order_id=?',
+                      (order['id'],)).fetchone() if 'subscription_payment_basis' in tables else None
+    if basis is None:
+        return 'original_payment_basis_missing'
+    fields = ('fee_micro', 'gross_micro', 'surplus_micro')
+    if (any(type(basis[k]) is not int or basis[k] < 0 for k in fields)
+            or basis['fee_micro'] + basis['surplus_micro'] != basis['gross_micro']
+            or (basis['user_id'], basis['period_start'], basis['gross_micro']) !=
+            (order['user_id'], order['period_start'], order['amount_cents'] * 10000)):
+        return 'original_payment_basis_conflict'
+    captures = c.execute('SELECT amount_cents FROM paypal_captures WHERE order_id=?',
+                         (order['id'],)).fetchall() if 'paypal_captures' in tables else []
+    if (not captures or any(type(p[0]) is not int or p[0] <= 0 for p in captures)
+            or sum(p[0] for p in captures) != order['amount_cents']):
+        return 'original_capture_total_unproved'
+    position = c.execute("""SELECT user_id,amount_minor,currency,funded
+        FROM payment_reconciliation_positions WHERE provider='paypal' AND order_id=?""",
+                         (order['id'],)).fetchone() if 'payment_reconciliation_positions' in tables else None
+    if position is None or tuple(position) != (order['user_id'], order['amount_cents'], 'EUR', 1):
+        return 'original_funding_position_unproved'
+    return None
+
+
+def _review(c, limit, offset, user_id):
     tables = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     # A partial legacy schema is an unavailable audit, never a verified empty
     # result. Explicit projections also make failures ordinary database errors.
@@ -54,42 +87,20 @@ def _review(c, limit, offset):
     orders = c.execute("""SELECT o.* FROM paypal_orders o WHERE o.kind='subscription'
         AND (o.status='paid' OR o.paid_at IS NOT NULL
              OR EXISTS(SELECT 1 FROM paypal_captures p WHERE p.order_id=o.id))
-        ORDER BY o.id""")
+        AND (? IS NULL OR o.user_id=?) ORDER BY o.id""", (user_id, user_id))
     for order in orders:
         result['checked'] += 1
-        if (type(order['user_id']) is not int or type(order['period_start']) is not int
-                or type(order['amount_cents']) is not int or order['amount_cents'] <= 0):
-            gap(order['id'], 'original_payment_identity_invalid')
-            continue
-        basis = c.execute('SELECT * FROM subscription_payment_basis WHERE order_id=?',
-                          (order['id'],)).fetchone() if 'subscription_payment_basis' in tables else None
-        if basis is None:
-            gap(order['id'], 'original_payment_basis_missing')
-            continue
-        fields = ('fee_micro', 'gross_micro', 'surplus_micro')
-        if (any(type(basis[k]) is not int or basis[k] < 0 for k in fields)
-                or basis['fee_micro'] + basis['surplus_micro'] != basis['gross_micro']
-                or (basis['user_id'], basis['period_start'], basis['gross_micro']) !=
-                (order['user_id'], order['period_start'], order['amount_cents'] * 10000)):
-            gap(order['id'], 'original_payment_basis_conflict')
-            continue
-        captures = c.execute('SELECT amount_cents FROM paypal_captures WHERE order_id=?',
-                             (order['id'],)).fetchall()
-        if (not captures or any(type(p[0]) is not int or p[0] <= 0 for p in captures)
-                or sum(p[0] for p in captures) != order['amount_cents']):
-            gap(order['id'], 'original_capture_total_unproved')
-            continue
-        position = c.execute("""SELECT user_id,amount_minor,currency,funded
-            FROM payment_reconciliation_positions WHERE provider='paypal' AND order_id=?""",
-                             (order['id'],)).fetchone() if 'payment_reconciliation_positions' in tables else None
-        if position is None or tuple(position) != (order['user_id'], order['amount_cents'], 'EUR', 1):
-            gap(order['id'], 'original_funding_position_unproved')
+        issue = original_basis_issue(c, order, tables=tables)
+        if issue:
+            gap(order['id'], issue)
     if 'subscription_payment_basis' in tables:
         for row in c.execute("""SELECT b.order_id FROM subscription_payment_basis b
             LEFT JOIN paypal_orders o ON o.id=b.order_id
-            WHERE o.id IS NULL OR o.kind!='subscription' OR
+            WHERE (? IS NULL OR o.user_id=? OR (o.id IS NULL AND b.user_id=?))
+            AND (o.id IS NULL OR o.kind!='subscription' OR
               (o.status!='paid' AND o.paid_at IS NULL AND
-               NOT EXISTS(SELECT 1 FROM paypal_captures p WHERE p.order_id=o.id)) ORDER BY b.order_id"""):
+               NOT EXISTS(SELECT 1 FROM paypal_captures p WHERE p.order_id=o.id))) ORDER BY b.order_id""",
+                             (user_id, user_id, user_id)):
             result['checked'] += 1
             gap(row[0], 'original_payment_basis_unbound')
     return result

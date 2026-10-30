@@ -17,8 +17,9 @@ def test_real_basic_pitch_global_queue_cpu_and_artifacts(tmp_path, monkeypatch):
     from app.music_interchange import MusicResult
     root = Path(__file__).resolve().parents[1]
     registry = tmp_path/'registry.json'
-    registry.write_text(json.dumps([{'kind':'audio-to-midi', 'executable':str(root/'app/ai_studio_adapter.py'),
-                                    'python':os.environ['MTA_STUDIO_PYTHON'], 'gpu_capable':False}]))
+    registry.write_text('[]')
+    monkeypatch.setenv('MTA_AI_WORKER_AUDIO_TO_MIDI_EXECUTABLE',str(root/'app/ai_studio_adapter.py'))
+    monkeypatch.setenv('MTA_AI_WORKER_AUDIO_TO_MIDI_PYTHON',os.environ['MTA_STUDIO_PYTHON'])
     monkeypatch.setattr(auth, 'data_root', lambda: tmp_path/'data')
     monkeypatch.setattr(queue, '_ROOT', tmp_path/'jobs')
     monkeypatch.setenv('MTA_AI_ENGINE_REGISTRY_FILE', str(registry))
@@ -82,8 +83,9 @@ def test_real_project_two_sources_then_vocal_harmony(tmp_path,monkeypatch):
     from app.main import app
     root=Path(__file__).resolve().parents[1]
     registry=tmp_path/'registry.json'
-    registry.write_text(json.dumps([{'kind':'audio-to-midi','executable':str(root/'app/ai_studio_adapter.py'),
-        'python':os.environ['MTA_STUDIO_PYTHON'],'gpu_capable':False}]))
+    registry.write_text('[]')
+    monkeypatch.setenv('MTA_AI_WORKER_AUDIO_TO_MIDI_EXECUTABLE',str(root/'app/ai_studio_adapter.py'))
+    monkeypatch.setenv('MTA_AI_WORKER_AUDIO_TO_MIDI_PYTHON',os.environ['MTA_STUDIO_PYTHON'])
     monkeypatch.setattr(auth,'data_root',lambda:tmp_path/'data')
     monkeypatch.setattr(storage,'ROOT',tmp_path/'projects');storage.ROOT.mkdir()
     monkeypatch.setattr(queue,'_ROOT',tmp_path/'jobs')

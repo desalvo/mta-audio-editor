@@ -1,3 +1,93 @@
+## Checkpoint corrente — riscossione legacy e prove originali — 30 ottobre 2026
+
+**RC69,0% (29/42),invariata:nessun criterio promosso;l'aumento richiesto non è ottenuto.** Leggere **LEGACY_SUBSCRIPTION_COLLECTION_R210.md** e `validation/r210/legacy-collection-result.json`. Rimborsi senza base originale registrati senza debiti ipotetici;riscossioni legacy preesistenti non verificate sospese prima del provider e dell'allocazione;account IT/EN e aggregati mostrano importi da verificare,revisione privata per proprietario. **779 casi distinti correnti passati,24 nuovi,10 skip Playwright;nessun nuovo collaudo Chromium/provider reale.** Ruff/sintassi/compilazione e quattro gate passano,senza nuovi finding o checker modificati.
+
+A5/C3 restano aperti per prove originali quota/surplus mancanti e migrazione completa non certificata;A4 mantiene anche software/storia/movimenti da completare.Coda operativa in RC_DELIVERY_PLAN_R210.md,senza ripetere i blocchi già verificati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip**,include ACE e la riorganizzazione;non riapplicare il vecchio patch. Tutti i delta da4014a1f restano non committati. Nessuna azione remota.
+
+---
+
+Cronologia precedente,superata dove incompatibile:
+
+## Stato corrente e nuovo ordine RC — 30 ottobre 2026
+
+**69,0% verso RC: 29/42 criteri originali verificati, 13 aperti, E completa (1/7). Nessuna promozione in questa riorganizzazione.** Leggere **RC_DELIVERY_PLAN_R210.md** e `RC_EXECUTION_STRATEGY_R210.json`: primo blocco A4/A5/C3, poi C5/D6; F4/F6 come coda indipendente, campagna target con prerequisiti espliciti. Un solo blocco funzionale; passare a un altro scenario quando manca una prova/ambiente preciso. Ogni resoconto deve riportare percentuale e verificati/42.
+
+Ultimo codice completo: **MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip**; delta documentale successivo, senza nuovo ZIP intermedio. Nessun codice/test/gate/criterio modificato o nuovo collaudo applicativo dichiarato. Tutti i delta da4014a1f restano non committati; nessuna azione remota. Prova del riordino: `validation/r210/rc-reorganization-result.json`. Le priorità e i numeri storici sotto sono superati dove incompatibili.
+
+---
+
+## Checkpoint corrente — isolamento osservatori ACE — 30 ottobre 2026
+
+Leggere **ACE_OBSERVER_ISOLATION_R210.md**. Corrette risposte tardive tra progetti e chiusura del nuovo dialogo da osservatore precedente.57pass,2skip,1nuovo caso/3race. PRE-RC29/42=69,0%,invariato;nessun criterio promosso. Tutti i delta dopo4014a1f non committati.
+
+---
+
+## Checkpoint corrente — loader MT3 vincolati — 30 ottobre 2026
+
+Leggere **PINNED_TRANSCRIPTION_LOADERS_R210.md** e `validation/r210/source-contract-result.json`. Contratti indipendenti per sorgenti/tensori YourMT3noPS e MR-MT3; importlib ignora cache .pyc e moduli estranei, snapshot dei tensori senza riapertura dei pathname, policy per ogni forward. PS rifiutato senza identità indipendente dei tensori. **789pass,29nuovi,3skip per Torch/modello reale assenti.** Ruff/Bandit/inventari passano con checker invariati. **29/42criteriRC,69,0%,invariato:incremento richiesto non raggiunto,F4 ancora aperto per runtime/dipendenze esterne e modello ACE.** Nessun nuovo collaudo neurale/GPU/fullCI. Tutti i delta successivi a4014a1f non committati. Cumulativo:`MTA-0.3.0-r210-pre-RC-pinned-transcription-loaders-cumulative.zip`. Conservati log diagnostici e correzione del vecchio test FFmpeg pre-B2.
+
+---
+
+Cronologia precedente, superata dove incompatibile:
+
+## Checkpoint corrente — ripresa Work #16 — 30 ottobre 2026
+
+Leggere **WORK16_RECOVERY_R210.md** e `validation/r210/work16-recovery-result.json`. Baseline4014a1f e cumulativo independent-guardian recuperati. Delta F4 perso ricostruito solo in parte: override Python arbitrari rifiutati prima di disponibilità/ledger; cambio di regime locale consente storico guardian integro già chiuso, conservando tutti gli altri blocchi. **245 casi distinti negli ultimi esiti passano,52nuovi; un precedente errore intermittente guardian/drain rimane documentato e senza causa stabilita.** Ruff, Bandit e inventari passano. **29/42 criteri RC,69,0%,invariato;F4 aperto,percentuale globale del prodotto non misurata.** Nessun commit o azione remota. Cumulativo: `MTA-0.3.0-r210-pre-RC-work16-recovery-cumulative.zip`. Riprendere runtime/import/upstream F4 e finanza generale C3/C5/D6,senza ripetere B2.
+
+---
+
+Cronologia precedente, superata dove incompatibile:
+
+## Checkpoint corrente — B2 verificato con recupero indipendente — 30 ottobre 2026
+
+Leggere **INDEPENDENT_WORKER_RECOVERY_R210.md** e `validation/r210/independent-guardian-result.json`. **29/42 criteri originali verificati (69,0%), da28/42(66,7%);+B2,nessun testo/peso/denominatore modificato.E completa,PRE-RC.** Processo Linux indipendente per albero,subreaper/pidfd e prova kernel ECHILD;scope/claim originali prima del modello,cleanup dopo SIGKILL,CPU reale dell'albero e API amministrative di perdita senza misura inventata o riesecuzione.
+
+**628 casi distinti correnti passati,16nuovi,zero failure/error/skip correnti.** Include serverHTTP reale/token/SIGKILL/recupero originale in entrambi i regimi,vero FFmpeg e figli/nipoti setsid,drain durante cleanup,guardian perso con claim trattenuto e rifiuto di usare il solo client ACE per liberare il servizio esterno.Guardian/quiescenza non effettuano addebiti automatici;esterno ignoto resta sospeso.Cgroup configurati conservano il percorso precedente;nessun requisito di privilegi/cgroup simulato.
+
+Ruff completo e gate passano:307sorgenti app/168finding(0HIGH/21MED/147LOW),C2173,runtime554/780,HTTP30/21.Checker/soglie/soppressioni invariati;5 nuovi LOW revisionati.Nessuna nuova inferenza neurale,fullCI,prova OS/hardware/host remoti.Le prove sorgente-identiche precedenti restano conservate.
+
+Restano **A4,A5,A6,B6,C3,C5,C6,D6,F4,F5,F6,G5,G6**:8 implementazione/review e5 target.B2non richiede di ripetere un'altra campagna preparatoria;proseguire F4 su interpreti/runtime/checkpoint e finanza generale/legacy per C3/C5/D6.B6/F5/F6/G5/G6 mantengono i requisiti originali.Transizione finanziaria globale e RC restano bloccate.
+
+Baseline dichiarata4014a1f;delta restored-rights+adapter-identity+guardian non committato.Cumulativo:**MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip**;conservati4939percorsi/694log input.Nessun commit/staging/push/dispatchCI o intervento reale server/provider/modelli.Commit suggerito cumulativo:`Enforce model rights and recover crashed workers with independent Linux guardians`.Dopo il commit dell'utente verificare Quality/SAST standard;le16 nuove prove sono nella selezione unit ordinaria,senza nuovi opt-in.
+
+---
+
+## Cronologia precedente — superata dove incompatibile con il checkpoint corrente
+
+## Checkpoint corrente — identità degli adapter configurati — 30 ottobre 2026
+
+Leggere **OPAQUE_ADAPTER_IDENTITY_R210.md** e `validation/r210/adapter-identity-result.json`. Ripresa dall'allegato restored-rights e dall'ultima chat Work; baseline confermata4014a1f e CI standard40972934180 verde conservate. Input4910percorsi/680log,SHA256125b08ff10497d877f41198253d33e9a4bbf0494f289d69a0d2ca00306692f93.
+
+Il registro rifiuta script arbitrari,copie,adapter di altra famiglia,alias e plugin senza integrazione;nomi Studio riservati protetti.Copia ACE gestita vincolata a tutti i sibling originali.Launcher ACE libero e canto neural-external negati prima di effetti;opzione generica UI disabilitata,bridge supportati conservati.36 rifiuti API token con permessi sintetici validi coprono18tipi/2trasporti senza avvio né ledger.**905pass distinti correnti,101nuovi,6skip espliciti,zero failure/error correnti.**Fixture sintetiche di accounting con dependency injection soltanto nei test;nessun bypass nel prodotto.
+
+Ruff/sintassiJS/gate passano.Bandit305sorgenti/163finding(0HIGH/21MED/142LOW),C2169,runtime552/781,HTTP30/21.Checker/soglie/soppressioni invariati;launcher subprocess rimosso,non riclassificato.LoaderF3/finanza/FFmpeg/native/mobile invariati riusati per i rispettivi confini;nessun nuovo modello o target certificato.
+
+**28/42(66,7%),E completa,PRE-RC;nessun criterio promosso.**F4 resta aperto per identità di interpreti Python/runtime upstream e checkpoint effettivi,oltre ai residui originali A4,A5,A6,B2,B6,C3,C5,C6,D6,F4,F5,F6,G5,G6.Non tutti sono esterni.Prossimo blocco:worker_python/runtime ACE e root Mega53/DiffSinger con vero binding del loader,senza ripetere i rifiuti qui chiusi.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-adapter-identity-cumulative.zip**.Commit suggerito cumulativo dopo4014a1f:`Enforce reviewed model rights and reject opaque inference adapters`.Nessun commit/staging/push/dispatch CI o intervento remoto.Dopo il commit dell'utente verificare Quality/SAST standard;iOS/fullCI invariati non da ripetere ora.
+
+---
+
+## Cronologia precedente — superata dove incompatibile con il checkpoint corrente
+
+## Checkpoint corrente — autorizzazioni ripristinate e ingressi legacy — 30 ottobre 2026
+
+Leggere **RESTORED_MODEL_RIGHTS_R210.md** e `validation/r210/restored-rights-result.json`. Baseline **4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d**,4208blob input identici. Il run40972934180 è interamente completato con successo:Quality7155/50skip/76,71%,SAST e tutti i job build passano;pubblicazioni saltate. Profilo unit standard,non nuova full regression. Il nuovo delta non ha ancora CI remota.
+
+Corrette le deroghe abilitate con record incompleti/JSON ambiguo e la condizione NC globale. Policy corrente prima/dopo callback Madmom/BTC/ChordFormer/Mega53/profilazione e agli avvii ACE;MR-MT3 resumable controlla ogni forward e la pubblicazione anche dopo decode.72rifiuti API reali coprono18tipi e2trasporti senza esecuzione/ledger.**1104test distinti correnti passati,305nuovi,7skip espliciti per prerequisiti mancanti,zero failure/error correnti**.Rapporti diagnostici storici conservati;il JSON applica l'ultimo esito per identità.
+
+Ruff/gate correnti passano.Bandit304sorgenti/165finding(0HIGH/21MED/144LOW),C2 170,runtime551sorgenti/782punti,HTTP30/21.Checker/workflow/soglie/dipendenze invariati;13hash Apple invariati,32SDK/build precedenti riusati.LoaderF3/finanza/web e accountingFFmpeg invariati per i rispettivi confini.Non sono modelli neurali reali né prove installed-OS.
+
+**28/42(66,7%),E completa1/7,PRE-RC;nessun criterio promosso,l'aumento numerico richiesto non è ancora raggiunto.** F4 resta aperto:gli eseguibili configurabili non provano universalmente il modello caricato e manca l'accettazione completa delle librerie/native dinamiche.Non basta riclassificarli o restringere il criterio.F5/F6 restano separati.Non tutti i residui sono esterni.
+
+Prossimo blocco:contratti verificabili executable/loader/checkpoint per ai_worker_registry,launcher ACE e runtime esterni,oppure rifiuto dei percorsi privi di contratto;prove reali di bypass prima della promozioneF4.Riusare le prove qui elencate finché i confini non cambiano.Finanza globale/legacy prosegue indipendentemente.Nessun commit/staging/push/dispatch CI o intervento su server/provider/modelli reali.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-restored-rights-cumulative.zip**.Commit dell'utente dopo4014a1f:`Require complete model reviews and guard legacy inference entry points`.Dopo il commit verificare Quality/SAST standard;non serve ripetere ora iOS/full CI.
+
+---
+
+## Checkpoint precedenti — storico, superseduto dalle informazioni correnti sopra
+
 ## Checkpoint corrente — contesa SQLite nel polling della coda — 29 ottobre 2026
 
 Leggere **QUEUE_BARRIER_CONTENTION_R210.md** e `validation/r210/queue-busy-result.json`. Baseline confermata **dafdff6a1d5a8fc5670e9125297406c5df470231**:4193blob tracciati corrispondono all’input. CI40912981261:7145passati,1fallimento BarrierUnavailable retryable nel polling,50skip,copertura76,71%;SAST/VST3 passano. La lettura SQLite bloccata è riprodotta con lock reale;il log non identifica il detentore concorrente.

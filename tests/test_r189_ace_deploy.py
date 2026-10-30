@@ -34,11 +34,13 @@ def test_manifests_do_not_embed_weights_or_publish_api():
     assert 'value: http://127.0.0.1:8001' in k8s
     assert 'ace-pvc.yaml' in (ROOT/'k8s/base/kustomization.yaml').read_text()
 
-def test_desktop_launch_requires_user_consent(tmp_path):
+def test_opaque_launcher_is_denied_even_with_user_consent(tmp_path):
     from app.ace_step_local import launch
     executable = tmp_path / 'ace-api'
     executable.write_text('#!/bin/sh\nexit 0\n')
     executable.chmod(0o755)
-    with pytest.raises(RuntimeError, match='--allow-model-download'):
+    with pytest.raises(ValueError, match='checkpoint loader contract'):
         launch(str(executable), model_dir=str(tmp_path / 'models'))
-    assert launch(str(executable), model_dir=str(tmp_path / 'models'), confirm_download=True) == 0
+    with pytest.raises(ValueError, match='checkpoint loader contract'):
+        launch(str(executable), model_dir=str(tmp_path / 'models'), confirm_download=True)
+    assert not (tmp_path / 'models').exists()

@@ -25,7 +25,7 @@ def source_audio():
 
 
 @pytest.fixture
-def operator(tmp_path, monkeypatch):
+def operator(tmp_path, monkeypatch, synthetic_worker_resolution):
     monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path / 'private'))
     monkeypatch.delenv('MTA_AI_CGROUP_PARENT', raising=False)
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
@@ -131,7 +131,7 @@ def test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan(operator, mo
     monkeypatch.setattr(queue, '_ROOT', tmp_path / 'queue')
     queue.configure_execution_settings({'max_artifact_mib': 2048})
     monkeypatch.setenv('MTA_AI_JOB_MAX_ARTIFACT_MIB', '8192')
-    runner = ai_metering_agent.run_metered_process
+    runner = ai_metering_agent.run_supervised_process
     packager = ai_worker_artifacts.package_artifacts
     def run(*args, **kwargs):
         assert kwargs['env']['MTA_AI_JOB_MAX_ARTIFACT_MIB'] == '2048'
@@ -141,7 +141,7 @@ def test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan(operator, mo
     def package(path, **kwargs):
         assert kwargs['max_bytes'] == 2 * 1024**3
         return packager(path, **kwargs)
-    monkeypatch.setattr(ai_metering_agent, 'run_metered_process', run)
+    monkeypatch.setattr(ai_metering_agent, 'run_supervised_process', run)
     monkeypatch.setattr(ai_worker_artifacts, 'package_artifacts', package)
     payload, _ = ai_metering_agent.execute_registered_worker(operator, 'whisper',
         {'kind': 'whisper', 'max_artifact_mib': 8192}, source_wav=source_audio())

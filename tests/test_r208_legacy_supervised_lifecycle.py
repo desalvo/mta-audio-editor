@@ -7,6 +7,8 @@ import pytest
 
 from app.ai_worker_protocol import WorkerUnavailable, run_external_worker
 
+pytestmark = pytest.mark.usefixtures('synthetic_worker_resolution')
+
 
 def _worker(tmp_path, monkeypatch, body):
     path = tmp_path / 'worker.py'

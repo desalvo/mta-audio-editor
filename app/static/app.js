@@ -5901,7 +5901,7 @@ async function aiArrangerWatchActive(waitForFinish=false){
     let delay=2000;
     try{
       const job=await api(`/api/projects/${encodeURIComponent(pid)}/ai-arranger/active-generation`);
-      if(watchEpoch!==aiArrangerWatchEpoch)return;
+      if(watchEpoch!==aiArrangerWatchEpoch||current?.id!==pid)return;
       aiArrangerPollFailures=0;
       aiArrangerLastSnapshot=job;
       const active=['running','busy','queued','blocked'].includes(job.state);
@@ -5921,7 +5921,7 @@ async function aiArrangerWatchActive(waitForFinish=false){
           const output=document.getElementById('aiRemixPlanResult');
           if(output)output.textContent='AI generation complete; new track added.';
           await reconcileAiProject(pid);
-          if(current?.id===pid){
+          if(watchEpoch===aiArrangerWatchEpoch&&current?.id===pid){
             // Close only the still-open AI dialog, never an unrelated modal.
             if(document.getElementById('aiRemixJobProgress') &&
                document.getElementById('aiRemixPlanResult') &&
@@ -5940,7 +5940,7 @@ async function aiArrangerWatchActive(waitForFinish=false){
     }catch(e){
       // Network/proxy failures are not terminal job states. Preserve the latest
       // server snapshot and retry; never claim fabricated CPU/GPU accounting.
-      if(watchEpoch!==aiArrangerWatchEpoch)return;
+      if(watchEpoch!==aiArrangerWatchEpoch||current?.id!==pid)return;
       aiArrangerPollFailures++;
       const output=document.getElementById('aiRemixPlanResult');
       if(output)output.textContent='Connection interrupted; retrying AI job status automatically: '+e.message;

@@ -54,7 +54,7 @@ def test_six_stems_over_old_limits_roundtrip_server_cache_and_native(tmp_path, m
         assert not kw['cancel_check']()
         Path(args[-1]).write_bytes(b'input fixture')
         return agent.Measurement(0,0,{},'unmetered',False)
-    monkeypatch.setattr(agent, 'run_metered_process', convert)
+    monkeypatch.setattr(agent, 'run_supervised_process', convert)
     result, job = execution.execute(env,'demucs',lambda _:server.infer('demucs', entries[0][0]))
     assert job == meta['job_id'] and len(result['audio']) == 6
     del result
@@ -121,7 +121,7 @@ def test_server_manifest_is_not_charged_to_audio_budget(tmp_path, monkeypatch,en
         assert not kw['cancel_check']()
         Path(args[-1]).write_bytes(b'fixture')
         return agent.Measurement(0,0,{},'unmetered',False)
-    monkeypatch.setattr(agent,'run_metered_process',convert)
+    monkeypatch.setattr(agent,'run_supervised_process',convert)
     result, job = execution.execute(env,'demucs',lambda _:server.infer('demucs', tmp_path / 'source.wav'))
     assert result['audio'] == {'stem.wav': b'RIFF'} and job == 'job'
 

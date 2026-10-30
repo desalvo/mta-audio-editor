@@ -1,6 +1,5 @@
 """Pinned optional MR-MT3-family inference; never downloads or unpickles weights."""
 import hashlib
-import json
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -24,13 +23,15 @@ def verified_runtime(full=True,require_tested=True):
     receipt=root/'mta-runtime.json'
     if receipt.is_symlink() or not receipt.is_file() or receipt.stat().st_size>65536:
         raise ValueError('Missing/unsafe MR-MT3 receipt')
-    value=json.loads(receipt.read_text())
+    from .transcription_source_contract import read_json, verify_sources
+    value=read_json(receipt)
     if (value.get('schema')!='mta-mrmt3-runtime-1' or value.get('model')!=MODEL or
             value.get('source_commit')!=SOURCE_COMMIT or (require_tested and value.get('tested') is not True)):
         raise ValueError('Unverified MR-MT3 runtime identity')
     files=value.get('files')
     if not isinstance(files,dict) or not 10<=len(files)<=32 or not REQUIRED<=set(files):
         raise ValueError('Incomplete MR-MT3 inventory')
+    verify_sources(root,files,'mrmt3',model=MODEL)
     for name,digest in files.items():
         if (not isinstance(name,str) or '\\' in name or PurePosixPath(name).is_absolute() or
                 any(x in ('','..','.') for x in name.split('/')) or not isinstance(digest,str) or not re.fullmatch('[a-f0-9]{64}',digest)):
@@ -55,6 +56,19 @@ def transcribe(source,options):
 
 
 def _transcribe(source,options,*,_require_tested=True):
+    if not isinstance(options,dict) or set(options)-{'name'}:
+        raise ValueError('MR-MT3 classifies programs; only the source name is configurable')
+    from .model_license_policy import evaluate_model
+    evaluate_model('mr-mt3-assets')
+    root,value,_=verified_runtime(require_tested=_require_tested)
+    from .transcription_source_contract import imports
+    with imports(root,value['files'],'mrmt3','mr-mt3-assets'):
+        result=_transcribe_verified(source,options,root,value['files'])
+        evaluate_model('mr-mt3-assets')
+        return result
+
+
+def _transcribe_verified(source,options,root,files):
     from .music_interchange import MusicPart,MusicResult,no_notes
     from .models import MidiNote
     from .ai_studio_adapter import progress
@@ -73,12 +87,11 @@ def _transcribe(source,options,*,_require_tested=True):
     info=sf.info(str(source))
     if info.channels not in (1,2) or not 8000<=info.samplerate<=192000 or not 0<info.duration<=600:
         raise ValueError('MR-MT3 accepts mono/stereo audio up to 600 seconds and 192 kHz')
-    root,_,_=verified_runtime(require_tested=_require_tested)
     os.environ.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',HF_HUB_DISABLE_TELEMETRY='1',DO_NOT_TRACK='1')
     sys.path.insert(0,str(root/'source'))
     import torch
     import transformers
-    from safetensors.torch import load_file
+    from safetensors.torch import load
     if transformers.__version__!='5.13.1':raise ValueError('MR-MT3 requires its reviewed Transformers 5.13.1 runtime')
     from transformers import T5Config
     from mt3_infer.adapters.mr_mt3 import MRMT3Adapter,_import_t5_model
@@ -88,7 +101,10 @@ def _transcribe(source,options,*,_require_tested=True):
     adapter.model=_import_t5_model()(T5Config.from_dict(adapter.model_config))
     # The upstream convenience loader uses unrestricted pickle/partial loading.
     # This path only reads safetensors and requires every architecture tensor.
-    adapter.model.load_state_dict(load_file(str(root/WEIGHTS),device='cpu'),strict=True)
+    from .transcription_source_contract import checkpoint_bytes
+    _,data=checkpoint_bytes(root,files,'mrmt3',MODEL)
+    adapter.model.load_state_dict(load(data),strict=True)
+    del data
     adapter.model.eval();adapter._initialize_vocab();adapter._model_loaded=True
     wave,rate=sf.read(str(source),always_2d=True,dtype='float32')
     if not np.isfinite(wave).all():raise ValueError('Non-finite source audio')
@@ -102,7 +118,8 @@ def _transcribe(source,options,*,_require_tested=True):
         for index in range(len(features['inputs'])):
             progress('transcribing',f'MR-MT3 window {index+1}/{len(features["inputs"])}')
             selected={key:value[index:index+1] for key,value in features.items()}
-            output=adapter.forward(selected)
+            from .model_license_policy import guarded_model_call
+            output=guarded_model_call('mr-mt3-assets',adapter.forward,selected)
             tokens=output['tokens'][0];tokens=tokens[tokens>=0]
             predictions.append({'est_tokens':tokens,'start_time':float(output['frame_times'][0][0])})
     notes,audit=decode(predictions,adapter.codec,info.duration)

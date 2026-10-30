@@ -57,6 +57,11 @@ def runtime(tmp_path,monkeypatch,tested=True):
     for name in sorted(adapter.REQUIRED):
         p=tmp_path/name;p.parent.mkdir(exist_ok=True,parents=True);p.write_bytes(b'contract file')
         files[name]=hashlib.sha256(p.read_bytes()).hexdigest()
+    # Synthetic runtime/decoder fixture: inject a deployment-owned source
+    # contract independently from the receipt, never a production bypass.
+    monkeypatch.setattr('app.transcription_source_contract.profile',lambda family:{
+        'files':{n:h for n,h in files.items() if n!=adapter.WEIGHTS},'import_roots':['source'],
+        'checkpoints':{adapter.MODEL:{adapter.WEIGHTS:files[adapter.WEIGHTS]}}})
     python=tmp_path/'bin/python';python.parent.mkdir();python.write_bytes(b'test interpreter identity')
     value={'schema':'mta-mrmt3-runtime-1','model':adapter.MODEL,'source_commit':adapter.SOURCE_COMMIT,
            'tested':tested,'files':files,'python_sha256':hashlib.sha256(python.read_bytes()).hexdigest()}

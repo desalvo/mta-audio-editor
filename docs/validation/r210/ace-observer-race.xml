@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="2" tests="59" time="4.782" timestamp="2026-10-30T15:43:31.836177+00:00" hostname="ba470c9333ee"><testcase classname="tests.test_r210_arranger_terminal_status" name="test_terminal_job_stops_activity_and_retry_restores_progress" time="0.123" /><testcase classname="tests.test_r210_arranger_terminal_status" name="test_submission_error_stops_animation_and_reenables_generate" time="0.065" /><testcase classname="tests.test_r210_arranger_terminal_status" name="test_stale_status_and_reconciliation_never_update_another_project_or_close_new_observer" time="0.078" /><testcase classname="tests.test_r210_ace_progress" name="test_observed_evaluations_owner_thread_cleanup_and_no_completion_claim" time="0.001" /><testcase classname="tests.test_r210_ace_progress" name="test_unknown_step_semantics_fall_back_to_stage[options0]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_unknown_step_semantics_fall_back_to_stage[options1]" time="0.001" /><testcase classname="tests.test_r210_ace_progress" name="test_unknown_step_semantics_fall_back_to_stage[options2]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_unknown_step_semantics_fall_back_to_stage[options3]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_observer_overflow_invalidates_and_callback_failure_never_retries_audio" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_untrusted_progress_rejected[changes0]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_untrusted_progress_rejected[changes1]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_untrusted_progress_rejected[changes2]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_untrusted_progress_rejected[changes3]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_untrusted_progress_rejected[changes4]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_untrusted_progress_rejected[changes5]" time="0.000" /><testcase classname="tests.test_r210_ace_progress" name="test_callback_forwarded_once_and_authenticated_progress_route" time="0.033" /><testcase classname="tests.test_r210_ace_progress" name="test_real_ui_terminal_cancel_has_no_waiting_hint_and_visible_metrics" time="0.077" /><testcase classname="tests.test_r210_live_status_hidden" name="test_hidden_controls_do_not_paint_without_javascript[False]" time="0.001"><skipped type="pytest.skip" message="could not import 'weasyprint': No module named 'weasyprint'">/workspace/scratch/1911c27a491f/mta/tests/test_r210_live_status_hidden.py:11: could not import 'weasyprint': No module named 'weasyprint'</skipped></testcase><testcase classname="tests.test_r210_live_status_hidden" name="test_hidden_controls_do_not_paint_without_javascript[True]" time="0.001"><skipped type="pytest.skip" message="could not import 'weasyprint': No module named 'weasyprint'">/workspace/scratch/1911c27a491f/mta/tests/test_r210_live_status_hidden.py:11: could not import 'weasyprint': No module named 'weasyprint'</skipped></testcase><testcase classname="tests.test_r210_live_status_hidden" name="test_actual_watcher_replaces_queued_and_reconnect_message" time="0.082" /><testcase classname="tests.test_r210_live_status_hidden" name="test_modal_never_inserts_native_setup_on_web_even_with_pending_status" time="0.071" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_live_windows_are_cumulative_and_removed_after_generation" time="0.006" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_other_thread_cannot_stop_inference_capture" time="0.002" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_checkpoint_failure_does_not_retry_or_break_audio" time="0.001" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_partial_report_has_same_evidence_gates_as_final[gpu_active_seconds-nan]" time="0.000" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_partial_report_has_same_evidence_gates_as_final[wall_seconds-0.01]" time="0.000" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_partial_report_has_same_evidence_gates_as_final[device_id--1]" time="0.001" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_partial_report_has_same_evidence_gates_as_final[kernel_count-0]" time="0.001" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_general_worker_sequential_reports_accumulate_without_billing" time="0.009" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_adapter_reports_partial_profiler_not_idle_host" time="0.004" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_diagnostic_endpoint_requires_administrator" time="0.048" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_diagnostic_storage_does_not_update_billing" time="0.025" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_demucs_and_sam_commands_profile_actual_child" time="0.002" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_hook_registration_failure_keeps_final_capture" time="0.001" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_compiler_capture_skips_live_control_but_retains_final_result" time="0.001" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_actual_worker_diagnostic_identity_and_gpu_billing_gate[False]" time="0.467"><failure message="app.ai_worker_protocol.WorkerUnavailable: No trusted AI worker configured">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_worker_diagnostic_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f67f5cf1790&gt;
+trusted = False
+
+    @pytest.mark.parametrize('trusted',[False,True])
+    def test_actual_worker_diagnostic_identity_and_gpu_billing_gate(tmp_path, monkeypatch,trusted):
+        monkeypatch.setenv('MTA_TRUST_AI_DIAGNOSTIC_ESTIMATES','true' if trusted else 'false')
+        from app import ai_metering_agent, ai_torch_diagnostics
+        from app.auth import init_auth_db, db
+        monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path / 'data'))
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_TORCH_PROFILER', 'true')
+        monkeypatch.delenv('MTA_AI_CGROUP_PARENT', raising=False)
+        init_auth_db()
+        with db() as con:
+            con.execute("INSERT INTO users(username,email,password_hash,active,role,created_at,updated_at) VALUES('gpu_worker','gpu@example.org','fake',1,'user',1,1)")
+            uid = con.execute("SELECT id FROM users WHERE username='gpu_worker'").fetchone()[0]
+        worker = tmp_path / 'worker.py'
+        worker.write_text('''import argparse,json,pathlib,wave
+    p=argparse.ArgumentParser();p.add_argument('--request');p.add_argument('--output');a=p.parse_args()
+    request=json.loads(pathlib.Path(a.request).read_text())
+    assert request['gpu_profile_task_id'] != 'forged'
+    with wave.open(a.output,'wb') as f:
+     f.setnchannels(1);f.setsampwidth(2);f.setframerate(44100);f.writeframes(bytes(512))
+    report={'task_id':request['gpu_profile_task_id'],'source':'torch-profiler','billing_eligible':False,
+     'status':'profiled_kernels_diagnostic','gpu_active_seconds':.2,'wall_seconds':1,'kernel_count':2,'device_id':0}
+    (pathlib.Path(a.output).parent/'gpu-profile.json').write_text(json.dumps(report))
+    ''')
+        worker.chmod(0o700)
+        monkeypatch.setenv('MTA_AI_WORKER_WHISPER_EXECUTABLE', str(worker))
+        def cancel_check():
+            with db() as con:
+                if con.execute("SELECT 1 FROM sqlite_master WHERE name='ai_compute_jobs'").fetchone():
+                    row=con.execute("SELECT status FROM ai_compute_jobs WHERE kind='whisper'").fetchone()
+                    assert row is None or row[0] == 'running'
+            return False
+&gt;       audio, meta = ai_metering_agent.execute_registered_worker(uid, 'whisper',
+            {'kind': 'whisper', 'gpu_profile_task_id': 'forged'}, cancel_check=cancel_check)
+
+tests/test_r210_live_gpu_profiles.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/service_admission.py:286: in invoke
+    with operation(source): return call(*args,**kwargs)
+                                   ^^^^^^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:516: in execute_registered_worker
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+app/ai_global_execution.py:67: in execute
+    if 'error' in result:raise result['error']
+                         ^^^^^^^^^^^^^^^^^^^^^
+app/ai_arranger_runtime.py:480: in execute
+    fn(progress, stop)
+app/ai_global_execution.py:54: in run
+    result['value']=call(cancelled)
+                    ^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:516: in &lt;lambda&gt;
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+user_id = 1, kind = 'whisper'
+plan = {'kind': 'whisper', 'gpu_profile_task_id': 'forged'}, token_id = None
+timeout_seconds = 1200, source_wav = None, source_json = None
+cancel_check = &lt;function execute.&lt;locals&gt;.run.&lt;locals&gt;.cancelled at 0x7f67f5cbe660&gt;
+license_decision = Decision(model_id='whisper', mode='cost_recovery', source='https://github.com/openai/whisper/blob/main/LICENSE', policy_sha256='7778d2219d16cd7188830b2a01b133efb535eb6f4b9b5f200c3cf5d0b4eaf785', operator_review=False)
+_request_key = None, _request_digest = None
+
+    def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
+                                  timeout_seconds: int = 1200, source_wav: bytes | None = None, source_json: bytes | None = None,
+                                  cancel_check: Callable[[], bool] | None = None, license_decision=None,
+                                  _request_key=None, _request_digest=None) -&gt; tuple[bytes, dict]:
+        """Run the administrator-installed AI worker and persist measured usage.
+    
+        Unsupported GPU/process-tree telemetry is omitted, not guessed. Output is
+        returned to the caller without changing billing for model files shared
+        by multiple users.
+        """
+        import json
+        import tempfile
+        from . import ai_billing
+        from .ai_worker_protocol import verify_preview_wav, WorkerUnavailable, MAX_REQUEST_BYTES
+        from .ai_worker_registry import resolve_worker
+        from .ai_worker_artifacts import package_artifacts
+    
+        # Reject user-supplied paths before requiring a live scheduler context too.
+        if not isinstance(plan, dict) or plan.get('kind', kind) != kind:
+            raise ValueError('AI plan cannot override the registered engine')
+        if 'source_score' in plan:
+            raise ValueError('Score path must be generated by MTA')
+        require_dispatch_identity(user_id, token_id)
+        from . import ai_pull_coordinator as pull
+        if pull.mode() == 'pull':
+            return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
+                                source_wav=source_wav, source_json=source_json, cancel_check=cancel_check,
+                                request_key=_request_key, request_digest=_request_digest)
+    
+        from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
+        worker = resolve_worker(kind)
+        if plan.get('kind',kind)!=kind:raise ValueError('AI plan cannot override the registered engine')
+        plan={**plan,'kind':kind}
+        if worker is None:
+&gt;           raise WorkerUnavailable('No trusted AI worker configured')
+E           app.ai_worker_protocol.WorkerUnavailable: No trusted AI worker configured
+
+app/ai_metering_agent.py:277: WorkerUnavailable</failure></testcase><testcase classname="tests.test_r210_live_gpu_profiles" name="test_actual_worker_diagnostic_identity_and_gpu_billing_gate[True]" time="0.471"><failure message="app.ai_worker_protocol.WorkerUnavailable: No trusted AI worker configured">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_worker_diagnostic_1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f67f4d1aa80&gt;
+trusted = True
+
+    @pytest.mark.parametrize('trusted',[False,True])
+    def test_actual_worker_diagnostic_identity_and_gpu_billing_gate(tmp_path, monkeypatch,trusted):
+        monkeypatch.setenv('MTA_TRUST_AI_DIAGNOSTIC_ESTIMATES','true' if trusted else 'false')
+        from app import ai_metering_agent, ai_torch_diagnostics
+        from app.auth import init_auth_db, db
+        monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path / 'data'))
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_TORCH_PROFILER', 'true')
+        monkeypatch.delenv('MTA_AI_CGROUP_PARENT', raising=False)
+        init_auth_db()
+        with db() as con:
+            con.execute("INSERT INTO users(username,email,password_hash,active,role,created_at,updated_at) VALUES('gpu_worker','gpu@example.org','fake',1,'user',1,1)")
+            uid = con.execute("SELECT id FROM users WHERE username='gpu_worker'").fetchone()[0]
+        worker = tmp_path / 'worker.py'
+        worker.write_text('''import argparse,json,pathlib,wave
+    p=argparse.ArgumentParser();p.add_argument('--request');p.add_argument('--output');a=p.parse_args()
+    request=json.loads(pathlib.Path(a.request).read_text())
+    assert request['gpu_profile_task_id'] != 'forged'
+    with wave.open(a.output,'wb') as f:
+     f.setnchannels(1);f.setsampwidth(2);f.setframerate(44100);f.writeframes(bytes(512))
+    report={'task_id':request['gpu_profile_task_id'],'source':'torch-profiler','billing_eligible':False,
+     'status':'profiled_kernels_diagnostic','gpu_active_seconds':.2,'wall_seconds':1,'kernel_count':2,'device_id':0}
+    (pathlib.Path(a.output).parent/'gpu-profile.json').write_text(json.dumps(report))
+    ''')
+        worker.chmod(0o700)
+        monkeypatch.setenv('MTA_AI_WORKER_WHISPER_EXECUTABLE', str(worker))
+        def cancel_check():
+            with db() as con:
+                if con.execute("SELECT 1 FROM sqlite_master WHERE name='ai_compute_jobs'").fetchone():
+                    row=con.execute("SELECT status FROM ai_compute_jobs WHERE kind='whisper'").fetchone()
+                    assert row is None or row[0] == 'running'
+            return False
+&gt;       audio, meta = ai_metering_agent.execute_registered_worker(uid, 'whisper',
+            {'kind': 'whisper', 'gpu_profile_task_id': 'forged'}, cancel_check=cancel_check)
+
+tests/test_r210_live_gpu_profiles.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/service_admission.py:286: in invoke
+    with operation(source): return call(*args,**kwargs)
+                                   ^^^^^^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:516: in execute_registered_worker
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+app/ai_global_execution.py:67: in execute
+    if 'error' in result:raise result['error']
+                         ^^^^^^^^^^^^^^^^^^^^^
+app/ai_arranger_runtime.py:480: in execute
+    fn(progress, stop)
+app/ai_global_execution.py:54: in run
+    result['value']=call(cancelled)
+                    ^^^^^^^^^^^^^^^
+app/ai_metering_agent.py:516: in &lt;lambda&gt;
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+user_id = 1, kind = 'whisper'
+plan = {'kind': 'whisper', 'gpu_profile_task_id': 'forged'}, token_id = None
+timeout_seconds = 1200, source_wav = None, source_json = None
+cancel_check = &lt;function execute.&lt;locals&gt;.run.&lt;locals&gt;.cancelled at 0x7f67f5d936a0&gt;
+license_decision = Decision(model_id='whisper', mode='cost_recovery', source='https://github.com/openai/whisper/blob/main/LICENSE', policy_sha256='7778d2219d16cd7188830b2a01b133efb535eb6f4b9b5f200c3cf5d0b4eaf785', operator_review=False)
+_request_key = None, _request_digest = None
+
+    def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
+                                  timeout_seconds: int = 1200, source_wav: bytes | None = None, source_json: bytes | None = None,
+                                  cancel_check: Callable[[], bool] | None = None, license_decision=None,
+                                  _request_key=None, _request_digest=None) -&gt; tuple[bytes, dict]:
+        """Run the administrator-installed AI worker and persist measured usage.
+    
+        Unsupported GPU/process-tree telemetry is omitted, not guessed. Output is
+        returned to the caller without changing billing for model files shared
+        by multiple users.
+        """
+        import json
+        import tempfile
+        from . import ai_billing
+        from .ai_worker_protocol import verify_preview_wav, WorkerUnavailable, MAX_REQUEST_BYTES
+        from .ai_worker_registry import resolve_worker
+        from .ai_worker_artifacts import package_artifacts
+    
+        # Reject user-supplied paths before requiring a live scheduler context too.
+        if not isinstance(plan, dict) or plan.get('kind', kind) != kind:
+            raise ValueError('AI plan cannot override the registered engine')
+        if 'source_score' in plan:
+            raise ValueError('Score path must be generated by MTA')
+        require_dispatch_identity(user_id, token_id)
+        from . import ai_pull_coordinator as pull
+        if pull.mode() == 'pull':
+            return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
+                                source_wav=source_wav, source_json=source_json, cancel_check=cancel_check,
+                                request_key=_request_key, request_digest=_request_digest)
+    
+        from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
+        worker = resolve_worker(kind)
+        if plan.get('kind',kind)!=kind:raise ValueError('AI plan cannot override the registered engine')
+        plan={**plan,'kind':kind}
+        if worker is None:
+&gt;           raise WorkerUnavailable('No trusted AI worker configured')
+E           app.ai_worker_protocol.WorkerUnavailable: No trusted AI worker configured
+
+app/ai_metering_agent.py:277: WorkerUnavailable</failure></testcase><testcase classname="tests.test_r210_live_gpu_profiles" name="test_live_adapter_delivers_partial_before_completion" time="0.004" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_live_ui_marks_partial_and_retains_final_result_on_reopen" time="0.072" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_profiled_child_cli_runs_fixed_demucs_entrypoint_once[0]" time="0.084" /><testcase classname="tests.test_r210_live_gpu_profiles" name="test_profiled_child_cli_runs_fixed_demucs_entrypoint_once[3]" time="0.078" /><testcase classname="tests.test_r210_ace_task_control" name="test_long_generation_passes_600_seconds_and_profiles_gpu_thread" time="0.001" /><testcase classname="tests.test_r210_ace_task_control" name="test_checkpoint_stops_child_for_cancel_or_selected_budget[True]" time="0.001" /><testcase classname="tests.test_r210_ace_task_control" name="test_checkpoint_stops_child_for_cancel_or_selected_budget[False]" time="0.001" /><testcase classname="tests.test_r210_ace_task_control" name="test_budget_is_bounded_and_cannot_be_extended[True]" time="0.000" /><testcase classname="tests.test_r210_ace_task_control" name="test_budget_is_bounded_and_cannot_be_extended[59]" time="0.000" /><testcase classname="tests.test_r210_ace_task_control" name="test_budget_is_bounded_and_cannot_be_extended[14401]" time="0.000" /><testcase classname="tests.test_r210_ace_task_control" name="test_budget_is_bounded_and_cannot_be_extended[3600]" time="0.000" /><testcase classname="tests.test_r210_ace_task_control" name="test_cancel_before_execution_does_not_start_model" time="0.000" /><testcase classname="tests.test_r210_ace_task_control" name="test_runtime_control_auth_ceiling_and_fixed_task_scope" time="0.022" /><testcase classname="tests.test_r210_ace_task_control" name="test_adapter_forwards_budget_and_cancels_backend_after_failure" time="0.003" /><testcase classname="tests.test_r210_ace_task_control" name="test_supervisor_delivers_cancel_even_after_adapter_is_killed" time="0.001" /><testcase classname="tests.test_r210_ace_task_control" name="test_project_cancel_route_authorizes_before_job_and_rejects_other_project" time="0.559" /><testcase classname="tests.test_r210_ace_task_control" name="test_generate_button_cancels_reopened_job_instead_of_submitting_again" time="0.076" /><testcase classname="tests.test_r210_ace_task_control" name="test_running_queue_cancellation_is_not_hidden_by_worker_progress" time="0.443" /><testcase classname="tests.test_r210_ace_task_control" name="test_failure_classification_survives_redacted_zip_without_secret" time="0.002" /><testcase classname="tests.test_r210_ace_task_control" name="test_project_cancel_http_auth_csrf_and_access" time="0.095" /><testcase classname="tests.test_r210_ace_task_control" name="test_real_adapter_termination_delivers_http_cancel" time="0.650" /><testcase classname="tests.test_r210_ace_task_control" name="test_cancellation_of_pending_ace_task_is_not_expired_before_execution" time="0.001" /></testsuite></testsuites>

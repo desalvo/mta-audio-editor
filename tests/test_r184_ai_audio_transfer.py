@@ -17,7 +17,7 @@ def _wav(path):
         stream.writeframes(b'\0\0' * 100)
 
 
-def test_worker_receives_audio_and_returns_preview(monkeypatch, tmp_path):
+def test_worker_receives_audio_and_returns_preview(monkeypatch, tmp_path, synthetic_worker_resolution):
     monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     source = tmp_path / 'source.wav'
     _wav(source)
@@ -40,7 +40,7 @@ shutil.copyfile(input_path,args[args.index('--output')+1])
     assert data.startswith(b'RIFF') and meta['sample_rate'] == 44100
 
 
-def test_source_path_is_not_user_controlled(monkeypatch, tmp_path):
+def test_source_path_is_not_user_controlled(monkeypatch, tmp_path, synthetic_worker_resolution):
     monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
     exe = tmp_path / 'worker'

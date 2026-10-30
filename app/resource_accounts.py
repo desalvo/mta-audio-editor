@@ -512,9 +512,11 @@ def options(uid,body):
 
 def transactions(uid):
     from .subscription_receivables import rows as reversal_rows
+    from .subscription_basis_audit import review as basis_review
     with auth.db() as c:
         init(c)
-        return {'subscription_reversals':reversal_rows(c,uid),'terminations':[dict(row) for row in c.execute('SELECT * FROM resource_contract_terminations WHERE user_id=? ORDER BY terminated_at DESC LIMIT 200',(uid,))],'subscription_fees':[dict(row) for row in c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? ORDER BY period_start DESC LIMIT 200',(uid,))],'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
+        return {'subscription_payment_evidence':basis_review(c,user_id=uid),
+                'subscription_reversals':reversal_rows(c,uid),'terminations':[dict(row) for row in c.execute('SELECT * FROM resource_contract_terminations WHERE user_id=? ORDER BY terminated_at DESC LIMIT 200',(uid,))],'subscription_fees':[dict(row) for row in c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? ORDER BY period_start DESC LIMIT 200',(uid,))],'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
                 'overages':[dict(r) for r in c.execute('SELECT r.job_id,r.period_start,r.charge_micro,b.gross_micro,b.waived_micro FROM resource_job_contracts r JOIN ai_compute_jobs j ON j.id=r.job_id LEFT JOIN resource_job_budgets b ON b.job_id=r.job_id WHERE r.user_id=? AND (r.charge_micro>0 OR b.waived_micro>0) AND j.accounting_excluded=0 ORDER BY r.period_start DESC LIMIT 200',(uid,))]}
 
 

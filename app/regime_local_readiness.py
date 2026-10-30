@@ -38,6 +38,7 @@ CONFIGS = frozenset({'credit_payment_config', 'paypal_config', 'nc_contribution_
 REVIEWED_JOB_TABLES = frozenset('''ai_compute_jobs ai_job_hardware_snapshots
  ai_job_license_snapshots ai_job_settlement_requirements ai_job_billing_exemptions ai_compute_job_diagnostics
  resource_job_contracts resource_job_budgets resource_job_modes'''.split())
+REVIEWED_PROCESS_TABLES = frozenset({'worker_cgroup_scopes', 'worker_cgroup_receipts'})
 
 
 # Fixed, source-reviewed SQL only. New financial schemas require an explicit review.
@@ -248,10 +249,16 @@ def audit(con):
         if row is None or row[0]:
             raise FenceBlocked('Disable voluntary collection and reconcile its complete history first')
     jobs = _settled_jobs(con, tables)
+    # Physical receipts are history, not a new economic obligation. Validate the
+    # complete immutable journal, not merely terminal labels or one job's scope.
+    from .worker_cgroup_recovery import report as process_report
+    processes = process_report(con)
+    if not processes['verified'] or processes['pending'] != 0:
+        raise FenceBlocked('Worker process history requires verified quiescence')
     # Every row in every other financial/execution journal is an explicit
     # blocker, including unknown/new tables. Do not whitelist by terminal label.
     for name in sorted(tables):
-        if name in LOCAL_TABLES or name in CONFIGS or name in REVIEWED_JOB_TABLES or name in {'ai_resource_prices', 'ai_resource_price_history'}:
+        if name in LOCAL_TABLES or name in CONFIGS or name in REVIEWED_JOB_TABLES or name in REVIEWED_PROCESS_TABLES or name in {'ai_resource_prices', 'ai_resource_price_history'}:
             continue
         if name.startswith(PREFIXES):
             if name not in _ROW_QUERIES or con.execute(_ROW_QUERIES[name]).fetchone():

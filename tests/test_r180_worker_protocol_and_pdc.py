@@ -13,7 +13,7 @@ def test_worker_requires_admin_opt_in(monkeypatch):
     with pytest.raises(WorkerUnavailable):
         run_external_worker({'prompt': 'x'})
 
-def test_worker_file_contract_and_validation(tmp_path, monkeypatch):
+def test_worker_file_contract_and_validation(tmp_path, monkeypatch, synthetic_worker_resolution):
     monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     script = tmp_path / 'worker.py'
     script.write_text("#!/usr/bin/env python3\nimport argparse, json, wave\np=argparse.ArgumentParser(); p.add_argument('--request'); p.add_argument('--output'); a=p.parse_args()\nassert json.load(open(a.request))['model_id']=='test-model'\nwith wave.open(a.output,'wb') as w:\n w.setnchannels(1);w.setsampwidth(2);w.setframerate(44100);w.writeframes(b'\\0\\0'*441)\n")

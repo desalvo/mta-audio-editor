@@ -3,6 +3,7 @@ from unittest.mock import patch
 import pytest
 from app import model_license_policy as policy
 from app.service_regime import Regime
+from model_rights_fixtures import synthetic_review
 
 
 @pytest.mark.parametrize('regime,mode,allowed', [
@@ -12,7 +13,7 @@ from app.service_regime import Regime
     (Regime.NON_COMMERCIAL, 'cost_recovery', True),
 ])
 def test_regime_admission_prevents_commercial_use_of_free_only(regime, mode, allowed):
-    with patch.object(policy, 'overrides', return_value={'custom-test': {'mode': mode, 'evidence_url': 'https://example.org/review'}}), \
+    with patch.object(policy, 'overrides', return_value={'custom-test': synthetic_review(mode)}), \
          patch.object(policy, 'commercial_service_enabled', return_value=True), \
          patch('app.service_regime.current_regime', return_value=regime):
         if allowed:

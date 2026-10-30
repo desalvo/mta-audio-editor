@@ -94,9 +94,50 @@ def configure_commercial_service(body,actor_id):
 def overrides():
     path=_path()
     if path.is_symlink() or (path.exists() and path.stat().st_size>128*1024):raise LicenseDenied('Unsafe license policy')
-    value=json.loads(path.read_text()) if path.is_file() else {}
+    def unique(pairs):
+        result={}
+        for key,item in pairs:
+            if key in result:raise LicenseDenied('Duplicate license policy field')
+            result[key]=item
+        return result
+    def invalid(value):raise LicenseDenied('Nonfinite license policy value')
+    value=json.loads(path.read_text(),object_pairs_hook=unique,parse_constant=invalid) if path.is_file() else {}
     if not isinstance(value,dict):raise LicenseDenied('Invalid license policy')
     return value
+
+
+def _require_recorded_review(model_id,custom):
+    """Restored/hand-edited policy files cannot bypass the review writer."""
+    from urllib.parse import urlsplit
+    required={'mode','acknowledge_responsibility','evidence_url','reason','free_access_confirmed','actor_id','reviewed_at'}
+    if (not required<=set(custom) or set(custom)-required-{'authorization_basis','confirm_risk_twice'}
+            or custom['acknowledge_responsibility'] is not True
+            or type(custom['free_access_confirmed']) is not bool
+            or not isinstance(custom['reason'],str) or not 12<=len(custom['reason'])<=2000
+            or not isinstance(custom['evidence_url'],str) or not 1<=len(custom['evidence_url'])<=2000
+            or type(custom['actor_id']) is not int or custom['actor_id']<0
+            or type(custom['reviewed_at']) is not int or not 0<custom['reviewed_at']<=int(time.time())):
+        raise LicenseDenied('Model permission requires a complete recorded operator review: '+model_id)
+    try:parsed=urlsplit(custom['evidence_url'])
+    except ValueError as exc:raise LicenseDenied('Invalid model permission evidence reference') from exc
+    if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password:
+        raise LicenseDenied('Model permission requires an HTTPS evidence reference without credentials')
+    if custom['mode']=='free_only' and custom['free_access_confirmed'] is not True:
+        raise LicenseDenied('Free-only model permission requires confirmed free access')
+    if model_id in RESTRICTED_MODELS or model_id not in CATALOG:
+        if (custom.get('confirm_risk_twice') is not True
+                or custom.get('authorization_basis') not in ('written_permission','verified_license','noncommercial_context')):
+            raise LicenseDenied('Restricted model permission requires a recorded authorization basis and second confirmation')
+        if model_id in ('chordformer','audio-separator-weights','uvr-kara-2','drumsep-weights') and custom['authorization_basis']=='noncommercial_context':
+            raise LicenseDenied('Unknown checkpoint permissions require actual reviewed authorization')
+
+
+def guarded_model_call(model_id,call,*args,**kwargs):
+    """Recheck an admitted legacy callback immediately before/after execution."""
+    evaluate_model(model_id)
+    result=call(*args,**kwargs)
+    evaluate_model(model_id)
+    return result
 
 
 def effective_backing_model(plan):
@@ -132,6 +173,9 @@ def selected(kind,plan):
         if kind.endswith('-mr-mt3') or (kind=='audio-to-midi' and os.getenv('MTA_STUDIO_TRANSCRIBER')=='mr-mt3'):return 'mr-mt3-assets'
         return 'yourmt3' if kind.endswith('-yourmt3') or (kind=='audio-to-midi' and os.getenv('MTA_STUDIO_TRANSCRIBER')=='yourmt3') else 'basic-pitch'
     if kind=='vocal-synthesis':
+        if plan.get('settings',{}).get('backend','oddvoices')=='neural-external':
+            from .ai_adapter_identity import deny_opaque_executor
+            deny_opaque_executor()
         if plan.get('settings',{}).get('backend','oddvoices') in ('neural-external','diffsinger'):
             import os
             settings=plan.get('settings',{})
@@ -232,8 +276,10 @@ def evaluate_singing_components():
 
 
 def evaluate_model(model_id):
+    if not isinstance(model_id,str) or not model_id:raise LicenseDenied('Invalid model permission identity')
     known=CATALOG.get(model_id,('Unreviewed model/weights','disabled',''))
     custom=overrides().get(model_id,{})
+    if not isinstance(custom,dict):raise LicenseDenied('Invalid model license review')
     mode=custom.get('mode',known[1])
     if mode not in ('disabled','free_only','cost_recovery'):raise LicenseDenied('Invalid model licensing mode')
     # Re-evaluate rights at the admission boundary, including policy files
@@ -246,6 +292,8 @@ def evaluate_model(model_id):
         from .service_regime import current_regime, Regime
         if current_regime() == Regime.COMMERCIAL:
             raise LicenseDenied('Noncommercial-context authorization is incompatible with commercial service')
+        if commercial_service_enabled():
+            raise LicenseDenied('Noncommercial-context authorization requires the entire commercial service to be disabled')
     if mode=='cost_recovery' and not commercial_service_enabled():
         raise LicenseDenied('Commercial service is globally disabled; this model must have a reviewed free-only authorization')
     # Enforce the active service regime at the model admission boundary, not
@@ -256,6 +304,7 @@ def evaluate_model(model_id):
     if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
         raise LicenseDenied('Free-only model is not authorized for the commercial service: '+model_id)
     if mode=='disabled':raise LicenseDenied('Model disabled pending license review: '+model_id+'. Contact the administrator; cost recovery alone does not grant permission.')
+    if custom:_require_recorded_review(model_id,custom)
     source=custom.get('evidence_url') or known[2]
     fingerprint=hashlib.sha256(json.dumps({'model':model_id,'license':known[0],'policy':custom,'source':source},sort_keys=True).encode()).hexdigest()
     return Decision(model_id,mode,source,fingerprint,bool(custom))
@@ -326,7 +375,8 @@ def catalog():
     custom=overrides()
     items=[]
     for name,(license_name,default,source) in descriptors().items():
-        selected_mode=custom.get(name,{}).get('mode',default)
+        entry=custom.get(name,{})
+        selected_mode=entry.get('mode',default) if isinstance(entry,dict) else 'disabled'
         try:
             decision=evaluate_model(name)
             available=True

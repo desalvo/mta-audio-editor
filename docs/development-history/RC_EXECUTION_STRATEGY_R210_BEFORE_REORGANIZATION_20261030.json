@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-30",
+  "release": "0.3.0-r210 PRE-RC",
+  "measure": "Original42 equal-weight acceptance criteria;no helper/test count reweighting or criterion changes.",
+  "progress": {
+    "verified": 29,
+    "total": 42,
+    "percent": 69.0,
+    "whole_macroareas_accepted": 1
+  },
+  "accepted_this_cycle": [
+    "B2"
+  ],
+  "latest_handoff": "docs/INDEPENDENT_WORKER_RECOVERY_R210.md",
+  "latest_proof": "docs/validation/r210/independent-guardian-result.json",
+  "batch_exit": "Complete a functional macroarea/criterion with actual original-owner/API/crash/economic acceptance,or document a concrete blocker and continue an independent stream.",
+  "reuse_policy": "627affected current distinct passes include real kernel/HTTP recovery;do not repeat this block or unchanged full CI/Apple/model/financial proofs.",
+  "remaining_original_criteria": [
+    "A4",
+    "A5",
+    "A6",
+    "B6",
+    "C3",
+    "C5",
+    "C6",
+    "D6",
+    "F4",
+    "F5",
+    "F6",
+    "G5",
+    "G6"
+  ],
+  "workstreams": [
+    {
+      "priority": 1,
+      "criteria": [
+        "F4",
+        "F6"
+      ],
+      "stream": "Remaining configured interpreter/upstream loader/checkpoint identity and independent optional rights;reuse the completed policy/adapter and guardian boundaries."
+    },
+    {
+      "priority": 2,
+      "criteria": [
+        "A4",
+        "A5",
+        "C3",
+        "C5",
+        "D6"
+      ],
+      "stream": "Complete original legacy/provider-wide financial proofs,liabilities and integrated two-way administrative cutover;do not infer original fees,payouts or missing cash."
+    },
+    {
+      "priority": 3,
+      "criteria": [
+        "A6",
+        "B6",
+        "C6",
+        "F5",
+        "G5",
+        "G6"
+      ],
+      "stream": "Actual isolated provider/independent-host/installed-OS/container/GPU/plugin target campaign after code prerequisites;no target skip becomes acceptance."
+    }
+  ],
+  "delivery": "One full cumulative at this substantial closure,preserve original paths/logs/licenses and exact criteria. User commits later;no dispatch/server/provider mutation or publication."
+}

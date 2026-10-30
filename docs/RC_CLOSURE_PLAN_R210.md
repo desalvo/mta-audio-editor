@@ -1,3 +1,21 @@
+## Checkpoint corrente — riscossione legacy e prove originali — 30 ottobre 2026
+
+**RC69,0% (29/42),invariata:nessun criterio promosso;l'aumento richiesto non è ottenuto.** Leggere **LEGACY_SUBSCRIPTION_COLLECTION_R210.md** e `validation/r210/legacy-collection-result.json`. Rimborsi senza base originale registrati senza debiti ipotetici;riscossioni legacy preesistenti non verificate sospese prima del provider e dell'allocazione;account IT/EN e aggregati mostrano importi da verificare,revisione privata per proprietario. **779 casi distinti correnti passati,24 nuovi,10 skip Playwright;nessun nuovo collaudo Chromium/provider reale.** Ruff/sintassi/compilazione e quattro gate passano,senza nuovi finding o checker modificati.
+
+A5/C3 restano aperti per prove originali quota/surplus mancanti e migrazione completa non certificata;A4 mantiene anche software/storia/movimenti da completare.Coda operativa in RC_DELIVERY_PLAN_R210.md,senza ripetere i blocchi già verificati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip**,include ACE e la riorganizzazione;non riapplicare il vecchio patch. Tutti i delta da4014a1f restano non committati. Nessuna azione remota.
+
+---
+
+Cronologia precedente,superata dove incompatibile:
+
+## Stato corrente e nuovo ordine RC — 30 ottobre 2026
+
+**69,0% verso RC: 29/42 criteri originali verificati, 13 aperti, E completa (1/7). Nessuna promozione in questa riorganizzazione.** Leggere **RC_DELIVERY_PLAN_R210.md** e `RC_EXECUTION_STRATEGY_R210.json`: primo blocco A4/A5/C3, poi C5/D6; F4/F6 come coda indipendente, campagna target con prerequisiti espliciti. Un solo blocco funzionale; passare a un altro scenario quando manca una prova/ambiente preciso. Ogni resoconto deve riportare percentuale e verificati/42.
+
+Ultimo codice completo: **MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip**; delta documentale successivo, senza nuovo ZIP intermedio. Nessun codice/test/gate/criterio modificato o nuovo collaudo applicativo dichiarato. Tutti i delta da4014a1f restano non committati; nessuna azione remota. Prova del riordino: `validation/r210/rc-reorganization-result.json`. Le priorità e i numeri storici sotto sono superati dove incompatibili.
+
+---
+
 ## Checkpoint corrente — B5 chiuso — 28 ottobre 2026
 
 Leggere **EXECUTION_ENTRY_ACCEPTANCE_R210.md** e `validation/r210/execution-entry-result.json`. **26/42 criteri originali verificati (61,9%), +1 criterio B5 rispetto a25/42(59,5%);0/7 macroaree,PRE-RC.** Proprietà e metering degli ingressi server/legacy/native censiti sono ora verificati:539 sorgenti runtime vincolati,779 punti classificati(18 tipi di worker incorporati;il conteggio dei punti include handler senza inferenza),271 test interessati distinti passati(unione degli esiti più recenti),59 nuovi,zero fallimenti/errori/skip. Identità account/token ricontrollata dopo FIFO e prima del risultato;CPU su cancellazione conservata;figlio raccolto anche su errore del sensore;incertezza conserva claim/fence/riserva e restituisce409 privato senza riesecuzione o falsa misura.

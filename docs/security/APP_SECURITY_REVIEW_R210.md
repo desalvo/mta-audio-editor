@@ -1,3 +1,15 @@
+## Revisione corrente — processo Linux indipendente — 30 ottobre 2026
+
+307 sorgenti app/168 finding Bandit(0HIGH,21MEDIUM,147LOW),scan guardian-bandit.json;5 nuovi LOW import/Popen e5 identità spostate revisionati. Processo dedicato,canali privati,identità originali prima del modello,pidfd e kernelECHILD,DB continuation limitata allo scope per il cleanup durante drain. Nessun addebito/riavvio da una ricevuta fisica;ACE esterno e guardian perso restano sospesi. C2173,runtime554/780,HTTP30/21;checker/soglie/soppressioni invariati. B2 ha prove kernel/API proprie;F4/F5/F6/B6 e RC restano separati. Vedere ../INDEPENDENT_WORKER_RECOVERY_R210.md e il JSON di accettazione.
+
+---
+
+## Revisione corrente — identità degli adapter — 30 ottobre 2026
+
+305 sorgenti/163 finding(0HIGH,21MEDIUM,142LOW),scan adapter-identity-bandit.json. Rimossi import/avvio subprocess dal launcher ACE;sei identità B404/B603 spostate e riesaminate,nessun finding nuovo. Adapter fissi per tipo,copia ACE/sibling controllati,rifiuti generici prima di lavoro/ledger;gli interpreti e runtime upstream restano nel confine di fiducia,F4/F6 non chiusi. C2169,runtime552/781,HTTP30/21,checker e soglie invariati. Vedere ../OPAQUE_ADAPTER_IDENTITY_R210.md e le prove correnti.
+
+---
+
 ## Current legacy separator review — 29 October2026
 
 304 app sources,165 reviewed Bandit findings(0HIGH/21MEDIUM/144LOW),30 explicit HTTP sites/21files. Direct Demucs and backing selectors/revocation are checked;opaque lead/backing commands are refused. Fixed DSP is shared and bounded;unverified registered descendant usage remains held. No whole F4/F5/F6 promotion or new model/kernel proof. See LEGACY_SEPARATOR_ACCEPTANCE_R210.md. Existing checker bytes and suppressions are unchanged.

@@ -278,8 +278,11 @@ def report(c,*,limit=50,offset=0):
     receivables=None;repayment_refunds=None
     try:
         reversals=reversal_rows(c)
-        receivables=sum(row['due_micro'] for row in reversals)
-        repayment_refunds=sum(payment['refund_due_micro'] for row in reversals for payment in row['payments'])
+        if any(not row['collection_verified'] for row in reversals):
+            issues.append('subscription_repayment_unverifiable')
+        else:
+            receivables=sum(row['due_micro'] for row in reversals)
+            repayment_refunds=sum(payment['refund_due_micro'] for row in reversals for payment in row['payments'])
     except FenceBlocked:
         issues.append('subscription_repayment_unverifiable')
     subscription_risk=c.execute("SELECT coalesce(sum(p.held_minor),0)*10000 FROM payment_reconciliation_positions p JOIN paypal_orders o ON p.provider='paypal' AND p.order_id=o.id WHERE o.kind='subscription'").fetchone()[0] if 'paypal_orders' in tables else 0
@@ -288,7 +291,10 @@ def report(c,*,limit=50,offset=0):
     if not original_losses['verified']:issues.append('subscription_original_loss_unverified')
     from .subscription_basis_audit import review as basis_review
     original_basis=basis_review(c,limit=limit,offset=offset)
-    if not original_basis['verified']:issues.append('subscription_original_basis_unverified')
+    if not original_basis['verified']:
+        issues.append('subscription_original_basis_unverified')
+        receivables=None
+        repayment_refunds=None
     positions=[dict(zip(keys,row)) for row in rows]
     from .checkout_terminal_outcomes import terminal_receipt
     for position in positions:

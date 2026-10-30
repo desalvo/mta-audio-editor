@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="14" time="8.193" timestamp="2026-10-30T02:36:47.153727+01:00" hostname="fa16cbf55a36"><testcase classname="tests.test_r210_independent_process_guard" name="test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[normal-leader-exit]" time="0.194" /><testcase classname="tests.test_r210_independent_process_guard" name="test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[cancel]" time="0.193" /><testcase classname="tests.test_r210_independent_process_guard" name="test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[callback-error]" time="0.189" /><testcase classname="tests.test_r210_independent_process_guard" name="test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[timeout]" time="0.581" /><testcase classname="tests.test_r210_independent_process_guard" name="test_precancel_never_starts_a_worker_or_guard" time="0.001" /><testcase classname="tests.test_r210_independent_process_guard" name="test_actual_supervisor_sigkill_leaves_complete_kernel_receipt_and_original_claim" time="1.266" /><testcase classname="tests.test_r210_independent_process_guard" name="test_original_supervisor_cannot_forge_a_guardian_receipt" time="1.057" /><testcase classname="tests.test_r210_independent_process_guard" name="test_guard_never_signals_a_sibling_unrelated_to_its_job" time="0.172" /><testcase classname="tests.test_r210_independent_process_guard" name="test_short_lived_child_cpu_is_collected_even_without_proc_samples" time="0.323" /><testcase classname="tests.test_r210_independent_process_guard" name="test_empty_proc_samples_cannot_turn_a_live_child_into_quiescence" time="0.004" /><testcase classname="tests.test_r210_independent_process_guard" name="test_lost_guardian_is_not_replaced_by_a_pid_guess_or_fabricated_cpu" time="0.887" /><testcase classname="tests.test_r210_independent_process_guard" name="test_ace_external_service_cannot_be_cleared_with_only_a_local_tree_receipt" time="0.979" /><testcase classname="tests.test_r210_independent_process_guard" name="test_real_registered_ffmpeg_tree_settles_only_after_guardian_kernel_receipt" time="1.306" /><testcase classname="tests.test_r210_independent_process_guard" name="test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution[COMMERCIAL]" time="0.486"><failure message="ImportError: Using SOCKS proxy, but the 'socksio' package is not installed. Make sure to install httpx using `pip install httpx[socks]`.">account = 2
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-21/test_real_http_supervisor_loss0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4c85c329f0&gt;
+regime = 'COMMERCIAL'
+
+    @pytest.mark.parametrize('regime', ['COMMERCIAL', 'NON_COMMERCIAL'])
+    def test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution(account, tmp_path, monkeypatch, regime):
+        from concurrent.futures import ThreadPoolExecutor
+        import socket
+        import httpx
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from app import ai_access, ai_billing_routes, resource_routes, ai_arranger_runtime as queue
+        from test_r210_legal_documents import cookie
+        monkeypatch.setattr(queue, '_ROOT', tmp_path / 'http-queue')
+        (auth.data_root() / 'service-regime.json').write_text(json.dumps({'regime': regime, 'revision': 0}))
+        with auth.db() as c:
+            c.execute('UPDATE regime_fence_state SET regime=? WHERE singleton=1', (regime,))
+        token = ai_access.issue(account, 'Actual HTTP supervisor crash')['token']
+        argv = descendants(tmp_path)
+        worker = tmp_path / 'protocol_worker.py'
+        worker.write_text('import runpy,sys\nsys.argv=' + repr(argv[1:]) + '\nrunpy.run_path(' + repr(argv[1]) + ',run_name="__main__")\n')
+        worker.chmod(0o700)
+        with socket.socket() as probe:
+            probe.bind(('127.0.0.1', 0)); port = probe.getsockname()[1]
+        bootstrap = '''import sys
+    from pathlib import Path
+    from fastapi import FastAPI
+    import uvicorn
+    from app import ai_billing_routes,ai_worker_registry,ai_arranger_runtime as queue
+    queue._ROOT=Path(sys.argv[2])
+    original=ai_worker_registry.resolve_worker
+    ai_worker_registry.resolve_worker=lambda kind:Path(sys.argv[1]) if kind=='whisper' else original(kind)
+    app=FastAPI();app.include_router(ai_billing_routes.router)
+    @app.get('/guard-test-ready')
+    def ready():return {'ready':True}
+    uvicorn.run(app,host='127.0.0.1',port=int(sys.argv[3]),log_level='error',access_log=False)
+    '''
+        server = subprocess.Popen([sys.executable, '-c', bootstrap, str(worker), str(queue._ROOT), str(port)],
+            env={**os.environ, 'PYTHONPATH': str(ROOT), 'MTA_DATA_DIR': str(auth.data_root()),
+                 'MTA_AI_WORKER_ENABLED': 'true', 'MTA_AI_EXECUTION_MODE': 'local'},
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        base = f'http://127.0.0.1:{port}'
+        def ready():
+            if server.poll() is not None: raise AssertionError(server.stderr.read().decode())
+            try: return httpx.get(base + '/guard-test-ready', timeout=.2).status_code == 200
+            except httpx.HTTPError: return False
+&gt;       until(ready)
+
+tests/test_r210_independent_process_guard.py:307: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_r210_independent_process_guard.py:24: in until
+    value = call()
+            ^^^^^^
+tests/test_r210_independent_process_guard.py:305: in ready
+    try: return httpx.get(base + '/guard-test-ready', timeout=.2).status_code == 200
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../06e635791464/venv/lib/python3.12/site-packages/httpx/_api.py:195: in get
+    return request(
+../../06e635791464/venv/lib/python3.12/site-packages/httpx/_api.py:102: in request
+    with Client(
+../../06e635791464/venv/lib/python3.12/site-packages/httpx/_client.py:700: in __init__
+    else self._init_proxy_transport(
+../../06e635791464/venv/lib/python3.12/site-packages/httpx/_client.py:750: in _init_proxy_transport
+    return HTTPTransport(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;httpx.HTTPTransport object at 0x7f4c876df6b0&gt;, verify = True
+cert = None, trust_env = True, http1 = True, http2 = False
+limits = Limits(max_connections=100, max_keepalive_connections=20, keepalive_expiry=5.0)
+proxy = Proxy('socks5h://127.0.0.1:35591'), uds = None, local_address = None
+retries = 0, socket_options = None
+
+    def __init__(
+        self,
+        verify: ssl.SSLContext | str | bool = True,
+        cert: CertTypes | None = None,
+        trust_env: bool = True,
+        http1: bool = True,
+        http2: bool = False,
+        limits: Limits = DEFAULT_LIMITS,
+        proxy: ProxyTypes | None = None,
+        uds: str | None = None,
+        local_address: str | None = None,
+        retries: int = 0,
+        socket_options: typing.Iterable[SOCKET_OPTION] | None = None,
+    ) -&gt; None:
+        import httpcore
+    
+        proxy = Proxy(url=proxy) if isinstance(proxy, (str, URL)) else proxy
+        ssl_context = create_ssl_context(verify=verify, cert=cert, trust_env=trust_env)
+    
+        if proxy is None:
+            self._pool = httpcore.ConnectionPool(
+                ssl_context=ssl_context,
+                max_connections=limits.max_connections,
+                max_keepalive_connections=limits.max_keepalive_connections,
+                keepalive_expiry=limits.keepalive_expiry,
+                http1=http1,
+                http2=http2,
+                uds=uds,
+                local_address=local_address,
+                retries=retries,
+                socket_options=socket_options,
+            )
+        elif proxy.url.scheme in ("http", "https"):
+            self._pool = httpcore.HTTPProxy(
+                proxy_url=httpcore.URL(
+                    scheme=proxy.url.raw_scheme,
+                    host=proxy.url.raw_host,
+                    port=proxy.url.port,
+                    target=proxy.url.raw_path,
+                ),
+                proxy_auth=proxy.raw_auth,
+                proxy_headers=proxy.headers.raw,
+                ssl_context=ssl_context,
+                proxy_ssl_context=proxy.ssl_context,
+                max_connections=limits.max_connections,
+                max_keepalive_connections=limits.max_keepalive_connections,
+                keepalive_expiry=limits.keepalive_expiry,
+                http1=http1,
+                http2=http2,
+                socket_options=socket_options,
+            )
+        elif proxy.url.scheme in ("socks5", "socks5h"):
+            try:
+                import socksio  # noqa
+            except ImportError:  # pragma: no cover
+&gt;               raise ImportError(
+                    "Using SOCKS proxy, but the 'socksio' package is not installed. "
+                    "Make sure to install httpx using `pip install httpx[socks]`."
+                ) from None
+E               ImportError: Using SOCKS proxy, but the 'socksio' package is not installed. Make sure to install httpx using `pip install httpx[socks]`.
+
+../../06e635791464/venv/lib/python3.12/site-packages/httpx/_transports/default.py:191: ImportError</failure></testcase></testsuite></testsuites>

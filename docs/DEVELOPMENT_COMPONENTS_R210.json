@@ -2,23 +2,24 @@
   "schema_version": 2,
   "project": "MTA Audio Editor",
   "release": "0.3.0-r210",
-  "updated_utc": "2026-10-29",
-  "baseline_archive": "MTA-0.3.0-r210-pre-RC-ffmpeg-tree-cumulative.zip",
-  "baseline_sha256": "4f184c5f4cb2915cc824334d3abb128f9147edeb11c34eaa7b128bd83abf4817",
+  "updated_utc": "2026-10-30T17:19:20.011429+00:00",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-adapter-identity-cumulative.zip",
+  "baseline_sha256": "65f119b2c4194ecd84b7e582bfa9a98bd856eb251077638e0402b8c47bd2bf9c",
   "git_baseline": {
     "repository": "https://github.com/desalvo/mta-audio-editor",
     "branch": "main",
-    "verified_head": "dafdff6a1d5a8fc5670e9125297406c5df470231",
-    "comparison": "Complete untruncated read-only tree comparison:all4193 tracked blob hashes match delivered input;run40912981261 commit metadata"
+    "verified_head": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+    "tree": "9cd308daa505ef7c01c743ef2b5ce7461f1cd488",
+    "comparison": "Historical complete4208blob comparison of the queue-busy input is retained in RESTORED_MODEL_RIGHTS_R210.md;the current cumulative includes uncommitted rights/adapter/guardian changes after4014a1f."
   },
   "commit_deferred": true,
   "release_candidate": false,
   "transition_enabled": false,
   "progress": {
     "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
-    "numerator": 28,
+    "numerator": 29,
     "denominator": 42,
-    "percent": 66.7,
+    "percent": 69.0,
     "accepted_macroareas": 1,
     "macroarea_denominator": 7,
     "historical_dual_regime_estimate_percent": 70,
@@ -93,8 +94,8 @@
         {
           "id": "B2",
           "criterion": "Actual supervisor-crash recovery with external worker quiescence proof",
-          "state": "implementation_pending",
-          "evidence": "Partial local cgroup workflow implemented: prelaunch original supervisor/claim binding, transactional bootstrap admission, immutable kernel quiescence receipts, admin API/IT-EN UI, financial finalization and GPU-lease barrier. Actual prelaunch supervisor SIGKILL and synthetic kernel/API/browser fixtures pass. Actual delegated nested-cgroup crash test is prepared but skipped; post-crash economic resolution and other executor coverage remain pending. docs/DURABLE_WORKER_RECOVERY_HANDOFF_R210.md; docs/validation/r210/cgroup-journal-summary.json.; partial extension: original frozen recovery and explicit operator-funded unknown loss resolution, immutable audit, reservation/lease release and evidence barriers, IT/EN API/browser/NC privacy checks; docs/WORKER_LOSS_RESOLUTION_HANDOFF_R210.md. Real delegated-kernel acceptance and complete executor coverage remain pending. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. 2026-10-29:FFMPEG_TREE_ACCOUNTING_R210.md;known internal child topology requires cgroup tree measurement regardless of proc samples,including interruption;248distinct affected passes/13new. Original criterion state unchanged;real cgroup/external worker quiescence acceptance not supplied.",
+          "state": "verified",
+          "evidence": "Partial local cgroup workflow implemented: prelaunch original supervisor/claim binding, transactional bootstrap admission, immutable kernel quiescence receipts, admin API/IT-EN UI, financial finalization and GPU-lease barrier. Actual prelaunch supervisor SIGKILL and synthetic kernel/API/browser fixtures pass. Actual delegated nested-cgroup crash test is prepared but skipped; post-crash economic resolution and other executor coverage remain pending. docs/DURABLE_WORKER_RECOVERY_HANDOFF_R210.md; docs/validation/r210/cgroup-journal-summary.json.; partial extension: original frozen recovery and explicit operator-funded unknown loss resolution, immutable audit, reservation/lease release and evidence barriers, IT/EN API/browser/NC privacy checks; docs/WORKER_LOSS_RESOLUTION_HANDOFF_R210.md. Real delegated-kernel acceptance and complete executor coverage remain pending. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. 2026-10-29:FFMPEG_TREE_ACCOUNTING_R210.md;known internal child topology requires cgroup tree measurement regardless of proc samples,including interruption;248distinct affected passes/13new. Original criterion state unchanged;real cgroup/external worker quiescence acceptance not supplied. Superseded for B2 by INDEPENDENT_WORKER_RECOVERY_R210.md and validation/r210/independent-guardian-result.json: actual independent Linux guardian, kernel subreaper/pidfd/ECHILD, original scope/claim and HTTP admin economic recovery in both regimes;16new/628distinct affected passes. Missing guardian/external ACE proof retains work. B6/F5/G6 and delegated cgroup target evidence remain separate;no original criterion text or weight changed.",
           "weight": 1
         },
         {
@@ -309,7 +310,7 @@
           "id": "F4",
           "criterion": "Rights and bypass acceptance for every legacy executor",
           "state": "implementation_pending",
-          "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending. 2026-10-29:CI_40858_REPAIR_R210.md;actual Apple40858613243 supersedes the earlier SDK block:32exact checks,real Keychain,unsigned iOS app build and13current source hashes verified. No real neural or installed-device/full-F4 acceptance;criterion remains open.",
+          "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending. 2026-10-29:CI_40858_REPAIR_R210.md;actual Apple40858613243 supersedes the earlier SDK block:32exact checks,real Keychain,unsigned iOS app build and13current source hashes verified. No real neural or installed-device/full-F4 acceptance;criterion remains open. 2026-10-30:RESTORED_MODEL_RIGHTS_R210.md;strict imported-review contract,cached chord/Madmom/Mega53/profile and ACE/MRMT3 diagnostics guarded;1104distinct affected passes,305new,7explicit prerequisite skips.72actual token API denials cover18registered kinds/two transports before worker/ledger. Opaque executable/model identity and dynamic/native universal acceptance remain open;criterion not promoted. 2026-10-30:PINNED_TRANSCRIPTION_LOADERS_R210.md;789passes,3skips.Independent shipped MT3 source/tensor pins,source-only importlib and immutable tensor input,per-forward permissions.OriginalF4 remains pending external interpreter/dependency/ACE model contracts;PS refused without independent tensor pin.",
           "weight": 1
         },
         {
@@ -393,9 +394,11 @@
     "Local SQLite ownership is not multi-host coordination"
   ],
   "next_actions": [
-    "After the user commits,review standard Quality/SAST for the queue contention repair. No automatic dispatch or Git mutation.",
-    "Reuse unchanged Apple40858613243,FFmpeg/worker,finances/web/loader proofs;13Apple hashes match. Real kernel/multi-host/physicalOS and complete financial/executor criteria remain open.",
-    "Continue remaining original financial/legacy/rights/executor work;preserve42criterion wording/weights/states. No real server/provider actions authorized."
+    "Recover independently proved original legacy subscription bases through a verified migration contract;no evidence is available here and no current-price reconstruction is allowed.",
+    "Continue an unclosed A4 financial scenario with canonical movement proof;full provider history/unsupported payout/protection formats and references remain implementation plus evidence work.",
+    "Reuse accepted drain/UI and existing local cutover;general C3/C5/D6 remain blocked until original obligations are fully resolved.",
+    "Continue independent F4/F6 residual runtime/backend contracts and actual model/rights evidence;do not repeat completed loader/ACE UI/API-denial campaigns.",
+    "After user commit inspect ordinary Quality/SAST;no automatic CI dispatch or real provider/server mutation."
   ],
   "test_results": {
     "full_available_linux": {
@@ -772,8 +775,8 @@
       "scanner_skips": 0,
       "review_ledger": "docs/security/APP_SECURITY_REVIEW_R210.json",
       "gate": "scripts/check_security_review.py",
-      "note": "Legacy separator review:one duplicate DSP LOW removed,no new finding,four changed contexts reviewed,other line identities relocated;no suppression/checker relaxation.",
-      "current_raw_scan": "docs/validation/r210/legacy-separator-bandit.json"
+      "note": "Restored policy guards:165findings unchanged in total;four ACE context/line identities explicitly reviewed,zero new findings. Other finding identities unchanged;all gates pass without suppressions.",
+      "current_raw_scan": "docs/validation/r210/f4-bandit.json"
     },
     "continuation_new_modules": {
       "modules": [
@@ -982,41 +985,42 @@
       "ruff": "passed",
       "existing_finding_ids_unchanged": 165,
       "checker_suppression_threshold_changes": false
-    }
+    },
+    "restored_rights_gates": "docs/validation/r210/restored-rights-result.json"
   },
   "resume_checkpoint": {
-    "date": "2026-10-29",
-    "handoff": "docs/QUEUE_BARRIER_CONTENTION_R210.md",
-    "proof": "docs/validation/r210/queue-busy-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-queue-busy-cumulative.zip",
-    "base_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
-    "accepted_criteria": 28,
+    "date": "2026-10-30",
+    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
+    "proof": "docs/validation/r210/legacy-collection-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "accepted_criteria": 29,
     "original_criteria_total": 42,
-    "percent": 66.7,
-    "accepted_macroareas": [
-      "E"
-    ],
+    "percent": 69.0,
+    "passed": 779,
+    "new_cases": 24,
+    "skipped": 10,
     "criteria_promoted": [],
-    "release_candidate": false,
+    "numeric_progress_requested_achieved": false,
     "commit_deferred": true,
-    "requested_numeric_progress_achieved": false
+    "release_candidate": false,
+    "whole_A5_or_C3_accepted": false
   },
   "latest_checkpoint": {
-    "date": "2026-10-29",
-    "handoff": "docs/QUEUE_BARRIER_CONTENTION_R210.md",
-    "proof": "docs/validation/r210/queue-busy-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-queue-busy-cumulative.zip",
-    "base_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
-    "accepted_criteria": 28,
+    "date": "2026-10-30",
+    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
+    "proof": "docs/validation/r210/legacy-collection-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "accepted_criteria": 29,
     "original_criteria_total": 42,
-    "percent": 66.7,
-    "accepted_macroareas": [
-      "E"
-    ],
+    "percent": 69.0,
+    "passed": 779,
+    "new_cases": 24,
+    "skipped": 10,
     "criteria_promoted": [],
-    "release_candidate": false,
+    "numeric_progress_requested_achieved": false,
     "commit_deferred": true,
-    "requested_numeric_progress_achieved": false
+    "release_candidate": false,
+    "whole_A5_or_C3_accepted": false
   },
   "publication_recovery_checkpoint": {
     "handoff": "docs/TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md",
@@ -1025,29 +1029,51 @@
     "transition_enabled": false
   },
   "current_committed_baseline": {
-    "sha": "dafdff6a1d5a8fc5670e9125297406c5df470231",
-    "source": "Run40912981261 and complete4193blob comparison against exact input",
-    "pending_delta": "Bounded typed BUSY/LOCKED queue observation retry;private queue and joined thread lifecycle for known-tree test fixtures;9new regression cases and current proof/docs."
+    "sha": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+    "source": "Run40972934180 success and complete4208blob input comparison",
+    "pending_delta": "Restored model review/legacy rights,opaque adapter identity refusal,and independent Linux guardian original worker recovery;all changes after4014a1f remain uncommitted."
   },
   "work_organization": {
-    "date": "2026-10-29",
+    "date": "2026-10-30",
     "commit_deferred_by_user": true,
     "single_uncommitted_delta": true,
     "intermediate_packages": false,
-    "definition_of_done": "Original full macroarea acceptance or a concrete, documented blocker; no helper/test-count stopping rule",
-    "reuse_policy": "Source/boundary changes select affected verification; unchanged evidence is retained. No repeat of the existing full suite solely because work continues.",
+    "definition_of_done": "Continue to full criterion acceptance or a concrete recorded blocker;do not deliver a helper-only intermediate ZIP.",
+    "reuse_policy": "Reuse source-identical accepted proofs;run affected tests only after a boundary change,then the relevant existing security gates.",
     "queue": "docs/RC_FINAL_WORK_QUEUE_R210.md",
+    "plan": "docs/RC_DELIVERY_PLAN_R210.md",
+    "strategy": "docs/RC_EXECUTION_STRATEGY_R210.json",
     "remaining_criteria": {
-      "implementation_or_review_pending": 9,
+      "implementation_or_review_pending": 8,
       "external_target_blocked": 5,
-      "total": 14
+      "total": 13
     },
     "not_a_full_product_percentage": true,
-    "delivery": "Complete cumulative archive at each substantial checkpoint when possible,not only a patch;no ZIP per helper. Commit remains deferred.",
-    "uncommitted_scope": "Bounded retry of typed busy queue observations without reexecuting original workers;isolated known-tree fixtures with joined threads;9new real-lock/regression cases and current CI/source-review documentation."
+    "active_workstream": "finance",
+    "work_in_progress_limit": 1,
+    "mandatory_status": "Always report RC percent and verified/42;29/42=69.0 until original criteria fully close.",
+    "delivery": "Existing complete ACE cumulative plus one documentation/strategy delta for this reorganization;no new intermediate cumulative ZIP. One complete cumulative at a substantial functional acceptance checkpoint.",
+    "uncommitted_scope": "All cumulative changes since4014a1f plus original-evidence collection/refund guards,owner-scoped unknown amounts and integrated reorganization.",
+    "latest_concrete_blockers": "docs/validation/r210/legacy-collection-result.json"
   },
-  "latest_confirmed_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
-  "latest_continuation": "docs/QUEUE_BARRIER_CONTENTION_R210.md",
+  "latest_confirmed_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "latest_continuation": {
+    "date": "2026-10-30",
+    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
+    "proof": "docs/validation/r210/legacy-collection-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "passed": 779,
+    "new_cases": 24,
+    "skipped": 10,
+    "criteria_promoted": [],
+    "numeric_progress_requested_achieved": false,
+    "commit_deferred": true,
+    "release_candidate": false,
+    "whole_A5_or_C3_accepted": false
+  },
   "latest_confirmed_cutover_chromium": {
     "date": "2026-10-27",
     "commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
@@ -1084,39 +1110,106 @@
     "no_local_test_rerun": true
   },
   "latest_confirmed_standard_ci": {
-    "date": "2026-10-27",
-    "commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
-    "run_id": 40480180716,
+    "schema": "mta-ci-observation-1",
+    "observed_utc": "2026-10-30",
+    "commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+    "tree": "9cd308daa505ef7c01c743ef2b5ce7461f1cd488",
+    "run_id": 40972934180,
+    "run_status": "completed",
+    "run_conclusion": "success",
+    "complete_regression": false,
     "quality": {
-      "job_id": 122108234185,
-      "conclusion": "success",
-      "passed": 6393,
-      "skipped": 46,
-      "failed": 0,
-      "coverage_percent": 76.01,
-      "seconds": 564.3
+      "passed": 7155,
+      "skipped": 50,
+      "warnings": 1027,
+      "seconds": 859.42,
+      "coverage_percent": 76.71,
+      "required_percent": 70,
+      "artifact_id": 12942381400,
+      "artifact_sha256": "b6b900e488610f57ad62a10fc0ec3d9cf19ac318469ed85be0ee024005404284"
     },
-    "sast": {
-      "job_id": 122108233822,
-      "conclusion": "success",
-      "bandit": "success",
-      "dependency_audit": "success",
-      "secret_scan": "success",
-      "trivy_filesystem": "success"
-    },
-    "other_jobs": "VST3 SDK,container production gate,Windows Chordino and all native/mobile builds successful;three publication jobs intentionally skipped",
-    "scope": "Standard CI;optional admin cutover Chromium not included",
-    "rc": false,
-    "original_acceptance": {
-      "accepted": 23,
-      "total": 42,
-      "macroareas_accepted": 0,
-      "macroareas_total": 7
-    },
-    "no_tests_rerun": true,
-    "no_remote_mutations": true
+    "jobs": [
+      {
+        "id": 123793866705,
+        "name": "Quality and unit tests",
+        "conclusion": "success"
+      },
+      {
+        "id": 123793867078,
+        "name": "SAST and dependency audit",
+        "conclusion": "success"
+      },
+      {
+        "id": 123793867128,
+        "name": "VST3 SDK compile Linux",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801016981,
+        "name": "Build Windows Chordino runtime",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017063,
+        "name": "Linux native arm64",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017085,
+        "name": "Native macOS x64",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017094,
+        "name": "Container production gate",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017101,
+        "name": "iOS / iPadOS archive",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017105,
+        "name": "Native macOS arm64",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017124,
+        "name": "Linux native x86_64",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017180,
+        "name": "Android APK / AAB",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801335550,
+        "name": "Native Windows installer",
+        "conclusion": "success"
+      },
+      {
+        "id": 123804388622,
+        "name": "Publish Docker Hub image",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123810542506,
+        "name": "Publish rolling early-main packages",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123810542972,
+        "name": "Publish installers to GitHub Release",
+        "conclusion": "skipped"
+      }
+    ],
+    "tracked_blobs_matching_input": 4208,
+    "new_delta_ci_executed": false,
+    "release_candidate": false
   },
-  "next_commit_scope": "Bounded retry of typed busy queue observations without reexecuting original workers;isolated known-tree fixtures with joined threads;9new real-lock/regression cases and current CI/source-review documentation.",
+  "next_commit_scope": "Enforce model rights, recover workers, isolate ACE observers and verify subscription debt",
   "legacy_execution_continuation": {
     "handoff": "docs/LEGACY_EXECUTION_BOUNDARIES_R210.md",
     "result": "docs/validation/r210/legacy-executor-result.json",
@@ -1161,102 +1254,103 @@
     "external_target_acceptance": false
   },
   "latest_observed_ci": {
-    "date": "2026-10-29",
-    "timezone": "Europe/Rome",
-    "commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
-    "run_id": 40912981261,
-    "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40912981261",
-    "mode": "standard unit",
+    "schema": "mta-ci-observation-1",
+    "observed_utc": "2026-10-30",
+    "commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+    "tree": "9cd308daa505ef7c01c743ef2b5ce7461f1cd488",
+    "run_id": 40972934180,
+    "run_status": "completed",
+    "run_conclusion": "success",
+    "complete_regression": false,
     "quality": {
-      "job_id": 123585628451,
-      "conclusion": "failure",
-      "passed": 7145,
-      "failed": 1,
-      "errors": 0,
+      "passed": 7155,
       "skipped": 50,
       "warnings": 1027,
-      "seconds": 1089.52,
+      "seconds": 859.42,
       "coverage_percent": 76.71,
-      "coverage_threshold_percent": 70
-    },
-    "sast": {
-      "job_id": 123585627963,
-      "conclusion": "success"
-    },
-    "vst3_sdk": {
-      "job_id": 123585627630,
-      "conclusion": "success"
+      "required_percent": 70,
+      "artifact_id": 12942381400,
+      "artifact_sha256": "b6b900e488610f57ad62a10fc0ec3d9cf19ac318469ed85be0ee024005404284"
     },
     "jobs": [
       {
-        "id": 123585627630,
-        "name": "VST3 SDK compile (Linux)",
+        "id": 123793866705,
+        "name": "Quality and unit tests",
         "conclusion": "success"
       },
       {
-        "id": 123585627963,
+        "id": 123793867078,
         "name": "SAST and dependency audit",
         "conclusion": "success"
       },
       {
-        "id": 123585628451,
-        "name": "Quality and unit tests",
-        "conclusion": "failure"
+        "id": 123793867128,
+        "name": "VST3 SDK compile Linux",
+        "conclusion": "success"
       },
       {
-        "id": 123598698003,
-        "name": "Container production gate",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123598698111,
+        "id": 123801016981,
         "name": "Build Windows Chordino runtime",
-        "conclusion": "skipped"
+        "conclusion": "success"
       },
       {
-        "id": 123598698437,
-        "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
-        "conclusion": "skipped"
+        "id": 123801017063,
+        "name": "Linux native arm64",
+        "conclusion": "success"
       },
       {
-        "id": 123598698541,
+        "id": 123801017085,
+        "name": "Native macOS x64",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017094,
+        "name": "Container production gate",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017101,
         "name": "iOS / iPadOS archive",
-        "conclusion": "skipped"
+        "conclusion": "success"
       },
       {
-        "id": 123598698578,
+        "id": 123801017105,
+        "name": "Native macOS arm64",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017124,
+        "name": "Linux native x86_64",
+        "conclusion": "success"
+      },
+      {
+        "id": 123801017180,
         "name": "Android APK / AAB",
-        "conclusion": "skipped"
+        "conclusion": "success"
       },
       {
-        "id": 123598699094,
-        "name": "Native macOS installer (${{ matrix.arch }})",
-        "conclusion": "skipped"
+        "id": 123801335550,
+        "name": "Native Windows installer",
+        "conclusion": "success"
       },
       {
-        "id": 123598699746,
+        "id": 123804388622,
         "name": "Publish Docker Hub image",
         "conclusion": "skipped"
       },
       {
-        "id": 123598699976,
-        "name": "Native Windows installer",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123598700401,
-        "name": "Publish desktop/mobile installers to GitHub Release",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123598700871,
+        "id": 123810542506,
         "name": "Publish rolling early-main packages",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123810542972,
+        "name": "Publish installers to GitHub Release",
         "conclusion": "skipped"
       }
     ],
-    "all_input_tracked_blobs_match": true,
-    "tracked_blobs": 4193,
-    "no_remote_mutations_by_agent": true,
+    "tracked_blobs_matching_input": 4208,
+    "new_delta_ci_executed": false,
     "release_candidate": false
   },
   "ci_refund_fixture_repair": {
@@ -1528,5 +1622,271 @@
     "signed_IPA": false,
     "commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
     "proof": "docs/validation/r210/ci-40858613243-ios/acceptance.json"
+  },
+  "restored_model_rights": {
+    "date": "2026-10-30",
+    "handoff": "docs/RESTORED_MODEL_RIGHTS_R210.md",
+    "proof": "docs/validation/r210/restored-rights-result.json",
+    "cumulative": "MTA-0.3.0-r210-pre-RC-restored-rights-cumulative.zip",
+    "passed": 1104,
+    "new_cases": 305,
+    "skipped": 7,
+    "criteria_promoted": [],
+    "progress_percent": 66.7,
+    "release_candidate": false,
+    "whole_F4_accepted": false
+  },
+  "previous_checkpoint_before_guardian": {
+    "date": "2026-10-30",
+    "handoff": "docs/RESTORED_MODEL_RIGHTS_R210.md",
+    "proof": "docs/validation/r210/restored-rights-result.json",
+    "cumulative": "MTA-0.3.0-r210-pre-RC-restored-rights-cumulative.zip",
+    "passed": 1104,
+    "new_cases": 305,
+    "skipped": 7,
+    "criteria_promoted": [],
+    "progress_percent": 66.7,
+    "release_candidate": false,
+    "whole_F4_accepted": false,
+    "archive": "MTA-0.3.0-r210-pre-RC-restored-rights-cumulative.zip",
+    "base_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+    "accepted_criteria": 28,
+    "original_criteria_total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ],
+    "commit_deferred": true,
+    "requested_numeric_progress_achieved": false
+  },
+  "independent_guardian": {
+    "date": "2026-10-30",
+    "handoff": "docs/INDEPENDENT_WORKER_RECOVERY_R210.md",
+    "proof": "docs/validation/r210/independent-guardian-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "passed": 628,
+    "new_cases": 16,
+    "skipped": 0,
+    "criteria_promoted": [
+      "B2"
+    ],
+    "accepted_macroareas": [
+      "E"
+    ],
+    "commit_deferred": true,
+    "release_candidate": false,
+    "requested_numeric_progress_achieved": true
+  },
+  "previous_guardian_checkpoint": {
+    "date": "2026-10-30",
+    "handoff": "docs/INDEPENDENT_WORKER_RECOVERY_R210.md",
+    "proof": "docs/validation/r210/independent-guardian-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "passed": 628,
+    "new_cases": 16,
+    "skipped": 0,
+    "criteria_promoted": [
+      "B2"
+    ],
+    "accepted_macroareas": [
+      "E"
+    ],
+    "commit_deferred": true,
+    "release_candidate": false,
+    "requested_numeric_progress_achieved": true
+  },
+  "work16_recovery": {
+    "baseline_archive": "MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip",
+    "baseline_sha256": "5a4738d737e15fe2badda0b1b67a2a8307d45035bddbc291b8eed854c3b83524",
+    "last_user_confirmed_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+    "date": "2026-10-30",
+    "distinct_latest_passed": 245,
+    "new_cases": 52,
+    "latest_failures": 0,
+    "latest_skipped": 0,
+    "reports": {
+      "work16-isolated-final.xml": "f5112d615afff8324c9292f33edd2daf262f8795985a5e1d35a84ccdd972e52b",
+      "work16-guardian-final.xml": "ec213a47ad5189e6f553c223f9b0096b58f59bc52df89fa4d5214e92a11d25a6"
+    },
+    "earlier_intermittent_failure": {
+      "report": "work16-isolated-final.xml",
+      "case": "test_guardian_can_finish_original_cleanup_during_drain_without_releasing_its_debt",
+      "error": "sqlite3.OperationalError: no such table: worker_cgroup_receipts",
+      "followup": "Single case passed, then entire independent guardian file16/16 passed. Cause not established; retain diagnostics rather than claim it was fixed."
+    },
+    "recovery_limits": [
+      "Original unpackaged F4 code not available; this is a reconstruction of a subset, not byte-for-byte recovery.",
+      "Prior reported1697passed/9skipped not independently available and not reused as current evidence.",
+      "Explicit interpreter overrides guarded; automatic managed runtime imports, upstream roots and native dynamic libraries still require F4 work."
+    ],
+    "progress": {
+      "numerator": 29,
+      "denominator": 42,
+      "percent": 69.0,
+      "scope": "original RC acceptance criteria, not full product completion"
+    },
+    "release_candidate": false
+  },
+  "previous_work16_checkpoint": {
+    "date": "2026-10-30",
+    "handoff": "docs/WORK16_RECOVERY_R210.md",
+    "proof": "docs/validation/r210/work16-recovery-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-work16-recovery-cumulative.zip",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "passed": 245,
+    "new_cases": 52,
+    "skipped": 0,
+    "criteria_promoted": [],
+    "commit_deferred": true,
+    "release_candidate": false,
+    "whole_F4_accepted": false,
+    "lost_F4_delta_fully_recovered": false,
+    "intermittent_guardian_test_cause_resolved": false
+  },
+  "transcription_source_and_tensor_contracts": {
+    "date": "2026-10-30",
+    "baseline_archive": "MTA-0.3.0-r210-pre-RC-work16-recovery-cumulative.zip",
+    "baseline_sha256": "2fc29bc50eb2c2633f978fe85821fefab51882367aed71fef31962c7d854c41c",
+    "last_user_confirmed_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+    "report": "docs/validation/r210/source-contract-all-final.xml",
+    "report_sha256": "b63aa65fb69461fbaf812c0ccf8fd2c2bfc69c0a94e9a0bc81dc6f8814b9115d",
+    "passed": 789,
+    "skipped": 3,
+    "failures": 0,
+    "new_cases": 29,
+    "criteria_promoted": [],
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "progress_percent": 69.0,
+    "numeric_progress_requested_achieved": false,
+    "whole_F4_accepted": false,
+    "release_candidate": false,
+    "current_limits": [
+      "Torch and optional full MT3 runtime/model are absent; no new neural prediction or GPU test. Three explicit prerequisite skips.",
+      "PS variant refused because an independently verified converted tensor fingerprint is unavailable.",
+      "F4 still needs independently trusted external Python/import/dependency and ACE backend model contracts; source/receipt hashes alone are insufficient."
+    ],
+    "historical_diagnostics": [
+      "source-contract-initial.xml",
+      "source-contract-extended.xml",
+      "source-contract-tensors.xml",
+      "source-contract-final.xml",
+      "source-contract-resumable.xml"
+    ]
+  },
+  "previous_transcription_checkpoint": {
+    "date": "2026-10-30",
+    "handoff": "docs/PINNED_TRANSCRIPTION_LOADERS_R210.md",
+    "proof": "docs/validation/r210/source-contract-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-pinned-transcription-loaders-cumulative.zip",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "passed": 789,
+    "new_cases": 29,
+    "skipped": 3,
+    "criteria_promoted": [],
+    "commit_deferred": true,
+    "release_candidate": false,
+    "whole_F4_accepted": false,
+    "numeric_progress_requested_achieved": false
+  },
+  "previous_ace_observer_checkpoint": {
+    "archive": "MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip",
+    "handoff": "docs/ACE_OBSERVER_ISOLATION_R210.md",
+    "proof": "docs/validation/r210/ace-observer-result.json",
+    "report_sha256": "174da311847697aa46b3f3b7bd1bf4868077df695e1e05a1ea889b58401443ed",
+    "passed": 57,
+    "skipped": 2,
+    "new_cases": 1,
+    "new_race_scenarios": 3,
+    "percent": 69.0,
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "criteria_promoted": [],
+    "numeric_progress_requested_achieved": false,
+    "commit_deferred": true,
+    "release_candidate": false,
+    "base_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d"
+  },
+  "rc_delivery_reorganization": {
+    "date": "2026-10-30",
+    "handoff": "docs/RC_DELIVERY_PLAN_R210.md",
+    "proof": "docs/validation/r210/rc-reorganization-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip",
+    "archive_is_previous_code_checkpoint": true,
+    "change_artifact": "MTA-r210-rc-reorganization.patch",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "criteria_promoted": [],
+    "documentation_only": true,
+    "new_application_tests_run": false,
+    "commit_deferred": true,
+    "release_candidate": false,
+    "active_workstream": "finance",
+    "exact_original_criteria_retained": true,
+    "no_intermediate_zip": true,
+    "critical_path": {
+      "A4": [],
+      "A5": [],
+      "C3": [
+        "A4",
+        "A5"
+      ],
+      "C5": [
+        "C2",
+        "C3"
+      ],
+      "D6": [
+        "C5"
+      ],
+      "C6": [
+        "C5",
+        "B6"
+      ]
+    }
+  },
+  "previous_reorganization_checkpoint": {
+    "date": "2026-10-30",
+    "handoff": "docs/RC_DELIVERY_PLAN_R210.md",
+    "proof": "docs/validation/r210/rc-reorganization-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip",
+    "archive_is_previous_code_checkpoint": true,
+    "change_artifact": "MTA-r210-rc-reorganization.patch",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "criteria_promoted": [],
+    "documentation_only": true,
+    "new_application_tests_run": false,
+    "commit_deferred": true,
+    "release_candidate": false,
+    "active_workstream": "finance"
+  },
+  "legacy_subscription_collection": {
+    "date": "2026-10-30",
+    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
+    "proof": "docs/validation/r210/legacy-collection-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "passed": 779,
+    "new_cases": 24,
+    "skipped": 10,
+    "criteria_promoted": [],
+    "numeric_progress_requested_achieved": false,
+    "commit_deferred": true,
+    "release_candidate": false,
+    "whole_A5_or_C3_accepted": false
   }
 }

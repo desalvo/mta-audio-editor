@@ -1,0 +1,100 @@
+{
+  "schema": "mta-ci-observation-1",
+  "observed_utc": "2026-10-30",
+  "commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "tree": "9cd308daa505ef7c01c743ef2b5ce7461f1cd488",
+  "run_id": 40972934180,
+  "run_status": "completed",
+  "run_conclusion": "success",
+  "complete_regression": false,
+  "quality": {
+    "passed": 7155,
+    "skipped": 50,
+    "warnings": 1027,
+    "seconds": 859.42,
+    "coverage_percent": 76.71,
+    "required_percent": 70,
+    "artifact_id": 12942381400,
+    "artifact_sha256": "b6b900e488610f57ad62a10fc0ec3d9cf19ac318469ed85be0ee024005404284"
+  },
+  "jobs": [
+    {
+      "id": 123793866705,
+      "name": "Quality and unit tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 123793867078,
+      "name": "SAST and dependency audit",
+      "conclusion": "success"
+    },
+    {
+      "id": 123793867128,
+      "name": "VST3 SDK compile Linux",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801016981,
+      "name": "Build Windows Chordino runtime",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801017063,
+      "name": "Linux native arm64",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801017085,
+      "name": "Native macOS x64",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801017094,
+      "name": "Container production gate",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801017101,
+      "name": "iOS / iPadOS archive",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801017105,
+      "name": "Native macOS arm64",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801017124,
+      "name": "Linux native x86_64",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801017180,
+      "name": "Android APK / AAB",
+      "conclusion": "success"
+    },
+    {
+      "id": 123801335550,
+      "name": "Native Windows installer",
+      "conclusion": "success"
+    },
+    {
+      "id": 123804388622,
+      "name": "Publish Docker Hub image",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123810542506,
+      "name": "Publish rolling early-main packages",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123810542972,
+      "name": "Publish installers to GitHub Release",
+      "conclusion": "skipped"
+    }
+  ],
+  "tracked_blobs_matching_input": 4208,
+  "new_delta_ci_executed": false,
+  "release_candidate": false
+}

@@ -418,20 +418,20 @@ def _apply_refund(c,normalized,event_id):
                 c.execute('INSERT INTO resource_credits VALUES(?,?,?,?,?,?)',(cid,order['user_id'],delta,None,'PayPal credit refund: '+order['id'],int(time.time())))
                 c.execute("INSERT INTO payment_reconciliation_movements VALUES('paypal',?,?,?,?)",(event_id,cid,order['id'],delta))
         elif order['kind']=='subscription':
-            # A refunded subscription payment becomes a receivable again; retain
-            # the exact amount separately rather than marking the entire fee due.
-            c.execute('''CREATE TABLE IF NOT EXISTS paypal_subscription_reversals(
-              refund_id TEXT PRIMARY KEY,order_id TEXT NOT NULL,user_id INTEGER NOT NULL,
-              period_start INTEGER NOT NULL,amount_micro INTEGER NOT NULL)''')
-            surplus=order['refund_due_micro']
-            receivable=max(0,amount*10000-surplus)
-            from .subscription_receivables import original_loss_target
-            target=original_loss_target(c,order)
-            if target is not None:
+            # Record authenticated cash even for legacy orders, but never infer
+            # the original fee from today's mutable refundable balance.
+            from .subscription_receivables import original_loss_position
+            position=original_loss_position(c,order)
+            if position is not None:
+                target, remaining_surplus = position
                 allocated=c.execute('SELECT coalesce(sum(amount_micro),0) FROM paypal_subscription_reversals WHERE order_id=?',(order['id'],)).fetchone()[0]
+                if allocated > target:
+                    raise ValueError('Subscription obligation exceeds proved original loss')
                 receivable=max(0,target-allocated)
-            c.execute('INSERT INTO paypal_subscription_reversals VALUES(?,?,?,?,?)',(rid,order['id'],order['user_id'],order['period_start'],receivable))
-        c.execute('UPDATE paypal_orders SET refund_due_micro=max(0,refund_due_micro-?) WHERE id=?',(amount*10000,order['id']))
+                c.execute('INSERT INTO paypal_subscription_reversals VALUES(?,?,?,?,?)',(rid,order['id'],order['user_id'],order['period_start'],receivable))
+                c.execute('UPDATE paypal_orders SET refund_due_micro=? WHERE id=?',(remaining_surplus,order['id']))
+        if order['kind']!='subscription':
+            c.execute('UPDATE paypal_orders SET refund_due_micro=max(0,refund_due_micro-?) WHERE id=?',(amount*10000,order['id']))
     _record_position(c,order,'capture:'+order['provider_order'])
     mark_applied(c,'paypal',event_id,order['id'])
     c.execute('INSERT OR IGNORE INTO paypal_events VALUES(?,?)',(event_id,int(time.time())))

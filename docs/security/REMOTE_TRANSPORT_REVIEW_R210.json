@@ -6,10 +6,10 @@
     {
       "path": "app/ace_step_desktop_manager.py",
       "function": "_health_ready",
-      "line": 375,
+      "line": 378,
       "call": "opener.open",
       "call_sha256": "63ae96350316fd0819d6ede56db4cb83c0ad453d9a8ac042424e0f16c980e79a",
-      "source_sha256": "e2d5e575febb9ec016251de4cc64683385c458f7254338ae6c398e593a474720",
+      "source_sha256": "0d62f1d60181e204838869e321daf860f958cfd47b3cd78501ee00008927b551",
       "category": "local_health",
       "boundary": "Loopback ACE health probe or fixed AF_UNIX GPU telemetry socket; no audio/score model work is submitted. Local operator process trust remains separate.",
       "verification": "Explicit health URL/AF_UNIX snapshot review; previous desktop-manager and Proxmox telemetry tests are retained. This is not remote worker attestation."
@@ -17,10 +17,10 @@
     {
       "path": "app/ace_step_desktop_manager.py",
       "function": "_download_source",
-      "line": 454,
+      "line": 457,
       "call": "urllib.request.build_opener().open",
       "call_sha256": "b984d459adfb0e9a501b00e7d85d9a67b93f9b1d1b9b772c54e6fc687c1fefd3",
-      "source_sha256": "e2d5e575febb9ec016251de4cc64683385c458f7254338ae6c398e593a474720",
+      "source_sha256": "0d62f1d60181e204838869e321daf860f958cfd47b3cd78501ee00008927b551",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -64,7 +64,7 @@
       "line": 69,
       "call": "http.client.HTTPSConnection",
       "call_sha256": "7d699db894bae95facb054b74f994127231d0704684bbd305e8df575e93156a5",
-      "source_sha256": "d2ac8882117daa13884909d784c249e24d791ae15b4342909f73f31ca78c9d5d",
+      "source_sha256": "619a63069a8c3073d71679c0732aa03d7337ce0d6672f2cb4dca8c28987fffc4",
       "category": "inference_guarded",
       "boundary": "Private operator-owned pull control only: fixed validated HTTPS origin and paths, verified system/operator CA, no redirects/proxies; bearer grants only exact claim/heartbeat/completion routes. Authority and node recheck NC model policy; no checkpoint attestation or commercial enablement.",
       "verification": "Actual TLS and independent worker processes, untrusted CA before credential transmission, redirect rejection, credential/CA journal drift rejection, exact API scope, partition and SIGKILL recovery in test_r210_pull_transport.py and companion acceptance tests."
@@ -174,7 +174,7 @@
       "line": 122,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "f426f9f02cd85f916058ee258f0a4f4368ced967b1e9a5edce9e857119279395",
-      "source_sha256": "86ba5a55507dd13bb80936ed610d3fe1eef20ec786fd765734733c3c66ff02af",
+      "source_sha256": "dad908b9b8d0f43b6bff995388e84a977e27f4753acfd80e7fb44c70c1e23f58",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -295,7 +295,7 @@
       "line": 64,
       "call": "httpx.Client",
       "call_sha256": "1a0599f0d91a80de9b631fae1009e7cbcfa6c2007deb0fa81a14dff3be3f35c3",
-      "source_sha256": "91b2aa0b4818ecd8c924424c939e917e109a2ef85d9753282026814426e0f17b",
+      "source_sha256": "f76c37955a028c5f5e5bda3e9ba69b317db7da2df4ef12cf3c6a5c7c4620fd6c",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -413,5 +413,19 @@
     "proof": "tests/test_r210_legacy_separator_rights.py",
     "criteria_promoted": [],
     "scope": "Direct desktop Demucs,closed backing checkpoint selectors,current loaded permissions,opaque-command refusal and explicit DSP. Not whole F4/F5/F6 or kernel acceptance."
+  },
+  "restored_review_20261030": {
+    "scope": "All30HTTPcallshapes unchanged. Source hash/line refresh for ACE desktop manager and music_text current per-model admission guards;no transport origin or credential boundary changed.",
+    "evidence": "tests/test_r210_legacy_rights_acceptance.py"
+  },
+  "independent_guardian_review": {
+    "date": "2026-10-30",
+    "scope": "Only ai_pull_worker complete-source hash changes for the guarded process runner;all30 HTTP call shapes,host/TLS/path/authentication boundaries unchanged. No new network transport or permission.",
+    "evidence": "tests/test_r210_pull_transport.py;tests/test_r210_independent_process_guard.py"
+  },
+  "legacy_collection_review": {
+    "date": "2026-10-30",
+    "scope": "Legacy subscription refunds and collection;no new network/process/admission boundary. Exact original basis/captures/funding and original liability cap gate repayment. Owner-scoped evidence and unknown amounts are private diagnostics;no global cutover or RC acceptance.",
+    "verification": "tests/test_r210_legacy_subscription_collection.py;actual FastAPI/SQLite/provider-I/O fixtures and shipped JS in Node;not actual sandbox/Chromium acceptance."
   }
 }

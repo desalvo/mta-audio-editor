@@ -15,6 +15,8 @@ import sys
 import tempfile
 import time
 
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+
 
 def sha256(path):
     h = hashlib.sha256()
@@ -127,6 +129,8 @@ def main(argv=None):
     parser.add_argument('--time-budget-seconds', type=float, default=0,
                         help='Stop after the current completed window once the elapsed budget is reached (0 disables)')
     args = parser.parse_args(argv)
+    from app.model_license_policy import evaluate_model
+    evaluate_model('mr-mt3-assets')
     if (args.max_windows < 0 or not 1 <= args.threads <= 64
             or not 0 <= args.time_budget_seconds <= 86400
             or not 0 <= args.min_free_gpu_gib <= 1024):
@@ -136,6 +140,20 @@ def main(argv=None):
             parser.error(f'File not found: {path}')
     if args.model.suffix != '.safetensors':
         parser.error('Only Safetensors model weights are supported')
+    from app.mrmt3_adapter import verified_runtime, WEIGHTS
+    from app.transcription_source_contract import imports
+    root,value,_=verified_runtime()
+    if args.model.absolute()!=root/WEIGHTS:
+        raise ValueError('Resumable MR-MT3 requires the original installed checkpoint')
+    with imports(root,value['files'],'mrmt3','mr-mt3-assets'):
+        return _run_verified(args,root,value['files'])
+
+
+def _run_verified(args,root,files):
+    from app.model_license_policy import evaluate_model,guarded_model_call
+    from app.mrmt3_adapter import WEIGHTS,MODEL
+    from app.transcription_source_contract import checkpoint_bytes
+    evaluate_model('mr-mt3-assets')
     os.environ.update(HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
                       HF_HUB_DISABLE_TELEMETRY='1', DO_NOT_TRACK='1')
     # The decoded audio is canonically resampled by ffmpeg before hashing.
@@ -149,7 +167,7 @@ def main(argv=None):
         import soundfile as sf
         import torch
         from transformers import T5Config
-        from safetensors.torch import load_file
+        from safetensors.torch import load
         from mt3_infer.adapters.mr_mt3 import MRMT3Adapter, _import_t5_model
         from app.mrmt3_decode import decode
         wave, rate = sf.read(wav, dtype='float32')
@@ -163,7 +181,10 @@ def main(argv=None):
             raise RuntimeError('Insufficient free GPU memory; refusing to compete with production')
         model = MRMT3Adapter()
         model.model = _import_t5_model()(T5Config.from_dict(model.model_config))
-        model.model.load_state_dict(load_file(str(args.model), device='cpu'), strict=True)
+        evaluate_model('mr-mt3-assets')
+        _,data=checkpoint_bytes(root,files,'mrmt3',MODEL)
+        model.model.load_state_dict(load(data), strict=True)
+        del data
         model.model.to(device)
         # MRMT3Adapter.forward() moves its inputs to self.device_str.
         # Without this, CUDA/ROCm weights receive CPU tensors.
@@ -173,7 +194,7 @@ def main(argv=None):
         model._model_loaded = True
         features = model.preprocess(wave, rate)
         count = len(features['inputs'])
-        identity = {'audio_pcm_sha256': sha256(wav), 'model_sha256': sha256(args.model),
+        identity = {'audio_pcm_sha256': sha256(wav), 'model_sha256': files[WEIGHTS],
                     'source': 'MRMT3Adapter', 'sample_rate': rate,
                     'duration_samples': int(len(wave)), 'windows': count, 'device': device, 'gpu_backend': gpu_backend(torch) if device == 'cuda' else None}
         manifest = args.output / 'manifest.json'
@@ -191,12 +212,13 @@ def main(argv=None):
             if budget_exhausted(started, time.monotonic(), computed, args.time_budget_seconds):
                 break
             with torch.inference_mode():
-                result = model.forward({k: v[i:i+1].to(device) if hasattr(v, 'to') else v[i:i+1]
+                result = guarded_model_call('mr-mt3-assets',model.forward,{k: v[i:i+1].to(device) if hasattr(v, 'to') else v[i:i+1]
                                         for k, v in features.items()})
             tokens = result['tokens'][0]
             payload = {'identity': identity, 'index': i, 'window_count': count,
                        'tokens': serializable_tokens(tokens),
                        'start_time': float(result['frame_times'][0][0])}
+            evaluate_model('mr-mt3-assets')
             atomic_json(dest, payload)
             computed += 1
             print(f'computed window {i + 1}/{count}', flush=True)
@@ -204,9 +226,11 @@ def main(argv=None):
                  for i in range(count)]
         complete = all(x is not None for x in saved)
         if complete:
+            evaluate_model('mr-mt3-assets')
             predictions = [{'est_tokens': np.asarray(x['tokens'], dtype=np.int64),
                             'start_time': x['start_time']} for x in saved]
             notes, audit = decode(predictions, model.codec, duration)
+            evaluate_model('mr-mt3-assets')
             atomic_json(args.output / 'prediction.json', {'identity': identity,
                         'real_inference': True, 'duration_seconds': duration,
                         'notes': notes, 'decode_audit': audit})

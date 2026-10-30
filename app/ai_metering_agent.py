@@ -28,6 +28,7 @@ class Measurement:
     isolated: bool = True
     gpu_diagnostics: dict[str, float] | None = None
     pid: int | None = None
+    tree_complete: bool = False
 
 
 class WorkerInterrupted(RuntimeError):
@@ -229,6 +230,16 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
     return measurement
 
 
+def run_supervised_process(argv, *, cwd, timeout_seconds=3600, cancel_check=None, env=None, owner_receipt=None):
+    """Use an independent tree guardian on Linux; retain native OS limitations."""
+    if sys.platform == 'linux':
+        from .ai_process_guard import run
+        return run(argv, cwd=cwd, timeout_seconds=timeout_seconds, cancel_check=cancel_check,
+                   env=env, owner_receipt=owner_receipt)
+    return run_metered_process(argv, cwd=cwd, timeout_seconds=timeout_seconds,
+                               cancel_check=cancel_check, env=env)
+
+
 def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
                               timeout_seconds: int = 1200, source_wav: bytes | None = None, source_json: bytes | None = None,
                               cancel_check: Callable[[], bool] | None = None, license_decision=None,
@@ -417,8 +428,8 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 from .ai_cgroup_metering import run_cgroup_process
                 result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
-            if not result.isolated or (tree_metering_required and result.source != 'cgroup'):
+                result = run_supervised_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, **({'owner_receipt':{'job_id':job_id,**claim_credentials}} if sys.platform == 'linux' else {}))
+            if not result.isolated or (tree_metering_required and result.source != 'cgroup' and not result.tree_complete):
                 raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained')
             try:
                 require_dispatch_identity(user_id, token_id)
@@ -475,7 +486,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             if isinstance(exc, WorkerInterrupted):
                 result = exc.measurement
             if isinstance(exc, WorkerUncertain) or (result is not None and (
-                    not result.isolated or (tree_metering_required and result.source != 'cgroup'))):
+                    not result.isolated or (tree_metering_required and result.source != 'cgroup' and not result.tree_complete))):
                 raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained', job_id=job_id) from exc
             diagnostic_checkpoint(final=True)
             from .worker_cgroup_recovery import require_quiescent

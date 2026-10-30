@@ -1,3 +1,35 @@
+## Checkpoint corrente — B2 verificato con recupero indipendente — 30 ottobre 2026
+
+Leggere **INDEPENDENT_WORKER_RECOVERY_R210.md** e `validation/r210/independent-guardian-result.json`. **29/42 criteri originali verificati (69,0%), da28/42(66,7%);+B2,nessun testo/peso/denominatore modificato.E completa,PRE-RC.** Processo Linux indipendente per albero,subreaper/pidfd e prova kernel ECHILD;scope/claim originali prima del modello,cleanup dopo SIGKILL,CPU reale dell'albero e API amministrative di perdita senza misura inventata o riesecuzione.
+
+**628 casi distinti correnti passati,16nuovi,zero failure/error/skip correnti.** Include serverHTTP reale/token/SIGKILL/recupero originale in entrambi i regimi,vero FFmpeg e figli/nipoti setsid,drain durante cleanup,guardian perso con claim trattenuto e rifiuto di usare il solo client ACE per liberare il servizio esterno.Guardian/quiescenza non effettuano addebiti automatici;esterno ignoto resta sospeso.Cgroup configurati conservano il percorso precedente;nessun requisito di privilegi/cgroup simulato.
+
+Ruff completo e gate passano:307sorgenti app/168finding(0HIGH/21MED/147LOW),C2173,runtime554/780,HTTP30/21.Checker/soglie/soppressioni invariati;5 nuovi LOW revisionati.Nessuna nuova inferenza neurale,fullCI,prova OS/hardware/host remoti.Le prove sorgente-identiche precedenti restano conservate.
+
+Restano **A4,A5,A6,B6,C3,C5,C6,D6,F4,F5,F6,G5,G6**:8 implementazione/review e5 target.B2non richiede di ripetere un'altra campagna preparatoria;proseguire F4 su interpreti/runtime/checkpoint e finanza generale/legacy per C3/C5/D6.B6/F5/F6/G5/G6 mantengono i requisiti originali.Transizione finanziaria globale e RC restano bloccate.
+
+Baseline dichiarata4014a1f;delta restored-rights+adapter-identity+guardian non committato.Cumulativo:**MTA-0.3.0-r210-pre-RC-independent-guardian-cumulative.zip**;conservati4939percorsi/694log input.Nessun commit/staging/push/dispatchCI o intervento reale server/provider/modelli.Commit suggerito cumulativo:`Enforce model rights and recover crashed workers with independent Linux guardians`.Dopo il commit dell'utente verificare Quality/SAST standard;le16 nuove prove sono nella selezione unit ordinaria,senza nuovi opt-in.
+
+---
+
+## Cronologia precedente — superata dove incompatibile con il checkpoint corrente
+
+## Checkpoint corrente — identità degli adapter configurati — 30 ottobre 2026
+
+Leggere **OPAQUE_ADAPTER_IDENTITY_R210.md** e `validation/r210/adapter-identity-result.json`. Ripresa dall'allegato restored-rights e dall'ultima chat Work; baseline confermata4014a1f e CI standard40972934180 verde conservate. Input4910percorsi/680log,SHA256125b08ff10497d877f41198253d33e9a4bbf0494f289d69a0d2ca00306692f93.
+
+Il registro rifiuta script arbitrari,copie,adapter di altra famiglia,alias e plugin senza integrazione;nomi Studio riservati protetti.Copia ACE gestita vincolata a tutti i sibling originali.Launcher ACE libero e canto neural-external negati prima di effetti;opzione generica UI disabilitata,bridge supportati conservati.36 rifiuti API token con permessi sintetici validi coprono18tipi/2trasporti senza avvio né ledger.**905pass distinti correnti,101nuovi,6skip espliciti,zero failure/error correnti.**Fixture sintetiche di accounting con dependency injection soltanto nei test;nessun bypass nel prodotto.
+
+Ruff/sintassiJS/gate passano.Bandit305sorgenti/163finding(0HIGH/21MED/142LOW),C2169,runtime552/781,HTTP30/21.Checker/soglie/soppressioni invariati;launcher subprocess rimosso,non riclassificato.LoaderF3/finanza/FFmpeg/native/mobile invariati riusati per i rispettivi confini;nessun nuovo modello o target certificato.
+
+**28/42(66,7%),E completa,PRE-RC;nessun criterio promosso.**F4 resta aperto per identità di interpreti Python/runtime upstream e checkpoint effettivi,oltre ai residui originali A4,A5,A6,B2,B6,C3,C5,C6,D6,F4,F5,F6,G5,G6.Non tutti sono esterni.Prossimo blocco:worker_python/runtime ACE e root Mega53/DiffSinger con vero binding del loader,senza ripetere i rifiuti qui chiusi.
+
+Cumulativo:**MTA-0.3.0-r210-pre-RC-adapter-identity-cumulative.zip**.Commit suggerito cumulativo dopo4014a1f:`Enforce reviewed model rights and reject opaque inference adapters`.Nessun commit/staging/push/dispatch CI o intervento remoto.Dopo il commit dell'utente verificare Quality/SAST standard;iOS/fullCI invariati non da ripetere ora.
+
+---
+
+## Cronologia precedente — superata dove incompatibile con il checkpoint corrente
+
 ## Checkpoint corrente — contratto Core ML iOS e build — 29 ottobre 2026
 
 Leggere **IOS_LOCAL_MODEL_RIGHTS_R210.md** e `validation/r210/ios-rights-result.json`. **28/42(66,7%),E completa1/7,PRE-RC;nessun criterio promosso,l’aumento numerico richiesto non è raggiunto.** Contratto iOS integrato tra revisione nel bundle,byte sorgenti,compilazione,ricevuta Keychain,inventario compilato,cache,revoca per chunk e consegna. Registro di produzione vuoto:zero checkpoint reali approvati;modelli legacy conservati ma senza grant automatico. Build/refresh non scaricano asset privi di revisione corrispondente.

@@ -76,3 +76,39 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 '''
     result = subprocess.run(['node', '-e', js, section], capture_output=True, text=True, timeout=10)
     assert result.returncode == 0, result.stderr
+
+
+def test_stale_status_and_reconciliation_never_update_another_project_or_close_new_observer():
+    source = (ROOT / 'app/static/app.js').read_text()
+    section = source[source.index('let aiArrangerWatchTimer=null;'):source.index('async function generateAndAddAiRemix()')]
+    js = r'''
+const vm=require('vm'),assert=require('assert');
+(async()=>{
+ for(const scenario of ['response','error','reconciliation']){
+  let resolve,reject,rendered=0,closed=0;
+  const pending=new Promise((a,b)=>{resolve=a;reject=b});
+  const output={textContent:'new dialog'};
+  const ctx={current:{id:'p'},document:{getElementById:()=>output},
+   api:()=>pending,setTimeout:()=>1,clearTimeout(){},clearInterval(){},
+   reconcileAiProject:async()=>vm.runInContext('aiArrangerWatchEpoch++',ctx),
+   closeUtilityModal(){closed++},toast(){},window:{}};
+  vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
+  ctx.aiArrangerRenderProgress=()=>{rendered++};ctx.aiArrangerRenderElapsed=()=>{};
+  const watched=ctx.aiArrangerWatchActive(true);
+  if(scenario==='reconciliation')resolve({state:'completed',job_id:'old'});
+  else{
+   ctx.current={id:'different-project'};
+   if(scenario==='error')reject(Error('old project network error'));
+   else resolve({state:'completed',job_id:'old'});
+  }
+  await watched;
+  assert.equal(closed,0);
+  if(scenario!=='reconciliation'){
+   assert.equal(rendered,0);assert.equal(output.textContent,'new dialog');
+   assert.equal(vm.runInContext('aiArrangerLastSnapshot',ctx),null);
+  }
+ }
+})().catch(e=>{console.error(e);process.exitCode=1});
+'''
+    result = subprocess.run(['node', '-e', js, section], capture_output=True, text=True, timeout=10)
+    assert result.returncode == 0, result.stderr

@@ -16,6 +16,8 @@ import subprocess
 import sys
 import time
 
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+
 
 def run(args, timeout=12):
     try:
@@ -88,6 +90,8 @@ def main():
     p.add_argument('--timeout', type=int, default=900)
     p.add_argument('--probe-only', action='store_true', help='Detect devices/tools without running inference')
     args = p.parse_args()
+    from app.model_license_policy import evaluate_model
+    if not args.probe_only:evaluate_model('ace-step')
     if not sys.platform.startswith('linux'):
         p.error('Linux only')
     if not 0.1 <= args.interval <= 10 or not 10 <= args.timeout <= 7200:
@@ -134,6 +138,7 @@ def main():
             monitor_log.close()
             monitor_log = None
     with (out / 'ace-cli.log').open('w') as log:
+        evaluate_model('ace-step')
         proc = subprocess.Popen(command, cwd=root, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
         samples = []
         began = time.monotonic()

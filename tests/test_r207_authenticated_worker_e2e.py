@@ -15,7 +15,7 @@ from app.auth import db
 
 
 @pytest.fixture
-def isolated_api(tmp_path, monkeypatch):
+def isolated_api(tmp_path, monkeypatch, synthetic_worker_resolution):
     monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path / 'private-db'))
     monkeypatch.delenv('MTA_AI_CGROUP_PARENT', raising=False)
     monkeypatch.delenv('MTA_AI_UNIFIED_WORKERS_ENABLED', raising=False)

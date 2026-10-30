@@ -130,7 +130,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
     assert result.returncode==0,result.stderr
 
 
-def test_mac_supervisor_does_not_depend_on_linux_proc_or_fabricate_tree_metering(local,monkeypatch):
+def test_mac_supervisor_does_not_depend_on_linux_proc_or_fabricate_tree_metering(local,monkeypatch,synthetic_worker_resolution):
     monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     import wave
     from app import ai_worker_protocol as protocol,ai_metering_agent,audio_engine

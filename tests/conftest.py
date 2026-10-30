@@ -19,6 +19,23 @@ if OFFLINE:
 
 
 @pytest.fixture
+def synthetic_worker_resolution(tmp_path, monkeypatch):
+    """Inject test-only generated adapters for protocol/accounting fixtures.
+
+    These tests prove process/ledger behavior, never checkpoint identity. Real
+    configuration rejection tests must not request this fixture. There is no
+    runtime flag or environment bypass in production.
+    """
+    from pathlib import Path
+    from app import ai_adapter_identity
+    original = ai_adapter_identity.supported_worker
+    def supported(kind, worker):
+        path = Path(worker)
+        return (path.is_file() and path.resolve().is_relative_to(tmp_path.resolve())) or original(kind, path)
+    monkeypatch.setattr(ai_adapter_identity, 'supported_worker', supported)
+
+
+@pytest.fixture
 def reviewed_backing_policy(tmp_path, monkeypatch):
     """Synthetic permission for artifact fixtures; never approves real weights."""
     from app import auth, model_license_policy
@@ -30,7 +47,7 @@ def reviewed_backing_policy(tmp_path, monkeypatch):
         'evidence_url': 'https://example.test/synthetic-artifact-fixture',
         'reason': 'Synthetic transport bytes only; no real checkpoint rights',
         'acknowledge_responsibility': True, 'confirm_risk_twice': True,
-        'free_access_confirmed': True,
+        'free_access_confirmed': True, 'actor_id':0, 'reviewed_at':1,
     }}))
     assert not model_license_policy.evaluate('backing-vocals', {'model': 'uvr_mdxnet_kara_2'}).billable
     return path

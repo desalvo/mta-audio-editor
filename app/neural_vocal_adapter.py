@@ -3,30 +3,22 @@
 The executable and checkpoint are deployment-controlled, never supplied by API
 clients. This adapter does not bundle model weights or assert their license.
 """
-import hashlib
 import json
 import os
 from pathlib import Path
-import stat
 import subprocess
 
 
 def checked_assets():
-    executable = Path(os.environ.get('MTA_NEURAL_SINGER_EXECUTABLE',''))
-    checkpoint = Path(os.environ.get('MTA_NEURAL_SINGER_CHECKPOINT',''))
-    checksum = os.environ.get('MTA_NEURAL_SINGER_SHA256','').lower()
-    if not all([executable.is_absolute(),checkpoint.is_absolute(),len(checksum)==64]):
-        raise RuntimeError('Neural singing requires an operator-installed executable, checkpoint and pinned SHA-256')
-    if any(c not in '0123456789abcdef' for c in checksum):raise ValueError('Invalid checkpoint digest')
-    for path in (executable,checkpoint):
-        if path.is_symlink() or not path.is_file() or not stat.S_ISREG(path.stat().st_mode) or path.stat().st_nlink!=1:
-            raise ValueError('Unsafe neural singing asset')
-    if not os.access(executable,os.X_OK):raise ValueError('Neural singer is not executable')
-    if hashlib.sha256(checkpoint.read_bytes()).hexdigest()!=checksum:raise ValueError('Neural singer checkpoint integrity mismatch')
-    return executable,checkpoint,checksum
+    # A hash of a file passed to arbitrary code does not prove that it loads
+    # that file. DiffSinger uses the separate fixed, reviewed bridge below.
+    from .ai_adapter_identity import deny_opaque_executor
+    deny_opaque_executor()
 
 
 def render_neural(score,cfg,output,progress):
+    if cfg.backend != 'diffsinger':
+        checked_assets()
     from .model_license_policy import evaluate_model
     from .vocal_synthesis import validate_voice_lyrics,ordered_voice_events
     from .music_interchange import MusicResult

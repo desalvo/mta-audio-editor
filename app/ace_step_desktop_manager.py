@@ -309,6 +309,8 @@ def stop_server(*, disable_auto_start: bool = False) -> dict:
 
 
 def start_server(*, confirmed_model_download: bool, remember_consent: bool = True) -> dict:
+    from .model_license_policy import evaluate_model
+    evaluate_model('ace-step')
     global _PROCESS, _CACHE_BASELINE, _READY
     if connection()['mode'] == 'remote': raise RuntimeError('Switch to local ACE-Step mode before starting a local server')
     if not confirmed_model_download: raise ValueError('Model download consent required')
@@ -327,6 +329,7 @@ def start_server(*, confirmed_model_download: bool, remember_consent: bool = Tru
         with log_path.open('ab') as log:
             python=folder/'.venv'/('Scripts/python.exe' if os.name=='nt' else 'bin/python')
             if not python.is_file():raise RuntimeError('ACE_PYTHON_MISSING')
+            evaluate_model('ace-step')
             _PROCESS=subprocess.Popen([str(python),'-m','acestep.api_server','--host','127.0.0.1','--port','8001','--no-init'],cwd=folder,env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,**options)
         if remember_consent:
             _remember_consent()

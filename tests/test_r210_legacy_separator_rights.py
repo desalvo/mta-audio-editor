@@ -10,6 +10,7 @@ from unittest.mock import Mock
 
 import pytest
 from app import model_license_policy as policy
+from model_rights_fixtures import synthetic_review
 from test_r208_unified_adapter_billing_e2e import operator as operator, source_audio  # noqa: F401
 from test_r210_execution_entry_acceptance import env as env, registered as registered, api  # noqa: F401
 
@@ -27,7 +28,7 @@ def local(tmp_path, monkeypatch):
 
 
 def permission(folder, model, mode='cost_recovery'):
-    (folder / 'policy.json').write_text(json.dumps({model: {'mode': mode}}))
+    (folder / 'policy.json').write_text(json.dumps({model: synthetic_review(mode)}))
 
 
 @pytest.mark.parametrize('frozen', [False, True])
@@ -244,23 +245,26 @@ def test_builtin_dsp_actual_child_outputs_preserve_center_side_pcm_and_current_p
     assert len(json.loads((local / 'output.manifest.json').read_text())['files']) == 2
 
 
-def test_registered_dsp_cannot_fabricate_single_process_measurement_for_ffmpeg_child(operator, monkeypatch):
-    from app import ai_metering_agent, ai_billing
+def test_registered_dsp_requires_kernel_tree_proof_when_proc_misses_ffmpeg_child(operator, monkeypatch):
+    from app import ai_metering_agent, ai_billing, worker_cgroup_recovery as scopes
     monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND', raising=False)
     monkeypatch.delenv('MTA_AI_WORKER_BACKING_VOCALS_EXECUTABLE')
     monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED', 'true')
     monkeypatch.setenv('MTA_AI_WORKER_BACKING_VOCALS_PYTHON', sys.executable)
     # Reproduce a short-lived FFmpeg child missed between /proc samples.
-    # The known worker topology must still forbid direct-child-only billing.
+    # B2 now supplies independent kernel proof without delegated cgroups. An
+    # empty proc sample still cannot authorize direct-child-only measurement.
     monkeypatch.setattr(ai_metering_agent, '_descendants', lambda pid: set())
-    with pytest.raises(ai_metering_agent.WorkerUncertain) as error:
-        ai_metering_agent.execute_registered_worker(
-            operator, 'backing-vocals', {'model': 'ffmpeg-center-side'}, source_wav=source_audio())
+    payload, meta = ai_metering_agent.execute_registered_worker(
+        operator, 'backing-vocals', {'model': 'ffmpeg-center-side'}, source_wav=source_audio())
+    assert payload[:2] == b'PK' and meta['process_tree_metered'] and meta['usage']['cpu_seconds'] > 0
     with ai_billing.db() as c:
-        row = c.execute('SELECT status,resource_source FROM ai_compute_jobs WHERE id=?', (error.value.job_id,)).fetchone()
-        assert row['status'] == 'running' and row['resource_source'] == 'unmetered'
-        claim = c.execute('SELECT state FROM regime_worker_claims WHERE operation_id=?', ('job:ledger:' + error.value.job_id,)).fetchone()
-        assert claim['state'] == 'running'
+        row = c.execute('SELECT status,resource_source,worker_scope_count FROM ai_compute_jobs WHERE id=?', (meta['job_id'],)).fetchone()
+        assert tuple(row) == ('done', 'worker', 1)
+        scope = c.execute('SELECT id FROM worker_cgroup_scopes WHERE job_id=?', (meta['job_id'],)).fetchone()[0]
+        assert scopes._receipt(c, scope)['method'] == 'linux-subreaper-pidfd-1:completed'
+        claim = c.execute('SELECT state FROM regime_worker_claims WHERE operation_id=?', ('job:ledger:' + meta['job_id'],)).fetchone()
+        assert claim['state'] == 'finished'
 
 
 def test_backing_revocation_inside_inference_does_not_release_result(local):

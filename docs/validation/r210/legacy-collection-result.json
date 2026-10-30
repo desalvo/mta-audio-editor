@@ -1,0 +1,4062 @@
+{
+  "schema": "mta-legacy-subscription-collection-1",
+  "date": "2026-10-30",
+  "base_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip",
+  "input_sha256": "ff08b5549904981ffb1950c87987feabb6bfa6fd1d6490e3e2af73614cf860f0",
+  "integrated_documentation_delta": {
+    "name": "MTA-r210-rc-reorganization.patch",
+    "sha256": "af9e900859c1e8ea83d6e0265e3e5911f8633479701fda5809c9f8d7e9c286f9"
+  },
+  "reproduced_before_repair": {
+    "report": "legacy-collection-initial.xml",
+    "failed_cases": 4,
+    "unproved_refund_receivable": true,
+    "unproved_legacy_collection_allowed": true
+  },
+  "current_distinct_affected": {
+    "passed": 779,
+    "skipped": 10,
+    "failures": 0,
+    "errors": 0,
+    "new_cases": 24,
+    "cases": [
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_complete_exact_browser_report_is_required",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_any_failure_error_or_prerequisite_skip_refuses_acceptance[failure]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_any_failure_error_or_prerequisite_skip_refuses_acceptance[error]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_any_failure_error_or_prerequisite_skip_refuses_acceptance[skipped]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_missing_foreign_or_duplicate_case_cannot_replace_real_acceptance[<lambda>0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_missing_foreign_or_duplicate_case_cannot_replace_real_acceptance[<lambda>1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_missing_foreign_or_duplicate_case_cannot_replace_real_acceptance[<lambda>2]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_dtd_is_rejected_before_parsing",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_integrated_drain_acceptance_requires_twelve_exact_new_cases[None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_integrated_drain_acceptance_requires_twelve_exact_new_cases[missing]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_integrated_drain_acceptance_requires_twelve_exact_new_cases[skip]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_integrated_drain_acceptance_requires_twelve_exact_new_cases[duplicate]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_integrated_drain_acceptance_requires_twelve_exact_new_cases[wrong-family]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_integrated_drain_acceptance_requires_twelve_exact_new_cases[old-report]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_complete_operator_acceptance_requires_all_fifty_nine_cases[None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_complete_operator_acceptance_requires_all_fifty_nine_cases[missing]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_complete_operator_acceptance_requires_all_fifty_nine_cases[skip]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_complete_operator_acceptance_requires_all_fifty_nine_cases[duplicate]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_complete_operator_acceptance_requires_all_fifty_nine_cases[foreign-family]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_ci_gate::test_complete_operator_acceptance_requires_all_fifty_nine_cases[old-nine]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[provider]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[history]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[credit]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[priced-plan]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[missing-schema]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unknown-journal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unprefixed-legacy-schema]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_unverifiable_or_financially_unsupported_states_refuse_actual_api[running-job]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_preview_staleness_auth_csrf_default_off_and_confirmation_are_not_bypassable",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_live_accounting_connection_blocks_exclusive_cutover",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_independent_process_lease_blocks_api_and_sigkill_releases_only_os_lock",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_changed_original_receipt_cannot_rebaseline_or_abort_committed_transition",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_admin_cutover_e2e::test_forward_recovery_records_the_actual_second_administrator",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_internal_commit_mirror_finalize_conserve_actual_wallet_periods_and_nc_history",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_post_commit_drift_cannot_release_fence[wallet]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_post_commit_drift_cannot_release_fence[period]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_post_commit_drift_cannot_release_fence[history]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_post_commit_drift_cannot_release_fence[schema]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_post_commit_drift_cannot_release_fence[new-statement-table]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_mutating_readiness_callback_rolls_back_with_caller_transaction",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_baseline_immutable_and_missing_original_never_adopted",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_finalize_callback_mutation_cannot_commit_fence_release",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_unknown_schema_is_not_a_zero_balance",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_balance_continuity::test_internal_roundtrip_preserves_same_wallet_and_period_history",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_lost_stripe_create_response_binds_then_terminal_readback_closes",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[reference]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[owner]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mode]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[config]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[local]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[epoch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[drain]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mirror]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[network]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[not_found]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[url]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_concurrent_reference_binding_never_reposts_or_claims_payment",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_lost_paypal_creation_binds_and_owner_capture_funds_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_legacy_provider_reference_cannot_be_bound_to_second_local_order",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_checkout_reference_recovery::test_reference_recovery_endpoint_roles_csrf_and_shape",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_abort_boundary::test_pre_cutover_abort_remains_possible",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_abort_boundary::test_committed_cutover_cannot_abort_and_open_barrier",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_abort_boundary::test_cutover_replayed_at_old_revision_rejected",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_abort_boundary::test_direct_abort_after_cutover_also_refused",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_actual_two_way_cutover_keeps_original_drain_until_explicit_resume",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_open_service_cannot_preview_or_execute_old_confirmation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_resume_and_new_drain_invalidate_unchanged_financial_preview",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_original_predrain_ticket_blocks_cutover_even_without_financial_work",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_committed_crash_cannot_resume_and_only_original_forward_recovery_clears_it",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-journal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[missing-instance]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[build]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[event]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[active]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_damaged_or_unfinished_original_admission_never_authorizes_cutover[schema]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_removed_configuration_cannot_bypass_persisted_drain",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_financial_history_is_still_blocked_after_successful_service_drain",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_held_original_reservation_requires_abort_before_service_resume",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_forward_recovery_cannot_waive_an_unrelated_unfinished_publication",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_actual_process_sigkill_releases_os_locks_but_preserves_original_drain_and_cutover",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_cutover_service_drain::test_resume_waits_until_financial_commit_mirror_and_finalization_release_original_guard",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_current_complete_execution_entry_review",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_sibling_local_imports_do_not_rewrite_other_functions",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_execution_entry_inventory::test_native_and_operator_sources_are_part_of_complete_binding",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_closed_intact_guardian_history_allows_two_way_cutover_and_replay",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[missing-receipt]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[bad-receipt]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[bad-scope]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[missing-journal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[count]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[open-operation]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_guardian_cutover_history::test_history_or_obligation_damage_still_blocks_cutover[uncertain-job]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus[0]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus[1000000]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_legacy_refund_does_not_guess_original_fee_from_mutable_surplus[5000000]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_preexisting_unproved_legacy_receivable_cannot_start_another_payment",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_collection_revalidates_original_identity_and_allocation[basis_missing]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_collection_revalidates_original_identity_and_allocation[owner]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_collection_revalidates_original_identity_and_allocation[period]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_collection_revalidates_original_identity_and_allocation[capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_collection_revalidates_original_identity_and_allocation[funding]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_collection_revalidates_original_identity_and_allocation[excess_obligation]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_approved_repayment_cannot_capture_after_original_proof_disappears",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_lost_original_proof_during_approval_readback_denies_collection",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_completed_external_repayment_cannot_allocate_unproved_obligation",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_refund_of_earlier_repayment_is_recorded_without_guessing_legacy_refund_due",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_concurrent_legacy_refunds_preserve_one_cash_receipt_without_a_guessed_debt",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_known_original_basis_determines_fee_even_if_mutable_surplus_changes[0]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_known_original_basis_determines_fee_even_if_mutable_surplus_changes[5000000]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_owner_and_admin_api_show_unknown_without_disclosing_another_owners_gaps",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_shipped_owner_panel_never_labels_unknown_as_zero_or_settled[False-it]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_shipped_owner_panel_never_labels_unknown_as_zero_or_settled[False-en]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_shipped_owner_panel_never_labels_unknown_as_zero_or_settled[True-it]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_shipped_owner_panel_never_labels_unknown_as_zero_or_settled[True-en]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_discovered_initial_refunded_principal_uses_exact_original_net[ODR-capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_discovered_initial_refunded_principal_uses_exact_original_net[ODR-refund]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_discovered_initial_refunded_principal_uses_exact_original_net[TXN-capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_discovered_initial_refunded_principal_uses_exact_original_net[TXN-refund]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_unsupported_observation_remains_unresolved_before_network[fee]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_unsupported_observation_remains_unresolved_before_network[payout]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_unsupported_observation_remains_unresolved_before_network[pending]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_unsupported_observation_remains_unresolved_before_network[denied]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_unsupported_observation_remains_unresolved_before_network[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_unsupported_observation_remains_unresolved_before_network[wrong_sign]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_reporting_observation_alone_never_funds_or_closes_unknown_money[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_reporting_observation_alone_never_funds_or_closes_unknown_money[fraction]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_reporting_observation_alone_never_funds_or_closes_unknown_money[transaction]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_reporting_observation_alone_never_funds_or_closes_unknown_money[reference]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_reporting_observation_alone_never_funds_or_closes_unknown_money[timestamp]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_reporting_observation_alone_never_funds_or_closes_unknown_money[missing_time]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[actor]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[secret]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[merchant]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[owner]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[kind]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[snapshot]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_context_drift_during_canonical_reads_rolls_back_money[epoch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_failure_after_binding_and_partial_refund_rolls_back_then_recovers",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_private_admin_api_confirmation_and_no_provider_mutations",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_review_counts_all_cases_beyond_display_page_without_network",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_refund_cannot_be_associated_with_another_capture_in_same_order",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_discovery_never_adopts_payer_labels_when_original_order_is_missing",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_unknown_observation_and_unconfirmed_action_never_contact_provider",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_merchant_continuation_paths_are_exact_not_a_general_mutation_bypass",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_merchant_ledger_bridge::test_actual_merchant_recovery_remains_available_under_service_drain",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[True-session]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[True-intent]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[True-charge]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[None-session]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[None-intent]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[None-charge]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[0-session]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[0-intent]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[0-charge]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents--1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-1.2]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-1000000001]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[provider-other]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[order_id-../x]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[target-None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[reason-x]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[reason-bad\\nreason]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[request_id-tiny]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[overamount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[wrongtarget]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[unknownorder]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[extra]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[nonadmin]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[drain]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_cancel_only_prepared_and_conflicting_idempotency_rejected",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute--1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-1.2]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify--1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-1.2]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel--1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-1.2]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_concurrent_preparations_reserve_once_and_concurrent_execution_sends_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_timeout_and_process_restart_recover_by_exact_get_without_repost",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[pending]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[requires_action]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[failed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[canceled]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[intent]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[metadata]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[status]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[id]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[object]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_quote_balance_and_merchant_changes_prevent_dispatch",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_post_error_stays_uncertain_and_get_failure_stays_pending",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_get_unavailable_after_post_does_not_repost_or_settle",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_readiness_detects_inconsistent_refund_journal[fence]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_readiness_detects_inconsistent_refund_journal[event]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_readiness_detects_inconsistent_refund_journal[state]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_canonical_refund_moves_real_wallet_once[200]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_canonical_refund_moves_real_wallet_once[500]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_timeout_then_get_only_recovery",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[custom_id]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[status]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[merchant]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds::test_owner_history_privacy_and_admin_reason_not_disclosed",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_real_child_exit_after_committed_uncertainty_is_recovered_without_reexecution",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_external_balance_change_invalidates_prepared_quote",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_original_payment_drift_is_rejected_before_provider_read_or_write[user_id-1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_original_payment_drift_is_rejected_before_provider_read_or_write[amount_cents-600]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_original_payment_drift_is_rejected_before_provider_read_or_write[session_id-cs_other]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_reason_bound_includes_whitespace_and_rejects_before_provider_io",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_wallet_commit_failure_keeps_refund_pending_then_reconciles_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_role_revoked_during_readback_prevents_dispatch",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_pending_paypal_needs_completed_receipt_and_canonical_capture",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_multicapture_history_remaining_capture_refund",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription_reversal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[context]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[revision]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[receipt]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[schema]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_refund_identity_audit_and_deletion_require_retired_owner_authorization",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_recovery::test_operator_refund_actually_clears_surplus_repayment_liability",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-stripe_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-paypal_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-stripe_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-paypal_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-stripe_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-paypal_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-stripe_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-paypal_env]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_uncertain_browser_only_recovers_existing_reference[it]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_uncertain_browser_only_recovers_existing_reference[en]",
+        "outcome": "skipped",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_auth_csrf_exact_shapes_private_pagination_and_unknown_action",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_operator_refunds_ui::test_all_actual_owner_admin_templates_load_the_shared_refund_ui",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_original_permanent_loss_can_be_repaid_exactly",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_full_reversal_and_refund_of_same_capture_never_double_debt[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_full_reversal_and_refund_of_same_capture_never_double_debt[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_duplicate_permanent_cases_on_same_capture_share_fee_cap",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_partial_permanent_loss_stays_unallocated",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_legacy_missing_original_basis_is_not_invented",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_payment_basis_is_immutable_and_failed_event_rolls_back",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_concurrent_verified_reversals_allocate_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_rounding_surplus_is_consumed_before_reopening_original_fee",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_gap_review_distinguishes_legacy_and_unproved_partial_loss",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_original_fee_basis_survives_later_subscription_price_change",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_actual_owner_api_repay_private_loss_obligation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_same_capture_refund_after_loss_was_repaid_does_not_reopen_debt",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_original_subscription_loss::test_buyer_favour_dispute_without_actual_reversal_never_collects_fee",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_private_paginated_history_no_provider_or_credentials",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[javascript:alert(1)]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://evil.test/pay]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com@evil.test/]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://user:pw@checkout.stripe.com/]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com:444/]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com\\\\@evil.test/]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com/\\r\\nBad]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com:bad/]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_fresh_ids_and_other_provider_do_not_escape_pending[stripe]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_fresh_ids_and_other_provider_do_not_escape_pending[paypal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_unknown_creation_blocks_new_purchase_and_owner_probe",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_concurrent_cross_provider_new_ids_admit_only_one",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_owner_get_reconciliation_closes_terminal_and_releases_guard",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_wrong_owner_refused_before_any_provider_io",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_paypal_approved_verify_never_captures_and_preserves_hold",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_subscription_same_period_guard_and_readonly_nc_history",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_owner_probe_rejects_midflight_identity_change[owner]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_owner_probe_rejects_midflight_identity_change[credentials]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_failed_provider_lookup_keeps_pending_and_never_recreates[404]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_failed_provider_lookup_keeps_pending_and_never_recreates[timeout]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_owner_paid_and_refund_readback_is_net_and_idempotent",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-stripe]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-paypal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[port-stripe]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[port-paypal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[control-stripe]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[control-paypal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_valid_provider_redirect_is_stored_resumable_without_redispatch[stripe]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_owner_payments::test_valid_provider_redirect_is_stored_resumable_without_redispatch[paypal]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_refund_before_paid_is_durable_and_applied_atomically",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_full_refund_after_closed_checkout_and_replay",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_dispute_hold_won_then_stale_open_does_not_remove_credits",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_pending_dispute_and_partial_refund_do_not_allow_overcredit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_lost_dispute_never_reopens_on_stale_or_contradictory_event",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_event_identity_conflict_even_after_success_cannot_mutate_money",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_payment_intent_cannot_fund_two_orders",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_credit_mutation_failure_rolls_back_journal_position_inbox_and_payment",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_concurrent_delivery_only_one_credit_and_refund",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_legacy_paid_position_is_reconciled_without_second_credit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_tampered_financial_credit_is_detected",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation2]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation3]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_payment_reconciliation_e2e::test_financial_journal_payload_cannot_be_modified_or_reopened",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_settings_sealed_and_no_secret_disclosure",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_credit_checkout_capture_and_retries_only_credit_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_checkout_requires_eligible_subscription",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_subscription_payment_settles_fee_without_adding_overage_credits",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_capture_wrong_owner_amount_currency_identity_and_unpaid_are_refused",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_webhook_signature_verified_and_canonical_order_fetched",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_untrusted_approval_url_and_denomination_refused",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_authenticated_refund_reverses_credits_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_http_roles_csrf_and_unsigned_webhook_are_enforced",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_prorated_subscription_fee_remains_payable_after_termination",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_webhook_event_and_fulfillment_share_atomic_commit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_paypal_outbox_confirmed_on_provider_acceptance",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal::test_paypal_uncertain_provider_failure_requires_reconciliation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovery_funds_only_net_and_replays_idempotently[False-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovery_funds_only_net_and_replays_idempotently[False-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovery_funds_only_net_and_replays_idempotently[True-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovery_funds_only_net_and_replays_idempotently[True-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_PAYOUT]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_OTHER]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-UNKNOWN]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_PAYOUT]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_OTHER]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-UNKNOWN]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_items]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[non_list]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_status]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_time]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[wrong_detail]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[foreign_capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[duplicate_capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[partial_multi]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[negative]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[bad_time]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[naive_time]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[empty_transactions]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_gross]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[gross_mismatch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[single_gross_mismatch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[incomplete_membership]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[collection_changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[detail_changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[order_changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[http_error]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_known]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_gap_recovery_is_atomic_and_later_gap_never_reopens_an_immutable_event",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_original_context_drift_after_remote_discovery_never_settles[owner]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_original_context_drift_after_remote_discovery_never_settles[merchant]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_original_context_drift_after_remote_discovery_never_settles[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_original_context_drift_after_remote_discovery_never_settles[kind]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_original_context_drift_after_remote_discovery_never_settles[provider]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_original_context_drift_after_remote_discovery_never_settles[epoch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_opposing_final_history_is_pending_and_never_releases_permanent_loss[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_opposing_final_history_is_pending_and_never_releases_permanent_loss[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_complete_two_page_readback_applies_each_dispute_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[host]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[environment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[credentials]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[port]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[fragment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[path]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[filter]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[size]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[extra_query]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_query]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[method]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_link]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[empty_continuation]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_row]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[no_links_list]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[token]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[control]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[backslash]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[object_bound]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page_bound]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[request_bound]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_observed_dispute_during_unstable_scan_cannot_disappear_on_later_empty_scan",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_combined_historical_refunds_and_dispute_never_publish_gross_or_double_debit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_discovered_repayment_dispute_reopens_exact_debt_and_release_restores_allocation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_dispute_history::test_changed_dispute_amount_preserves_old_hold_and_durable_private_review",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_failure_after_funding_rolls_back_history_and_wallet",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_refunded_subscription_creates_exact_receivable",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.01]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[NaN]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1e2]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[-1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.001]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[ 1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_partial_multicapture_original_subscription_risk_does_not_mint_credit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_items]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[empty_items]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[wrong_type]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_id]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_id]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_cross_capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[control_id]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[long_id]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_money]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[negative]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[capture_overflow]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[global_mismatch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[numeric_quantity]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero_quantity]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[excess_items]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[malformed_item]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-fund_movements]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-money_movements]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-both]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-none]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-fund_movements]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-money_movements]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-both]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-none]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-fund_movements]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-money_movements]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-both]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-none]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_party]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_direction]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[unknown_reason]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[bad_time]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[asset]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_time]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_malformed_movement_collection_requires_durable_history_review[non_list]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_malformed_movement_collection_requires_durable_history_review[non_object]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_malformed_movement_collection_requires_durable_history_review[over_bound]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_malformed_movement_collection_requires_durable_history_review[wrong_currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_malformed_movement_collection_requires_durable_history_review[invalid_money]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_private_movement_report_bounded_and_deduplicated_across_two_captures",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[value0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[0]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_item_movements::test_admin_only_safe_movement_dto_and_corrupt_observation_fail_closed",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_stable_global_query_persists_private_fixed_dto_without_money_mutation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_pagination_covers_same_id_with_distinct_reporting_entries",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[missing_total]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[string_page]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[wrong_page]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[too_many_pages]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[count_mismatch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[duplicate]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[changed_pass]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[malformed_money]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[unknown_status]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[timeout]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[configuration]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_incomplete_or_changed_readback_never_commits[actor_revoked]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-01T00:00:00Z-2026-09-02T00:00:00Z-False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-01-2026-09-02T00:00:00Z-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-02T00:00:00Z-2026-09-01T00:00:00Z-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-01T00:00:00Z-2026-11-05T00:00:00Z-True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_reader_and_acquisition_require_active_administrator",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_snapshot_corruption_stays_blocked",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_private_actual_admin_api_session_csrf_confirmation_and_details",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_metadata_and_semantic_corruption_cannot_relabel_snapshot",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_merchant_history::test_non_eur_pending_observations_remain_nonsettlement_data",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_multiple_capture_refund_before_fulfillment_replays_atomically",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_canonical_refund_cannot_be_attributed_to_other_capture",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_refund_cannot_cross_provider_environment",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_failed_refund_replay_rolls_back_capture_and_wallet",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_subscription_refund_records_exact_receivable_without_wallet_credit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_capture_reversal_and_refund_never_double_debit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_reversal_before_capture_is_replayed_in_capture_transaction",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_dispute_readback_holds_then_releases_and_rejects_stale_updates",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_reconciliation_e2e::test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_exact_completed_defended_report_releases_original_hold_and_replays",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[account]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[reference]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[direction]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[fee_event]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[temporary_hold]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[duplicate]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[case]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[gross]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[status]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[not_resolved]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[changed_case]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[missing_payee]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[role]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[config]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[owner]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[report_timeout]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[reused_case]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_invalid_or_changed_evidence_never_releases_original_money[stale_report]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_changed_canonical_after_resolution_is_pending_not_a_second_refund",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_failure_after_report_resolution_rolls_back_all_credit_changes",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[truncate]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[footer]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[duplicate_header]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[foreign_header]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[extra_section]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[bad_utf8]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[huge]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_incomplete_raw_report_cannot_become_authority[nul]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_multicapture_report_allocates_each_distinct_completed_credit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_same_provider_movement_cannot_be_adopted_by_a_second_case",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_documented_acm_footer_order_and_trailing_report_field_are_supported",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_transport_is_fixed_host_pinned_keys_bounded_and_reaps[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_transport_is_fixed_host_pinned_keys_bounded_and_reaps[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_unsafe_transport_never_returns_unverified_report[username]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_unsafe_transport_never_returns_unverified_report[path]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_unsafe_transport_never_returns_unverified_report[format]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_unsafe_transport_never_returns_unverified_report[key_mode]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_unsafe_transport_never_returns_unverified_report[symlink]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_unsafe_transport_never_returns_unverified_report[timeout]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_actual_drain_waits_for_report_recovery_and_closes_after_reaped_work",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_admission_distinguishes_finished_failure_from_unknown_child[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_settlement_reports::test_admission_distinguishes_finished_failure_from_unknown_child[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-released-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-released-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-released-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[released-credits]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[released-subscription]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[released-repayment]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_current_inventory_matches_review",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_call_fingerprint_does_not_depend_on_python_ast_dump",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[source]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[missing]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[category]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[rationale]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[hash]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[checker]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[reorder]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_actual_source_bound_service_admission_review",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_service_admission_inventory::test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_new_fulfillment_basis_passes_without_modifying_account",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_missing_legacy_basis_blocks_before_any_dispute_or_reversal",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_current_price_paid_status_and_refund_balance_cannot_reconstruct_legacy",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_conflicting_basis_is_not_treated_as_historical_proof[user_id-999]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_conflicting_basis_is_not_treated_as_historical_proof[period_start-1]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_conflicting_basis_is_not_treated_as_historical_proof[gross_micro-6000000]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_conflicting_basis_is_not_treated_as_historical_proof[fee_micro-4000000]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_partial_or_invalid_capture_inventory_cannot_verify_basis[UPDATE paypal_captures SET amount_cents=299 WHERE id='CAPTURE111']",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_partial_or_invalid_capture_inventory_cannot_verify_basis[DELETE FROM paypal_captures]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_partial_or_invalid_capture_inventory_cannot_verify_basis[UPDATE paypal_captures SET amount_cents=-1 WHERE id='CAPTURE111']",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_original_funding_must_match_owner_currency_and_amount[UPDATE payment_reconciliation_positions SET funded=0]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_original_funding_must_match_owner_currency_and_amount[UPDATE payment_reconciliation_positions SET user_id=999]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_original_funding_must_match_owner_currency_and_amount[UPDATE payment_reconciliation_positions SET currency='USD']",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_original_funding_must_match_owner_currency_and_amount[UPDATE payment_reconciliation_positions SET amount_minor=499]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_original_funding_must_match_owner_currency_and_amount[DELETE FROM payment_reconciliation_positions]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_unpaid_checkout_is_not_a_missing_original_payment",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_historical_terminal_label_does_not_hide_paid_order",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_basis_cannot_be_attached_to_a_different_payment_kind",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_audit_preserves_callers_write_transaction_and_rollback",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_pagination_checks_all_orders_even_when_page_is_empty",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_invalid_pages_are_rejected_without_starting_transaction[kwargs0]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_invalid_pages_are_rejected_without_starting_transaction[kwargs1]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_invalid_pages_are_rejected_without_starting_transaction[kwargs2]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_invalid_pages_are_rejected_without_starting_transaction[kwargs3]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_invalid_pages_are_rejected_without_starting_transaction[kwargs4]",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_actual_private_api_permissions_pagination_and_no_cache",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_basis_audit::test_actual_api_schema_failure_is_not_a_verified_empty_list",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_checkout_only_one_provider_order_and_pending_target",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_fulfillment_delivers_one_allocation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_refund_reopens_same_debt_and_can_be_repaid_again",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_dispute_release_after_second_repayment_creates_refund_liability",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_uncertain_create_stays_pending_without_second_provider_post",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_cent_rounding_surplus_is_separate_and_refunded_first",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_owner_api_quote_csrf_and_regime_guards",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_allocations_are_immutable_and_missing_position_blocks_report",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_refund_before_repayment_fulfillment_is_atomic",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_owner_quote_change_is_checked_before_provider_capture",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_multiple_sources_are_bound_to_original_refund",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_already_captured_obsolete_quote_is_retained_as_refund_due",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_verified_webhook_retries_allocate_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_authenticated_refunded_initial_repayment_reopens_original_debt",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_permanent_capture_reversal_reopens_original_receivable",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscription_repayment_e2e::test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_defaults_and_admin_unlimited",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_manual_daily_limits_inherit_storage_and_block",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_concurrent_limited_jobs_cannot_double_spend",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_overage_ordinary_tariff_credits_and_no_double_invoice",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_exhausted_credit_blocks_next_job",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_live_checkpoint_and_alerts_are_idempotent",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_no_overage_without_opt_in",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_credit_retry_validation_and_promo",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_renewal_freezes_plan_and_charges_once",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_unfunded_and_cancellation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_calendar_boundaries_do_not_drift",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_storage_unlock_is_time_priced_and_idempotent",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_history_without_quotas_is_owner_scoped",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_self_service_cannot_reset_active_period",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_notice_smtp_absence_does_not_drop_events",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_legal_updates_enqueue_once_and_remove_draft",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_cancelled_diagnostic_usage_consumes_quota_without_gpu_invoice",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_email_html_links_retries_and_language",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_retention_change_notifies_and_noop_does_not",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_routes_enforce_owner_admin_and_csrf",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_storage_coverage_is_time_bounded_and_does_not_hide_usage",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_privacy_pdf_preserves_all_data_categories[it]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_privacy_pdf_preserves_all_data_categories[en]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_actual_frontend_history_and_escaping",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_ended_subscription_reverts_to_free_accounting",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_zero_storage_quota_is_not_unlimited",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_existing_explicit_admin_storage_limit_survives_migration",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_cancelling_queued_job_releases_quota_reservation",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_concurrent_renewal_is_one_credit_debit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_subscriptions::test_credit_usage_report_and_email_are_separate_from_ordinary_invoice",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_expired_checkout_readback_closes_exactly_once[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_expired_checkout_readback_closes_exactly_once[True]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_canceled_intent_after_async_failure_resolves_pending_signed_event",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_signed_expiration_without_intent_closes_without_network",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[requires_payment_method]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[processing]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[requires_capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_id]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_owner]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_currency]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[paid]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_mode]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[missing_intent]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[captured]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[charge]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[config]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[epoch]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[drain]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[mirror]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_transaction_rolls_back_and_retries",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_concurrent_signed_expiration_and_canonical_readback",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paid_notification_after_terminal_is_durable_conflict_not_credit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_paid_after_terminal_keeps_conflict_without_wallet_credit",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_receipt_audit_detects_reopened_fence",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[wallet]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[funded_position]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[pending_paid]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[wrong_pending_identity]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_empty_order_closes_and_stale_retry_never_captures",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[CREATED]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[APPROVED]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PAYER_ACTION_REQUIRED]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PENDING_APPROVAL]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_financial_graph_erasure_preserves_other_owner[erase]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_financial_graph_erasure_preserves_other_owner[privacy_purge]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[capture]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[refund]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[authorization]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[amount]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[identity]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[intent]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[changed]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[config]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_atomic::test_atomic_sqlite_half_keeps_barrier",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_atomic::test_not_ready_does_not_mutate[False]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_atomic::test_not_ready_does_not_mutate[None]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_atomic::test_not_ready_does_not_mutate[1]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_atomic::test_not_ready_does_not_mutate[yes]",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_atomic::test_stale_epoch_refused",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_atomic::test_no_transaction_refused",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_finalize::test_requires_authoritative_positive_check",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_finalize::test_success_atomic_and_rollback",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_finalize::test_rejects_stale_mirror",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_finalize::test_requires_transaction",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_mirror::test_recovers_only_mirror_and_keeps_barrier",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_mirror::test_unexpected_epoch_never_overwritten",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_mirror::test_symlink_rejected",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_mirror::test_closed_barrier_rejected",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_mirror::test_requires_caller_transaction",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_recovery::test_recovers_without_activating",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_recovery::test_retry_is_idempotent",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_recovery::test_open_operations_block_mirror_recovery",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_recovery::test_requires_transaction",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_regime_cutover_recovery::test_wrong_epoch_rejected",
+        "outcome": "passed",
+        "report": "legacy-collection-regression.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_owner_evidence_cannot_disclose_a_misbound_basis_for_another_owners_order",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      },
+      {
+        "id": "tests.test_r210_legacy_subscription_collection::test_restored_exact_original_basis_resumes_same_approved_repayment_once",
+        "outcome": "passed",
+        "report": "legacy-collection-final.xml"
+      }
+    ]
+  },
+  "reports": [
+    {
+      "path": "legacy-collection-regression.xml",
+      "sha256": "af0595aa27a7023f4632665ab0e25b795acd89749ba10aba095fecb696ff1326"
+    },
+    {
+      "path": "legacy-collection-final.xml",
+      "sha256": "294c19d139044c9be6df725b2c37afeb01640d576aa37986cd0972805faa8995"
+    }
+  ],
+  "verification": {
+    "actual_application_api_and_sqlite": true,
+    "provider_io": "Synthetic authenticated-I/O fixtures only;no provider/sandbox contacted.",
+    "shipped_javascript_node_scenarios": 4,
+    "new_chromium_acceptance": false,
+    "skips": "Existing operator-refund UI cases require missing playwright.sync_api;not target acceptance.",
+    "full_ruff": "passed",
+    "javascript_syntax": "passed",
+    "changed_python_compilation": "passed",
+    "security": {
+      "app_sources": 308,
+      "unsuppressed_findings": 168,
+      "high": 0,
+      "medium": 21,
+      "low": 147,
+      "new_findings": 0,
+      "checkers_or_suppressions_changed": false
+    },
+    "runtime_inventory": {
+      "sources": 555,
+      "boundaries": 780
+    },
+    "service_admission_sites": 173,
+    "transport_sites": 30,
+    "transport_files": 21
+  },
+  "changed_source_sha256": {
+    "app/subscription_basis_audit.py": "0b30d3c945ad2774a49ab343239c4fc352eaf70976d0e409bf329edbe72ebb7e",
+    "app/subscription_receivables.py": "fa33c97517e0ce23d3895609b6763bebd9dde097a9f0c108eddb09984344b38b",
+    "app/paypal_payments.py": "f76c37955a028c5f5e5bda3e9ba69b317db7da2df4ef12cf3c6a5c7c4620fd6c",
+    "app/payment_reconciliation.py": "05ffdd8c833336218305f70f69e12770b1a72c89a11645e115b4ffafc3243196",
+    "app/resource_accounts.py": "0770812c5ed8e6bb0573cbd5d6b34689198acbe3a49cf107c90f8e9daefc011f",
+    "app/static/subscriptions.js": "edc11e89cb80c1bf7d56e39b36da1407db9cd4094fc44f6eb5911d04ecc13ace"
+  },
+  "progress": {
+    "accepted": 29,
+    "total": 42,
+    "percent": 69.0,
+    "new_criteria_accepted": [],
+    "requested_numeric_progress_achieved": false,
+    "release_candidate": false
+  },
+  "concrete_remaining_blockers": [
+    {
+      "criteria": [
+        "A5",
+        "C3"
+      ],
+      "scenario": "Recover exact original legacy subscription obligations",
+      "kind": "missing independent historical evidence and uncompleted verified migration contract",
+      "required": "Original historical order/owner/period/gross/fee/surplus evidence with trustworthy provenance;current price,gross and mutable refundable balance are insufficient.",
+      "available_here": false,
+      "effect": "Collections and general transition remain blocked;original records are retained."
+    },
+    {
+      "criteria": [
+        "A4",
+        "C3"
+      ],
+      "scenario": "Complete provider-wide history and unsupported payout/protection movements",
+      "kind": "implementation plus account-origin/canonical-movement/report evidence",
+      "required": "Complete original account-history boundary and unambiguous original money movements;remaining formats/states/references need code and actual authenticated report validation.",
+      "available_here": false,
+      "effect": "Existing bounded collector/report bridge is partial;do not rename this as only an environment block."
+    },
+    {
+      "criteria": [
+        "F4",
+        "F6"
+      ],
+      "scenario": "Every legacy executor and installed checkpoint acceptance",
+      "kind": "remaining runtime/backend contracts plus real runtime and independent rights evidence",
+      "required": "Actual authorized ACE/backend checkpoint and external runtime/dependency identities;independent rights evidence for all optional installed checkpoints.",
+      "available_here": false,
+      "effect": "MT3 pins,client identity,policy denials and synthetic workers do not close the criteria."
+    }
+  ],
+  "cumulative_archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+  "commit_deferred": true,
+  "remote_mutations": false,
+  "general_transition_enabled": false
+}

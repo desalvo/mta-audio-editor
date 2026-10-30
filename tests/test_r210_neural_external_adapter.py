@@ -10,16 +10,19 @@ def test_settings_neural_explicit():
 
 
 def test_model_policy_not_oddvoices(monkeypatch):
+    from app.model_license_policy import LicenseDenied
     monkeypatch.delenv('MTA_NEURAL_SINGER_POLICY_MODEL',raising=False)
-    assert selected('vocal-synthesis',{'settings':{'backend':'neural-external'}})=='unreviewed-neural-singer'
+    with pytest.raises(LicenseDenied,match='checkpoint loader contract'):
+        selected('vocal-synthesis',{'settings':{'backend':'neural-external'}})
     monkeypatch.setenv('MTA_NEURAL_SINGER_POLICY_MODEL','diffsinger-qixuan')
-    assert selected('vocal-synthesis',{'settings':{'backend':'neural-external'}})=='diffsinger-qixuan'
+    with pytest.raises(LicenseDenied,match='checkpoint loader contract'):
+        selected('vocal-synthesis',{'settings':{'backend':'neural-external'}})
 
 
 def test_missing_neural_assets_fail_closed(monkeypatch):
     for name in ('MTA_NEURAL_SINGER_EXECUTABLE','MTA_NEURAL_SINGER_CHECKPOINT','MTA_NEURAL_SINGER_SHA256'):
         monkeypatch.delenv(name,raising=False)
-    with pytest.raises(RuntimeError):checked_assets()
+    with pytest.raises(ValueError,match='checkpoint loader contract'):checked_assets()
 
 
 def test_invalid_checkpoint_detected(tmp_path,monkeypatch):
@@ -28,4 +31,4 @@ def test_invalid_checkpoint_detected(tmp_path,monkeypatch):
     monkeypatch.setenv('MTA_NEURAL_SINGER_EXECUTABLE',str(exe))
     monkeypatch.setenv('MTA_NEURAL_SINGER_CHECKPOINT',str(model))
     monkeypatch.setenv('MTA_NEURAL_SINGER_SHA256','a'*64)
-    with pytest.raises(ValueError,match='integrity'):checked_assets()
+    with pytest.raises(ValueError,match='checkpoint loader contract'):checked_assets()

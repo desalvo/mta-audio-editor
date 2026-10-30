@@ -1,0 +1,3201 @@
+{
+  "date": "2026-10-30",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-work16-recovery-cumulative.zip",
+  "baseline_sha256": "2fc29bc50eb2c2633f978fe85821fefab51882367aed71fef31962c7d854c41c",
+  "last_user_confirmed_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "report": "docs/validation/r210/source-contract-all-final.xml",
+  "report_sha256": "b63aa65fb69461fbaf812c0ccf8fd2c2bfc69c0a94e9a0bc81dc6f8814b9115d",
+  "passed": 789,
+  "skipped": 3,
+  "failures": 0,
+  "new_cases": 29,
+  "criteria_promoted": [],
+  "accepted_criteria": 29,
+  "original_criteria_total": 42,
+  "progress_percent": 69.0,
+  "numeric_progress_requested_achieved": false,
+  "whole_F4_accepted": false,
+  "release_candidate": false,
+  "cases": [
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_validated_source_imports_namespace_and_can_repeat_without_inheriting_modules",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_rewriting_receipt_hash_cannot_authorize_different_source",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_uninventoried_import_code_is_refused_even_when_added_to_receipt[other.py]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_uninventoried_import_code_is_refused_even_when_added_to_receipt[other.pyc]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_uninventoried_import_code_is_refused_even_when_added_to_receipt[extension.so]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_uninventoried_import_code_is_refused_even_when_added_to_receipt[extension.pyd]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_uninventoried_import_code_is_refused_even_when_added_to_receipt[other/__init__.py]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_matching_timestamp_size_pyc_is_not_loaded",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_replacement_between_inventory_and_actual_import_is_rejected",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_cached_module_cannot_claim_approved_filename",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_policy_revocation_before_actual_import_is_enforced",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_aliases_cannot_disguise_upstream_code[parent-link]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_aliases_cannot_disguise_upstream_code[source-link]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_aliases_cannot_disguise_upstream_code[hardlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_unknown_module_inside_owned_namespace_does_not_fall_through",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_deployment_contract_matches_historical_pinned_sources_and_only_known_yourmt3_patches",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_deployment_contract_itself_cannot_be_replaced",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_receipt_duplicate_fields_are_not_accepted",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_regular_packages_and_relative_imports_keep_standard_python_semantics",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_upstream_tensor_loader_uses_snapshot_even_if_path_is_replaced",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_tensor_replacement_and_receipt_rewrite_do_not_change_deployment_identity",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_explicit_gpu_placement_is_preserved_for_tensor_snapshot",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_unpinned_ps_variant_is_refused_before_runtime_or_model_import",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_resumable_cli_cannot_bypass_runtime_contract_with_a_different_model",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_resumable_cli_requires_exact_checkpoint_after_valid_runtime_preflight",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_actual_token_api_rejects_self_authorized_upstream_before_process_and_ledger[json-yourmt3-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_actual_token_api_rejects_self_authorized_upstream_before_process_and_ledger[json-mrmt3-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_actual_token_api_rejects_self_authorized_upstream_before_process_and_ledger[upload-yourmt3-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_transcription_source_contract::test_actual_token_api_rejects_self_authorized_upstream_before_process_and_ledger[upload-mrmt3-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_program_nine_is_not_drum_and_drum_duration_is_explicit",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_ties_preserve_note_across_windows_without_duplicates",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_untied_notes_close_at_next_source_window",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_invalid_and_outside_window_events_are_audited_not_invented",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_no_configured_runtime_is_unavailable",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_runtime_requires_actual_tested_receipt_and_pinned_identity",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_full_runtime_hash_and_path_checks",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_checkpoint_unknown_bytes_rejected_before_deserialization",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_manual_program_override_cannot_relabel_model_output",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_runtime::test_required_source_omission_cannot_be_hidden_by_extra_inventory_files",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_optional_backend_has_no_basic_pitch_fallback",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_verified_interpreter_is_delegated_without_changing_default",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_dispatch_preserves_programs_in_worker_result[audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_dispatch_preserves_programs_in_worker_result[audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_model_rights_are_independent_and_disabled_by_default",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_explicit_request_reaches_own_policy_and_queue",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_classifier_rejects_basic_pitch_overrides_before_queue[overrides0]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_classifier_rejects_basic_pitch_overrides_before_queue[overrides1]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_recovery_fingerprint_tracks_mr_runtime_receipt",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_fast_selector_does_not_replace_ensemble_dependencies[accurate]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_fast_selector_does_not_replace_ensemble_dependencies[maximum]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_integration::test_selector_readiness_and_fast_only_settings_in_javascript",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_window_roundtrip",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_tokens[tokens0]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_tokens[tokens1]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_tokens[tokens2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_tokens[tokens3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_tokens[None]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_tokens[tokens5]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_corruption_and_bad_time",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_time_budget_stops_only_between_completed_windows",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_numpy_output_tokens_are_serializable",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_torch_output_tokens_are_serializable",
+      "result": "skipped"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_model_token_shape_or_dtype[values0]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_model_token_shape_or_dtype[values1]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_resumable::test_reject_invalid_model_token_shape_or_dtype[values2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_gpu_benchmark::test_explicit_gpu_does_not_fall_back",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_gpu_benchmark::test_gpu_respects_free_memory",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_gpu_benchmark::test_plan_rejects_incorrect_inputs",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_mrmt3_gpu_benchmark::test_cli_requires_production_opt_in",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_checkpoint_rejects_untrusted_size_and_symlink",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_yourmt3_requires_operator_runtime",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_real_yourmt3_piano_prediction",
+      "result": "skipped"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_pinned_download_does_not_publish_corrupt_bytes",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_routing_driver_errors_are_normalized",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_offline_source_cache_has_no_network_fallback",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_frozen_harmony_never_launches_application_as_python",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_readonly_bundled_adapter_keeps_external_executable_boundary",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_checkpoint::test_checkpoint_allowlists_legacy_numpy_globals_without_unsafe_pickle",
+      "result": "skipped"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_ps_variant::test_default_variant_remains_backward_compatible_and_unknown_variant_fails",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_ps_variant::test_ps_is_available_only_after_its_own_inference_receipt",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_ps_variant::test_ps_converter_does_not_accept_arbitrary_checkpoints",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_ps_variant::test_initial_receipt_publication_cannot_replace_an_existing_variant",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_yourmt3_ps_variant::test_singing_classes_are_not_mislabeled_as_gm_fx_instruments",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-json-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant0-upload-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-json-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_registered_token_api_refuses_unreviewed_permission_before_execution[grant1-upload-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-diffsinger-nishiren]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-diffsinger-qixuan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-diffsinger-spore]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-diffsinger-vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-mta-analysis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-operator-fixture]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-rvc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-seed-vc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-transkun-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[evidence_url-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-diffsinger-nishiren]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-diffsinger-qixuan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-diffsinger-spore]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-diffsinger-vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-mta-analysis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-operator-fixture]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-rvc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-seed-vc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-transkun-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reason-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-diffsinger-nishiren]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-diffsinger-qixuan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-diffsinger-spore]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-diffsinger-vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-mta-analysis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-operator-fixture]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-rvc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-seed-vc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-transkun-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[acknowledge_responsibility-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-diffsinger-nishiren]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-diffsinger-qixuan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-diffsinger-spore]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-diffsinger-vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-mta-analysis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-operator-fixture]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-rvc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-seed-vc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-transkun-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[free_access_confirmed-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-diffsinger-nishiren]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-diffsinger-qixuan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-diffsinger-spore]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-diffsinger-vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-mta-analysis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-operator-fixture]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-rvc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-seed-vc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-transkun-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[actor_id-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-diffsinger-nishiren]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-diffsinger-qixuan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-diffsinger-spore]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-diffsinger-vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-mta-analysis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-operator-fixture]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-rvc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-seed-vc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-transkun-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_every_model_rejects_restored_review_with_a_missing_required_field[reviewed_at-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restricted_model_cannot_be_enabled_by_bare_or_malformed_override[value0]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restricted_model_cannot_be_enabled_by_bare_or_malformed_override[None]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restricted_model_cannot_be_enabled_by_bare_or_malformed_override[value2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restricted_model_cannot_be_enabled_by_bare_or_malformed_override[value3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_ambiguous_json_is_not_a_license_permission[{\"whisper\":{},\"whisper\":{}}]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_ambiguous_json_is_not_a_license_permission[{\"whisper\":{\"mode\":\"disabled\",\"mode\":\"cost_recovery\"}}]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_ambiguous_json_is_not_a_license_permission[{\"whisper\":{\"mode\":\"cost_recovery\",\"reviewed_at\":NaN}}]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[diffsinger-nishiren]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[diffsinger-qixuan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[diffsinger-spore]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[diffsinger-vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[mta-analysis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[operator-fixture]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[rvc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[seed-vc-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[transkun-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_complete_synthetic_review_is_consumed_without_real_weight_installation[yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_noncommercial_label_cannot_complete_unknown_checkpoint_rights[uvr-kara-2]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_noncommercial_label_cannot_complete_unknown_checkpoint_rights[audio-separator-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_noncommercial_label_cannot_complete_unknown_checkpoint_rights[chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_noncommercial_label_cannot_complete_unknown_checkpoint_rights[drumsep-weights]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[actor_id-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[actor_id--1]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[reviewed_at-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[reviewed_at-4611686018427387904]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[evidence_url-http://example.test/permission]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[evidence_url-https://user:secret@example.test]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[evidence_url-https://[]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[reason-short]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[acknowledge_responsibility-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[free_access_confirmed-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[confirm_risk_twice-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[authorization_basis-responsibility_only]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_review_must_obey_the_same_writer_contract[unrecognized_permission-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_restored_noncommercial_context_requires_global_commercial_off",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_malformed_single_review_is_visible_as_unavailable_in_catalog",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override0-btc-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override0-chordformer-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override0-madmom-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override0-mega53-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override0-ace-launch-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override0-ace-desktop-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override0-ace-smoke-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override1-btc-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override1-chordformer-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override1-madmom-madmom]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override1-mega53-mvsep-mega53]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override1-ace-launch-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override1-ace-desktop-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_legacy_entries_refuse_before_files_runtime_or_processes[override1-ace-smoke-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_guarded_loaded_callback_rejects_revocation_without_second_inference[before]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_guarded_loaded_callback_rejects_revocation_without_second_inference[during]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_actual_standalone_diagnostic_refuses_disabled_model_before_optional_imports[app/ace_step_local.py-args0-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_actual_standalone_diagnostic_refuses_disabled_model_before_optional_imports[scripts/ace_gpu_benchmark.py-args1-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_actual_standalone_diagnostic_refuses_disabled_model_before_optional_imports[scripts/run_mrmt3_resumable.py-args2-mr-mt3-assets]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_chord_entries_use_actual_fixed_python_child_and_reject_revocation[allowed-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_chord_entries_use_actual_fixed_python_child_and_reject_revocation[allowed-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_chord_entries_use_actual_fixed_python_child_and_reject_revocation[before-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_chord_entries_use_actual_fixed_python_child_and_reject_revocation[before-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_chord_entries_use_actual_fixed_python_child_and_reject_revocation[during-btc-hcqt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_chord_entries_use_actual_fixed_python_child_and_reject_revocation[during-chordformer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_cached_madmom_processor_rechecks_current_permission[allowed-madmom-deep-chroma]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_cached_madmom_processor_rechecks_current_permission[allowed-madmom-cnn-crf]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_cached_madmom_processor_rechecks_current_permission[before-madmom-deep-chroma]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_cached_madmom_processor_rechecks_current_permission[before-madmom-cnn-crf]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_cached_madmom_processor_rechecks_current_permission[during-madmom-deep-chroma]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_cached_madmom_processor_rechecks_current_permission[during-madmom-cnn-crf]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_profiled_callback_cannot_reuse_permission_after_profile_callback[allowed]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_profiled_callback_cannot_reuse_permission_after_profile_callback[during]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_mega53_fixed_child_cannot_publish_after_permission_revocation[allowed]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_mega53_fixed_child_cannot_publish_after_permission_revocation[before]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_mega53_fixed_child_cannot_publish_after_permission_revocation[during]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_resumable_mrmt3_rechecks_each_actual_forward_before_saving_windows[False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_resumable_mrmt3_rechecks_each_actual_forward_before_saving_windows[True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_rights_acceptance::test_resumable_mrmt3_rechecks_each_actual_forward_before_saving_windows[decode]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[kind-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_interpreter_override_is_refused_before_availability[default-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[copy]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[symlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[hardlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[venv]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_matching_binary_bytes_do_not_attest_another_import_context[relative]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_current_installation_interpreter_is_preserved",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_actual_token_api_cannot_launch_substituted_python_or_create_ledger[json]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_configured_interpreter_identity::test_actual_token_api_cannot_launch_substituted_python_or_create_ledger[upload]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_each_builtin_kind_rejects_opaque_override_without_builtin_fallback[whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_supported_kind_is_bound_to_its_own_installed_integration[whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[copy]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[symlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[parent-symlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_same_name_or_even_same_bytes_do_not_authorize_external_code[hardlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[opaque]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[ai_unified_adapter.py]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_custom_registry_cannot_grant_identity_with_labels_or_metering[ai_studio_adapter.py]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_extension_cannot_override_reserved_studio_kind[vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[legacy]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[project]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_legacy_configuration_never_executes_an_opaque_worker[probe]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[none]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[entry]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[sibling]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[missing]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[link]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_managed_ace_copy_requires_every_shipped_sibling[parent]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_raw_ace_launcher_denial_has_no_cache_or_process_side_effect[False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_raw_ace_launcher_denial_has_no_cache_or_process_side_effect[True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_actual_raw_launcher_cli_cannot_bypass_with_download_consent",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_pinned_checkpoint_and_operator_policy_name_do_not_attest_generic_singer",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_direct_generic_singer_is_denied_before_score_or_output_access",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_generic_singer_executable_alone_cannot_advertise_synthesis",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[json-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-ace-step]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-arranger]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-basic-pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-mr-mt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-audio-to-midi-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-backing-vocals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-chords-ml]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-markers]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-remix]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-sam-audio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-singer-separation]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-vocal-harmony]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-vocal-synthesis]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_opaque_adapter_identity::test_real_token_api_rejects_opaque_adapter_before_inference_or_ledger[upload-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_transcribe_passes_exact_verified_bytes_to_runtime_and_keeps_cpu_limits",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_changed_or_unsafe_model_never_reaches_runtime[replace]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_changed_or_unsafe_model_never_reaches_runtime[same-size]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_changed_or_unsafe_model_never_reaches_runtime[empty]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_changed_or_unsafe_model_never_reaches_runtime[symlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_changed_or_unsafe_model_never_reaches_runtime[hardlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_changed_or_unsafe_model_never_reaches_runtime[directory]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_changed_or_unsafe_model_never_reaches_runtime[oversized]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_diffsinger_loader_passes_verified_bytes_and_refuses_replacement[acoustic]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_basic_pitch_loaded_identity::test_diffsinger_loader_passes_verified_bytes_and_refuses_replacement[vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_identity_is_portable_and_retains_unchanged_unmanaged_policy",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[checkpoint]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[runtime]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[config]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[notice]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[added-file]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[link]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[directory-link]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[hardlink]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_changed_installation_rejected_before_admission[disabled]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_authority_rejects_changed_inventory_before_dispatch",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_worker_compares_real_installed_identity_and_never_reexecutes[checkpoint]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_worker_compares_real_installed_identity_and_never_reexecutes[runtime]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_worker_compares_real_installed_identity_and_never_reexecutes[same]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_old_policy_snapshot_is_not_silently_upgraded",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_managed_execution_identity::test_verified_digest_reused_but_same_size_write_with_restored_mtime_is_rejected",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-whisper_progressive]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-loaded_whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-basic_pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-studio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-mrmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-mrmt3_selftest]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-transkun_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-sam_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-profile_demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-profile_sam]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_bridge]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[disabled-singer_session]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-whisper_progressive]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-loaded_whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-basic_pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-studio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-mrmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-mrmt3_selftest]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-transkun_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-sam_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-profile_demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-profile_sam]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_bridge]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_free_only-singer_session]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-whisper_progressive]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-loaded_whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-basic_pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-studio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-mrmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-mrmt3_selftest]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-transkun_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-sam_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-profile_demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-profile_sam]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_bridge]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[commercial_off-singer_session]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-whisper_progressive]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-loaded_whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-basic_pitch]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-studio]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-yourmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-mrmt3]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-mrmt3_selftest]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-transkun_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-sam_cli]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-profile_demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-profile_sam]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-oddvoices]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_bridge]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_direct_boundary_rechecks_actual_rights_before_source_model_or_output_effects[corrupt-singer_session]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_loaded_whisper_revocation_denies_mps_cpu_fallback",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_permitted_loaded_whisper_retains_original_fallback_and_timestamps",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_bridge]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_acoustic_permission_cannot_replace_separate_vocoder_permission[singer_session]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_singing_component_policy_cannot_be_bypassed_by_allowed_singer_and_vocoder",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_independent_actual_cli_denies_before_optional_runtime_import[sam]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_independent_actual_cli_denies_before_optional_runtime_import[demucs]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_independent_actual_cli_denies_before_optional_runtime_import[drumsep]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_independent_actual_cli_denies_before_optional_runtime_import[transkun]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_model_only_interpreter_reads_current_policy_without_web_dependencies[disabled]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_direct_executor_rights::test_model_only_interpreter_reads_current_policy_without_web_dependencies[cost_recovery]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_original_installed_component_executes_under_actual_child_policy",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[role]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[missing_role]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[asset]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[foreign_script]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[changed_script]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[cwd]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[disabled]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[revoked]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_wrong_original_component_or_permission_never_executes[guard]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_actual_singing_child_cannot_be_used_as_generic_script_runner[role]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_actual_singing_child_cannot_be_used_as_generic_script_runner[script]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_actual_singing_child_cannot_be_used_as_generic_script_runner[singer]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_actual_singing_child_cannot_be_used_as_generic_script_runner[vocoder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_offline_component_rights::test_actual_singing_child_cannot_be_used_as_generic_script_runner[format]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_operator_local_repository_is_not_a_checkpoint_permission[False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_operator_local_repository_is_not_a_checkpoint_permission[True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_cardinality_profile_cannot_inject_an_unreviewed_model_after_initial_admission",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[False]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[True]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_loader_rejects_revocation_before_runtime_load[UVR_MDXNET_KARA_2.onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_loader_rejects_revocation_before_runtime_load[mel_band_roformer_karaoke_gabox_v2.ckpt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[/unreviewed/weights.onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[../UVR_MDXNET_KARA_2.onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[foreign.onnx]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[operator-provided.ckpt]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[None]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_load_revocation_cannot_mark_the_cached_runtime_admitted",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_loaded_backing_runtime_rechecks_current_permission_and_exact_selector",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-policy]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-native]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-unified]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-policy]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-native]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-unified]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-policy]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-native]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-unified]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_opaque_command_rejection_precedes_actual_queue_and_ledger_admission",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_actual_token_api_denies_opaque_command_without_worker_or_ledger[json]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_actual_token_api_denies_opaque_command_without_worker_or_ledger[wav]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_builtin_dsp_actual_child_outputs_preserve_center_side_pcm_and_current_policy",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_registered_dsp_requires_kernel_tree_proof_when_proc_misses_ffmpeg_child",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_backing_revocation_inside_inference_does_not_release_result",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_rocm_loaded_callback_rechecks_current_rights_before_every_chunk",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_legacy_separator_rights::test_fixed_tool_sharing_metered_group_is_stopped_and_reaped_without_signalling_parent",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_two_separate_worker_processes_share_only_https_not_sqlite",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_partition_after_committed_claim_or_completion_never_reexecutes[claim]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_partition_after_committed_claim_or_completion_never_reexecutes[complete]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_untrusted_tls_never_transmits_worker_credential",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_redirect_cannot_forward_credential",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_journal_rejects_authority_key_and_trust_drift_before_network[credential]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_journal_rejects_authority_key_and_trust_drift_before_network[trust]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_dispatched_journal_never_reexecutes_after_actual_supervisor_sigkill",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_shared_worker_state_lock_serializes_two_processes",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_pull_transport::test_actual_authority_sigkill_after_frozen_result_recovers_without_new_inference",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[normal-leader-exit]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[cancel]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[callback-error]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_kernel_reaps_even_setsid_descendants_and_retains_actual_cpu[timeout]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_precancel_never_starts_a_worker_or_guard",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_actual_supervisor_sigkill_leaves_complete_kernel_receipt_and_original_claim",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_original_supervisor_cannot_forge_a_guardian_receipt",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_guard_never_signals_a_sibling_unrelated_to_its_job",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_short_lived_child_cpu_is_collected_even_without_proc_samples",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_empty_proc_samples_cannot_turn_a_live_child_into_quiescence",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_lost_guardian_is_not_replaced_by_a_pid_guess_or_fabricated_cpu",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_ace_external_service_cannot_be_cleared_with_only_a_local_tree_receipt",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_real_registered_ffmpeg_tree_settles_only_after_guardian_kernel_receipt",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution[COMMERCIAL]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_real_http_supervisor_loss_admin_recovery_and_original_request_no_reexecution[NON_COMMERCIAL]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_independent_process_guard::test_guardian_can_finish_original_cleanup_during_drain_without_releasing_its_debt",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_current_complete_execution_entry_review",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_sibling_local_imports_do_not_rewrite_other_functions",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_execution_entry_inventory::test_native_and_operator_sources_are_part_of_complete_binding",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_actual_source_bound_service_admission_review",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_service_admission_inventory::test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_current_inventory_matches_review",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[source]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[missing]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[category]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[rationale]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[hash]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[checker]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[reorder]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "result": "passed"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "result": "passed"
+    }
+  ],
+  "current_limits": [
+    "Torch and optional full MT3 runtime/model are absent; no new neural prediction or GPU test. Three explicit prerequisite skips.",
+    "PS variant refused because an independently verified converted tensor fingerprint is unavailable.",
+    "F4 still needs independently trusted external Python/import/dependency and ACE backend model contracts; source/receipt hashes alone are insufficient."
+  ],
+  "historical_diagnostics": [
+    "source-contract-initial.xml",
+    "source-contract-extended.xml",
+    "source-contract-tensors.xml",
+    "source-contract-final.xml",
+    "source-contract-resumable.xml"
+  ]
+}

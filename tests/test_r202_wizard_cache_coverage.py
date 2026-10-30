@@ -110,20 +110,15 @@ def test_local_launcher_guards(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         ace_step_local.launch(str(alias), model_dir=str(tmp_path))
     cache = tmp_path / 'cache'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError, match='checkpoint loader contract'):
         ace_step_local.launch(str(exe), model_dir=str(cache))
-    assert cache.is_dir()
-    seen = {}
-    def fake_call(cmd, env):
-        seen['cmd'] = cmd; seen['env'] = env
-        return 0
-    monkeypatch.setattr(ace_step_local.subprocess, 'call', fake_call)
-    assert ace_step_local.launch(str(exe), model_dir=str(cache), confirm_download=True) == 0
-    assert seen['cmd'] == [str(exe)]
-    assert seen['env']['HF_HOME'] == str(cache / 'huggingface')
-    assert seen['env']['ACESTEP_MODE'] == 'api'
+    assert not cache.exists()
+    with pytest.raises(ValueError, match='checkpoint loader contract'):
+        ace_step_local.launch(str(exe), model_dir=str(cache), confirm_download=True)
+    cache.mkdir()
     (cache / 'present').touch()
-    assert ace_step_local.launch(str(exe), model_dir=str(cache)) == 0
+    with pytest.raises(ValueError, match='checkpoint loader contract'):
+        ace_step_local.launch(str(exe), model_dir=str(cache))
 
 
 def test_desktop_manager_cache_status_consent_and_install_guards(tmp_path, monkeypatch):
