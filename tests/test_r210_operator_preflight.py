@@ -29,9 +29,9 @@ def test_actual_complete_review_has_original_preview_and_never_changes_money(rea
     assert data['schema'] == 'mta-operator-preflight-1'
     assert len(data['sections']) == 13 and len({s['id'] for s in data['sections']}) == 13
     assert not data['general_transition_authorized'] and not data['general_financial_clearance']
-    assert data['maintenance_eligibility'] == 'verified_restricted_profile'
+    assert data['maintenance_eligibility'] == 'verified_precommercial_profile'
     assert data['preview']['transition_enabled'] and data['preview']['source_revision'] == 0
-    assert data['preview']['readiness']['profile'] == 'local-authority-no-provider-history-1'
+    assert data['preview']['readiness']['profile'] == 'precommercial-no-payment-history-1'
     with auth.db() as c:
         c.execute('PRAGMA query_only=ON'); c.execute('BEGIN')
         changes = c.total_changes
@@ -73,11 +73,10 @@ def test_unavailable_financial_family_is_isolated_private_and_not_zero(ready, mo
     assert data['preview'] is None
 
 
-@pytest.mark.parametrize('damage', ['provider', 'unknown-schema', 'missing-schema'])
+@pytest.mark.parametrize('damage', ['unknown-schema', 'missing-schema'])
 def test_unproven_history_and_schemas_remain_visible_blockers(ready, damage):
     with auth.db() as c:
-        if damage == 'provider': c.execute("UPDATE paypal_config SET enabled=1 WHERE id=1")
-        elif damage == 'unknown-schema': c.execute('CREATE TABLE unreviewed_legacy_finance(id TEXT)')
+        if damage == 'unknown-schema': c.execute('CREATE TABLE unreviewed_legacy_finance(id TEXT)')
         else: c.execute('DROP TABLE credit_purchase_orders')
     data = get(ready).json()
     assert data['maintenance_eligibility'] == 'blocked' and data['preview'] is None
@@ -91,7 +90,7 @@ def test_actual_settings_notification_default_is_not_an_economic_obligation(read
     from app import ai_notifications
     with auth.db() as c: ai_notifications._init(c)
     data = get(ready).json()
-    assert data['maintenance_eligibility'] == 'verified_restricted_profile'
+    assert data['maintenance_eligibility'] == 'verified_precommercial_profile'
     assert data['preview'] is not None
 
 

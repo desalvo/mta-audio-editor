@@ -1,0 +1,94 @@
+{
+  "schema": "mta-merchant-reference-discovery-1",
+  "base_commit": "da300396a8dc9f7b84703565959b4df36dd7c15e",
+  "functional_exit": "Existing private IT/EN merchant action can discover a credit checkout whose create response was lost, bind its original reference, independently reconcile all refunds/disputes, apply net wallet once, and recover after response loss or atomic-write failures.",
+  "scope": "PayPal credit orders with surviving original local order and attempted uncertain creation; no reconstruction of legacy subscription quote or owner.",
+  "passed": 232,
+  "failed": 0,
+  "skipped": 8,
+  "new_non_browser_cases": 34,
+  "new_browser_cases_skipped": 8,
+  "red_subset": {
+    "cases": 30,
+    "failed_on_original": 12,
+    "already_rejected_on_original": 18,
+    "source": "committed archive exact bytes"
+  },
+  "checks": [
+    "capture/refund merchant observations with TXN/ODR reference",
+    "one creation attempt; no capture/refund re-dispatch",
+    "initial refunded and partially refunded captures",
+    "exact 500 cents gross minus 400 refunded = 100 cents net",
+    "admin authentication,CSRF,exact request shape,no-store and private response",
+    "canonical metadata and original local merchant/owner/amount binding",
+    "original snapshot/admin/config/local changes before reference commit",
+    "full refund discovery and canonical stability before binding",
+    "concurrent discovery,stale-context refusal and retry",
+    "crash after binding and rollback inside binding/refund transaction",
+    "malformed provider replies retained as unresolved",
+    "legacy subscription/reversal/unknown kinds remain blocked without original quote evidence"
+  ],
+  "gates": {
+    "ruff": "passed",
+    "py_compile": "passed",
+    "bandit": {
+      "sources": 308,
+      "findings": 168,
+      "high": 0,
+      "medium": 21,
+      "low": 147,
+      "new_ids": 0,
+      "removed_ids": 0
+    },
+    "ai_inventory": {
+      "passed": true,
+      "sources": 555,
+      "boundaries": 780
+    },
+    "service_inventory": {
+      "passed": true,
+      "sources": 308,
+      "sites": 173
+    },
+    "transport_inventory": {
+      "passed": true,
+      "sources": 21,
+      "sites": 30
+    }
+  },
+  "security_review_refresh": "Only the two edited source hashes refreshed in APP/AI/admission reviews and existing checkout HTTP-client source hash in transport review. Discovered sites,AST call shapes,dispositions,findings,checkers,thresholds and suppressions unchanged.",
+  "browser_prerequisite": "Playwright tooling available; Chromium download denied with HTTP403 Domain not in allowlist. All8real-browser cases are explicit skips; no DOM shim or browser acceptance claimed.",
+  "new_remote_ci": false,
+  "real_provider_mutation": false,
+  "new_full_suite": false,
+  "original_rc": {
+    "verified": 29,
+    "total": 42,
+    "percent": 69.0,
+    "promoted": [],
+    "requested_percentage_increase_achieved": false
+  },
+  "blockers": [
+    {
+      "criteria": [
+        "A4"
+      ],
+      "missing": "Complete account-history coverage and supported proof/attribution for payout/protection movements; bounded observations and this one-order recovery do not certify the full merchant history."
+    },
+    {
+      "criteria": [
+        "A5",
+        "C3"
+      ],
+      "missing": "Independent original fee/surplus and complete legacy/terminal financial recovery. A local pending subscription amount or current plan fee is not the original quote proof. Unknown subscriptions remain unresolved; no guessed debt or migrated evidence."
+    },
+    {
+      "criteria": [
+        "C5",
+        "D6"
+      ],
+      "missing": "Complete general financial clearance; restricted local profile remains separate and unchanged."
+    }
+  ],
+  "commit_push_tag_dispatch_release_or_server_action": false
+}

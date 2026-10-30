@@ -100,8 +100,14 @@ def test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history(rea
     assert reservations['integrity_verified'] and not reservations['reservations']
 
 
-def test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover(ready, monkeypatch):
+@pytest.mark.parametrize('providers_prepared',[False,True])
+def test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover(ready, monkeypatch, providers_prepared):
     client, uid, _ = ready
+    if providers_prepared:
+        paypal_payments.settings({'enabled':True,'environment':'sandbox','client_id':'prepared-client',
+            'client_secret':'prepared-secret','webhook_id':'prepared-webhook'})
+        credit_purchases.settings({'secret_key':'sk_test_prepared','webhook_secret':'whsec_prepared'})
+        with auth.db() as con:con.execute('UPDATE resource_plans SET price_micro=5000000')
     body = begin(client)
     assert client.post(BASE, headers=HEADERS, json=body).status_code == 200
     from app import ai_metering_agent, ai_studio_adapter
@@ -172,19 +178,15 @@ def test_interruption_keeps_barrier_auth_and_original_finances_then_forward_reco
         assert accounts._balance(con, uid) == 1_000_000
 
 
-@pytest.mark.parametrize('change', ['provider', 'history', 'credit', 'priced-plan', 'missing-schema', 'unknown-journal', 'unprefixed-legacy-schema', 'running-job'])
+@pytest.mark.parametrize('change', ['history', 'credit', 'missing-schema', 'unknown-journal', 'unprefixed-legacy-schema', 'running-job'])
 def test_unverifiable_or_financially_unsupported_states_refuse_actual_api(ready, change):
     client, _, _ = ready
     body = begin(client)
     with auth.db() as con:
-        if change == 'provider':
-            con.execute("UPDATE paypal_config SET enabled=1")
-        elif change == 'history':
+        if change == 'history':
             con.execute("INSERT INTO paypal_events VALUES('unmatched-history',1)")
         elif change == 'credit':
             con.execute("UPDATE resource_credits SET id='imported-provider-credit' WHERE delta_micro>0")
-        elif change == 'priced-plan':
-            con.execute('UPDATE resource_plans SET price_micro=1')
         elif change == 'missing-schema':
             con.execute('DROP TABLE payment_reconciliation_events')
         elif change == 'unknown-journal':

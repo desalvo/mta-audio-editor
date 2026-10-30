@@ -54,12 +54,29 @@ def original_basis_issue(c, order, *, tables=None):
     return None
 
 
+def _unfunded_quote(c, order, tables):
+    """A valid new quote is not a paid basis or a legacy reconstruction gap."""
+    if (order is None or order['kind']!='subscription' or order['paid_at'] is not None or order['refund_due_micro']!=0
+            or order['status'] not in ('pending','cancelled','canceled','failed')):
+        return False
+    from .subscription_receivables import original_quote
+    from .regime_operation_fence import FenceBlocked
+    try:original_quote(c,order)
+    except FenceBlocked:return False
+    if c.execute('SELECT 1 FROM paypal_captures WHERE order_id=?',(order['id'],)).fetchone():return False
+    if 'payment_reconciliation_positions' in tables:
+        p=c.execute("""SELECT user_id,amount_minor,currency,refunded_minor,held_minor,net_micro,funded
+            FROM payment_reconciliation_positions WHERE provider='paypal' AND order_id=?""",(order['id'],)).fetchone()
+        if p is not None and tuple(p)!=(order['user_id'],order['amount_cents'],'EUR',0,0,0,0):return False
+    return True
+
+
 def _review(c, limit, offset, user_id):
     tables = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     # A partial legacy schema is an unavailable audit, never a verified empty
     # result. Explicit projections also make failures ordinary database errors.
     projections = {
-        'paypal_orders': 'SELECT id,user_id,period_start,amount_cents,kind,status,paid_at FROM paypal_orders LIMIT 0',
+        'paypal_orders': 'SELECT id,user_id,period_start,amount_cents,kind,status,paid_at,refund_due_micro FROM paypal_orders LIMIT 0',
         'paypal_captures': 'SELECT id,order_id,amount_cents FROM paypal_captures LIMIT 0',
         'subscription_payment_basis': 'SELECT order_id,user_id,period_start,fee_micro,gross_micro,surplus_micro FROM subscription_payment_basis LIMIT 0',
         'payment_reconciliation_positions': 'SELECT provider,order_id,user_id,amount_minor,currency,funded FROM payment_reconciliation_positions LIMIT 0',
@@ -67,7 +84,7 @@ def _review(c, limit, offset, user_id):
     for table, sql in projections.items():
         if table in tables:
             c.execute(sql)
-    result = {'verified': True, 'checked': 0, 'total': 0, 'items': [],
+    result = {'verified': True, 'checked': 0, 'total': 0, 'items': [], 'unfunded_quotes':0,
               'limit': limit, 'offset': offset, 'transition_safe': False,
               'automatic_reconstruction_allowed': False}
     def gap(order_id, reason):
@@ -102,5 +119,9 @@ def _review(c, limit, offset, user_id):
                NOT EXISTS(SELECT 1 FROM paypal_captures p WHERE p.order_id=o.id))) ORDER BY b.order_id""",
                              (user_id, user_id, user_id)):
             result['checked'] += 1
+            order=c.execute('SELECT * FROM paypal_orders WHERE id=?',(row[0],)).fetchone()
+            if _unfunded_quote(c,order,tables):
+                result['unfunded_quotes']+=1
+                continue
             gap(row[0], 'original_payment_basis_unbound')
     return result

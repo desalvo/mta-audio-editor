@@ -2,345 +2,361 @@
   "schema": "mta-rc-delivery-plan-2",
   "date": "2026-10-30",
   "release": "0.3.0-r210 PRE-RC",
-  "measure": "Original 42 equally weighted RC acceptance criteria;not whole-product completion,coverage,helper count or test count.",
+  "measure": "Equal-weight RC checklist revision precommercial-20261030; no legacy monetary migration. Not directly comparable to v1 and not full-product completion.",
   "progress": {
-    "verified": 29,
+    "verified": 32,
     "total": 42,
-    "percent": 69.0,
-    "whole_macroareas_accepted": 1
+    "percent": 76.2,
+    "whole_macroareas_accepted": 2
   },
-  "accepted_this_cycle": [],
-  "latest_handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
-  "latest_proof": "docs/validation/r210/ci-41125/result.json",
-  "code_resume_handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
-  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
+  "accepted_this_cycle": [
+    "C3(v2)",
+    "C5(v2)",
+    "D6(v2)"
+  ],
+  "latest_handoff": "docs/PRECOMMERCIAL_MODEL_R210.md",
+  "latest_proof": "docs/validation/r210/precommercial-model/result.json",
+  "code_resume_handoff": "docs/PRECOMMERCIAL_MODEL_R210.md",
+  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-precommercial-model-cumulative.zip",
   "remaining_original_criteria": [
     "A4",
     "A5",
     "A6",
     "B6",
-    "C3",
-    "C5",
     "C6",
-    "D6",
     "F4",
     "F5",
     "F6",
     "G5",
     "G6"
   ],
-  "original_criteria": {
-    "A1": {
+  "original_criteria": [
+    {
+      "id": "A1",
       "criterion": "Stripe authenticated readback binds journal, refund/dispute pages and actual credit ledger",
       "state": "verified",
+      "evidence": "tests/test_r210_authenticated_ledger_service.py",
       "weight": 1
     },
-    "A2": {
+    {
+      "id": "A2",
       "criterion": "Stripe signed events cover replay, concurrency, refunds-before-payment and disputes",
       "state": "verified",
+      "evidence": "tests/test_r210_payment_reconciliation_e2e.py",
       "weight": 1
     },
-    "A3": {
+    {
+      "id": "A3",
       "criterion": "PayPal multicapture refunds, individual capture reversals and common dispute outcomes",
       "state": "verified",
+      "evidence": "tests/test_r210_paypal_reconciliation_e2e.py",
       "weight": 1
     },
-    "A4": {
-      "criterion": "Complete PayPal historical discovery, refunded initial captures, ambiguous payout and multicapture dispute allocation",
+    {
+      "id": "A4",
+      "criterion": "Canonical history for payments created by this release, refunded initial captures, exact multicapture attribution and unresolved ambiguous PayPal dispute/payout movements; no import of pre-release merchant history",
       "state": "implementation_pending",
-      "weight": 1
+      "evidence": "Partial implementation: tests/test_r210_paypal_history_reconciliation.py; complete dispute/payout discovery and allocation still pending New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Exact partial multicapture allocation is now supported when canonical item amounts uniquely bind every capture and sum to the dispute total;private movement observations are operator-visible but never settlement authority.392 distinct affected cases/30 Chromium;PAYPAL_ITEM_MOVEMENT_HANDOFF_R210.md. Missing/ambiguous item allocation,global history and actual payout/protection transaction proof remain open. MERCHANT_HISTORY_HANDOFF_R210.md:merchant-wide requested-window stable acquisition/private admin API/IT-EN panel implemented;61 affected cases pass,23 new,4 browser prerequisite skips. No complete account-history,actual cash settlement,global conservation or whole A4 acceptance. 2026-10-28: MERCHANT_LEDGER_RECOVERY_R210.md;immutable reporting principal -> exact canonical history -> atomic original ledger and private IT/EN API/UI;368distinct passes/40new/12actualChromium. Full merchant coverage,payout/protection allocation and legacy proof remain incomplete;original criterion NOT promoted. PAYPAL_SETTLEMENT_RECOVERY_R210.md: scoped operator-only authenticated ACM/STL S6 exact completed credit -> original ledger,one-case immutable movement,actor audit and same-document replay;348distinct passes/46new. Broader account/payout/legacy proof and actual report target remain unaccepted;original state unchanged. 2026-10-28:PAYPAL_PARTIAL_SETTLEMENT_R210.md;exact partial multicapture report allocation,claim-bound ordinary replay and refund/subscription conservation implemented;357 distinct passes/40new. Whole historical/general financial criterion remains open;no target provider acceptance. PRECOMMERCIAL_MODEL_R210.md;validation/r210/precommercial-model/result.json. Explicit user-authorized scope revision: no historical commercial billing/refunds exist. Configuration is not monetary history; new quotes freeze before dispatch; checkout-start marker prevents reusing pre-commercial eligibility. No original v1 whole-history closure claimed.",
+      "weight": 1,
+      "scope_revision": "precommercial-20261030"
     },
-    "A5": {
-      "criterion": "Complete legacy obligations, all terminal/uncertain checkout outcomes and subscription reversal repayment",
+    {
+      "id": "A5",
+      "criterion": "New checkout/refund/reversal lifecycle with immutable original quotes, terminal and uncertain response recovery and subscription repayment; no adoption of pre-release financial obligations",
       "state": "implementation_pending",
-      "weight": 1
+      "evidence": "Partial: strict authenticated failed-charge closure, proof audit and owner/admin recovery/re-admission; immutable PayPal final outcome conflicts with private owner IT/EN review status. 243 affected cases incl. 12 Chromium, no current failures. docs/FINANCIAL_OUTCOME_HANDOFF_R210.md. Partial: private owner paginated Stripe/PayPal local history, trusted resumption, GET-only authenticated reconciliation, same-owner serialized cross-provider pending credit and same-period subscription admission, actual account/credits IT/EN error/eligibility/locale recovery. 231 affected cases incl. 24 Chromium. docs/OWNER_PAYMENT_RECOVERY_HANDOFF_R210.md. Partial: exact subscription refund receivables, authenticated empty terminal Stripe/PayPal closure, known-ID uncertain-create recovery and IT/EN owner/operator workflows; tests/test_r210_terminal_checkout_e2e.py; tests/test_r210_checkout_reference_recovery.py; tests/test_r210_terminal_recovery_browser.py; docs/TERMINAL_CHECKOUT_HANDOFF_R210.md. Legacy, unknown references, failed-charge histories, original subscription risks and operator refunds still pending. Operator refunds now locally completed for exact reconciled Stripe credit payments and PayPal captures (credits/subscription/repayment/surplus), with single dispatch, GET-only recovery, immutable audit, private IT/EN UI and erasure integration. 254 affected cases /10 Chromium. docs/OPERATOR_REFUNDS_HANDOFF_R210.md. This does not close complete legacy/provider-wide history or original fee-loss obligations; state remains implementation_pending. New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged. 2026-10-26: complete-set original subscription basis audit before losses, private admin-only no-store API/IT-EN paged error/retry panel, ledger/combined-readiness blocker. Historical split proof missing, no guessed migration/debt. SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md; whole criterion remains open. 2026-10-27: STRIPE_CHECKOUT_HISTORY_R210.md:stable complete known-intent attempts/refunds/disputes,webhook serialization and empty-terminal rereads integrated through owner/admin APIs;global/legacy obligations remain unaccepted. PRECOMMERCIAL_MODEL_R210.md;validation/r210/precommercial-model/result.json. Explicit user-authorized scope revision: no historical commercial billing/refunds exist. Configuration is not monetary history; new quotes freeze before dispatch; checkout-start marker prevents reusing pre-commercial eligibility. No original v1 whole-history closure claimed.",
+      "weight": 1,
+      "scope_revision": "precommercial-20261030"
     },
-    "A6": {
+    {
+      "id": "A6",
       "criterion": "Actual Stripe and PayPal sandbox readback and lifecycle verification",
       "state": "environment_blocked",
+      "evidence": "tests/test_r210_real_provider_sandbox.py",
       "weight": 1
     },
-    "B1": {
+    {
+      "id": "B1",
       "criterion": "Registered direct workers claim, heartbeat and finish with atomic ledger/fence settlement",
       "state": "verified",
+      "evidence": "tests/test_r208_unified_adapter_billing_e2e.py Ten-cycle backend integration: PULL_COORDINATION_HANDOFF_R210.md; registered/deferred original ownership, free-only no-charge, pull admission barrier with pre-drain intents and original client result recovery. This does not complete whole-service drain or every legacy executor.",
       "weight": 1
     },
-    "B2": {
+    {
+      "id": "B2",
       "criterion": "Actual supervisor-crash recovery with external worker quiescence proof",
       "state": "verified",
+      "evidence": "Partial local cgroup workflow implemented: prelaunch original supervisor/claim binding, transactional bootstrap admission, immutable kernel quiescence receipts, admin API/IT-EN UI, financial finalization and GPU-lease barrier. Actual prelaunch supervisor SIGKILL and synthetic kernel/API/browser fixtures pass. Actual delegated nested-cgroup crash test is prepared but skipped; post-crash economic resolution and other executor coverage remain pending. docs/DURABLE_WORKER_RECOVERY_HANDOFF_R210.md; docs/validation/r210/cgroup-journal-summary.json.; partial extension: original frozen recovery and explicit operator-funded unknown loss resolution, immutable audit, reservation/lease release and evidence barriers, IT/EN API/browser/NC privacy checks; docs/WORKER_LOSS_RESOLUTION_HANDOFF_R210.md. Real delegated-kernel acceptance and complete executor coverage remain pending. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. 2026-10-29:FFMPEG_TREE_ACCOUNTING_R210.md;known internal child topology requires cgroup tree measurement regardless of proc samples,including interruption;248distinct affected passes/13new. Original criterion state unchanged;real cgroup/external worker quiescence acceptance not supplied. Superseded for B2 by INDEPENDENT_WORKER_RECOVERY_R210.md and validation/r210/independent-guardian-result.json: actual independent Linux guardian, kernel subreaper/pidfd/ECHILD, original scope/claim and HTTP admin economic recovery in both regimes;16new/628distinct affected passes. Missing guardian/external ACE proof retains work. B6/F5/G6 and delegated cgroup target evidence remain separate;no original criterion text or weight changed.",
       "weight": 1
     },
-    "B3": {
+    {
+      "id": "B3",
       "criterion": "Propagate owner credentials through deferred Arranger/Remix publication and billing outboxes",
       "state": "verified",
+      "evidence": "tests/test_r210_deferred_owner_e2e.py; docs/validation/r210/continuation-deferred-final.log Current local ownership epoch hardening: WORKER_EPOCH_HANDOFF_R210.md;350 distinct affected cases including49 new. No distributed authority/pull backend acceptance; existing criterion state unchanged. Ten-cycle backend integration: PULL_COORDINATION_HANDOFF_R210.md; registered/deferred original ownership, free-only no-charge, pull admission barrier with pre-drain intents and original client result recovery. This does not complete whole-service drain or every legacy executor.",
       "weight": 1
     },
-    "B4": {
+    {
+      "id": "B4",
       "criterion": "Shared multi-host coordinator and storage/locking backend",
       "state": "verified",
+      "evidence": "PULL_COORDINATION_HANDOFF_R210.md; actual authority admission/claims/rights/input-result storage, HTTPS-only independent worker processes, original deferred/API request bindings, SIGKILL/response-loss/no-reexecution and atomic billing. 90 new/898 distinct affected passing cases. Single pinned Linux authority only; no worker SQLite/network-mounted DB, automatic takeover or HA. B2/B5/B6 and whole-service C2 remain separate, unaccepted.",
       "weight": 1
     },
-    "B5": {
+    {
+      "id": "B5",
       "criterion": "Prove ownership/metering for every legacy/local/native executor entry",
       "state": "verified",
+      "evidence": "docs/validation/r210/work-ai-entrypoints.json Current local ownership epoch hardening: WORKER_EPOCH_HANDOFF_R210.md;350 distinct affected cases including49 new. No distributed authority/pull backend acceptance; existing criterion state unchanged. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-28: EXECUTION_ENTRY_ACCEPTANCE_R210.md;validation/r210/execution-entry-result.json. OriginalB5 closed with539 runtime sources/779 classified points,all18 built-in kinds and one operator extension through actualAPI/process/CPU,271 distinct affected passes/59new;fresh original scheduler/account/token,recursive JSON/WAV preflight,cancelled CPU retention,reaping on observer error and private409/held original claims for unknown tree/measurement. Existing immutable deferred/pull/native boundaries reused. This is software entry ownership/metering coverage,not B2 external kernel/physical multi-host,F3/F4/F6 loaded model/independent rights or F5/G6 installed native/hardware acceptance. 2026-10-29:FFMPEG_TREE_ACCOUNTING_R210.md;known internal child topology requires cgroup tree measurement regardless of proc samples,including interruption;248distinct affected passes/13new. Original criterion state unchanged;real cgroup/external worker quiescence acceptance not supplied.",
       "weight": 1
     },
-    "B6": {
+    {
+      "id": "B6",
       "criterion": "Multi-host worker loss, partition, drain and no duplicate execution acceptance",
       "state": "environment_blocked",
+      "evidence": null,
       "weight": 1
     },
-    "C1": {
+    {
+      "id": "C1",
       "criterion": "Persistent reservation, local concurrency and transaction primitives",
       "state": "verified",
+      "evidence": "tests/test_regime_transition_journal.py",
       "weight": 1
     },
-    "C2": {
+    {
+      "id": "C2",
       "criterion": "Distributed admission barrier and service-wide drain",
       "state": "verified",
+      "evidence": "docs/SERVICE_ADMISSION_DRAIN_R210.md;docs/validation/r210/service-admission-result.json.Whole ASGI,tracked original child/session/periodic/CLI work and pending audits;private durable original instance/build/generation barrier,explicit admin begin/resume/zero-work upgrade and exact immutable journal backup/restore.71 new C2 cases/321 distinct affected passes,including real API/process/TLS/local worker/PCM/source-build/backup boundaries.170 reviewed explicit boundaries/all299app sources.Supported B4 single pinned local Linux authority;no HA/NFS,kernel or actual physical multi-host/hardware acceptance inferred.C3/C5/C6 and financial cutover authorization remain open. 2026-10-28:CUTOVER_SERVICE_DRAIN_R210.md;actual C2 guard held through commit/mirror/finalize,original drain-bound preview,postcommit resume refusal,17 new functional passes including actual SIGKILL;149 distinct affected passes/12 new browser prerequisites skipped. Restricted local profile only;complete financial transition and unchanged original C3/C5/C6/D6/E4 remain unaccepted.",
       "weight": 1
     },
-    "C3": {
-      "criterion": "Resolve every financial obligation before cutover",
-      "state": "implementation_pending",
-      "weight": 1
+    {
+      "id": "C3",
+      "criterion": "Transactional absence of monetary checkout/refund/history and unknown financial schemas before pre-commercial activation; no legacy financial migration",
+      "state": "verified",
+      "evidence": " Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged. 2026-10-26: complete-set original subscription basis audit before losses, private admin-only no-store API/IT-EN paged error/retry panel, ledger/combined-readiness blocker. Historical split proof missing, no guessed migration/debt. SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md; whole criterion remains open. 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Strict local profile refuses configured providers,any provider/ambiguous financial history,unreviewed schemas,priced/negative/unsettled obligations and unknown execution. This does not resolve missing general provider/legacy obligations or accept C3. 2026-10-27: STRIPE_CHECKOUT_HISTORY_R210.md:stable complete known-intent attempts/refunds/disputes,webhook serialization and empty-terminal rereads integrated through owner/admin APIs;global/legacy obligations remain unaccepted. 2026-10-28:CUTOVER_SERVICE_DRAIN_R210.md;actual C2 guard held through commit/mirror/finalize,original drain-bound preview,postcommit resume refusal,17 new functional passes including actual SIGKILL;149 distinct affected passes/12 new browser prerequisites skipped. Restricted local profile only;complete financial transition and unchanged original C3/C5/C6/D6/E4 remain unaccepted. 2026-10-28: MERCHANT_LEDGER_RECOVERY_R210.md;immutable reporting principal -> exact canonical history -> atomic original ledger and private IT/EN API/UI;368distinct passes/40new/12actualChromium. Full merchant coverage,payout/protection allocation and legacy proof remain incomplete;original criterion NOT promoted. PAYPAL_SETTLEMENT_RECOVERY_R210.md: scoped operator-only authenticated ACM/STL S6 exact completed credit -> original ledger,one-case immutable movement,actor audit and same-document replay;348distinct passes/46new. Broader account/payout/legacy proof and actual report target remain unaccepted;original state unchanged. 2026-10-28:PAYPAL_PARTIAL_SETTLEMENT_R210.md;exact partial multicapture report allocation,claim-bound ordinary replay and refund/subscription conservation implemented;357 distinct passes/40new. Whole historical/general financial criterion remains open;no target provider acceptance. PRECOMMERCIAL_MODEL_R210.md;validation/r210/precommercial-model/result.json. Explicit user-authorized scope revision: no historical commercial billing/refunds exist. Configuration is not monetary history; new quotes freeze before dispatch; checkout-start marker prevents reusing pre-commercial eligibility. No original v1 whole-history closure claimed.",
+      "weight": 1,
+      "scope_revision": "precommercial-20261030"
     },
-    "C4": {
+    {
+      "id": "C4",
       "criterion": "Local mirror/cutover recovery invariants",
       "state": "verified",
+      "evidence": "tests/test_regime_cutover_recovery.py",
       "weight": 1
     },
-    "C5": {
-      "criterion": "Enabled safe transition in both directions through actual administrator API",
-      "state": "implementation_pending",
-      "weight": 1
+    {
+      "id": "C5",
+      "criterion": "Enabled local-authority administrator API activation and two-way mode changes before commercial checkout starts, with exact preview, drain, replay and forward crash recovery; post-checkout migration unsupported",
+      "state": "verified",
+      "evidence": " 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Actual authenticated default-off local-authority two-way API and immutable request/audit/forward recovery implemented and tested without readiness doubles. General provider-history/distributed transition remains incomplete;original criterion not promoted. 2026-10-27: actual local-authority Chromium run40505295056 on772fbe7 passes9/9zero skips;browser prerequisite satisfied,original general criterion remains pending. 2026-10-28:CUTOVER_SERVICE_DRAIN_R210.md;actual C2 guard held through commit/mirror/finalize,original drain-bound preview,postcommit resume refusal,17 new functional passes including actual SIGKILL;149 distinct affected passes/12 new browser prerequisites skipped. Restricted local profile only;complete financial transition and unchanged original C3/C5/C6/D6/E4 remain unaccepted. PRECOMMERCIAL_MODEL_R210.md;validation/r210/precommercial-model/result.json. Explicit user-authorized scope revision: no historical commercial billing/refunds exist. Configuration is not monetary history; new quotes freeze before dispatch; checkout-start marker prevents reusing pre-commercial eligibility. No original v1 whole-history closure claimed.",
+      "weight": 1,
+      "scope_revision": "precommercial-20261030"
     },
-    "C6": {
+    {
+      "id": "C6",
       "criterion": "Cross-host crash and concurrent transition end-to-end acceptance",
       "state": "implementation_pending",
+      "evidence": " 2026-10-28:CUTOVER_SERVICE_DRAIN_R210.md;actual C2 guard held through commit/mirror/finalize,original drain-bound preview,postcommit resume refusal,17 new functional passes including actual SIGKILL;149 distinct affected passes/12 new browser prerequisites skipped. Restricted local profile only;complete financial transition and unchanged original C3/C5/C6/D6/E4 remain unaccepted.",
       "weight": 1
     },
-    "D1": {
+    {
+      "id": "D1",
       "criterion": "Actual done ledger -> immutable NC period -> private IT/EN CSV export",
       "state": "verified",
+      "evidence": "tests/test_r210_noncommercial_actual_ledger_e2e.py",
       "weight": 1
     },
-    "D2": {
+    {
+      "id": "D2",
       "criterion": "Commercial subscription quotes, credit checkout, authenticated funding and common refunds",
       "state": "verified",
+      "evidence": "tests/test_r210_credit_checkout.py; tests/test_r210_paypal.py",
       "weight": 1
     },
-    "D3": {
+    {
+      "id": "D3",
       "criterion": "Collect/settle exact subscription reversal receivables",
       "state": "verified",
+      "evidence": "tests/test_r210_subscription_repayment_e2e.py; tests/test_r210_subscription_repayment_browser.py; docs/SUBSCRIPTION_RECOVERY_HANDOFF_R210.md (existing exact refund-generated receivables; original-payment risk and operator refunds still A4/A5)",
       "weight": 1
     },
-    "D4": {
+    {
+      "id": "D4",
       "criterion": "Complete account-facing experience for both regimes",
       "state": "verified",
+      "evidence": "Complete local owner /account and /account/credits IT/EN 390/1280 workflow, both regimes, trial/renewal/cancel/overage/storage/reports, Stripe/PayPal funding/returns/pending recovery, exact existing repayment/refund history, NC voluntary statement/receipt/CSV, privacy/error/locale/in-flight/stale safety; 104 new cases incl. 94 Chromium, 315 distinct affected latest passing cases incl. 160 Chromium, scoped axe16 zero violations/unresolved. docs/ACCOUNT_WORKFLOW_HANDOFF_R210.md; docs/validation/r210/account-workflow-test-summary.json. Actual sandbox, enabled cutover D6, complete admin/native/product accessibility and full target acceptance remain separate and open.",
       "weight": 1
     },
-    "D5": {
+    {
+      "id": "D5",
       "criterion": "NC voluntary contribution settlement beyond immutable allocation statements",
       "state": "verified",
+      "evidence": "Manual external bank-evidence collection: tests/test_r210_noncommercial_collection_e2e.py; tests/test_r210_noncommercial_collection_browser.py; docs/NC_COLLECTION_HANDOFF_R210.md. No automated bank authentication or real transfers claimed.",
       "weight": 1
     },
-    "D6": {
-      "criterion": "Account balances and periods across enabled administrative cutover",
-      "state": "implementation_pending",
-      "weight": 1
+    {
+      "id": "D6",
+      "criterion": "Preserve balances, periods and measured non-commercial statements across pre-commercial administrator activation and recovery",
+      "state": "verified",
+      "evidence": "BALANCE_CONTINUITY_R210.md:internal conserving DB commit/finalize and maintenance integration,17-table exact original ledger/period/NC-history receipt;70 affected passes/11 new. Internal tests explicitly use readiness doubles. Enabled actual administrator cutover remains unavailable pending C2,C3,C5;D6 remains unaccepted. 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Actual bounded local administrator API conserves real operator credit balances/free periods,registered built-in harmony/CPU ledger and actual NC history across both directions and crashes. This scoped result does not close original integrated D6 pending broad C2/C3/C5 and UI acceptance. 2026-10-27: actual local-authority Chromium run40505295056 on772fbe7 passes9/9zero skips;browser prerequisite satisfied,original general criterion remains pending. 2026-10-28:CUTOVER_SERVICE_DRAIN_R210.md;actual C2 guard held through commit/mirror/finalize,original drain-bound preview,postcommit resume refusal,17 new functional passes including actual SIGKILL;149 distinct affected passes/12 new browser prerequisites skipped. Restricted local profile only;complete financial transition and unchanged original C3/C5/C6/D6/E4 remain unaccepted. PRECOMMERCIAL_MODEL_R210.md;validation/r210/precommercial-model/result.json. Explicit user-authorized scope revision: no historical commercial billing/refunds exist. Configuration is not monetary history; new quotes freeze before dispatch; checkout-start marker prevents reusing pre-commercial eligibility. No original v1 whole-history closure claimed.",
+      "weight": 1,
+      "scope_revision": "precommercial-20261030"
     },
-    "E1": {
+    {
+      "id": "E1",
       "criterion": "Financial positions use actual database API in Chromium IT/EN",
       "state": "verified",
+      "evidence": "tests/test_r210_financial_admin_browser.py",
       "weight": 1
     },
-    "E2": {
+    {
+      "id": "E2",
       "criterion": "Diagnostics remain readable during a reserved drain",
       "state": "verified",
+      "evidence": "tests/test_r210_financial_admin_browser.py",
       "weight": 1
     },
-    "E3": {
+    {
+      "id": "E3",
       "criterion": "Explicit confirmed reconciliation button traverses API/service and changes actual wallet in browser tests",
       "state": "verified",
+      "evidence": "tests/test_r210_financial_admin_browser.py",
       "weight": 1
     },
-    "E4": {
+    {
+      "id": "E4",
       "criterion": "Complete sensitive regime-switch operator workflow",
       "state": "verified",
+      "evidence": "docs/E4_ADMIN_WORKFLOW_ACCEPTANCE_R210.md;docs/validation/r210/sensitive-operator-acceptance.json. Complete13-family original financial/work review,exact absence/pending/unverified distinction,all125legacy cases,private query-only snapshot,mandatory fresh acknowledgement,actual C2 financial GET reconciliation/CSRF,two-way admin change,audit,loss/recovery/build/reopen controls on entire shipped settings IT/EN390/1280.243 distinct affected passes;59 actual Chromium/zero skips;8 full-panel axe scans/zero violations or exclusions. Closes complete operator contract including blocked/error states,not general financial backend C3/C5/D6.",
       "weight": 1
     },
-    "E5": {
+    {
+      "id": "E5",
       "criterion": "Complete transition progress, audit and forward recovery controls",
       "state": "verified",
+      "evidence": "E5_TRANSITION_PROGRESS_ACCEPTANCE_R210.md;validation/r210/transition-progress-result.json. General reservation/abort/commit/finalized/legacy/inconsistent lifecycle,private paginated audit,original actor evidence,explicit safe cancellation and receipt-bound forward recovery,read failure invalidation and read-only polling.32 actual Chromium/API/SQLite cases pass,IT/EN390/1280,full shipped settings,keyboard,8scoped axe scans zero violations. Original9-case restricted result alone was not accepted as E5. General backend switching and E4 remain separate and unaccepted.",
       "weight": 1
     },
-    "E6": {
+    {
+      "id": "E6",
       "criterion": "Full accessibility and responsive acceptance for the entire administration",
       "state": "verified",
+      "evidence": "Complete current local web administration:all9 settings tabs,Billing,Tokens,optional catalogue,job monitor;IT/EN/commercial-NC/390-1280/light-dark,real API/SQLite,keyboard/focus,names/reflow/read-error recovery and actual retention/quota/permissions/token readback.330 distinct affected cases,136 Chromium,44 new browser cases;328 axe reports,zero violations/unresolved,no rule exclusions. docs/ADMIN_ACCEPTANCE_HANDOFF_R210.md;docs/validation/r210/admin-test-summary.json. E4/E5 future enabled-cutover workflow,native/manual assistive-technology/whole-product/target certification remain separate.",
       "weight": 1
     },
-    "F1": {
+    {
+      "id": "F1",
       "criterion": "Backend policy, catalog and restricted model admission checks",
       "state": "verified",
+      "evidence": "tests/test_service_regime_commercial_gates.py",
       "weight": 1
     },
-    "F2": {
+    {
+      "id": "F2",
       "criterion": "Routed and direct transport boundaries reject disallowed remote execution before dispatch",
       "state": "verified",
+      "evidence": "Prior five routed guards plus raw client, gateway and standalone ACE HTTP including loopback/tunnels; exact gateway prefix and device path isolation. 213 affected cases, 4 shipped-dialog Chromium cases. docs/REMOTE_RIGHTS_HANDOFF_R210.md; tests/test_r210_remote_transport_rights.py; scripts/check_remote_transport_inventory.py.",
       "weight": 1
     },
-    "F3": {
+    {
+      "id": "F3",
       "criterion": "Authenticated remote checkpoint identity and rights attestation",
       "state": "verified",
+      "evidence": "docs/F3_REVIEWED_CHECKPOINT_ACCEPTANCE_R210.md;docs/validation/r210/reviewed-checkpoint-acceptance.json. Production verified-pull-v1:authority-reviewed pinned rights/model/loader/runtime,worker independent pre-load check,original epoch/plan/source/nonce/PID/result receipt,authenticated HTTPS original replay and generic-transport denial in both regimes.246 distinct affected passes,55new,5real-model cases incl4independent HTTPS cases.Only fixed reviewed BasicPitch supported;others denied in profile.Off/legacy not certified;F4/F5/F6 and kernel/hardware remain separate. 2026-10-29:direct rights guard changed adapter bytes;5 actual F3 ONNX/HTTPS cases and2 registered/project cases rerun successfully with current loader source hashes. Same original accepted profile;no broader checkpoint/rights claim. 2026-10-29:direct rights guard changed adapter bytes;5 actual F3 ONNX/HTTPS cases and2 registered/project cases rerun successfully with current loader source hashes. Same original accepted profile;no broader checkpoint/rights claim.",
       "weight": 1
     },
-    "F4": {
+    {
+      "id": "F4",
       "criterion": "Rights and bypass acceptance for every legacy executor",
       "state": "implementation_pending",
+      "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending. 2026-10-29:CI_40858_REPAIR_R210.md;actual Apple40858613243 supersedes the earlier SDK block:32exact checks,real Keychain,unsigned iOS app build and13current source hashes verified. No real neural or installed-device/full-F4 acceptance;criterion remains open. 2026-10-30:RESTORED_MODEL_RIGHTS_R210.md;strict imported-review contract,cached chord/Madmom/Mega53/profile and ACE/MRMT3 diagnostics guarded;1104distinct affected passes,305new,7explicit prerequisite skips.72actual token API denials cover18registered kinds/two transports before worker/ledger. Opaque executable/model identity and dynamic/native universal acceptance remain open;criterion not promoted. 2026-10-30:PINNED_TRANSCRIPTION_LOADERS_R210.md;789passes,3skips.Independent shipped MT3 source/tensor pins,source-only importlib and immutable tensor input,per-forward permissions.OriginalF4 remains pending external interpreter/dependency/ACE model contracts;PS refused without independent tensor pin.",
       "weight": 1
     },
-    "F5": {
+    {
+      "id": "F5",
       "criterion": "Native NC guarantees on all supported operating systems",
       "state": "environment_blocked",
+      "evidence": null,
       "weight": 1
     },
-    "F6": {
+    {
+      "id": "F6",
       "criterion": "Complete independent rights review of every optional installed checkpoint",
       "state": "implementation_pending",
+      "evidence": null,
       "weight": 1
     },
-    "G1": {
+    {
+      "id": "G1",
       "criterion": "Incoming CRC/SHA and exact Git tree comparison, no baseline files missing",
       "state": "verified",
+      "evidence": "docs/validation/r210/work-git-comparison.json",
       "weight": 1
     },
-    "G2": {
+    {
+      "id": "G2",
       "criterion": "Entire available Linux baseline with repairs, plus affected final-code regression; no complete target CI claim",
       "state": "verified",
+      "evidence": "docs/validation/r210/work-final-global-0.log; docs/validation/r210/work-final-global-1.log; docs/validation/r210/continuation-financial-regression.log; continuation-deferred-final.log; continuation-deferred-regression.log; docs/validation/r210/repayment-test-summary.json; docs/validation/r210/nc-collection-test-summary.json; docs/validation/r210/ci-full-confirmed-40257635101.json: full6448 passed/104 prerequisite skips,75.84%,combined live VST3/MIDI passed,all12 verify/build jobs successful; target/runtime requirements still open.",
       "weight": 1
     },
-    "G3": {
+    {
+      "id": "G3",
       "criterion": "App/native/tests/all-scripts Ruff, Python compilation and changed JavaScript syntax",
       "state": "verified",
+      "evidence": "docs/validation/r210/nc-collection-all-ruff.log; docs/NC_COLLECTION_HANDOFF_R210.md; complete source-bound local Bandit review and fail-closed review gate, docs/security/APP_SECURITY_REVIEW_R210.json, docs/validation/r210/security-test-summary.json (not deployment security certification).",
       "weight": 1
     },
-    "G4": {
+    {
+      "id": "G4",
       "criterion": "Available C++ audio-engine build and native DSP regression",
       "state": "verified",
+      "evidence": "docs/validation/r210/work-native-build.log",
       "weight": 1
     },
-    "G5": {
+    {
+      "id": "G5",
       "criterion": "Container images, Podman/Docker and Kubernetes execution",
       "state": "environment_blocked",
+      "evidence": null,
       "weight": 1
     },
-    "G6": {
+    {
+      "id": "G6",
       "criterion": "Windows/macOS native, GPU models, real VST plugins and hardware acceptance",
       "state": "environment_blocked",
+      "evidence": null,
       "weight": 1
     }
-  },
-  "critical_path": {
-    "A4": [],
-    "A5": [],
-    "C3": [
-      "A4",
-      "A5"
-    ],
-    "C5": [
-      "C2",
-      "C3"
-    ],
-    "D6": [
-      "C5"
-    ],
-    "C6": [
-      "C5",
-      "B6"
-    ]
-  },
+  ],
+  "critical_path": [
+    "A4/A5 new payment lifecycle",
+    "A6 provider sandbox",
+    "C6/B6 target acceptance",
+    "F4/F6 rights",
+    "F5/G5/G6 installed targets"
+  ],
   "workstreams": [
     {
-      "id": "finance",
-      "priority": 1,
+      "id": "payments",
       "criteria": [
         "A4",
-        "A5",
-        "C3"
+        "A5"
       ],
-      "state": "active_implementation_with_evidence_gates",
-      "depends_on": [],
-      "next_action": "Complete the missing original legacy subscription basis recovery contract and unsupported financial outcome paths;reuse existing acquisition,coverage,ledger and settlement modules. Separate absent original evidence from missing code before implementation.",
-      "code": [
-        "app/subscription_basis_audit.py",
-        "app/paypal_merchant_history.py",
-        "app/paypal_merchant_reconcile.py",
-        "app/paypal_settlement_reports.py",
-        "app/regime_reconciliation.py"
-      ],
-      "exit": "Complete original provider-wide history and exact legacy/payment/repayment liabilities,then integrated full financial clearance. Unknown or ambiguous originals remain blockers;never infer original fees/surplus or cash from present prices or dispute labels.",
-      "stop_condition": "An acceptance scenario needs missing independent original fee/surplus evidence,canonical transaction linkage,account origin/history or approved report access. Record the exact missing artifact and next code path;continue another unblocked scenario rather than repeating collector/audit/helper work.",
-      "reuse": [
-        "docs/PAYPAL_PARTIAL_SETTLEMENT_R210.md",
-        "docs/MERCHANT_RANGE_ACQUISITION_R210.md",
-        "docs/SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md"
-      ]
-    },
-    {
-      "id": "cutover",
-      "priority": 2,
-      "criteria": [
-        "C5",
-        "D6"
-      ],
-      "state": "depends_on_full_financial_clearance",
-      "depends_on": [
-        "C3"
-      ],
-      "next_action": "Integrate complete general readiness with existing original administrator API/drain/recovery and exact balance/period conservation;reuse accepted C2/E and bounded local API behavior.",
-      "code": [
-        "app/regime_local_readiness.py",
-        "app/regime_admin_cutover.py",
-        "app/regime_cutover_finalize.py",
-        "app/static/regime_cutover_panel.js"
-      ],
-      "exit": "Actual authenticated two-way administrator API with provider/legacy history,original obligations and balances/periods conserved through crash,response loss,concurrency and forward recovery;no readiness doubles as acceptance.",
-      "stop_condition": "C3 unresolved means general switching remains disabled. Do not rebuild the accepted restricted local cutover or repeat unchanged browser proof.",
-      "reuse": [
-        "docs/ADMIN_CUTOVER_LOCAL_R210.md",
-        "docs/CUTOVER_SERVICE_DRAIN_R210.md",
-        "docs/BALANCE_CONTINUITY_R210.md",
-        "docs/E4_ADMIN_WORKFLOW_ACCEPTANCE_R210.md"
-      ]
+      "next": "Complete remaining new-payment/refund/dispute and uncertain lifecycle cases with immutable quote/target receipts. No bulk legacy importer."
     },
     {
       "id": "rights",
-      "priority": 3,
       "criteria": [
         "F4",
         "F6"
       ],
-      "state": "independent_code_and_real_runtime_review",
-      "depends_on": [],
-      "next_action": "List remaining external interpreter/dependency/native/backend ACE loader boundaries against actual imported bytes and checkpoints;implement unclosed contracts,then validate with the authorized actual runtime/model and independent rights evidence.",
-      "code": [
-        "app/ai_adapter_identity.py",
-        "app/ai_worker_registry.py",
-        "app/transcription_source_contract.py",
-        "app/ace_step_readiness.py"
-      ],
-      "exit": "Every original legacy executor satisfies rights/bypass acceptance and every optional installed checkpoint has an independent rights review;operator policy,client identity,source pins,synthetic workers or Apple build alone do not close either criterion.",
-      "stop_condition": "Required Torch/runtime,authorized checkpoint,backend identity or independent rights evidence absent:record the exact prerequisite and continue an independent executable finance scenario. Do not repeat completed MT3 loader,API denial or ACE UI race campaigns.",
-      "reuse": [
-        "docs/PINNED_TRANSCRIPTION_LOADERS_R210.md",
-        "docs/RESTORED_MODEL_RIGHTS_R210.md",
-        "docs/ACE_OBSERVER_ISOLATION_R210.md"
-      ]
+      "next": "Complete residual executor/runtime/checkpoint identity and independent rights reviews; missing assets stay explicit."
     },
     {
       "id": "targets",
-      "priority": 4,
       "criteria": [
         "A6",
         "B6",
@@ -349,36 +365,21 @@
         "G5",
         "G6"
       ],
-      "state": "separate_target_campaign_with_code_dependencies",
-      "depends_on": [],
-      "next_action": "Keep one source/configuration checkpoint and prepare complete canonical cases for isolated provider,independent hosts,installed OS,containers and actual model/GPU/plugin/audio hardware execution. Execute only when target prerequisites and authorization exist.",
-      "code": [
-        "tests/test_r210_real_provider_sandbox.py",
-        "docs/RC_EXTERNAL_ACCEPTANCE_R210.md",
-        "deploy"
-      ],
-      "exit": "Original target criteria with actual target evidence and exact source/configuration/artifact identity;cross-host C6 also requires completed general transition implementation. Build-only passes and skipped tests are partial evidence.",
-      "stop_condition": "Do not repeat absent-tool probes or fabricate replacements. No provider/server mutation,CI dispatch or publication is authorized in this task. C6 remains implementation_pending,with an additional independent-host prerequisite.",
-      "reuse": [
-        "docs/RC_EXTERNAL_ACCEPTANCE_R210.md",
-        "docs/validation/r210/independent-guardian-result.json"
-      ]
+      "next": "Real sandbox,independent hosts,installed OS/container/GPU/VST targets. Builds and local processes do not replace target acceptance."
     }
   ],
-  "active_workstream": "finance",
+  "active_workstream": "future_payment_lifecycle",
   "work_in_progress_limit": 1,
   "agents_authorized": false,
   "operating_rules": [
-    "One functional acceptance batch at a time;independent streams are a queue,not automatically delegated agents.",
-    "Start by selecting an unclosed original acceptance scenario,its production boundary and its exact evidence requirement.",
-    "Continue to full criterion acceptance or a concrete recorded blocker;do not deliver a helper-only intermediate ZIP.",
-    "A blocker record identifies criterion,scenario,code/evidence/target gap,exact artifact or environment needed,unblocked next action and retained failed/skipped evidence.",
-    "Reuse source-identical accepted proofs;run affected tests only after a boundary change,then the relevant existing security gates.",
-    "After the user commits,inspect ordinary Quality/SAST;no remote dispatch or broad unchanged rerun in this task.",
-    "Every user-facing status/final includes verified/42 and RC percent;promote only original fully satisfied criteria with linked evidence.",
-    "If no criterion closes,report percent unchanged and what prevents closure;do not estimate full-product completion or remaining iteration counts."
+    "One functional acceptance batch at a time; no automatic delegation.",
+    "No pre-release commercial history migration or fee reconstruction. Unexpected financial history blocks activation.",
+    "New payments use immutable quote/target receipts. Uncertain dispatch never automatically repeats.",
+    "Keep original NC usage, balances, periods and statements. No financial reset or automatic cleanup.",
+    "Report current v2 RC and retain v1 comparison; scope reductions are not original-scope implementation gains.",
+    "Run affected checks; commit/push/tag/CI dispatch and real provider/server actions stay user-controlled."
   ],
-  "delivery": "Full CI41125 drain observer cumulative afterd3b17b6;original RC criteria unchanged.",
+  "delivery": "One complete cumulative, including all uncommitted changes afterda300396. No legacy financial migration work required.",
   "guardrails": {
     "commit_deferred": true,
     "staging": false,
@@ -389,20 +390,76 @@
     "release_candidate": false,
     "general_transition_enabled": false
   },
-  "parent_code_archive_sha256": "ff2160c18cb0df512ce7eafa841d5256e7840c217b7c1b5f1142831ee945b8c0",
+  "parent_code_archive_sha256": "24ea175561c8a55950949435b77d6df8dd1010f3aa9ce6ffab96e808958ca490",
   "latest_functional_checkpoint": {
     "date": "2026-10-30",
-    "handoff": "docs/CI_41125_DRAIN_OBSERVER_FIX_R210.md",
-    "proof": "docs/validation/r210/ci-41125/result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
-    "base_commit": "d3b17b6ebed8e512e5d6edb043b2a9f336d2b597",
-    "accepted_criteria": 29,
-    "original_criteria_total": 42,
-    "percent": 69.0,
-    "criteria_promoted": [],
-    "commit_deferred": true,
+    "handoff": "docs/PRECOMMERCIAL_MODEL_R210.md",
+    "proof": "docs/validation/r210/precommercial-model/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-precommercial-model-cumulative.zip",
+    "base_commit": "da300396a8dc9f7b84703565959b4df36dd7c15e",
+    "accepted_criteria": 32,
+    "criteria_total": 42,
+    "percent": 76.2,
+    "scope_revision": "precommercial-20261030",
+    "original_scope_percent": 69.0,
+    "original_scope_accepted": 29,
+    "accepted_revised_scope_checks": [
+      "C3",
+      "C5",
+      "D6"
+    ],
     "release_candidate": false,
-    "fix_remote_ci_executed": false,
-    "local_distinct_passed": 114
+    "commit_deferred": true,
+    "local_distinct_passed": 938,
+    "new_remote_ci": false
+  },
+  "scope_revision": {
+    "id": "precommercial-20261030",
+    "authorized_by_user": true,
+    "changes": [
+      {
+        "id": "A4",
+        "v1_criterion": "Complete PayPal historical discovery, refunded initial captures, ambiguous payout and multicapture dispute allocation",
+        "v1_state": "implementation_pending",
+        "v2_criterion": "Canonical history for payments created by this release, refunded initial captures, exact multicapture attribution and unresolved ambiguous PayPal dispute/payout movements; no import of pre-release merchant history",
+        "v2_state": "implementation_pending",
+        "weight_unchanged": 1
+      },
+      {
+        "id": "A5",
+        "v1_criterion": "Complete legacy obligations, all terminal/uncertain checkout outcomes and subscription reversal repayment",
+        "v1_state": "implementation_pending",
+        "v2_criterion": "New checkout/refund/reversal lifecycle with immutable original quotes, terminal and uncertain response recovery and subscription repayment; no adoption of pre-release financial obligations",
+        "v2_state": "implementation_pending",
+        "weight_unchanged": 1
+      },
+      {
+        "id": "C3",
+        "v1_criterion": "Resolve every financial obligation before cutover",
+        "v1_state": "implementation_pending",
+        "v2_criterion": "Transactional absence of monetary checkout/refund/history and unknown financial schemas before pre-commercial activation; no legacy financial migration",
+        "v2_state": "verified",
+        "weight_unchanged": 1
+      },
+      {
+        "id": "C5",
+        "v1_criterion": "Enabled safe transition in both directions through actual administrator API",
+        "v1_state": "implementation_pending",
+        "v2_criterion": "Enabled local-authority administrator API activation and two-way mode changes before commercial checkout starts, with exact preview, drain, replay and forward crash recovery; post-checkout migration unsupported",
+        "v2_state": "verified",
+        "weight_unchanged": 1
+      },
+      {
+        "id": "D6",
+        "v1_criterion": "Account balances and periods across enabled administrative cutover",
+        "v1_state": "implementation_pending",
+        "v2_criterion": "Preserve balances, periods and measured non-commercial statements across pre-commercial administrator activation and recovery",
+        "v2_state": "verified",
+        "weight_unchanged": 1
+      }
+    ],
+    "legacy_migration_required": false,
+    "post_checkout_regime_migration_supported": false,
+    "comparison": "docs/validation/r210/precommercial-model/scope-comparison.json"
   }
 }

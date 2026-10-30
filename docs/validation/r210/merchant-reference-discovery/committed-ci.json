@@ -1,0 +1,90 @@
+{
+  "run": 41129584447,
+  "commit": "da300396a8dc9f7b84703565959b4df36dd7c15e",
+  "tree": "4bca9324a11d00df7212011af2feff0eca1d85b9",
+  "status": "completed",
+  "conclusion": "success",
+  "quality": {
+    "job_id": 124336942210,
+    "passed": 7689,
+    "skipped": 50,
+    "coverage_percent": 76.58
+  },
+  "jobs": [
+    {
+      "id": 124336941030,
+      "name": "Native macOS installer (x64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336941320,
+      "name": "SAST and dependency audit",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336941921,
+      "name": "VST3 SDK compile (Linux)",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336942209,
+      "name": "iOS / iPadOS archive",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336942210,
+      "name": "Quality and unit tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336942271,
+      "name": "Container production gate",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336942336,
+      "name": "Build Windows Chordino runtime",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336942418,
+      "name": "Native macOS installer (arm64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336942451,
+      "name": "Linux native (x86_64) DEB/RPM",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336942925,
+      "name": "Native Windows installer",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336943055,
+      "name": "Linux native (arm64) DEB/RPM",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336943241,
+      "name": "Android APK / AAB",
+      "conclusion": "success"
+    },
+    {
+      "id": 124336943331,
+      "name": "Publish Docker Hub image",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124345548983,
+      "name": "Publish rolling early-main packages",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124345549245,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "conclusion": "skipped"
+    }
+  ]
+}

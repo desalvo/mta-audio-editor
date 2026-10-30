@@ -1,0 +1,38 @@
+{
+  "schema": "mta-cumulative-preservation-1",
+  "parent": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
+  "parent_sha256": "37f093544576c821f4be6501cbe6d597978efc912e81dcfb1fd6c8a54ef5da1b",
+  "original_entries": 5087,
+  "changed_original_paths": [
+    "app/checkout_reference_recovery.py",
+    "app/paypal_merchant_reconcile.py",
+    "docs/DEVELOPMENT_COMPONENTS_R210.json",
+    "docs/DEVELOPMENT_HANDOFF_R210.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/RC_ACCEPTANCE_REPORT.md",
+    "docs/RC_EXECUTION_STRATEGY_R210.json",
+    "docs/RC_FINAL_WORK_QUEUE_R210.md",
+    "docs/security/AI_EXECUTION_REVIEW_R210.json",
+    "docs/security/APP_SECURITY_REVIEW_R210.json",
+    "docs/security/REMOTE_TRANSPORT_REVIEW_R210.json",
+    "docs/security/SERVICE_ADMISSION_REVIEW_R210.json"
+  ],
+  "new_paths": [
+    "docs/validation/r210/merchant-reference-discovery/baseline.json",
+    "docs/validation/r210/merchant-reference-discovery/browser-prerequisite.log",
+    "docs/validation/r210/merchant-reference-discovery/committed-ci.json",
+    "docs/validation/r210/merchant-reference-discovery/original-regression.log",
+    "docs/validation/r210/merchant-reference-discovery/original-regression.xml",
+    "docs/validation/r210/merchant-reference-discovery/pytest-results.xml",
+    "docs/validation/r210/merchant-reference-discovery/pytest.log",
+    "docs/validation/r210/merchant-reference-discovery/result.json",
+    "docs/validation/r210/merchant-reference-discovery/security-gates.log",
+    "tests/test_r210_merchant_lost_creation.py",
+    "tests/test_r210_merchant_lost_creation_browser.py",
+    "docs/MERCHANT_REFERENCE_DISCOVERY_R210.md",
+    "docs/validation/r210/merchant-reference-discovery/preservation.json"
+  ],
+  "removed_paths": [],
+  "all_other_original_bytes_and_zip_metadata_preserved": true,
+  "original_criteria_states_texts_weights_and_progress_unchanged": true
+}

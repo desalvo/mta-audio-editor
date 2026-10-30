@@ -56,6 +56,7 @@ def snapshot(c, *, limit=50, offset=0):
     from . import worker_cgroup_recovery as processes, worker_loss_resolution as losses
     from . import noncommercial_contributions as nc, ai_pull_coordinator as pull
     from .regime_local_readiness import _KNOWN_SCHEMAS
+    from .commercial_launch import TABLE
     if not c.in_transaction:
         raise FenceBlocked('Original transactional operator review required')
     tables = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -87,7 +88,7 @@ def snapshot(c, *, limit=50, offset=0):
     elif cents:
         contribution['state'] = 'pending'
     sections.append(contribution)
-    unknown = sorted(tables - _KNOWN_SCHEMAS)
+    unknown = sorted(tables - (_KNOWN_SCHEMAS | {TABLE}))
     sections.append({'id': 'schema_coverage', 'family': 'finance', 'verified': not unknown,
                      'state': 'unverified' if unknown else 'verified', 'action': 'schema_review',
                      'counts': {'unknown_schemas': len(unknown)}, 'amounts_micro': {}, 'issues': unknown})
@@ -147,13 +148,15 @@ def _provider_history(c):
         'subscription_payment_basis': 'SELECT COUNT(*) FROM subscription_payment_basis',
         'subscription_repayment_allocations': 'SELECT COUNT(*) FROM subscription_repayment_allocations',
         'paypal_merchant_history': 'SELECT COUNT(*) FROM paypal_merchant_history',
+        'regime_commercial_origin': 'SELECT COUNT(*) FROM regime_commercial_origin',
     }
     for table, query in journals.items():
         if table in tables:
             records += c.execute(query).fetchone()[0]
     if stripe is None or paypal is None:
         return {'verified': False, 'records': records, 'history_or_configuration': True}
-    return {'verified': True, 'records': records, 'history_or_configuration': bool(records or any(stripe) or any(paypal))}
+    return {'verified': True, 'records': records, 'history_or_configuration': bool(records),
+            'configured':bool(any(stripe) or any(paypal))}
 
 
 def read(*, actor, target, limit=50, offset=0):
@@ -176,11 +179,13 @@ def read(*, actor, target, limit=50, offset=0):
         if any(section['state'] not in ('verified', 'not_used') for section in result['sections']):
             raise FenceBlocked('Operator review requires original evidence')
         preview = cutover.preview(target=destination, actor=actor)
-        eligibility = 'verified_restricted_profile'
+        eligibility = 'verified_precommercial_profile'
     except (FenceBlocked, sqlite3.DatabaseError, ValueError, TypeError, OSError):
         eligibility = 'mode_disabled' if not enabled() else 'same_regime' if destination == state.regime.value else 'blocked'
     body = {**result, 'schema': 'mta-operator-preflight-1', 'source': state.regime.value,
             'target': destination, 'source_revision': state.revision, 'service_admission': projected,
             'maintenance_eligibility': eligibility, 'preview': preview,
-            'general_transition_authorized': False, 'release_candidate': False}
+            'general_transition_authorized': False, 'release_candidate': False,
+            'financial_model':{'id':'precommercial-no-payment-history-1','legacy_migration_supported':False,
+                               'switching_after_checkout_started':False}}
     return {**body, 'review_sha256': hashlib.sha256(encode(body).encode()).hexdigest()}

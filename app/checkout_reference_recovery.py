@@ -14,7 +14,7 @@ from .regime_operation_fence import FenceBlocked
 from .regime_provider_probe import _get,_reference,ProviderProbeError
 
 
-def recover(provider,order_id,reference,*,client=None):
+def recover(provider,order_id,reference,*,client=None,_merchant_context=None):
     if provider not in ('stripe','paypal') or not isinstance(order_id,str) or not 1<=len(order_id)<=120:
         raise ValueError('Invalid checkout recovery request')
     reference=_reference(reference)
@@ -72,6 +72,10 @@ def recover(provider,order_id,reference,*,client=None):
             duplicate=c.execute('SELECT 1 FROM paypal_orders WHERE provider_order=? AND id!=?',(reference,order_id)).fetchone()
         if fresh!=config or current is None or any(current[k]!=initial[k] for k in immutable):
             raise FenceBlocked('Order or merchant changed during checkout reference recovery')
+        if _merchant_context is not None:
+            if provider!='paypal':raise FenceBlocked('Merchant history requires PayPal')
+            from .paypal_merchant_reconcile import check_reference_context
+            check_reference_context(c,_merchant_context,current,config,document)
         if duplicate or current[reference_field] not in (None,reference):raise FenceBlocked('Provider reference already bound to a different order')
         op='checkout:'+provider+':'+order_id
         dispatch=c.execute('SELECT provider,state,attempts,provider_reference FROM regime_payment_outbox WHERE operation_id=?',(op,)).fetchone()

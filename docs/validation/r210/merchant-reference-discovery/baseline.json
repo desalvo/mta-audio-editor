@@ -1,0 +1,11 @@
+{
+  "schema": "mta-source-comparison-1",
+  "commit": "da300396a8dc9f7b84703565959b4df36dd7c15e",
+  "tree": "4bca9324a11d00df7212011af2feff0eca1d85b9",
+  "tracked_blobs": 4328,
+  "matching_before_development": 4328,
+  "missing": [],
+  "different": [],
+  "input_archive": "MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip",
+  "input_sha256": "37f093544576c821f4be6501cbe6d597978efc912e81dcfb1fd6c8a54ef5da1b"
+}

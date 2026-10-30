@@ -148,10 +148,10 @@ def test_removed_configuration_cannot_bypass_persisted_drain(drained, monkeypatc
 def test_financial_history_is_still_blocked_after_successful_service_drain(drained):
     client, _, _ = drained
     with gate.control(), auth.db() as con:
-        con.execute("UPDATE paypal_config SET enabled=1 WHERE id=1")
+        con.execute("INSERT INTO paypal_events VALUES('unexpected-payment-history',1)")
     assert client.get('/api/admin/service-admission').json()['drained']
     result = client.get(BASE + '/preview?target=NON_COMMERCIAL')
-    assert result.status_code == 409 and 'financial reconciliation' in result.json()['detail']
+    assert result.status_code == 409 and 'reconciliation required' in result.json()['detail']
 
 
 def test_held_original_reservation_requires_abort_before_service_resume(drained):

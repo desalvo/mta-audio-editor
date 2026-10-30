@@ -1,8 +1,10 @@
-"""Exact, deliberately restricted maintenance eligibility for a local authority.
+"""Pre-commercial maintenance eligibility for a local authority.
 
 Unknown/provider/worker histories are refusals, not empty balances. This profile
 can carry operator-issued credits, free subscription periods and verified NC
 statements. It cannot certify a merchant account or adopt a historical worker.
+Prepared provider credentials and future plan prices are configuration. Once
+commercial checkout starts, this profile cannot migrate that monetary history.
 The broad online/distributed reconciliation diagnostic remains separate.
 """
 from contextlib import closing
@@ -226,7 +228,9 @@ def audit(con):
     if not enabled() or os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() in {'1', 'true', 'yes', 'on'}:
         raise FenceBlocked('Local-authority cutover is not enabled for this installation')
     tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-    if tables - _KNOWN_SCHEMAS:
+    from .commercial_launch import PROFILE, TABLE, require_not_started
+    require_not_started(con)
+    if tables - (_KNOWN_SCHEMAS | {TABLE}):
         raise FenceBlocked('Unreviewed database schema prevents financial cutover')
     if not REQUIRED <= tables:
         raise FenceBlocked('Required financial schemas unavailable; provision and review them before cutover')
@@ -242,12 +246,12 @@ def audit(con):
         raise FenceBlocked('Recovery requires an existing administrator with password or local TOTP authentication')
     stripe = con.execute('SELECT secret_key,webhook_secret FROM credit_payment_config WHERE id=1').fetchone()
     paypal = con.execute('SELECT enabled,client_id,client_secret,webhook_id FROM paypal_config WHERE id=1').fetchone()
-    if stripe is None or paypal is None or any(stripe) or any(paypal):
-        raise FenceBlocked('Configured providers require full authenticated financial reconciliation')
+    if stripe is None or paypal is None:
+        raise FenceBlocked('Original provider configuration schemas unavailable')
     if 'nc_contribution_settings' in tables:
         row = con.execute('SELECT enabled FROM nc_contribution_settings WHERE singleton=1').fetchone()
-        if row is None or row[0]:
-            raise FenceBlocked('Disable voluntary collection and reconcile its complete history first')
+        if row is None:
+            raise FenceBlocked('Voluntary collection configuration unavailable')
     jobs = _settled_jobs(con, tables)
     # Physical receipts are history, not a new economic obligation. Validate the
     # complete immutable journal, not merely terminal labels or one job's scope.
@@ -277,8 +281,8 @@ def audit(con):
                 (amount and not identifier.startswith('grant:')) or
                 not con.execute('SELECT 1 FROM users WHERE id=?', (uid,)).fetchone()):
             raise FenceBlocked('Original credit basis requires independent reconciliation')
-    if con.execute('SELECT 1 FROM resource_plans WHERE price_micro!=0 LIMIT 1').fetchone():
-        raise FenceBlocked('Priced subscription plans require full financial cutover')
+    # Plan prices are configuration, not a collected payment. Existing period
+    # charges below still block; no legacy charge is cleared or reconstructed.
     if con.execute('SELECT 1 FROM resource_plan_charges WHERE amount_micro!=0 LIMIT 1').fetchone():
         raise FenceBlocked('Subscription obligations require full financial cutover')
     if con.execute('''SELECT 1 FROM resource_contract_terminations WHERE
@@ -286,8 +290,8 @@ def audit(con):
         raise FenceBlocked('Contract termination obligations require full financial cutover')
     for raw, in con.execute('SELECT limits FROM resource_next_plans'):
         limits = json.loads(raw)
-        if not isinstance(limits, dict) or limits.get('price_micro', 0) != 0:
-            raise FenceBlocked('Future subscription obligations require full financial cutover')
+        if not isinstance(limits, dict):
+            raise FenceBlocked('Future subscription configuration cannot be verified')
     for start, end, raw in con.execute('SELECT start,end,limits FROM resource_periods'):
         limits = json.loads(raw)
         if (type(start) is not int or type(end) is not int or end <= start or
@@ -302,7 +306,8 @@ def audit(con):
     statements = list_statements(con)
     queue = _external_queue(jobs)
     financial = snapshot(con)
-    return {'profile': 'local-authority-no-provider-history-1',
+    return {'profile': PROFILE, 'financial_history_migration_supported':False,
+            'provider_configuration_sha256':hashlib.sha256(encode([tuple(stripe),tuple(paypal)]).encode()).hexdigest(),
             'financial_snapshot_sha256': hashlib.sha256(encode(financial).encode()).hexdigest(),
             'statement_hashes': [row['sha256'] for row in statements],
             'execution_journals': queue, 'provider_history': 'absent_in_verified_schemas',

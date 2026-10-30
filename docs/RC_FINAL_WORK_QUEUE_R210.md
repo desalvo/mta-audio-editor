@@ -1,52 +1,19 @@
-## Checkpoint corrente — CI41125188767: drain senza interferenze — 30 ottobre 2026
+# MTA0.3.0-r210 — stato corrente, modello pre-commerciale
 
-**RC69,0% (29/42),invariata;nessun criterio promosso.** Baseline utente **d3b17b6ebed8e512e5d6edb043b2a9f336d2b597**,4321blob verificati identici prima del fix. Leggere **CI_41125_DRAIN_OBSERVER_FIX_R210.md** e `validation/r210/ci-41125/result.json`.
+**RC v2:32/42=76,2%;D/E complete(2/7);10criteri aperti;PRE-RC.** Il perimetro v1 resta29/42=69,0%,non direttamente comparabile. L'utente ha escluso la migrazione finanziaria commerciale pre-release perché mai attivata. C3/C5/D6 sono ora accettati soltanto sul nuovo profilo iniziale;nessuna migrazione generale è dichiarata completa.
 
-SAST e VST3 SDK riusciti;Quality7686pass/1fallimento/50skip,copertura76,57%. Causa riprodotta:lo snapshot drain prendeva flock esclusivo durante lavoro originale,respingeva guardian/heartbeat al database. Ora con ammissioni attive restituisce pending non verificato e drainedfalse;solo dopo tutte le chiusure esegue l'audit esclusivo originale.114test distinti passano,0skip,2nuove regressioni rosse sull'originale;10processi/40ripetizioni riuscite. Ruff/compilazione/Bandit/treinventari passano,nessun nuovo finding o checker/soglia cambiato. Nuova CI remota ancora da confermare.
+Leggere **PRECOMMERCIAL_MODEL_R210.md**,`validation/r210/precommercial-model/result.json` e `scope-comparison.json`. La cronologia completa precedente è in `development-history/precommercial-scope-20261030/`. Da questo checkpoint le istruzioni storiche che richiedono importazione di pagamenti commerciali mai esistiti sono superate.
 
-Cumulativo:**MTA-0.3.0-r210-pre-RC-ci-41125-cumulative.zip**. Solo questo fix/test/revisione/stato segue il commitd3b17b6;il precedente Authenticode è già committato. Commit suggerito:`Keep drain status polling from interrupting admitted workers`. Nessuna azione remota. Cronologia sotto superata dove incompatibile.
+Provider/prezzi configurabili prima dell'attivazione;storia monetaria,schemi sconosciuti,intenti e lavori pendenti bloccano. Conservati consumi,saldi,periodi e rendiconti NC. Quote salvate prima del provider,mai ricostruite da prezzi successivi;preventivi non pagati distinti dai pagamenti. Il marcatore d'avvio checkout è immutabile e non personale. Cambio post-checkout automatico non supportato dalla RC semplificata;nessun reset dei libri.
 
----
+Verifica:894test finanziari/regime finali passati;938casi distinti correnti senza errori o skip,23casi nei nuovi file. Ruff/compilazione/JS,Bandit e tre inventari passano. Nessuna nuova prova browser/provider/target o CI remota.
 
-## Checkpoint corrente — correzione diagnostica CI41104088648 — 30 ottobre 2026
+Base Git confermata:**da300396a8dc9f7b84703565959b4df36dd7c15e**,CI41129584447verde. Tutti i delta merchant-reference più il modello attuale sono non committati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-precommercial-model-cumulative.zip**. Commit:`Simplify commercial launch, freeze quotes and recover PayPal checkouts`. Nessuna azione remota eseguita.
 
-**RC69,0% (29/42),invariata;nessun criterio promosso.** Baseline utente **2273dc4f6a797a09ae2762b3545ed351c6111e74**,4315blob verificati identici prima del fix. Leggere **CI_41104_INSTALLED_DIAGNOSTICS_FIX_R210.md** e `validation/r210/ci-41104/result.json`.
+## Coda residua
 
-Secondo tentativo Quality:1timeout diagnostica Windows su Linux,7682passati,50skip,copertura76,57%;SAST/Gitleaks/Trivy e VST3 SDK riusciti. Authenticode ora solo su Windows,SKIP esplicito su host estraneo;test senza PowerShell isolato davvero.31test locali passati,4nuovi casi;regressione originale2fallimenti riprodotti. Ruff/compilazione/treinventari passano;revisione del solo sorgente diagnostico aggiornata,checker invariati. Nessuna nuova CI remota o prova Windows reale.
+1. **A4/A5:** completare gli esiti dei nuovi checkout/rimborsi/dispute,compresi casi parziali/ambigui e recuperi incerti;usare esclusivamente quote e target originali. Non implementare importatori o ricostruzioni finanziarie pre-release.
+2. **F4/F6:** completare confini runtime/esecutori e revisioni indipendenti dei checkpoint;non sostituire asset o diritti mancanti con un worker sintetico.
+3. **A6/B6/C6/F5/G5/G6:** eseguire i collaudi reali su sandbox,host indipendenti,sistemi installati,container e hardware/modelli autorizzati. C6 mantiene lavoro di integrazione e target;build/skip non equivalgono all'accettazione.
 
-Cumulativo:**MTA-0.3.0-r210-pre-RC-ci-41104-cumulative.zip**. Solo diagnostica,test,revisione/stato sono non committati;il precedente fix Gitleaks è nel commit2273dc4 e verificato dalla CI. Commit suggerito:`Run installed Authenticode diagnostics only on Windows`. Nessuna azione remota. La cronologia sotto è superata dove incompatibile.
-
----
-
-## Checkpoint corrente — CI41098492290 e nuova baseline — 30 ottobre 2026
-
-**RC69,0% (29/42),invariata;nessun criterio promosso.** L'utente ha committato il cumulativo precedente in **d6ca2860538cab6a08e38ea91c40ff7c60479a47**,4306blob verificati identici. Leggere **CI_41098_GITLEAKS_FIX_R210.md**. SAST fallisce soltanto Secret scan sui3digest pubblici del contratto MT3:aggiunte3eccezioni per valori esatti,regole predefinite attive,contratto/runtime/app/test invariati. Scanner ufficiale8.24.3:prima3rilievi,dopo0;4controlli negativi ancora bloccati. I35vecchi rilievi della scansione senza storia restano distinti e non sono nuove eccezioni.
-
-Quality remoto:7683passati,50skip,76,56%copertura;job completato con successo.Run complessivo fallito:2job riusciti,1fallito(Secret scan),10saltati. VST3 SDK riuscito;Bandit/audit dipendenze riusciti,Trivy saltato dopo Secret scan. Il nuovo fix non ha ancora CI remota. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip**;solo questo hotfix/documentazione sono non committati. Commit suggerito:`Allow exact public MT3 source digests in secret scans`. Nessun commit/push/dispatchCI o intervento server/provider eseguito. Le istruzioni storiche sotto che definiscono non committati i delta da4014a1f sono superate dalla nuova baseline.
-
----
-
-## Checkpoint corrente — riscossione legacy e prove originali — 30 ottobre 2026
-
-**RC69,0% (29/42),invariata:nessun criterio promosso;l'aumento richiesto non è ottenuto.** Leggere **LEGACY_SUBSCRIPTION_COLLECTION_R210.md** e `validation/r210/legacy-collection-result.json`. Rimborsi senza base originale registrati senza debiti ipotetici;riscossioni legacy preesistenti non verificate sospese prima del provider e dell'allocazione;account IT/EN e aggregati mostrano importi da verificare,revisione privata per proprietario. **779 casi distinti correnti passati,24 nuovi,10 skip Playwright;nessun nuovo collaudo Chromium/provider reale.** Ruff/sintassi/compilazione e quattro gate passano,senza nuovi finding o checker modificati.
-
-A5/C3 restano aperti per prove originali quota/surplus mancanti e migrazione completa non certificata;A4 mantiene anche software/storia/movimenti da completare.Coda operativa in RC_DELIVERY_PLAN_R210.md,senza ripetere i blocchi già verificati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip**,include ACE e la riorganizzazione;non riapplicare il vecchio patch. Tutti i delta da4014a1f restano non committati. Nessuna azione remota.
-
----
-
-Cronologia precedente,superata dove incompatibile:
-
-# Coda corrente RC — 30 ottobre 2026
-
-**RC: 69,0% (29/42); 13 criteri aperti; 1/7 macroaree completa. Nessun criterio promosso dalla riorganizzazione.**
-
-Leggere `RC_DELIVERY_PLAN_R210.md`; ordine e condizioni di uscita sono in `RC_EXECUTION_STRATEGY_R210.json`. Questi file sostituiscono le priorità storiche, senza cambiare i criteri originali.
-
-1. **Attivo: A4/A5/C3.** Completare basi originali legacy ed esiti finanziari non coperti, riutilizzando acquisizione/ledger/settlement. Prove originali assenti restano impedimenti espliciti; passare a uno scenario indipendente senza ripetere l'audit.
-2. **Dipendente da C3: C5/D6.** Integrare transizione generale, API reale in entrambe le direzioni, recovery e conservazione saldi/periodi. Riutilizzare C2 e l'interfaccia E già accettati.
-3. **Coda indipendente: F4/F6.** Completare contratti residui e revisioni effettive; runtime/modello/prove indipendenti mancanti non si sostituiscono con worker sintetici o ulteriori rifiuti API già coperti.
-4. **Campagna target: A6/B6/C6/F5/G5/G6.** Predisporre casi completi e prerequisiti precisi, poi eseguire su target autorizzati disponibili. C6 mantiene anche la dipendenza dal software di transizione generale.
-
-Un solo blocco funzionale in lavorazione. Uscita: criterio originale completo o impedimento preciso con prossima azione indipendente. Ogni resoconto riporta percentuale RC e verificati/42. Test/helper/build/skip non cambiano il numeratore.
-
-Base completa: `MTA-0.3.0-r210-pre-RC-ace-observer-isolation-cumulative.zip`; applicare poi il delta documentale di questa riorganizzazione. Nessun nuovo ZIP per questo riordino. Nessun commit o operazione remota. Cronologia precedente preservata in `development-history/RC_FINAL_WORK_QUEUE_R210_BEFORE_REORGANIZATION_20261030.md`.
+Un blocco funzionale per volta,fino ad accettazione o impedimento concreto. Ogni resoconto riporta il perimetro della percentuale. Non ricontare B2 o i vecchi fix CI. Nessuna mutazione remota o commit automatico.

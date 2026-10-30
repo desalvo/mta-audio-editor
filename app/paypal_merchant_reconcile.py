@@ -141,6 +141,69 @@ def check_context(c, context, order, cfg):
     return snapshot, data
 
 
+def check_reference_context(c, context, order, cfg, canonical):
+    """Original admin/snapshot/canonical binding inside reference commit."""
+    snapshot,data=check_context(c,context,order,cfg)
+    if canonical!=context['canonical']:
+        raise FenceBlocked('Canonical order changed during reference discovery')
+    item=_selected(data,context['observation_sha256'])
+    _matches(snapshot,item,canonical,context['refunds'])
+
+
+def _recover_missing_reference(actor,snapshot_id,observation_sha256,pid,cfg):
+    # Only a directly authenticated Orders document may nominate the original
+    # local row. Reporting notes/custom labels are never local ownership proof.
+    from .checkout_terminal_outcomes import paypal_identity
+    from .paypal_reconciliation import discover
+    from .checkout_reference_recovery import recover
+    canonical=paypal._api(cfg,'GET','/v2/checkout/orders/'+pid)
+    if not isinstance(canonical,dict):
+        raise FenceBlocked('Canonical discovery order unavailable')
+    units=canonical.get('purchase_units')
+    if (not isinstance(units,list) or len(units)!=1 or not isinstance(units[0],dict)
+            or not isinstance(units[0].get('reference_id'),str)):
+        raise FenceBlocked('Original local order missing; restore its original evidence')
+    identifier=units[0]['reference_id']
+    with auth.db() as c:
+        snapshot,data,current=_snapshot(c,actor,snapshot_id)
+        item=_selected(data,observation_sha256)
+        row=c.execute('SELECT * FROM paypal_orders WHERE id=?',(identifier,)).fetchone()
+        if row is None:
+            raise FenceBlocked('Original local order missing; restore its original evidence')
+        order=dict(row)
+        if order['kind']=='subscription':
+            from .subscription_receivables import original_quote
+            original_quote(c,order)
+        elif order['kind']=='subscription_reversal':
+            from .subscription_receivables import quote
+            target=c.execute('SELECT refund_id,quoted_micro FROM subscription_repayment_targets WHERE order_id=?',(order['id'],)).fetchone()
+            if target is None:raise FenceBlocked('Original subscription quote evidence required')
+            quote(c,order['user_id'],target[0],target[1])
+        elif order['kind']!='credits':
+            raise FenceBlocked('Original subscription quote evidence required before reference discovery')
+        if (current!=cfg or order['provider_order'] not in (None,pid)
+                or order['environment']!=cfg['environment']
+                or order['client_fingerprint']!=snapshot['merchant_fingerprint']):
+            raise FenceBlocked('Original order merchant or reference changed')
+        paypal_identity(canonical,{**order,'provider_order':pid},require_empty=False)
+        if canonical.get('status')!='COMPLETED':
+            raise FenceBlocked('Merchant discovery requires a completed original payment')
+        context={'actor':actor,'snapshot_id':snapshot_id,'observation_sha256':observation_sha256,
+            'configuration':cfg,'original_order':{k:order[k] for k in
+            ('id','user_id','kind','period_start','amount_cents','environment','client_fingerprint','provider_order')}}
+    refunds=discover(canonical,cfg)
+    _matches(snapshot,item,canonical,refunds)
+    context.update(canonical=canonical,refunds=refunds)
+    # This confirms only the original attempted creation. Full authenticated
+    # history reconciliation below remains the sole settlement authority.
+    recover('paypal',identifier,pid,_merchant_context=context)
+    with auth.db() as c:
+        fresh=_local(c,{'transaction_id':item['transaction_id'],
+            'paypal_reference_id':pid,'paypal_reference_id_type':'ODR'},cfg)
+    if fresh is None:raise FenceBlocked('Recovered original order unavailable')
+    return fresh
+
+
 def reconcile(actor, snapshot_id, observation_sha256, *, confirm=False):
     if confirm is not True:
         raise ValueError('Explicit original-ledger reconciliation confirmation required')
@@ -152,20 +215,26 @@ def reconcile(actor, snapshot_id, observation_sha256, *, confirm=False):
     if order is None:
         # Only the fixed principal capture endpoint can discover its canonical
         # order. Never route using payer notes, custom IDs, URLs or account IDs.
-        cid = item['transaction_id'] if item['event_code'] == 'T0006' else (
-            item.get('paypal_reference_id') if item.get('paypal_reference_id_type') == 'TXN' else None)
+        cid=item['transaction_id']
+        if item['event_code']=='T1107':
+            refund=paypal._api(cfg,'GET','/v2/payments/refunds/'+cid)
+            if not isinstance(refund,dict) or refund.get('id')!=cid:
+                raise FenceBlocked('Canonical discovery refund changed')
+            cid=paypal._refund_capture(refund,cfg['environment'])
         from .paypal_reconciliation import _identifier
         cid = _identifier(cid)
         capture = paypal._api(cfg, 'GET', '/v2/payments/captures/' + cid)
-        if capture.get('id') != cid:
+        if not isinstance(capture,dict) or capture.get('id') != cid:
             raise FenceBlocked('Canonical discovery capture changed')
-        pid = capture.get('supplementary_data', {}).get('related_ids', {}).get('order_id')
+        supplementary=capture.get('supplementary_data')
+        related=supplementary.get('related_ids') if isinstance(supplementary,dict) else None
+        pid=related.get('order_id') if isinstance(related,dict) else None
         _identifier(pid)
         with auth.db() as c:
             order = _local(c, {'transaction_id': cid, 'paypal_reference_id': pid,
                               'paypal_reference_id_type': 'ODR'}, cfg)
         if order is None:
-            raise FenceBlocked('Original local order missing; restore its original evidence')
+            order=_recover_missing_reference(actor,snapshot_id,observation_sha256,pid,cfg)
     # The complete refund/dispute discovery is reused rather than trusting the
     # reporting amount as a credit. Its write lock rechecks this exact context.
     from .payment_reconcile_service import reconcile_paypal

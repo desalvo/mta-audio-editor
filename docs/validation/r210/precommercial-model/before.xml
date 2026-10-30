@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="9" time="2.970" timestamp="2026-10-31T00:10:19.658840+01:00" hostname="388294fdb9e2"><testcase classname="tests.test_r210_subscription_quote_origin" name="test_exact_quote_is_frozen_before_provider_can_observe_creation" time="0.209"><failure message="TypeError: 'NoneType' object is not iterable">account = 2, provider = ({}, [])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc964c0ab70&gt;
+
+    def test_exact_quote_is_frozen_before_provider_can_observe_creation(account,provider,monkeypatch):
+        original=paypal._api;quotes=[]
+        def api(cfg,method,path,*args):
+            if method=='POST' and path=='/v2/checkout/orders':
+                with auth.db() as c:
+                    quote=c.execute('SELECT fee_micro,gross_micro,surplus_micro FROM subscription_payment_basis').fetchone()
+                    quotes.append(tuple(quote))
+            return original(cfg,method,path,*args)
+        monkeypatch.setattr(paypal,'_api',api)
+&gt;       local=create(account)
+              ^^^^^^^^^^^^^^^
+
+tests/test_r210_subscription_quote_origin.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_r210_subscription_quote_origin.py:18: in create
+    return paypal.checkout(account,{'kind':'subscription','period_start':state['period']['start'],'request_id':'quote-before-dispatch-123'})['order_id']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/paypal_payments.py:153: in checkout
+    result=_api(cfg,'POST','/v2/checkout/orders',payload,'mta-create-'+order)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cfg = {'id': 1, 'enabled': 1, 'environment': 'sandbox', 'client_id': 'test-client', ...}
+method = 'POST', path = '/v2/checkout/orders'
+args = ({'intent': 'CAPTURE', 'purchase_units': [{'reference_id': '5f8e793183eb4e0cb1a36e9d613a9b23', 'custom_id': '5f8e79318..._url': 'https://mta.example.test/account/credits?payment=cancelled'}}}}, 'mta-create-5f8e793183eb4e0cb1a36e9d613a9b23')
+
+    def api(cfg,method,path,*args):
+        if method=='POST' and path=='/v2/checkout/orders':
+            with auth.db() as c:
+                quote=c.execute('SELECT fee_micro,gross_micro,surplus_micro FROM subscription_payment_basis').fetchone()
+&gt;               quotes.append(tuple(quote))
+                              ^^^^^^^^^^^^
+E               TypeError: 'NoneType' object is not iterable
+
+tests/test_r210_subscription_quote_origin.py:27: TypeError</failure></testcase><testcase classname="tests.test_r210_subscription_quote_origin" name="test_lost_response_preserves_quote_and_manual_reference_recovery_uses_it" time="0.200"><failure message="TypeError: 'NoneType' object is not subscriptable">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'APPROVED', 'purchase_units': [{'reference_id': '3d00d992648e4a389908895b..., ...}], 'payment_source': {'paypal': {'experience_context': {...}}}}, 'mta-create-3d00d992648e4a389908895b6978bb0f')])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc964c6a870&gt;
+
+    def test_lost_response_preserves_quote_and_manual_reference_recovery_uses_it(account,provider,monkeypatch):
+        state=plan(account,price_micro=5_000_001)
+        local,pid,_=unknown_paypal(account,provider,monkeypatch,body={'kind':'subscription','period_start':state['period']['start'],'request_id':'quote-lost-create-123'})
+        with auth.db() as c:
+&gt;           assert c.execute('SELECT fee_micro FROM subscription_payment_basis').fetchone()[0]==5_000_001
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_r210_subscription_quote_origin.py:41: TypeError</failure></testcase><testcase classname="tests.test_r210_subscription_quote_origin" name="test_current_plan_price_does_not_change_original_order_quote" time="0.195" /><testcase classname="tests.test_r210_subscription_quote_origin" name="test_subcent_receivable_change_is_rejected_before_collecting_money[5000002]" time="0.202"><failure message="Failed: DID NOT RAISE ValueError">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': 'a62314c2140b4879884e3ad...1/capture', {}, 'mta-capture-a62314c2140b4879884e3ad3336a1964'), ('GET', '/v2/checkout/orders/ORDER0001', None, None)])
+changed = 5000002
+
+    @pytest.mark.parametrize('changed',[5_000_002,4_999_999])
+    def test_subcent_receivable_change_is_rejected_before_collecting_money(account,provider,changed):
+        local=create(account);before=len(provider[1])
+        with auth.db() as c:c.execute('UPDATE resource_plan_charges SET amount_micro=?',(changed,))
+&gt;       with pytest.raises(ValueError):paypal.capture(account,local)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_r210_subscription_quote_origin.py:62: Failed</failure></testcase><testcase classname="tests.test_r210_subscription_quote_origin" name="test_subcent_receivable_change_is_rejected_before_collecting_money[4999999]" time="0.194" /><testcase classname="tests.test_r210_subscription_quote_origin" name="test_already_completed_receipt_cannot_refreeze_a_changed_original_fee" time="0.227"><failure message="Failed: DID NOT RAISE ValueError">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '4b15f09abd054477997af12.....}}}}, 'mta-create-4b15f09abd054477997af121d723a1c0'), ('POST', '/v2/checkout/orders/ORDER0001/capture', None, None)])
+
+    def test_already_completed_receipt_cannot_refreeze_a_changed_original_fee(account,provider):
+        local=create(account);pid=next(iter(provider[0]))
+        canonical=paypal._api({},'POST','/v2/checkout/orders/'+pid+'/capture')
+        with auth.db() as c:c.execute('UPDATE resource_plan_charges SET amount_micro=5000002')
+&gt;       with pytest.raises(ValueError,match='Original subscription receivable changed'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_r210_subscription_quote_origin.py:71: Failed</failure></testcase><testcase classname="tests.test_r210_subscription_quote_origin" name="test_missing_quote_is_not_backfilled_from_current_plan" time="0.201"><failure message="Failed: DID NOT RAISE FenceBlocked">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': 'e3a98701098c480fad8e939.....}}}}, 'mta-create-e3a98701098c480fad8e9397ceb5dd1e'), ('POST', '/v2/checkout/orders/ORDER0001/capture', None, None)])
+
+    def test_missing_quote_is_not_backfilled_from_current_plan(account,provider):
+        local=create(account);pid=next(iter(provider[0]))
+        canonical=paypal._api({},'POST','/v2/checkout/orders/'+pid+'/capture')
+        with auth.db() as c:c.execute('DROP TABLE subscription_payment_basis')
+&gt;       with pytest.raises(FenceBlocked,match='Original subscription quote evidence'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE FenceBlocked
+
+tests/test_r210_subscription_quote_origin.py:83: Failed</failure></testcase><testcase classname="tests.test_r210_subscription_quote_origin" name="test_merchant_discovery_of_new_subscription_uses_quote_from_original_create" time="0.193"><failure message="ImportError: cannot import name 'original_quote' from 'app.subscription_receivables' (/workspace/scratch/1911c27a491f/simple-work/app/subscription_receivables.py)">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '35eef9cc6efa4a7abbd03ab...b'), ('GET', '/v2/payments/captures/CAPTUREQUOTED', None, None), ('GET', '/v2/checkout/orders/ORDER0001', None, None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc964c69340&gt;
+
+    def test_merchant_discovery_of_new_subscription_uses_quote_from_original_create(account,provider,monkeypatch):
+        state=plan(account,price_micro=5_000_000)
+        local,pid,order=unknown_paypal(account,provider,monkeypatch,body={'kind':'subscription','period_start':state['period']['start'],'request_id':'quoted-merchant-create'})
+        order['status']='COMPLETED'
+        order['purchase_units'][0]['payments']={'captures':[{'id':'CAPTUREQUOTED','status':'COMPLETED',
+            'amount':{'currency_code':'EUR','value':'5.00'},'supplementary_data':{'related_ids':{'order_id':pid}}}]}
+        original=paypal._api
+        item={'transaction_info':{'transaction_id':'CAPTUREQUOTED','transaction_event_code':'T0006','transaction_status':'S',
+            'transaction_amount':{'currency_code':'EUR','value':'5.00'},'paypal_reference_id_type':'TXN','paypal_reference_id':'CAPTUREQUOTED',
+            'transaction_initiation_date':'2026-09-01T01:00:00Z'}}
+        def api(cfg,method,path,*args):
+            assert method=='GET'
+            if path.startswith('/v1/reporting/transactions?'):
+                return {'page':1,'total_pages':1,'total_items':1,'transaction_details':[copy.deepcopy(item)]}
+            return original(cfg,method,path,*args)
+        monkeypatch.setattr(paypal,'_api',api)
+        admin=auth.find_user('admin')['id'];snap=history.acquire(admin,START,END,confirm=True)['snapshot_id']
+        sha=history.digest(history.details(admin,snap)['items'][0])
+&gt;       assert bridge.reconcile(admin,snap,sha,confirm=True)['ledger_reconciled']
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_subscription_quote_origin.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/paypal_merchant_reconcile.py:237: in reconcile
+    order=_recover_missing_reference(actor,snapshot_id,observation_sha256,pid,cfg)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+actor = 1
+snapshot_id = 'e054bfe8f6ea1403ca6def0c191fa83dcb0aa6f8c4061cde3e27ddbc0185d4cc'
+observation_sha256 = '219add68105ea701da3063679aa59fc0bc24a46d37b6b88d8fe6ad4fcc620c37'
+pid = 'ORDER0001'
+cfg = {'id': 1, 'enabled': 1, 'environment': 'sandbox', 'client_id': 'test-client', ...}
+
+    def _recover_missing_reference(actor,snapshot_id,observation_sha256,pid,cfg):
+        # Only a directly authenticated Orders document may nominate the original
+        # local row. Reporting notes/custom labels are never local ownership proof.
+        from .checkout_terminal_outcomes import paypal_identity
+        from .paypal_reconciliation import discover
+        from .checkout_reference_recovery import recover
+        canonical=paypal._api(cfg,'GET','/v2/checkout/orders/'+pid)
+        if not isinstance(canonical,dict):
+            raise FenceBlocked('Canonical discovery order unavailable')
+        units=canonical.get('purchase_units')
+        if (not isinstance(units,list) or len(units)!=1 or not isinstance(units[0],dict)
+                or not isinstance(units[0].get('reference_id'),str)):
+            raise FenceBlocked('Original local order missing; restore its original evidence')
+        identifier=units[0]['reference_id']
+        with auth.db() as c:
+            snapshot,data,current=_snapshot(c,actor,snapshot_id)
+            item=_selected(data,observation_sha256)
+            row=c.execute('SELECT * FROM paypal_orders WHERE id=?',(identifier,)).fetchone()
+            if row is None:
+                raise FenceBlocked('Original local order missing; restore its original evidence')
+            order=dict(row)
+            if order['kind']=='subscription':
+&gt;               from .subscription_receivables import original_quote
+E               ImportError: cannot import name 'original_quote' from 'app.subscription_receivables' (/workspace/scratch/1911c27a491f/simple-work/app/subscription_receivables.py)
+
+app/paypal_merchant_reconcile.py:175: ImportError</failure></testcase><testcase classname="tests.test_r210_precommercial_launch" name="test_prepared_providers_and_prices_are_not_money_and_actual_api_preserves_every_row" time="0.818"><failure message="AssertionError: assert 'blocked' == 'verified_pre...rcial_profile'&#10;  &#10;  - verified_precommercial_profile&#10;  + blocked">ready = (&lt;starlette.testclient.TestClient object at 0x7fc9475983e0&gt;, 2, 1)
+
+    def test_prepared_providers_and_prices_are_not_money_and_actual_api_preserves_every_row(ready):
+        client,uid,admin=prepare(ready)
+        statement=client.post('/api/admin/service-regime/noncommercial-statements',headers=HEADERS,
+            json={'start':1,'end':2,'documented_cost_cents':0,'operator_cost_exclusion_confirmed':True})
+        assert statement.status_code==200,statement.text
+        with auth.db() as c:
+            c.execute('BEGIN IMMEDIATE');before=snapshot(c)
+        review=client.get(BASE+'/preflight?target=COMMERCIAL').json()
+&gt;       assert review['maintenance_eligibility']=='verified_precommercial_profile'
+E       AssertionError: assert 'blocked' == 'verified_pre...rcial_profile'
+E         
+E         - verified_precommercial_profile
+E         + blocked
+
+tests/test_r210_precommercial_launch.py:32: AssertionError</failure></testcase></testsuite></testsuites>

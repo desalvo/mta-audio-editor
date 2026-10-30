@@ -137,7 +137,7 @@ def allocate(c,order):
 
 
 def freeze_original_payment(c, order, surplus_micro):
-    """Freeze the actual fee applied by fulfillment, never infer it from later rates."""
+    """Freeze the original quote before dispatch; never infer it from later rates."""
     if not c.in_transaction:
         raise FenceBlocked('Original subscription basis requires payment transaction')
     gross = order['amount_cents'] * 10000
@@ -148,6 +148,18 @@ def freeze_original_payment(c, order, surplus_micro):
     if prior and tuple(prior) != values:
         raise FenceBlocked('Conflicting original subscription payment basis')
     c.execute('INSERT OR IGNORE INTO subscription_payment_basis VALUES(?,?,?,?,?,?)', values)
+
+
+def original_quote(c,order):
+    """Exact quote/owner/period binding, including an as-yet unfunded checkout."""
+    row=c.execute('SELECT * FROM subscription_payment_basis WHERE order_id=?',(order['id'],)).fetchone()
+    if (row is None or order['kind']!='subscription'
+            or tuple(row[:3])!=(order['id'],order['user_id'],order['period_start'])
+            or any(type(row[k]) is not int or row[k]<0 for k in ('fee_micro','gross_micro','surplus_micro'))
+            or row['fee_micro']+row['surplus_micro']!=row['gross_micro']
+            or row['gross_micro']!=order['amount_cents']*10000):
+        raise FenceBlocked('Original subscription quote evidence required')
+    return dict(row)
 
 
 def original_loss_position(c, order):

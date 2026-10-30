@@ -1,0 +1,67 @@
+{
+  "schema": "mta-rc-scope-comparison-2",
+  "authorization": "User: billing commerciale e rimborsi mai attivati; Ok, procedi e semplifica.",
+  "original_v1": {
+    "verified": 29,
+    "total": 42,
+    "percent": 69.0,
+    "scope": "Includes general legacy financial migration and provider-history cutover"
+  },
+  "current_v2": {
+    "verified": 32,
+    "total": 42,
+    "percent": 76.2,
+    "scope": "Pre-commercial launch without earlier monetary history; original quotes for new payments"
+  },
+  "directly_comparable_percentage_increase": false,
+  "revised_checks": [
+    {
+      "id": "A4",
+      "v1_criterion": "Complete PayPal historical discovery, refunded initial captures, ambiguous payout and multicapture dispute allocation",
+      "v1_state": "implementation_pending",
+      "v2_criterion": "Canonical history for payments created by this release, refunded initial captures, exact multicapture attribution and unresolved ambiguous PayPal dispute/payout movements; no import of pre-release merchant history",
+      "v2_state": "implementation_pending",
+      "weight_unchanged": 1
+    },
+    {
+      "id": "A5",
+      "v1_criterion": "Complete legacy obligations, all terminal/uncertain checkout outcomes and subscription reversal repayment",
+      "v1_state": "implementation_pending",
+      "v2_criterion": "New checkout/refund/reversal lifecycle with immutable original quotes, terminal and uncertain response recovery and subscription repayment; no adoption of pre-release financial obligations",
+      "v2_state": "implementation_pending",
+      "weight_unchanged": 1
+    },
+    {
+      "id": "C3",
+      "v1_criterion": "Resolve every financial obligation before cutover",
+      "v1_state": "implementation_pending",
+      "v2_criterion": "Transactional absence of monetary checkout/refund/history and unknown financial schemas before pre-commercial activation; no legacy financial migration",
+      "v2_state": "verified",
+      "weight_unchanged": 1
+    },
+    {
+      "id": "C5",
+      "v1_criterion": "Enabled safe transition in both directions through actual administrator API",
+      "v1_state": "implementation_pending",
+      "v2_criterion": "Enabled local-authority administrator API activation and two-way mode changes before commercial checkout starts, with exact preview, drain, replay and forward crash recovery; post-checkout migration unsupported",
+      "v2_state": "verified",
+      "weight_unchanged": 1
+    },
+    {
+      "id": "D6",
+      "v1_criterion": "Account balances and periods across enabled administrative cutover",
+      "v1_state": "implementation_pending",
+      "v2_criterion": "Preserve balances, periods and measured non-commercial statements across pre-commercial administrator activation and recovery",
+      "v2_state": "verified",
+      "weight_unchanged": 1
+    }
+  ],
+  "scoped_checks_accepted_after_actual_tests": [
+    "C3",
+    "C5",
+    "D6"
+  ],
+  "unchanged_criteria_ids_texts_states": 37,
+  "newly_completed_original_v1_checks": [],
+  "original_scope_snapshot": "docs/development-history/precommercial-scope-20261030/DEVELOPMENT_COMPONENTS_R210.json"
+}

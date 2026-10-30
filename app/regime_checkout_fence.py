@@ -22,7 +22,10 @@ def enroll(connection, provider: str, order_id: str) -> dict:
     state = connection.execute('SELECT regime,revision FROM regime_fence_state WHERE singleton=1').fetchone()
     if tuple(state) != (configured.regime.value, configured.revision):
         raise FenceBlocked('Checkout regime and persisted configuration differ')
-    return admit(connection, f'checkout:{provider}:{order_id}', 'checkout', required_regime='COMMERCIAL')
+    result=admit(connection, f'checkout:{provider}:{order_id}', 'checkout', required_regime='COMMERCIAL')
+    from .commercial_launch import mark_started
+    mark_started(connection)
+    return result
 
 
 def settle_if_enrolled(connection, provider: str, order_id: str) -> bool:

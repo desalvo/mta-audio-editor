@@ -1,0 +1,108 @@
+{
+  "schema": "mta-precommercial-model-2",
+  "base_commit": "da300396a8dc9f7b84703565959b4df36dd7c15e",
+  "parent_archive": "MTA-0.3.0-r210-pre-RC-merchant-reference-discovery-cumulative.zip",
+  "parent_sha256": "24ea175561c8a55950949435b77d6df8dd1010f3aa9ce6ffab96e808958ca490",
+  "user_authorization": "No commercial billing or refunds ever activated; simplify accordingly.",
+  "first_activation": {
+    "profile": "precommercial-no-payment-history-1",
+    "configured_providers_allowed": true,
+    "future_plan_prices_allowed": true,
+    "monetary_history_allowed": false,
+    "legacy_migration_supported": false,
+    "requires_existing_enabled_local_authority_mode": true,
+    "production_flags_changed": false,
+    "post_checkout_automatic_switching": false,
+    "checkout_start_marker": "Immutable non-personal epoch; enrolled atomically before external dispatch and retained across account erasure."
+  },
+  "new_payment_quotes": {
+    "before_provider_dispatch": true,
+    "existing_immutable_basis_reused": true,
+    "additional_quote_table": false,
+    "exact_fee_and_surplus": true,
+    "subcent_mutation_refused_before_capture": true,
+    "unfunded_quote_is_not_paid_evidence": true,
+    "current_price_not_historical_authority": true,
+    "missing_original_quote_not_backfilled": true,
+    "lost_reference_recovery": [
+      "credits",
+      "new quoted subscriptions",
+      "repayments bound to original immutable targets"
+    ]
+  },
+  "acceptance": {
+    "financial_final_passed": 894,
+    "distinct_current_passed": 938,
+    "failed": 0,
+    "skipped": 0,
+    "new_test_file_cases": 23,
+    "additional_prepared_provider_parameter": 1,
+    "baseline_comparison": {
+      "cases": 9,
+      "failed_before_change": 7,
+      "already_passed_before_change": 2
+    },
+    "no_new_browser_provider_sandbox_or_multihost_claim": true
+  },
+  "gates": {
+    "ruff": "passed",
+    "python_compile": "passed",
+    "javascript_syntax": "passed",
+    "bandit": {
+      "sources": 309,
+      "findings": 168,
+      "high": 0,
+      "medium": 21,
+      "low": 147,
+      "new_finding_ids": 0
+    },
+    "execution_inventory": {
+      "sources": 556,
+      "boundaries": 780,
+      "passed": true
+    },
+    "admission_inventory": {
+      "sources": 309,
+      "sites": 173,
+      "passed": true
+    },
+    "transport_inventory": {
+      "sources": 21,
+      "sites": 30,
+      "passed": true
+    }
+  },
+  "old_rc": {
+    "verified": 29,
+    "total": 42,
+    "percent": 69.0,
+    "unchanged_on_original_scope": true
+  },
+  "current_rc": {
+    "verified": 32,
+    "total": 42,
+    "percent": 76.2,
+    "accepted_macroareas": 2,
+    "total_macroareas": 7,
+    "scope_revision": "precommercial-20261030",
+    "scope_revised_checks_accepted": [
+      "C3",
+      "C5",
+      "D6"
+    ],
+    "not_a_directly_comparable_7_2_point_implementation_gain": true
+  },
+  "remaining": [
+    "A4",
+    "A5",
+    "A6",
+    "B6",
+    "C6",
+    "F4",
+    "F5",
+    "F6",
+    "G5",
+    "G6"
+  ],
+  "no_commit_push_tag_release_remote_ci_provider_or_server_action": true
+}

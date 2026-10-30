@@ -139,6 +139,11 @@ def checkout(uid,body):
                 if source['pending_order_id']:raise ValueError('A subscription repayment checkout is already pending; resume it or contact the administrator')
             order=uuid.uuid4().hex
             c.execute('INSERT INTO paypal_orders(id,user_id,request_id,kind,period_start,amount_cents,environment,client_fingerprint,created_at) VALUES(?,?,?,?,?,?,?,?,?)',(order,uid,key,body['kind'],period,cents,cfg['environment'],fingerprint,int(time.time())))
+            if body['kind']=='subscription':
+                from .subscription_receivables import freeze_original_payment
+                fee=c.execute("SELECT amount_micro FROM resource_plan_charges WHERE user_id=? AND period_start=? AND status='due'",(uid,period)).fetchone()[0]
+                original=c.execute('SELECT * FROM paypal_orders WHERE id=?',(order,)).fetchone()
+                freeze_original_payment(c,original,cents*10000-fee)
             if body['kind']=='subscription_reversal':
                 c.execute('INSERT INTO subscription_repayment_targets VALUES(?,?,?)',(order,body['refund_id'],body['expected_due_micro']))
             from .regime_checkout_fence import enroll
@@ -266,11 +271,12 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
             refund=allocate(c,order)
         else:
             fee=c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? AND period_start=?',(order['user_id'],order['period_start'])).fetchone()
-            if not fee:raise ValueError('Subscription receivable missing')
-            refund=max(0,order['amount_cents']*10000-(fee['amount_micro'] if fee['status']=='due' else 0))
+            from .subscription_receivables import original_quote
+            quote=original_quote(c,order)
+            if not fee or fee['status']!='due' or fee['amount_micro']!=quote['fee_micro']:
+                raise ValueError('Original subscription receivable changed; review the original order')
+            refund=quote['surplus_micro']
             c.execute("UPDATE resource_plan_charges SET status='paid' WHERE user_id=? AND period_start=?",(order['user_id'],order['period_start']))
-            from .subscription_receivables import freeze_original_payment
-            freeze_original_payment(c,order,refund)
         c.execute("UPDATE paypal_orders SET status='paid',paid_at=?,refund_due_micro=? WHERE id=?",(int(time.time()),refund,local_id))
         from .regime_checkout_fence import settle_if_enrolled
         settle_if_enrolled(c, 'paypal', local_id)
@@ -318,6 +324,12 @@ def capture(uid,local_id):
                 raise ValueError('Resolve pending payment evidence before capture')
             cents,period=_quote(c,uid,order['kind'],order['amount_cents'],order['period_start'],target[0] if target else None,target[1] if target else None)
             if cents!=order['amount_cents'] or period!=order['period_start']:raise ValueError('Payment quote changed during approval verification')
+            if order['kind']=='subscription':
+                from .subscription_receivables import original_quote
+                quote=original_quote(c,order)
+                fee=c.execute('SELECT amount_micro,status FROM resource_plan_charges WHERE user_id=? AND period_start=?',(uid,period)).fetchone()
+                if fee is None or tuple(fee)!=(quote['fee_micro'],'due'):
+                    raise ValueError('Original subscription quote changed before capture')
             from .regime_outcome_receipt import require_open_commercial_checkout
             require_open_commercial_checkout(c,'checkout:paypal:'+local_id)
             dispatch=c.execute('SELECT state,provider_reference FROM regime_payment_outbox WHERE operation_id=?',('checkout:paypal:'+local_id,)).fetchone()

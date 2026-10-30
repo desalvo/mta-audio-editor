@@ -163,7 +163,7 @@
       "line": 37,
       "call": "httpx.Client",
       "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
-      "source_sha256": "1ac3a548b8a59c5c2301c0c5fb99f6502b6d737578756c83b7c6fcd3190a08e8",
+      "source_sha256": "062633e7aaefd8abad99f11164a7623111c3f78628c19cf3edd06ce9bc40714f",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -295,7 +295,7 @@
       "line": 64,
       "call": "httpx.Client",
       "call_sha256": "1a0599f0d91a80de9b631fae1009e7cbcfa6c2007deb0fa81a14dff3be3f35c3",
-      "source_sha256": "f76c37955a028c5f5e5bda3e9ba69b317db7da2df4ef12cf3c6a5c7c4620fd6c",
+      "source_sha256": "09f249ecda75757e875b31e28ef2d476e3e2d1554e8a4c725bae5b3121b152af",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -427,5 +427,14 @@
     "date": "2026-10-30",
     "scope": "Legacy subscription refunds and collection;no new network/process/admission boundary. Exact original basis/captures/funding and original liability cap gate repayment. Owner-scoped evidence and unknown amounts are private diagnostics;no global cutover or RC acceptance.",
     "verification": "tests/test_r210_legacy_subscription_collection.py;actual FastAPI/SQLite/provider-I/O fixtures and shipped JS in Node;not actual sandbox/Chromium acceptance."
+  },
+  "precommercial_review_20261030": {
+    "evidence": [
+      "tests/test_r210_precommercial_launch.py",
+      "tests/test_r210_subscription_quote_origin.py"
+    ],
+    "boundary": "No new provider endpoint,process or network call. Marker is local immutable epoch metadata; source-bound quote exists before dispatch. Noncommercial statements and financial rows are preserved. Post-checkout migration stays refused.",
+    "unchanged": "Scanner/checker code,findings,AST boundary shape,classification,thresholds and suppressions.",
+    "source_inventory": "309app Python sources;556runtime sources;780execution,173admission,30transport boundaries."
   }
 }

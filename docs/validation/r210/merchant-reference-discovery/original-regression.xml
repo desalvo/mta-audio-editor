@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="30" time="8.448" timestamp="2026-10-30T23:37:38.676452+01:00" hostname="388294fdb9e2"><testcase classname="tests.test_r210_merchant_lost_creation" name="test_lost_create_discovers_original_order_and_applies_exact_net_once[TXN-capture]" time="0.410"><failure message="app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence">lost = {'local': 'a50b9aceb77b4ed2b8bc739c24d342a5', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...9aceb77b4ed2b8bc739c24d342a5', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': 'a50b9aceb77b4ed2b8bc739...t': {...}}}}, 'mta-create-a50b9aceb77b4ed2b8bc739c24d342a5'), ('GET', '/v2/payments/captures/CAPTURE111', None, None)])
+kind = 'capture', reference = 'TXN'
+
+    @pytest.mark.parametrize('kind',['capture','refund'])
+    @pytest.mark.parametrize('reference',['TXN','ODR'])
+    def test_lost_create_discovers_original_order_and_applies_exact_net_once(lost,account,provider,kind,reference):
+        snap,sha=lost['observe'](kind,reference)
+        assert bridge.review(lost['admin'],snap)['counts']['unbound_candidates']==1
+&gt;       result=bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_merchant_lost_creation.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+actor = 1
+snapshot_id = '1b42462a1a86385229fb919d73c100e85ae6d2736452e25d8c8dc09ce258e792'
+observation_sha256 = 'ef848eb09dd3f6939f4bedc95331bf0944c8dd543c3ca9e0a028650f4727b85b'
+confirm = True
+
+    def reconcile(actor, snapshot_id, observation_sha256, *, confirm=False):
+        if confirm is not True:
+            raise ValueError('Explicit original-ledger reconciliation confirmation required')
+        with auth.db() as c:
+            c.execute('BEGIN')
+            snapshot, data, cfg = _snapshot(c, actor, snapshot_id)
+            item = _selected(data, observation_sha256)
+            order = _local(c, item, cfg)
+        if order is None:
+            # Only the fixed principal capture endpoint can discover its canonical
+            # order. Never route using payer notes, custom IDs, URLs or account IDs.
+            cid = item['transaction_id'] if item['event_code'] == 'T0006' else (
+                item.get('paypal_reference_id') if item.get('paypal_reference_id_type') == 'TXN' else None)
+            from .paypal_reconciliation import _identifier
+            cid = _identifier(cid)
+            capture = paypal._api(cfg, 'GET', '/v2/payments/captures/' + cid)
+            if capture.get('id') != cid:
+                raise FenceBlocked('Canonical discovery capture changed')
+            pid = capture.get('supplementary_data', {}).get('related_ids', {}).get('order_id')
+            _identifier(pid)
+            with auth.db() as c:
+                order = _local(c, {'transaction_id': cid, 'paypal_reference_id': pid,
+                                  'paypal_reference_id_type': 'ODR'}, cfg)
+            if order is None:
+&gt;               raise FenceBlocked('Original local order missing; restore its original evidence')
+E               app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence
+
+app/paypal_merchant_reconcile.py:168: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_lost_create_discovers_original_order_and_applies_exact_net_once[TXN-refund]" time="0.235"><failure message="app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence">lost = {'local': '61cd530968c943ed926120f14deef4a5', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...530968c943ed926120f14deef4a5', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '61cd530968c943ed926120f...t': {...}}}}, 'mta-create-61cd530968c943ed926120f14deef4a5'), ('GET', '/v2/payments/captures/CAPTURE111', None, None)])
+kind = 'refund', reference = 'TXN'
+
+    @pytest.mark.parametrize('kind',['capture','refund'])
+    @pytest.mark.parametrize('reference',['TXN','ODR'])
+    def test_lost_create_discovers_original_order_and_applies_exact_net_once(lost,account,provider,kind,reference):
+        snap,sha=lost['observe'](kind,reference)
+        assert bridge.review(lost['admin'],snap)['counts']['unbound_candidates']==1
+&gt;       result=bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_merchant_lost_creation.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+actor = 1
+snapshot_id = '26e8f2e41426415ea590c5cc73c15ad7e2b2bfc1134731920168239078bf7ced'
+observation_sha256 = 'db7237f2f4acdc7cc492cbaa3d3b265e388869300348d2ea0b02a990286d5758'
+confirm = True
+
+    def reconcile(actor, snapshot_id, observation_sha256, *, confirm=False):
+        if confirm is not True:
+            raise ValueError('Explicit original-ledger reconciliation confirmation required')
+        with auth.db() as c:
+            c.execute('BEGIN')
+            snapshot, data, cfg = _snapshot(c, actor, snapshot_id)
+            item = _selected(data, observation_sha256)
+            order = _local(c, item, cfg)
+        if order is None:
+            # Only the fixed principal capture endpoint can discover its canonical
+            # order. Never route using payer notes, custom IDs, URLs or account IDs.
+            cid = item['transaction_id'] if item['event_code'] == 'T0006' else (
+                item.get('paypal_reference_id') if item.get('paypal_reference_id_type') == 'TXN' else None)
+            from .paypal_reconciliation import _identifier
+            cid = _identifier(cid)
+            capture = paypal._api(cfg, 'GET', '/v2/payments/captures/' + cid)
+            if capture.get('id') != cid:
+                raise FenceBlocked('Canonical discovery capture changed')
+            pid = capture.get('supplementary_data', {}).get('related_ids', {}).get('order_id')
+            _identifier(pid)
+            with auth.db() as c:
+                order = _local(c, {'transaction_id': cid, 'paypal_reference_id': pid,
+                                  'paypal_reference_id_type': 'ODR'}, cfg)
+            if order is None:
+&gt;               raise FenceBlocked('Original local order missing; restore its original evidence')
+E               app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence
+
+app/paypal_merchant_reconcile.py:168: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_lost_create_discovers_original_order_and_applies_exact_net_once[ODR-capture]" time="0.225"><failure message="app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence">lost = {'local': '5fb82542898f4750846660b6f3b9716b', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...2542898f4750846660b6f3b9716b', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '5fb82542898f4750846660b...t': {...}}}}, 'mta-create-5fb82542898f4750846660b6f3b9716b'), ('GET', '/v2/payments/captures/CAPTURE111', None, None)])
+kind = 'capture', reference = 'ODR'
+
+    @pytest.mark.parametrize('kind',['capture','refund'])
+    @pytest.mark.parametrize('reference',['TXN','ODR'])
+    def test_lost_create_discovers_original_order_and_applies_exact_net_once(lost,account,provider,kind,reference):
+        snap,sha=lost['observe'](kind,reference)
+        assert bridge.review(lost['admin'],snap)['counts']['unbound_candidates']==1
+&gt;       result=bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_merchant_lost_creation.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+actor = 1
+snapshot_id = 'f290b4171eadd46c72641c38f783dabcd5c517407d260a4ceb8d6dd376786af6'
+observation_sha256 = 'efc6c64ff10c33e49666bd6afb3c8ae0cd5d04b5b1b41be8b6a802f0ba5984f2'
+confirm = True
+
+    def reconcile(actor, snapshot_id, observation_sha256, *, confirm=False):
+        if confirm is not True:
+            raise ValueError('Explicit original-ledger reconciliation confirmation required')
+        with auth.db() as c:
+            c.execute('BEGIN')
+            snapshot, data, cfg = _snapshot(c, actor, snapshot_id)
+            item = _selected(data, observation_sha256)
+            order = _local(c, item, cfg)
+        if order is None:
+            # Only the fixed principal capture endpoint can discover its canonical
+            # order. Never route using payer notes, custom IDs, URLs or account IDs.
+            cid = item['transaction_id'] if item['event_code'] == 'T0006' else (
+                item.get('paypal_reference_id') if item.get('paypal_reference_id_type') == 'TXN' else None)
+            from .paypal_reconciliation import _identifier
+            cid = _identifier(cid)
+            capture = paypal._api(cfg, 'GET', '/v2/payments/captures/' + cid)
+            if capture.get('id') != cid:
+                raise FenceBlocked('Canonical discovery capture changed')
+            pid = capture.get('supplementary_data', {}).get('related_ids', {}).get('order_id')
+            _identifier(pid)
+            with auth.db() as c:
+                order = _local(c, {'transaction_id': cid, 'paypal_reference_id': pid,
+                                  'paypal_reference_id_type': 'ODR'}, cfg)
+            if order is None:
+&gt;               raise FenceBlocked('Original local order missing; restore its original evidence')
+E               app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence
+
+app/paypal_merchant_reconcile.py:168: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_lost_create_discovers_original_order_and_applies_exact_net_once[ODR-refund]" time="0.223"><failure message="ValueError: Invalid PayPal financial object ID">lost = {'local': '4e991f0dffc94d91a85e7b29b713c0e2', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...1f0dffc94d91a85e7b29b713c0e2', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '4e991f0dffc94d91a85e7b2..., ...}], 'payment_source': {'paypal': {'experience_context': {...}}}}, 'mta-create-4e991f0dffc94d91a85e7b29b713c0e2')])
+kind = 'refund', reference = 'ODR'
+
+    @pytest.mark.parametrize('kind',['capture','refund'])
+    @pytest.mark.parametrize('reference',['TXN','ODR'])
+    def test_lost_create_discovers_original_order_and_applies_exact_net_once(lost,account,provider,kind,reference):
+        snap,sha=lost['observe'](kind,reference)
+        assert bridge.review(lost['admin'],snap)['counts']['unbound_candidates']==1
+&gt;       result=bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_merchant_lost_creation.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/paypal_merchant_reconcile.py:158: in reconcile
+    cid = _identifier(cid)
+          ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = None
+
+    def _identifier(value):
+        if not isinstance(value,str) or re.fullmatch(r'[A-Z0-9]{6,64}',value) is None:
+&gt;           raise ValueError('Invalid PayPal financial object ID')
+E           ValueError: Invalid PayPal financial object ID
+
+app/paypal_reconciliation.py:15: ValueError</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[reference]" time="0.266" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[custom]" time="0.216" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[amount]" time="0.221" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[intent]" time="0.229" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[units]" time="0.200" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[missing_local]" time="0.219" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[merchant]" time="0.212" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[history]" time="0.234" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[row_amount]" time="0.262" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[row_time]" time="0.224" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[row_order]" time="0.246" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_unknown_reference_requires_original_local_and_canonical_proof[unattempted]" time="0.267" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_change_during_discovery_never_commits_reference_or_money[admin]" time="0.254" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_change_during_discovery_never_commits_reference_or_money[config]" time="0.254" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_change_during_discovery_never_commits_reference_or_money[local]" time="0.230" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_change_during_discovery_never_commits_reference_or_money[canonical]" time="0.231" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_change_during_discovery_never_commits_reference_or_money[snapshot]" time="0.224" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_change_during_discovery_never_commits_reference_or_money[network]" time="0.221" /><testcase classname="tests.test_r210_merchant_lost_creation" name="test_crash_after_reference_binding_recovers_without_recreating_checkout" time="0.235"><failure message="AssertionError: assert None == 'ORDER0001'">lost = {'local': '6511f250d1564139899459469523920a', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...f250d1564139899459469523920a', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0cab063440&gt;
+
+    def test_crash_after_reference_binding_recovers_without_recreating_checkout(lost,account,monkeypatch):
+        from app import payment_reconcile_service as service
+        snap,sha=lost['observe']();original=service.reconcile_paypal
+        monkeypatch.setattr(service,'reconcile_paypal',lambda *a,**kw:(_ for _ in ()).throw(RuntimeError('response lost after binding')))
+        with pytest.raises(RuntimeError):bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+        with auth.db() as c:
+&gt;           assert c.execute('SELECT provider_order FROM paypal_orders').fetchone()[0]==lost['pid']
+E           AssertionError: assert None == 'ORDER0001'
+
+tests/test_r210_merchant_lost_creation.py:130: AssertionError</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_failure_inside_binding_or_settlement_rolls_back_its_whole_transaction[reference]" time="0.223"><failure message="app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence">lost = {'local': '0438a3b051ba4bb2ab351918b6a06a7f', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...a3b051ba4bb2ab351918b6a06a7f', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0cab061040&gt;
+boundary = 'reference'
+
+    @pytest.mark.parametrize('boundary',['reference','refund'])
+    def test_failure_inside_binding_or_settlement_rolls_back_its_whole_transaction(lost,account,monkeypatch,boundary):
+        from app import payment_reconciliation as journal
+        snap,sha=lost['observe']()
+        module,name=(journal,'record_event') if boundary=='reference' else (paypal,'_apply_refund')
+        original=getattr(module,name)
+        monkeypatch.setattr(module,name,lambda *a,**kw:(_ for _ in ()).throw(RuntimeError('crash in atomic write')))
+        with pytest.raises(RuntimeError):bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+        assert resources.state(account)['credits_micro']==0
+        with auth.db() as c:
+            assert c.execute('SELECT provider_order FROM paypal_orders').fetchone()[0]==(None if boundary=='reference' else lost['pid'])
+            assert c.execute('SELECT state FROM regime_payment_outbox').fetchone()[0]==('uncertain' if boundary=='reference' else 'confirmed')
+            assert c.execute('SELECT count(*) FROM paypal_captures').fetchone()[0]==0
+            assert c.execute('SELECT count(*) FROM paypal_refunds').fetchone()[0]==0
+        monkeypatch.setattr(module,name,original)
+&gt;       bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+
+tests/test_r210_merchant_lost_creation.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+actor = 1
+snapshot_id = '1b42462a1a86385229fb919d73c100e85ae6d2736452e25d8c8dc09ce258e792'
+observation_sha256 = 'ef848eb09dd3f6939f4bedc95331bf0944c8dd543c3ca9e0a028650f4727b85b'
+confirm = True
+
+    def reconcile(actor, snapshot_id, observation_sha256, *, confirm=False):
+        if confirm is not True:
+            raise ValueError('Explicit original-ledger reconciliation confirmation required')
+        with auth.db() as c:
+            c.execute('BEGIN')
+            snapshot, data, cfg = _snapshot(c, actor, snapshot_id)
+            item = _selected(data, observation_sha256)
+            order = _local(c, item, cfg)
+        if order is None:
+            # Only the fixed principal capture endpoint can discover its canonical
+            # order. Never route using payer notes, custom IDs, URLs or account IDs.
+            cid = item['transaction_id'] if item['event_code'] == 'T0006' else (
+                item.get('paypal_reference_id') if item.get('paypal_reference_id_type') == 'TXN' else None)
+            from .paypal_reconciliation import _identifier
+            cid = _identifier(cid)
+            capture = paypal._api(cfg, 'GET', '/v2/payments/captures/' + cid)
+            if capture.get('id') != cid:
+                raise FenceBlocked('Canonical discovery capture changed')
+            pid = capture.get('supplementary_data', {}).get('related_ids', {}).get('order_id')
+            _identifier(pid)
+            with auth.db() as c:
+                order = _local(c, {'transaction_id': cid, 'paypal_reference_id': pid,
+                                  'paypal_reference_id_type': 'ODR'}, cfg)
+            if order is None:
+&gt;               raise FenceBlocked('Original local order missing; restore its original evidence')
+E               app.regime_operation_fence.FenceBlocked: Original local order missing; restore its original evidence
+
+app/paypal_merchant_reconcile.py:168: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_failure_inside_binding_or_settlement_rolls_back_its_whole_transaction[refund]" time="0.256"><failure message="AssertionError: assert None == 'ORDER0001'">lost = {'local': 'd6081c54b6944fe482384ed14aa4383c', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...1c54b6944fe482384ed14aa4383c', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0cab0a9010&gt;
+boundary = 'refund'
+
+    @pytest.mark.parametrize('boundary',['reference','refund'])
+    def test_failure_inside_binding_or_settlement_rolls_back_its_whole_transaction(lost,account,monkeypatch,boundary):
+        from app import payment_reconciliation as journal
+        snap,sha=lost['observe']()
+        module,name=(journal,'record_event') if boundary=='reference' else (paypal,'_apply_refund')
+        original=getattr(module,name)
+        monkeypatch.setattr(module,name,lambda *a,**kw:(_ for _ in ()).throw(RuntimeError('crash in atomic write')))
+        with pytest.raises(RuntimeError):bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+        assert resources.state(account)['credits_micro']==0
+        with auth.db() as c:
+&gt;           assert c.execute('SELECT provider_order FROM paypal_orders').fetchone()[0]==(None if boundary=='reference' else lost['pid'])
+E           AssertionError: assert None == 'ORDER0001'
+
+tests/test_r210_merchant_lost_creation.py:148: AssertionError</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_concurrent_discovery_and_retry_preserve_one_reference_and_one_credit" time="0.283"><failure message="assert False&#10; +  where False = any(&lt;generator object test_concurrent_discovery_and_retry_preserve_one_reference_and_one_credit.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f0caaf02330&gt;)">lost = {'local': 'b78c0eff72854b47af0ab644bfb5a753', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...0eff72854b47af0ab644bfb5a753', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+
+    def test_concurrent_discovery_and_retry_preserve_one_reference_and_one_credit(lost,account):
+        snap,sha=lost['observe']()
+        def run(_):
+            try:return bridge.reconcile(lost['admin'],snap,sha,confirm=True)
+            except FenceBlocked:return None  # A stale pre-binding context must be reread.
+        with ThreadPoolExecutor(max_workers=4) as pool:results=list(pool.map(run,range(4)))
+&gt;       assert any(r and r['ledger_reconciled'] for r in results)
+E       assert False
+E        +  where False = any(&lt;generator object test_concurrent_discovery_and_retry_preserve_one_reference_and_one_credit.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f0caaf02330&gt;)
+
+tests/test_r210_merchant_lost_creation.py:163: AssertionError</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_missing_original_subscription_quote_is_not_reconstructed[subscription]" time="0.242"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'Original subscription quote evidence'&#10;  Actual message: 'Original local order missing; restore its original evidence'">lost = {'local': '0e58d1c0064f4dc4bed752e13a412fec', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...d1c0064f4dc4bed752e13a412fec', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2, kind = 'subscription'
+
+    @pytest.mark.parametrize('kind',['subscription','subscription_reversal','legacy-unknown'])
+    def test_missing_original_subscription_quote_is_not_reconstructed(lost,account,kind):
+        snap,sha=lost['observe']()
+        with auth.db() as c:c.execute('UPDATE paypal_orders SET kind=? WHERE id=?',(kind,lost['local']))
+&gt;       with pytest.raises(FenceBlocked,match='Original subscription quote evidence'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'Original subscription quote evidence'
+E         Actual message: 'Original local order missing; restore its original evidence'
+
+tests/test_r210_merchant_lost_creation.py:172: AssertionError</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_missing_original_subscription_quote_is_not_reconstructed[subscription_reversal]" time="0.213"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'Original subscription quote evidence'&#10;  Actual message: 'Original local order missing; restore its original evidence'">lost = {'local': 'f1303928932f48de87c76232935f3e4c', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...3928932f48de87c76232935f3e4c', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2, kind = 'subscription_reversal'
+
+    @pytest.mark.parametrize('kind',['subscription','subscription_reversal','legacy-unknown'])
+    def test_missing_original_subscription_quote_is_not_reconstructed(lost,account,kind):
+        snap,sha=lost['observe']()
+        with auth.db() as c:c.execute('UPDATE paypal_orders SET kind=? WHERE id=?',(kind,lost['local']))
+&gt;       with pytest.raises(FenceBlocked,match='Original subscription quote evidence'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'Original subscription quote evidence'
+E         Actual message: 'Original local order missing; restore its original evidence'
+
+tests/test_r210_merchant_lost_creation.py:172: AssertionError</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_missing_original_subscription_quote_is_not_reconstructed[legacy-unknown]" time="0.228"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'Original subscription quote evidence'&#10;  Actual message: 'Original local order missing; restore its original evidence'">lost = {'local': '1170a6249723447191c5469eb746ebc2', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...a6249723447191c5469eb746ebc2', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2, kind = 'legacy-unknown'
+
+    @pytest.mark.parametrize('kind',['subscription','subscription_reversal','legacy-unknown'])
+    def test_missing_original_subscription_quote_is_not_reconstructed(lost,account,kind):
+        snap,sha=lost['observe']()
+        with auth.db() as c:c.execute('UPDATE paypal_orders SET kind=? WHERE id=?',(kind,lost['local']))
+&gt;       with pytest.raises(FenceBlocked,match='Original subscription quote evidence'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'Original subscription quote evidence'
+E         Actual message: 'Original local order missing; restore its original evidence'
+
+tests/test_r210_merchant_lost_creation.py:172: AssertionError</failure></testcase><testcase classname="tests.test_r210_merchant_lost_creation" name="test_existing_private_admin_action_discovers_reference_without_payer_labels" time="0.843"><failure message="AssertionError: {&quot;detail&quot;:&quot;Original local order missing; restore its original evidence&quot;}&#10;assert 409 == 200&#10; +  where 409 = &lt;Response [409 Conflict]&gt;.status_code">lost = {'local': '675bdab4f334464089935ee6d667ba0f', 'pid': 'ORDER0001', 'order': {'id': 'ORDER0001', 'status': 'COMPLETED', ...dab4f334464089935ee6d667ba0f', 'description': 'MTA Audio Editor credits', ...}], 'intent': 'CAPTURE'}, 'admin': 1, ...}
+account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0cab0ab590&gt;
+
+    def test_existing_private_admin_action_discovers_reference_without_payer_labels(lost,account,monkeypatch):
+        from fastapi.testclient import TestClient
+        from app import main
+        from test_r210_legal_documents import cookie
+        monkeypatch.setattr(main,'NATIVE_SINGLE_USER',False)
+        snap,sha=lost['observe']();path='/api/admin/paypal/merchant-history/'+snap+'/reconcile'
+        body={'observation_sha256':sha,'confirm':True}
+        with TestClient(main.app) as client:
+            assert client.post(path,json=body,headers={'X-MTA-Request':'1'}).status_code==401
+            client.cookies.update(cookie(account))
+            assert client.post(path,json=body,headers={'X-MTA-Request':'1'}).status_code==403
+            client.cookies.update(cookie(lost['admin']))
+            assert client.post(path,json=body).status_code==403
+            assert client.post(path,json={**body,'_merchant_context':{}},headers={'X-MTA-Request':'1'}).status_code==422
+            response=client.post(path,json=body,headers={'X-MTA-Request':'1'})
+&gt;           assert response.status_code==200,response.text
+E           AssertionError: {"detail":"Original local order missing; restore its original evidence"}
+E           assert 409 == 200
+E            +  where 409 = &lt;Response [409 Conflict]&gt;.status_code
+
+tests/test_r210_merchant_lost_creation.py:195: AssertionError</failure></testcase></testsuite></testsuites>
