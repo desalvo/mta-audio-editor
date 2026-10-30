@@ -2,15 +2,16 @@
   "schema_version": 2,
   "project": "MTA Audio Editor",
   "release": "0.3.0-r210",
-  "updated_utc": "2026-10-30T17:19:20.011429+00:00",
-  "baseline_archive": "MTA-0.3.0-r210-pre-RC-adapter-identity-cumulative.zip",
-  "baseline_sha256": "65f119b2c4194ecd84b7e582bfa9a98bd856eb251077638e0402b8c47bd2bf9c",
+  "updated_utc": "2026-10-30T17:59:54.036101+00:00",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+  "baseline_sha256": "a7e29723435e4e106072c4951719d354c00d52edab3c448f07511667b867f3c5",
   "git_baseline": {
     "repository": "https://github.com/desalvo/mta-audio-editor",
     "branch": "main",
-    "verified_head": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
-    "tree": "9cd308daa505ef7c01c743ef2b5ce7461f1cd488",
-    "comparison": "Historical complete4208blob comparison of the queue-busy input is retained in RESTORED_MODEL_RIGHTS_R210.md;the current cumulative includes uncommitted rights/adapter/guardian changes after4014a1f."
+    "verified_head": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+    "tree": "1d3e79af0d301bc7958025b1b0a47031c5d7bde0",
+    "matching_tracked_blobs": 4306,
+    "comparison": "docs/validation/r210/ci-41098-baseline-comparison.json"
   },
   "commit_deferred": true,
   "release_candidate": false,
@@ -394,11 +395,8 @@
     "Local SQLite ownership is not multi-host coordination"
   ],
   "next_actions": [
-    "Recover independently proved original legacy subscription bases through a verified migration contract;no evidence is available here and no current-price reconstruction is allowed.",
-    "Continue an unclosed A4 financial scenario with canonical movement proof;full provider history/unsupported payout/protection formats and references remain implementation plus evidence work.",
-    "Reuse accepted drain/UI and existing local cutover;general C3/C5/D6 remain blocked until original obligations are fully resolved.",
-    "Continue independent F4/F6 residual runtime/backend contracts and actual model/rights evidence;do not repeat completed loader/ACE UI/API-denial campaigns.",
-    "After user commit inspect ordinary Quality/SAST;no automatic CI dispatch or real provider/server mutation."
+    "After user commit verify Secret scan and subsequent Trivy plus ordinary Quality/SAST;no remote retry/dispatch was performed.",
+    "Resume original finance/rights/target plan after this CI repair;29/42 criteria and original blockers unchanged."
   ],
   "test_results": {
     "full_available_linux": {
@@ -990,37 +988,37 @@
   },
   "resume_checkpoint": {
     "date": "2026-10-30",
-    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
-    "proof": "docs/validation/r210/legacy-collection-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "handoff": "docs/CI_41098_GITLEAKS_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41098-gitleaks/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip",
+    "base_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
-    "passed": 779,
-    "new_cases": 24,
-    "skipped": 10,
     "criteria_promoted": [],
-    "numeric_progress_requested_achieved": false,
     "commit_deferred": true,
     "release_candidate": false,
-    "whole_A5_or_C3_accepted": false
+    "new_production_source_changes": false,
+    "fix_remote_ci_executed": false,
+    "local_exact_digest_positive_checks": 3,
+    "negative_control_findings": 4
   },
   "latest_checkpoint": {
     "date": "2026-10-30",
-    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
-    "proof": "docs/validation/r210/legacy-collection-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "handoff": "docs/CI_41098_GITLEAKS_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41098-gitleaks/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip",
+    "base_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
-    "passed": 779,
-    "new_cases": 24,
-    "skipped": 10,
     "criteria_promoted": [],
-    "numeric_progress_requested_achieved": false,
     "commit_deferred": true,
     "release_candidate": false,
-    "whole_A5_or_C3_accepted": false
+    "new_production_source_changes": false,
+    "fix_remote_ci_executed": false,
+    "local_exact_digest_positive_checks": 3,
+    "negative_control_findings": 4
   },
   "publication_recovery_checkpoint": {
     "handoff": "docs/TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md",
@@ -1029,9 +1027,9 @@
     "transition_enabled": false
   },
   "current_committed_baseline": {
-    "sha": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
-    "source": "Run40972934180 success and complete4208blob input comparison",
-    "pending_delta": "Restored model review/legacy rights,opaque adapter identity refusal,and independent Linux guardian original worker recovery;all changes after4014a1f remain uncommitted."
+    "sha": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+    "source": "User commit confirmation;GitHub run41098492290 and all4306tracked blobs verified.",
+    "pending_delta": "Three exact public MT3 digest exceptions in Gitleaks plus current CI/status evidence only."
   },
   "work_organization": {
     "date": "2026-10-30",
@@ -1053,26 +1051,26 @@
     "work_in_progress_limit": 1,
     "mandatory_status": "Always report RC percent and verified/42;29/42=69.0 until original criteria fully close.",
     "delivery": "Existing complete ACE cumulative plus one documentation/strategy delta for this reorganization;no new intermediate cumulative ZIP. One complete cumulative at a substantial functional acceptance checkpoint.",
-    "uncommitted_scope": "All cumulative changes since4014a1f plus original-evidence collection/refund guards,owner-scoped unknown amounts and integrated reorganization.",
+    "uncommitted_scope": "Only current Gitleaks exact-public-digest configuration and CI/status evidence afterd6ca286;earlier cumulative code is committed.",
     "latest_concrete_blockers": "docs/validation/r210/legacy-collection-result.json"
   },
-  "latest_confirmed_commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
+  "latest_confirmed_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
   "latest_continuation": {
     "date": "2026-10-30",
-    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
-    "proof": "docs/validation/r210/legacy-collection-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "handoff": "docs/CI_41098_GITLEAKS_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41098-gitleaks/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip",
+    "base_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
     "accepted_criteria": 29,
     "original_criteria_total": 42,
     "percent": 69.0,
-    "passed": 779,
-    "new_cases": 24,
-    "skipped": 10,
     "criteria_promoted": [],
-    "numeric_progress_requested_achieved": false,
     "commit_deferred": true,
     "release_candidate": false,
-    "whole_A5_or_C3_accepted": false
+    "new_production_source_changes": false,
+    "fix_remote_ci_executed": false,
+    "local_exact_digest_positive_checks": 3,
+    "negative_control_findings": 4
   },
   "latest_confirmed_cutover_chromium": {
     "date": "2026-10-27",
@@ -1209,7 +1207,7 @@
     "new_delta_ci_executed": false,
     "release_candidate": false
   },
-  "next_commit_scope": "Enforce model rights, recover workers, isolate ACE observers and verify subscription debt",
+  "next_commit_scope": "Allow exact public MT3 source digests in secret scans",
   "legacy_execution_continuation": {
     "handoff": "docs/LEGACY_EXECUTION_BOUNDARIES_R210.md",
     "result": "docs/validation/r210/legacy-executor-result.json",
@@ -1254,104 +1252,131 @@
     "external_target_acceptance": false
   },
   "latest_observed_ci": {
-    "schema": "mta-ci-observation-1",
-    "observed_utc": "2026-10-30",
-    "commit": "4014a1fd5bfccc4e7f65c32345cb4c52f98f3d8d",
-    "tree": "9cd308daa505ef7c01c743ef2b5ce7461f1cd488",
-    "run_id": 40972934180,
-    "run_status": "completed",
-    "run_conclusion": "success",
-    "complete_regression": false,
+    "schema": "mta-ci-observation-2",
+    "observed_date": "2026-10-30",
+    "run_id": 41098492290,
+    "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41098492290",
+    "commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+    "tree": "1d3e79af0d301bc7958025b1b0a47031c5d7bde0",
+    "event": "push",
+    "branch": "main",
+    "api_run_status": "completed",
+    "api_run_conclusion": "failure",
+    "tracked_blobs_matching_input": 4306,
     "quality": {
-      "passed": 7155,
+      "job_id": 124210367296,
+      "api_job_status": "completed",
+      "api_job_conclusion": "success",
+      "tests_verified_from_log": true,
+      "passed": 7683,
+      "failed": 0,
       "skipped": 50,
       "warnings": 1027,
-      "seconds": 859.42,
-      "coverage_percent": 76.71,
+      "seconds": 960.31,
+      "coverage_percent": 76.56,
       "required_percent": 70,
-      "artifact_id": 12942381400,
-      "artifact_sha256": "b6b900e488610f57ad62a10fc0ec3d9cf19ac318469ed85be0ee024005404284"
+      "mode": "unit standard;not new full or target acceptance"
+    },
+    "sast": {
+      "job_id": 124210367281,
+      "conclusion": "failure",
+      "failing_step": "Secret scan",
+      "gitleaks_version": "8.24.3",
+      "findings": 3,
+      "license_guard": "success",
+      "bandit": "success",
+      "dependency_audit": "success",
+      "trivy": "skipped"
     },
     "jobs": [
       {
-        "id": 123793866705,
-        "name": "Quality and unit tests",
+        "id": 124210367096,
+        "name": "VST3 SDK compile (Linux)",
+        "status": "completed",
         "conclusion": "success"
       },
       {
-        "id": 123793867078,
+        "id": 124210367281,
         "name": "SAST and dependency audit",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "id": 124210367296,
+        "name": "Quality and unit tests",
+        "status": "completed",
         "conclusion": "success"
       },
       {
-        "id": 123793867128,
-        "name": "VST3 SDK compile Linux",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801016981,
+        "id": 124222654786,
         "name": "Build Windows Chordino runtime",
-        "conclusion": "success"
+        "status": "completed",
+        "conclusion": "skipped"
       },
       {
-        "id": 123801017063,
-        "name": "Linux native arm64",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801017085,
-        "name": "Native macOS x64",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801017094,
-        "name": "Container production gate",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801017101,
-        "name": "iOS / iPadOS archive",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801017105,
-        "name": "Native macOS arm64",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801017124,
-        "name": "Linux native x86_64",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801017180,
+        "id": 124222670668,
         "name": "Android APK / AAB",
-        "conclusion": "success"
-      },
-      {
-        "id": 123801335550,
-        "name": "Native Windows installer",
-        "conclusion": "success"
-      },
-      {
-        "id": 123804388622,
-        "name": "Publish Docker Hub image",
+        "status": "completed",
         "conclusion": "skipped"
       },
       {
-        "id": 123810542506,
+        "id": 124222689829,
+        "name": "Container production gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124222700719,
+        "name": "Native macOS installer (${{ matrix.arch }})",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124223179115,
         "name": "Publish rolling early-main packages",
+        "status": "completed",
         "conclusion": "skipped"
       },
       {
-        "id": 123810542972,
-        "name": "Publish installers to GitHub Release",
+        "id": 124223223483,
+        "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124223223589,
+        "name": "iOS / iPadOS archive",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124223237525,
+        "name": "Publish desktop/mobile installers to GitHub Release",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124223310425,
+        "name": "Publish Docker Hub image",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 124223629063,
+        "name": "Native Windows installer",
+        "status": "completed",
         "conclusion": "skipped"
       }
     ],
-    "tracked_blobs_matching_input": 4208,
-    "new_delta_ci_executed": false,
-    "release_candidate": false
+    "remote_mutations": false,
+    "fix_remote_ci_executed": false,
+    "release_candidate": false,
+    "progress": {
+      "accepted": 29,
+      "total": 42,
+      "percent": 69
+    },
+    "run_updated_at": "2026-10-30T17:56:59Z"
   },
   "ci_refund_fixture_repair": {
     "proof": "docs/validation/r210/ci-5891082-result.json",
@@ -1888,5 +1913,39 @@
     "commit_deferred": true,
     "release_candidate": false,
     "whole_A5_or_C3_accepted": false
+  },
+  "previous_legacy_collection_checkpoint": {
+    "date": "2026-10-30",
+    "handoff": "docs/LEGACY_SUBSCRIPTION_COLLECTION_R210.md",
+    "proof": "docs/validation/r210/legacy-collection-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "passed": 779,
+    "new_cases": 24,
+    "skipped": 10,
+    "criteria_promoted": [],
+    "numeric_progress_requested_achieved": false,
+    "commit_deferred": true,
+    "release_candidate": false,
+    "whole_A5_or_C3_accepted": false
+  },
+  "ci_41098_secret_scan_fix": {
+    "date": "2026-10-30",
+    "handoff": "docs/CI_41098_GITLEAKS_FIX_R210.md",
+    "proof": "docs/validation/r210/ci-41098-gitleaks/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip",
+    "base_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+    "accepted_criteria": 29,
+    "original_criteria_total": 42,
+    "percent": 69.0,
+    "criteria_promoted": [],
+    "commit_deferred": true,
+    "release_candidate": false,
+    "new_production_source_changes": false,
+    "fix_remote_ci_executed": false,
+    "local_exact_digest_positive_checks": 3,
+    "negative_control_findings": 4
   }
 }

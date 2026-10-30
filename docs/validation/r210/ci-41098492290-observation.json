@@ -1,0 +1,127 @@
+{
+  "schema": "mta-ci-observation-2",
+  "observed_date": "2026-10-30",
+  "run_id": 41098492290,
+  "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41098492290",
+  "commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+  "tree": "1d3e79af0d301bc7958025b1b0a47031c5d7bde0",
+  "event": "push",
+  "branch": "main",
+  "api_run_status": "completed",
+  "api_run_conclusion": "failure",
+  "tracked_blobs_matching_input": 4306,
+  "quality": {
+    "job_id": 124210367296,
+    "api_job_status": "completed",
+    "api_job_conclusion": "success",
+    "tests_verified_from_log": true,
+    "passed": 7683,
+    "failed": 0,
+    "skipped": 50,
+    "warnings": 1027,
+    "seconds": 960.31,
+    "coverage_percent": 76.56,
+    "required_percent": 70,
+    "mode": "unit standard;not new full or target acceptance"
+  },
+  "sast": {
+    "job_id": 124210367281,
+    "conclusion": "failure",
+    "failing_step": "Secret scan",
+    "gitleaks_version": "8.24.3",
+    "findings": 3,
+    "license_guard": "success",
+    "bandit": "success",
+    "dependency_audit": "success",
+    "trivy": "skipped"
+  },
+  "jobs": [
+    {
+      "id": 124210367096,
+      "name": "VST3 SDK compile (Linux)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 124210367281,
+      "name": "SAST and dependency audit",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 124210367296,
+      "name": "Quality and unit tests",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 124222654786,
+      "name": "Build Windows Chordino runtime",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124222670668,
+      "name": "Android APK / AAB",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124222689829,
+      "name": "Container production gate",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124222700719,
+      "name": "Native macOS installer (${{ matrix.arch }})",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124223179115,
+      "name": "Publish rolling early-main packages",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124223223483,
+      "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124223223589,
+      "name": "iOS / iPadOS archive",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124223237525,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124223310425,
+      "name": "Publish Docker Hub image",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 124223629063,
+      "name": "Native Windows installer",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "remote_mutations": false,
+  "fix_remote_ci_executed": false,
+  "release_candidate": false,
+  "progress": {
+    "accepted": 29,
+    "total": 42,
+    "percent": 69
+  },
+  "run_updated_at": "2026-10-30T17:56:59Z"
+}

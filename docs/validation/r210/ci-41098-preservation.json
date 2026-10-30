@@ -1,0 +1,32 @@
+{
+  "input_archive": "MTA-0.3.0-r210-pre-RC-legacy-collection-cumulative.zip",
+  "input_sha256": "a7e29723435e4e106072c4951719d354c00d52edab3c448f07511667b867f3c5",
+  "all_input_entries_preserved": true,
+  "input_entries": 5056,
+  "changed_entries": [
+    ".gitleaks.toml",
+    "docs/DEVELOPMENT_COMPONENTS_R210.json",
+    "docs/DEVELOPMENT_HANDOFF_R210.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/RC_ACCEPTANCE_REPORT.md",
+    "docs/RC_EXECUTION_STRATEGY_R210.json",
+    "docs/RC_FINAL_WORK_QUEUE_R210.md",
+    "docs/security/GITLEAKS_REVIEW_R210.json"
+  ],
+  "added_entries": [
+    "docs/CI_41098_GITLEAKS_FIX_R210.md",
+    "docs/validation/r210/ci-41098-baseline-comparison.json",
+    "docs/validation/r210/ci-41098-gitleaks/before.json",
+    "docs/validation/r210/ci-41098-gitleaks/delivery.json",
+    "docs/validation/r210/ci-41098-gitleaks/delivery.log",
+    "docs/validation/r210/ci-41098-gitleaks/fixed-contract.json",
+    "docs/validation/r210/ci-41098-gitleaks/negative-controls.json",
+    "docs/validation/r210/ci-41098-gitleaks/result.json",
+    "docs/validation/r210/ci-41098-preservation.json",
+    "docs/validation/r210/ci-41098492290-log-excerpts.log",
+    "docs/validation/r210/ci-41098492290-observation.json"
+  ],
+  "application_test_workflow_and_dependency_bytes_unchanged": true,
+  "original_zip_entry_metadata_preserved": true,
+  "new_baseline": "d6ca2860538cab6a08e38ea91c40ff7c60479a47"
+}

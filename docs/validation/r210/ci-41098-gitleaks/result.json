@@ -1,0 +1,67 @@
+{
+  "schema": "mta-ci-41098492290-gitleaks-fix-1",
+  "baseline_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+  "run_id": 41098492290,
+  "failed_job_id": 124210367281,
+  "engine": "8.24.3",
+  "engine_binary_sha256": "e18325d568268b6efb6cd0cc721f8bea5667f4cd1c8d03618ab61987f41269ad",
+  "official_archive_checksum_verified": true,
+  "initial_findings": 3,
+  "original_source_contract_sha256_unchanged": "2610e877a8f9e963050f1601b5a832e23f0ae83a7e04edfa87f42aa4cff06492",
+  "exact_public_source_digests": {
+    "amt/src/extras/auth2/token_data.json": "d1b113b50e1f3c335e8c190ba614a45f4eaae05c26ea0cc52714886ffacb155e",
+    "amt/src/tests/tokenizer_test.py": "d7f15686eb42ad9b36b5153dea426751114faab3a7672c8ff837df0cd72545ac",
+    "amt/src/utils/tokenizer.py": "81c691cdc49084b3e65f5a722686a61b769a2d3169830cf04c1fe6bbc97fa8a8"
+  },
+  "new_exact_anchored_allowlist_values": 3,
+  "default_rules_retained": true,
+  "path_or_rule_exclusions_added": false,
+  "production_sources_changed": false,
+  "scans": [
+    {
+      "name": "fixed-contract",
+      "exit_code": 0,
+      "findings": 0,
+      "report": "fixed-contract.json"
+    },
+    {
+      "name": "changed-digests-and-canary",
+      "exit_code": 2,
+      "findings": 4,
+      "report": "changed-digests-and-canary.json"
+    },
+    {
+      "name": "project-before-documentation",
+      "exit_code": 2,
+      "findings": 35,
+      "report": "project-before-documentation.json"
+    },
+    {
+      "name": "project-original-config",
+      "exit_code": 2,
+      "findings": 44,
+      "report": "project-original-config.json"
+    }
+  ],
+  "historical_snapshot_comparison": {
+    "before_findings": 44,
+    "after_findings": 35,
+    "new_findings": 0,
+    "removed_findings": 9,
+    "scope": "No-git snapshot exposes existing commit-scoped historical exceptions;these are not newly approved or added to the allowlist."
+  },
+  "new_remote_ci_run_executed": false,
+  "release_candidate": false,
+  "rc_percent": 69.0,
+  "delivery_scan": {
+    "findings": 0,
+    "exit_code": 0,
+    "scope": "All changed/new delivered files;unchanged historical snapshot findings are retained separately."
+  },
+  "application_and_test_bytes_identical_to_committed_baseline": true,
+  "original_run_final_conclusion": "failure",
+  "original_quality_job_final_conclusion": "success",
+  "original_run_failed_steps": [
+    "Secret scan"
+  ]
+}

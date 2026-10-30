@@ -1,3 +1,11 @@
+## Checkpoint corrente — CI41098492290 e nuova baseline — 30 ottobre 2026
+
+**RC69,0% (29/42),invariata;nessun criterio promosso.** L'utente ha committato il cumulativo precedente in **d6ca2860538cab6a08e38ea91c40ff7c60479a47**,4306blob verificati identici. Leggere **CI_41098_GITLEAKS_FIX_R210.md**. SAST fallisce soltanto Secret scan sui3digest pubblici del contratto MT3:aggiunte3eccezioni per valori esatti,regole predefinite attive,contratto/runtime/app/test invariati. Scanner ufficiale8.24.3:prima3rilievi,dopo0;4controlli negativi ancora bloccati. I35vecchi rilievi della scansione senza storia restano distinti e non sono nuove eccezioni.
+
+Quality remoto:7683passati,50skip,76,56%copertura;job completato con successo.Run complessivo fallito:2job riusciti,1fallito(Secret scan),10saltati. VST3 SDK riuscito;Bandit/audit dipendenze riusciti,Trivy saltato dopo Secret scan. Il nuovo fix non ha ancora CI remota. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-ci-41098-cumulative.zip**;solo questo hotfix/documentazione sono non committati. Commit suggerito:`Allow exact public MT3 source digests in secret scans`. Nessun commit/push/dispatchCI o intervento server/provider eseguito. Le istruzioni storiche sotto che definiscono non committati i delta da4014a1f sono superate dalla nuova baseline.
+
+---
+
 ## Checkpoint corrente — riscossione legacy e prove originali — 30 ottobre 2026
 
 **RC69,0% (29/42),invariata:nessun criterio promosso;l'aumento richiesto non è ottenuto.** Leggere **LEGACY_SUBSCRIPTION_COLLECTION_R210.md** e `validation/r210/legacy-collection-result.json`. Rimborsi senza base originale registrati senza debiti ipotetici;riscossioni legacy preesistenti non verificate sospese prima del provider e dell'allocazione;account IT/EN e aggregati mostrano importi da verificare,revisione privata per proprietario. **779 casi distinti correnti passati,24 nuovi,10 skip Playwright;nessun nuovo collaudo Chromium/provider reale.** Ruff/sintassi/compilazione e quattro gate passano,senza nuovi finding o checker modificati.

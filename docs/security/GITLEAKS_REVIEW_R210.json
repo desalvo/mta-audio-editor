@@ -585,5 +585,31 @@
     "rule": "generic-api-key",
     "disposition": "One exact anchored public-digest allowlist;no regex/path/commit exclusion expansion",
     "verification": "Recomputed SHA-256 from actual reviewed app/auth.py;fresh unrelated synthetic secret negative control must still fail"
+  },
+  "transcription_contract_digest_review_20261030": {
+    "baseline_commit": "d6ca2860538cab6a08e38ea91c40ff7c60479a47",
+    "run_id": 41098492290,
+    "job_id": 124210367281,
+    "engine": "gitleaks8.24.3",
+    "scope": "Three exact public YourMT3 source-file SHA256 values in the independently pinned contract;not contents or credentials.",
+    "manifest": "app/studio_assets/transcription_source_contracts.json",
+    "manifest_sha256": "2610e877a8f9e963050f1601b5a832e23f0ae83a7e04edfa87f42aa4cff06492",
+    "exact_public_digest_exceptions": {
+      "amt/src/extras/auth2/token_data.json": "d1b113b50e1f3c335e8c190ba614a45f4eaae05c26ea0cc52714886ffacb155e",
+      "amt/src/tests/tokenizer_test.py": "d7f15686eb42ad9b36b5153dea426751114faab3a7672c8ff837df0cd72545ac",
+      "amt/src/utils/tokenizer.py": "81c691cdc49084b3e65f5a722686a61b769a2d3169830cf04c1fe6bbc97fa8a8"
+    },
+    "default_rules_retained": true,
+    "whole_paths_or_rules_excluded": false,
+    "proof": "docs/validation/r210/ci-41098-gitleaks/result.json",
+    "before_findings": 3,
+    "after_findings": 0,
+    "negative_controls": {
+      "same_manifest_key_paths_changed_digest": 3,
+      "synthetic_api_key": 1,
+      "findings": 4,
+      "exit_code": 2
+    },
+    "historical_snapshot_note": "A no-git scan retains35 old commit-scoped historical findings;0new versus the original44. These are not new exceptions and are not represented as a clean history scan."
   }
 }
