@@ -1514,7 +1514,7 @@
     "review": "New owner-derived account financial context validates UID through parameterized SQL, verifies private NC/loss histories, exposes only aggregate own totals and no combined debt. Account limits begins a read snapshot after schema setup and includes verified NC closed period ranges. The authenticated limits route returns a generic 409 for unverifiable context without leaking journal identities. No new subprocess, dynamic SQL or suppression. All existing findings matched unchanged code after line-number shifts.",
     "evidence": "tests/test_r210_account_financial_context.py; tests/test_r210_account_financial_browser.py; account-financial-final.xml"
   },
-  "current_scan": "docs/validation/r210/legacy-collection-bandit.json",
+  "current_scan": "docs/validation/r210/ci-41152-bandit.json",
   "owner_payment_continuation": {
     "date": "2026-10-23",
     "reviewed_sources": [
@@ -1686,7 +1686,7 @@
     "evidence": "docs/validation/r210/executor-boundaries-result.json",
     "native_error_mapping": "Denied or unverifiable native compatibility-model rights now return readable HTTP409 before upload copy; no unchecked exception or model side effect."
   },
-  "current_scan_sha256": "fca5a8666ac39652cb737877decb01cd710d5b9191f776e7ac6365bdc02cdf24",
+  "current_scan_sha256": "61886901b7c807daaf91797205e01f570c4a2b47c693381bf3b2499d638cb7e8",
   "date": "2026-10-29",
   "export_exclusive_contention_review": {
     "date": "2026-10-27",

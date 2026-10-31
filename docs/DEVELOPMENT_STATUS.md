@@ -8,7 +8,9 @@ Provider/prezzi configurabili prima dell'attivazione;storia monetaria,schemi sco
 
 Verifica:894test finanziari/regime finali passati;938casi distinti correnti senza errori o skip,23casi nei nuovi file. Ruff/compilazione/JS,Bandit e tre inventari passano. Nessuna nuova prova browser/provider/target o CI remota.
 
-Base Git confermata:**da300396a8dc9f7b84703565959b4df36dd7c15e**,CI41129584447verde. Tutti i delta merchant-reference più il modello attuale sono non committati. Cumulativo completo:**MTA-0.3.0-r210-pre-RC-precommercial-model-cumulative.zip**. Commit:`Simplify commercial launch, freeze quotes and recover PayPal checkouts`. Nessuna azione remota eseguita.
+Base Git verificata: **019471fb521cd82a96ddd35abfbbe43266975286**, tutti i 4357 blob corrispondono al cumulativo ci-41144. Full CI **41152155203**: 8093 passati, 5 falliti, 126 saltati; coverage 77% arrotondata. SAST e SDK riusciti, target dipendenti saltati. Correzione corrente: scansione archiviata completa dei 309 moduli, medesimi 168 finding ID e revisioni; fixture browser con evento PayPal reale e casi positivi con credenziali preparate. Nessun gate indebolito.
+
+Validazione locale della correzione: **94 test passati** (92 sicurezza/preflight/attivazione/drain e 2 API che distinguono configurazione da storico), Ruff e gate SAST correnti passati. Browser Chromium non disponibile localmente; nuova full CI necessaria dopo commit. Cumulativo: **MTA-0.3.0-r210-pre-RC-ci-41152-cumulative.zip**. Commit: `Refresh complete security scan and align precommercial browser scenarios`. Nessun commit, push, dispatch o pubblicazione automatici. RC invariata: **32/42=76,2%**, perimetro precommercial-20261030.
 
 ## Coda residua
 

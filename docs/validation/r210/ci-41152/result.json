@@ -1,0 +1,15 @@
+{
+  "base_commit": "019471fb521cd82a96ddd35abfbbe43266975286",
+  "tracked_blobs_verified": 4357,
+  "local_tests_passed": 94,
+  "browser_executed": false,
+  "rc_completed": 32,
+  "rc_total": 42,
+  "rc_scope": "precommercial-20261030",
+  "bandit_sources": 309,
+  "bandit_findings": 168,
+  "high": 0,
+  "medium": 21,
+  "low": 147,
+  "findings_unchanged": true
+}

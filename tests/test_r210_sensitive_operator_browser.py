@@ -25,6 +25,7 @@ def setup(ready, monkeypatch, scenario):
     elif scenario == 'provider':
         with auth.db() as c:
             c.execute('UPDATE paypal_config SET enabled=1,client_secret=? WHERE id=1', (auth._seal('private-preflight-marker'),))
+            c.execute("INSERT INTO paypal_events(id,received_at) VALUES('actual-provider-history',1)")
     elif scenario == 'unknown-schema':
         with auth.db() as c: c.execute('CREATE TABLE unreviewed_financial_history(id TEXT)')
     elif scenario == 'worker':
@@ -35,6 +36,24 @@ def setup(ready, monkeypatch, scenario):
         from app import payment_reconciliation
         def unavailable(*args, **kwargs): raise sqlite3.OperationalError('private diagnostic marker')
         monkeypatch.setattr(payment_reconciliation, 'report', unavailable)
+
+
+@pytest.mark.parametrize('has_history', [False, True])
+def test_provider_configuration_and_actual_history_have_distinct_preflight_results(ready, monkeypatch, has_history):
+    if has_history:
+        setup(ready, monkeypatch, 'provider')
+    else:
+        with auth.db() as c:
+            c.execute('UPDATE paypal_config SET enabled=1,client_secret=? WHERE id=1',
+                (auth._seal('private-preflight-marker'),))
+    response = ready[0].get(BASE + '/preflight?target=NON_COMMERCIAL')
+    assert response.status_code == 200
+    data = response.json()
+    assert 'private-preflight-marker' not in response.text
+    provider = next(item for item in data['sections'] if item['id'] == 'provider_history')
+    assert provider['counts']['records'] == int(has_history)
+    assert provider['state'] == ('review_required' if has_history else 'verified')
+    assert data['maintenance_eligibility'] == ('blocked' if has_history else 'verified_precommercial_profile')
 
 
 @pytest.mark.parametrize('language', ['it', 'en'])
@@ -76,9 +95,14 @@ def test_complete_financial_review_blocks_unsafe_confirmation_and_keeps_all_fami
 
 @pytest.mark.parametrize('language', ['it', 'en'])
 @pytest.mark.parametrize('width', [390, 1280])
+@pytest.mark.parametrize('provider_prepared', [False, True])
 def test_sensitive_review_requires_unchecked_acknowledgement_and_invalidates_after_new_drain(
-        ready, monkeypatch, nc_browser_config, language, width):
+        ready, monkeypatch, nc_browser_config, language, width, provider_prepared):
     from playwright.sync_api import sync_playwright, expect
+    if provider_prepared:
+        with auth.db() as c:
+            c.execute('UPDATE paypal_config SET enabled=1,client_secret=? WHERE id=1',
+                (auth._seal('private-preflight-marker'),))
     with sync_playwright() as api:
         browser = api.chromium.launch(**nc_browser_config)
         page, errors, posts = session(ready, monkeypatch, browser, language, width)
