@@ -1,0 +1,44 @@
+{
+  "schema": "mta-worker-startup-isolation-1",
+  "date": "2026-11-01",
+  "release": "0.3.0-r210 PRE-RC",
+  "criterion": "F4",
+  "criterion_closed": false,
+  "rc": {
+    "verified": 34,
+    "total": 42,
+    "percent": 81.0
+  },
+  "baseline_pythonpath_tests_failed": 2,
+  "final_tests": {
+    "cases": 775,
+    "passed": 764,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 11
+  },
+  "tests": "docs/validation/r210/worker-startup-isolation/tests-final.xml",
+  "baseline_red": "docs/validation/r210/worker-startup-isolation/baseline-red.xml",
+  "startup_positive_control": "docs/validation/r210/worker-startup-isolation/tests-startup-positive-control.xml",
+  "bandit": "docs/validation/r210/worker-startup-isolation/bandit.json",
+  "review": "docs/validation/r210/worker-startup-isolation/review-audit.json",
+  "gates": {
+    "ruff": "pass",
+    "compile": "pass",
+    "ai_execution_inventory": "pass",
+    "service_admission_inventory": "pass",
+    "remote_transport_inventory": "pass",
+    "security_review": "pass",
+    "bandit_findings": 168,
+    "bandit_high": 0
+  },
+  "limitations": [
+    "No independent external interpreter or package attestation",
+    "No ACE remote executed checkpoint proof",
+    "No real optional model or GPU certification",
+    "No delegated writable cgroup verification",
+    "No remote CI",
+    "LD_LIBRARY_PATH and PATH remain runtime inputs",
+    "Python isolated mode is not a sandbox"
+  ]
+}

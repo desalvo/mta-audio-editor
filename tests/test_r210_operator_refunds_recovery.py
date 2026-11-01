@@ -1,5 +1,6 @@
 """Death after committed dispatch barrier, ledger rollback and financial variants."""
 import copy
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 import sqlite3
@@ -35,8 +36,64 @@ refunds.execute(int(sys.argv[1]),sys.argv[2],0)
     doc=json.loads(receipt.read_text());stripe_env['refunds'][doc['id']]=doc
     row=current(item['id']);assert row['state']=='uncertain' and row['provider_reference'] is None and audit()['pending']==1
     with pytest.raises(FenceBlocked):refunds.execute(actor(),item['id'],row['revision'])
-    assert refunds.verify(actor(),item['id'],row['revision'],doc['id'])['state']=='settled'
+    assert refunds.verify(actor(),item['id'],row['revision'])['state']=='settled'
     assert not stripe_env['posts'] and resource_accounts.state(account)['credits_micro']==3_000_000
+
+
+def test_lost_stripe_refund_response_is_discovered_and_settled_without_another_post(stripe_env,account):
+    item=create(stripe_env)
+    stripe_env['timeout']=True
+    result=refunds.execute(actor(),item['id'],0)
+    assert result['state']=='uncertain' and result['provider_reference'] is None
+    result=refunds.verify(actor(),item['id'],result['revision'])
+    assert result['state']=='settled' and result['provider_reference']=='re_operator1'
+    assert resource_accounts.state(account)['credits_micro']==3_000_000
+    assert len(stripe_env['posts'])==1
+
+
+@pytest.mark.parametrize('mode',['missing','duplicate','wrong_amount','wrong_target'])
+def test_ambiguous_stripe_refund_discovery_never_binds_or_reposts(stripe_env,mode):
+    item=create(stripe_env);stripe_env['timeout']=True
+    state=refunds.execute(actor(),item['id'],0);assert state['state']=='uncertain'
+    doc=stripe_env['refunds']['re_operator1']
+    if mode=='missing':doc['metadata']={}
+    if mode=='duplicate':stripe_env['refunds']['re_operator2']={**copy.deepcopy(doc),'id':'re_operator2'}
+    if mode=='wrong_amount':doc['amount']=201
+    if mode=='wrong_target':doc['payment_intent']='pi_other'
+    with pytest.raises(FenceBlocked):refunds.verify(actor(),item['id'],state['revision'])
+    assert current(item['id'])['state']=='uncertain'
+    assert current(item['id'])['provider_reference'] is None and len(stripe_env['posts'])==1
+
+
+def test_revoked_admin_cannot_bind_refund_after_discovery(stripe_env,monkeypatch):
+    item=create(stripe_env);stripe_env['timeout']=True
+    state=refunds.execute(actor(),item['id'],0);uid=actor()
+    original=refunds._discover_stripe_refund
+    def discover(row,config):
+        result=original(row,config)
+        with auth.db() as c:c.execute("UPDATE users SET active=0 WHERE id=?",(uid,))
+        return result
+    monkeypatch.setattr(refunds,'_discover_stripe_refund',discover)
+    with pytest.raises(FenceBlocked,match='authorization changed'):
+        refunds.verify(uid,item['id'],state['revision'])
+    assert current(item['id'])['state']=='uncertain'
+    assert current(item['id'])['provider_reference'] is None and len(stripe_env['posts'])==1
+
+
+def test_changing_discovery_snapshot_preserves_uncertainty(stripe_env,monkeypatch):
+    from app import payment_reconcile_service
+    item=create(stripe_env);stripe_env['timeout']=True
+    state=refunds.execute(actor(),item['id'],0)
+    old=payment_reconcile_service._pages;count=[]
+    def pages(client,path,headers,params,**kwargs):
+        if path=='refunds' and 'payment_intent' in params:
+            count.append(1)
+            return [copy.deepcopy(stripe_env['refunds']['re_operator1'])] if len(count)==1 else []
+        return old(client,path,headers,params,**kwargs)
+    monkeypatch.setattr(payment_reconcile_service,'_pages',pages)
+    with pytest.raises(FenceBlocked,match='discovery changed'):
+        refunds.verify(actor(),item['id'],state['revision'])
+    assert current(item['id'])['state']=='uncertain' and len(stripe_env['posts'])==1
 
 
 def test_external_balance_change_invalidates_prepared_quote(stripe_env,account):
@@ -83,6 +140,24 @@ def test_wallet_commit_failure_keeps_refund_pending_then_reconciles_once(stripe_
     assert resource_accounts.state(account)['credits_micro']==3_000_000 and len(stripe_env['posts'])==1
 
 
+@pytest.mark.parametrize('persistent',[False,True])
+def test_stripe_journal_race_rechecks_once_without_reposting(stripe_env,account,monkeypatch,persistent):
+    from app.payment_reconcile_service import StripeJournalChanged
+    item=create(stripe_env);original=refunds._reconcile;attempts=[]
+    def changed(provider,order):
+        attempts.append(1)
+        if persistent or len(attempts)==1:raise StripeJournalChanged('Stripe event journal changed during readback; refresh again')
+        return original(provider,order)
+    stripe_env['after_post']=lambda _:monkeypatch.setattr(refunds,'_reconcile',changed)
+    result=refunds.execute(actor(),item['id'],0)
+    assert len(attempts)==2 and len(stripe_env['posts'])==1
+    if persistent:
+        assert result['state']=='pending' and resource_accounts.state(account)['credits_micro']==5_000_000
+        monkeypatch.setattr(refunds,'_reconcile',original)
+        result=refunds.verify(actor(),item['id'],result['revision'])
+    assert result['state']=='settled' and resource_accounts.state(account)['credits_micro']==3_000_000
+
+
 def test_role_revoked_during_readback_prevents_dispatch(stripe_env,monkeypatch):
     item=create(stripe_env);original=refunds._reconcile;uid=actor()
     def revoke(*args):
@@ -101,6 +176,131 @@ def test_pending_paypal_needs_completed_receipt_and_canonical_capture(paypal_env
     paypal_env['canonical']['purchase_units'][0]['payments']['captures'][0]['status']='PARTIALLY_REFUNDED'
     assert refunds.verify(actor(),item['id'],result['revision'])['state']=='settled'
     assert resource_accounts.state(account)['credits_micro']==3_000_000 and len(paypal_env['posts'])==1
+
+
+def test_lost_paypal_refund_is_discovered_and_settled_without_repost(paypal_env,account):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True
+    result=refunds.execute(actor(),item['id'],0)
+    assert result['state']=='uncertain' and result['provider_reference'] is None
+    result=refunds.verify(actor(),item['id'],result['revision'])
+    assert result['state']=='settled' and result['provider_reference']=='REFUND0001'
+    assert resource_accounts.state(account)['credits_micro']==3_000_000 and len(paypal_env['posts'])==1
+
+
+def test_process_death_after_paypal_dispatch_recovers_by_original_order(paypal_env,tmp_path,account):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);receipt=tmp_path/'paypal-refund.json'
+    code='''import json,os,sys
+from pathlib import Path
+from app import operator_refunds as refunds
+refunds._reconcile=lambda *args:None
+def crash(row,config):
+    doc={'id':'REFUNDCHILD1','status':'COMPLETED','amount':{'currency_code':'EUR','value':'2.00'},
+         'custom_id':'mta-refund-'+row['id'],'seller_payable_breakdown':{'total_refunded_amount':{'currency_code':'EUR','value':'2.00'}},
+         'links':[{'rel':'up','href':'https://api-m.sandbox.paypal.com/v2/payments/captures/'+row['target']}]}
+    Path(sys.argv[3]).write_text(json.dumps(doc));os._exit(23)
+refunds._dispatch=crash
+refunds.execute(int(sys.argv[1]),sys.argv[2],0)
+'''
+    process=subprocess.run([sys.executable,'-c',code,str(actor()),item['id'],str(receipt)],cwd=Path(__file__).resolve().parents[1],env=os.environ.copy(),capture_output=True,text=True,timeout=30)
+    assert process.returncode==23,process.stderr
+    doc=json.loads(receipt.read_text());paypal_env['refunds'][doc['id']]=doc
+    payments=paypal_env['canonical']['purchase_units'][0]['payments']
+    payments['refunds']=[doc];payments['captures'][0]['status']='PARTIALLY_REFUNDED'
+    state=current(item['id']);assert state['state']=='uncertain' and state['provider_reference'] is None
+    result=refunds.verify(actor(),item['id'],state['revision'])
+    assert result['state']=='settled' and resource_accounts.state(account)['credits_micro']==3_000_000
+    assert paypal_env['posts']==[]
+
+
+def test_discovered_pending_paypal_refund_reconciles_later_without_repost(paypal_env,account):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True;paypal_env['status']='PENDING'
+    result=refunds.execute(actor(),item['id'],0)
+    result=refunds.verify(actor(),item['id'],result['revision'])
+    assert result['state']=='pending' and result['provider_reference']=='REFUND0001'
+    assert resource_accounts.state(account)['credits_micro']==5_000_000
+    paypal_env['refunds']['REFUND0001']['status']='COMPLETED'
+    paypal_env['canonical']['purchase_units'][0]['payments']['captures'][0]['status']='PARTIALLY_REFUNDED'
+    result=refunds.verify(actor(),item['id'],result['revision'])
+    assert result['state']=='settled' and len(paypal_env['posts'])==1
+    assert resource_accounts.state(account)['credits_micro']==3_000_000
+
+
+@pytest.mark.parametrize('outcome',['FAILED','CANCELLED'])
+def test_discovered_terminal_failed_paypal_refund_does_not_debit_wallet(paypal_env,account,outcome):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True;paypal_env['status']=outcome
+    state=refunds.execute(actor(),item['id'],0)
+    result=refunds.verify(actor(),item['id'],state['revision'])
+    assert result['state']=='failed' and resource_accounts.state(account)['credits_micro']==5_000_000
+    assert len(paypal_env['posts'])==1
+
+
+def test_paypal_order_changing_during_discovery_stays_uncertain(paypal_env,monkeypatch):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True
+    state=refunds.execute(actor(),item['id'],0);original=paypal._api;reads=[]
+    def api(cfg,method,path,*args,**kwargs):
+        doc=original(cfg,method,path,*args,**kwargs)
+        if method=='GET' and path.startswith('/v2/checkout/orders/'):
+            reads.append(1)
+            if len(reads)==2:doc['status']='VOIDED'
+        return doc
+    monkeypatch.setattr(paypal,'_api',api)
+    with pytest.raises(FenceBlocked,match='order changed'):
+        refunds.verify(actor(),item['id'],state['revision'])
+    assert current(item['id'])['state']=='uncertain' and len(paypal_env['posts'])==1
+
+
+def test_paypal_not_yet_visible_is_not_treated_as_not_created(paypal_env):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True
+    state=refunds.execute(actor(),item['id'],0)
+    payments=paypal_env['canonical']['purchase_units'][0]['payments'];saved=payments['refunds']
+    payments['refunds']=[]
+    with pytest.raises(FenceBlocked,match='Unique original refund not found'):
+        refunds.verify(actor(),item['id'],state['revision'])
+    assert current(item['id'])['state']=='uncertain' and len(paypal_env['posts'])==1
+    payments['refunds']=saved
+    assert refunds.verify(actor(),item['id'],state['revision'])['state']=='settled'
+
+
+def test_paypal_merchant_change_during_discovery_never_binds_receipt(paypal_env,monkeypatch):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True
+    state=refunds.execute(actor(),item['id'],0);original=refunds._discover_paypal_refund
+    def discovery(row,config):
+        ref=original(row,config);paypal.settings({'client_id':'new-client'});return ref
+    monkeypatch.setattr(refunds,'_discover_paypal_refund',discovery)
+    with pytest.raises(FenceBlocked,match='merchant changed'):
+        refunds.verify(actor(),item['id'],state['revision'])
+    assert current(item['id'])['state']=='uncertain' and len(paypal_env['posts'])==1
+
+
+def test_concurrent_paypal_discovery_has_one_ledger_effect(paypal_env,account):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True
+    state=refunds.execute(actor(),item['id'],0)
+    def run(_):
+        try:return refunds.verify(actor(),item['id'],state['revision'])
+        except (ValueError,FenceBlocked):return None
+    with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(run,range(2)))
+    assert sum(result is not None for result in results)==1
+    assert current(item['id'])['state']=='settled' and len(paypal_env['posts'])==1
+    assert resource_accounts.state(account)['credits_micro']==3_000_000
+
+
+@pytest.mark.parametrize('fault',['missing','duplicate','amount','capture','merchant','order','status','summary'])
+def test_paypal_discovery_ambiguity_leaves_refund_uncertain(paypal_env,monkeypatch,fault):
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True
+    result=refunds.execute(actor(),item['id'],0);doc=paypal_env['refunds']['REFUND0001']
+    if fault=='missing':doc['custom_id']='other'
+    if fault=='duplicate':
+        other=copy.deepcopy(doc);other['id']='REFUND0002';paypal_env['refunds'][other['id']]=other
+        paypal_env['canonical']['purchase_units'][0]['payments']['refunds'].append(other)
+    if fault=='amount':doc['amount']['value']='2.01'
+    if fault=='capture':doc['links'][0]['href']=doc['links'][0]['href'].replace(paypal_env['target'],'WRONGCAPTURE')
+    if fault=='merchant':paypal.settings({'client_id':'other-client'})
+    if fault=='order':paypal_env['canonical']['purchase_units'][0]['reference_id']='wrong-order'
+    if fault=='status':doc['status']='UNKNOWN'
+    if fault=='summary':paypal_env['canonical']['purchase_units'][0]['payments']['refunds']=None
+    with pytest.raises((ValueError,FenceBlocked)):
+        refunds.verify(actor(),item['id'],result['revision'])
+    assert current(item['id'])['state']=='uncertain' and len(paypal_env['posts'])==1
 
 
 def test_multicapture_history_remaining_capture_refund(account,provider,monkeypatch):
@@ -123,7 +323,8 @@ def test_multicapture_history_remaining_capture_refund(account,provider,monkeypa
 
 
 @pytest.mark.parametrize('kind',['subscription','subscription_reversal'])
-def test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable(account,provider,monkeypatch,kind):
+@pytest.mark.parametrize('lost',[False,True])
+def test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable(account,provider,monkeypatch,kind,lost):
     from test_r210_subscription_repayment_e2e import checkout,balance
     from test_r210_paypal_reconciliation_e2e import setup_order,HEADERS
     if kind=='subscription':
@@ -136,6 +337,7 @@ def test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable(acc
         canonical=provider[0][pid]
     # Install canonical payment/refund GET handling for these existing paid or
     # newly reconciled orders; original webhook verification remains simulated.
+    canonical['intent']='CAPTURE'
     captures=canonical['purchase_units'][0]['payments']['captures'];objects={};posts=[]
     if kind=='subscription':
         # setup_order's original refund is intentionally not yet in the order
@@ -148,13 +350,19 @@ def test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable(acc
             doc={'id':'REFUNDOPERATOR1','status':'COMPLETED','custom_id':payload['custom_id'],'amount':copy.deepcopy(payload['amount']),
                  'seller_payable_breakdown':{'total_refunded_amount':copy.deepcopy(payload['amount'])},
                  'links':[{'rel':'up','href':paypal.BASES['sandbox']+'/v2/payments/captures/'+cid}]}
-            objects[doc['id']]=doc;canonical['purchase_units'][0]['payments']['refunds']=[doc];capture['status']='PARTIALLY_REFUNDED';return copy.deepcopy(doc)
+            objects[doc['id']]=doc;canonical['purchase_units'][0]['payments']['refunds']=[doc];capture['status']='PARTIALLY_REFUNDED'
+            if lost:raise ValueError('Refund response lost after provider accepted it')
+            return copy.deepcopy(doc)
         if '/payments/refunds/' in path:return copy.deepcopy(objects[path.rsplit('/',1)[1]])
         if '/payments/captures/' in path:return copy.deepcopy(next(x for x in captures if x['id']==path.rsplit('/',1)[1]))
         assert path=='/v2/checkout/orders/'+canonical['id'];return copy.deepcopy(canonical)
     monkeypatch.setattr(paypal,'_api',api)
     item=refunds.prepare(actor(),body(local,provider='paypal',target=captures[0]['id'],amount=100))
-    assert refunds.execute(actor(),item['id'],0)['state']=='settled'
+    result=refunds.execute(actor(),item['id'],0)
+    if lost:
+        assert result['state']=='uncertain' and result['provider_reference'] is None
+        result=refunds.verify(actor(),item['id'],result['revision'])
+    assert result['state']=='settled'
     assert resource_accounts.state(account)['credits_micro']==0 and len(posts)==1
     if kind=='subscription':
         assert resource_accounts.transactions(account)['subscription_reversals'][0]['due_micro']==1_000_000

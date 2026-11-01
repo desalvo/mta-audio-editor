@@ -1,0 +1,83 @@
+[
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/ai_cgroup_metering.py",
+    "function": "run_cgroup_process",
+    "old_line": 287,
+    "new_line": 305,
+    "review": "Existing process/inference boundary and call shape unchanged; nearby startup import and fixed diagnostic categorization reviewed."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "function": "main",
+    "old_line": 39,
+    "new_line": 65,
+    "review": "Existing process/inference boundary and call shape unchanged; nearby startup import and fixed diagnostic categorization reviewed."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "function": "main",
+    "old_line": 41,
+    "new_line": 69,
+    "review": "Existing process/inference boundary and call shape unchanged; nearby startup import and fixed diagnostic categorization reviewed."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "function": "main",
+    "old_line": 52,
+    "new_line": 80,
+    "review": "Existing process/inference boundary and call shape unchanged; nearby startup import and fixed diagnostic categorization reviewed."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/ai_cgroup_metering.py",
+    "function": "run_cgroup_process",
+    "old_line": 287,
+    "new_line": 305,
+    "review": "Existing process/inference boundary and call shape unchanged; nearby startup import and fixed diagnostic categorization reviewed."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "function": "<module>",
+    "old_line": 65,
+    "new_line": 96,
+    "review": "Existing process/inference boundary and call shape unchanged; nearby startup import and fixed diagnostic categorization reviewed."
+  },
+  {
+    "bandit": "app/ai_cgroup_metering.py",
+    "test": "B603",
+    "review": "Same subprocess call and arguments, shifted by diagnostic marker definitions."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "old_line": 65,
+    "new_line": 67,
+    "review": "Same fixed inference call; line moved after a non-disclosing HIP out-of-memory classifier."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "old_line": 69,
+    "new_line": 71,
+    "review": "Same fixed inference call; line moved after a non-disclosing HIP out-of-memory classifier."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "old_line": 80,
+    "new_line": 82,
+    "review": "Same fixed inference call; line moved after a non-disclosing HIP out-of-memory classifier."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/sam_audio_worker.py",
+    "old_line": 96,
+    "new_line": 98,
+    "review": "Same fixed inference call; line moved after a non-disclosing HIP out-of-memory classifier."
+  }
+]

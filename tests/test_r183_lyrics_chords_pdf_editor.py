@@ -51,5 +51,5 @@ def test_saving_overlay_warns_and_blocks_close():
 
 def test_pdf_page_break_reapplies_chord_style_after_ensure():
     fragment = MUSIC[MUSIC.index('if line_chords:'):MUSIC.index('lyric_font,lyric_size', MUSIC.index('if line_chords:'))]
-    assert fragment.index('ensure(chord_size+16)') < fragment.index('c.setFont(chord_font, chord_size)')
+    assert fragment.index('ensure(whole if whole <= height - 54 - 56 else first)') < fragment.index('c.setFont(chord_font, chord_size)')
     assert 'anchor_syllable_index' in MUSIC

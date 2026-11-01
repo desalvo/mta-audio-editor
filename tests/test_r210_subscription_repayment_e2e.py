@@ -217,6 +217,23 @@ def test_owner_quote_change_is_checked_before_provider_capture(account,provider,
     assert len([call for call in provider[1] if call[1].endswith('/capture')])==before
 
 
+def test_completed_repayment_is_recorded_as_surplus_when_original_hold_releases(account,provider,debt,monkeypatch):
+    first=checkout(account)['order_id'];paypal.capture(account,first)
+    risk(monkeypatch,first)
+    second=checkout(account,key='already-paid-after-release')['order_id']
+    with auth.db() as c:pid=c.execute('SELECT provider_order FROM paypal_orders WHERE id=?',(second,)).fetchone()[0]
+    paypal._api({},'POST','/v2/checkout/orders/'+pid+'/capture')
+    risk(monkeypatch,first,resolved=True)
+    before=len([call for call in provider[1] if call[0]=='POST' and call[1].endswith('/capture')])
+    assert paypal.capture(account,second)['status']=='paid'
+    assert paypal.capture(account,second)['status']=='paid'
+    assert len([call for call in provider[1] if call[0]=='POST' and call[1].endswith('/capture')])==before
+    assert balance(account)['due_micro']==0
+    with auth.db() as c:
+        assert c.execute('SELECT refund_due_micro FROM paypal_orders WHERE id=?',(second,)).fetchone()[0]==3_000_000
+        assert c.execute('SELECT amount_micro FROM subscription_repayment_allocations WHERE order_id=?',(second,)).fetchone()[0]==0
+
+
 def test_multiple_sources_are_bound_to_original_refund(account,provider,debt,monkeypatch):
     original_order=debt[0]
     with auth.db() as c:cid=c.execute("SELECT id FROM paypal_captures WHERE order_id=? AND id='CAPTURE222'",(original_order,)).fetchone()[0]

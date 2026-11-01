@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.281" timestamp="2026-11-01T16:51:15.630787+01:00" hostname="058579ff9fdd"><testcase classname="tests.test_r210_worker_python_isolation" name="test_real_guardian_ignores_inherited_pythonpath_before_startup" time="0.071"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_guardian_ignores_inh0/startup-executed').exists">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_guardian_ignores_inh0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f697bb9eae0&gt;
+
+    @pytest.mark.skipif(sys.platform!='linux',reason='Linux guardian boundary')
+    def test_real_guardian_ignores_inherited_pythonpath_before_startup(tmp_path,monkeypatch):
+        payload,marker=poisoned_pythonpath(tmp_path);monkeypatch.setenv('PYTHONPATH',str(payload))
+        clean=tmp_path/'clean';clean.mkdir()
+        result=ai_process_guard.run([sys.executable,'-I','-c','pass'],cwd=clean,timeout_seconds=10,env={})
+        assert result.exit_code==0 and result.tree_complete
+&gt;       assert not marker.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_guardian_ignores_inh0/startup-executed').exists
+
+tests/test_r210_worker_python_isolation.py:24: AssertionError</failure></testcase><testcase classname="tests.test_r210_worker_python_isolation" name="test_actual_ace_capability_worker_ignores_inherited_pythonpath" time="0.066"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_ace_capability_wor0/startup-executed').exists">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_ace_capability_wor0')
+
+    def test_actual_ace_capability_worker_ignores_inherited_pythonpath(tmp_path):
+        payload,marker=poisoned_pythonpath(tmp_path)
+        adapter=Path(ai_worker_protocol.__file__).with_name('ace_step_http_worker.py').resolve()
+        env={**os.environ,'PYTHONPATH':str(payload)}
+        result=subprocess.run(ai_worker_protocol.worker_command(adapter)+['--capabilities'],env=env,cwd=tmp_path,
+                              capture_output=True,timeout=10,check=True)
+        assert json.loads(result.stdout)['protocol']=='mta.ai.worker.v1'
+&gt;       assert not marker.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_ace_capability_wor0/startup-executed').exists
+
+tests/test_r210_worker_python_isolation.py:34: AssertionError</failure></testcase></testsuite></testsuites>

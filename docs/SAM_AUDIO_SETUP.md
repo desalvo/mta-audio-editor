@@ -21,3 +21,9 @@ Demucs first isolates the drum stem. Kick/Snare/Toms/Cymbals are extracted from 
 5. I checkpoint sono conservati nella cache Hugging Face (`HF_HOME`, oppure normalmente `~/.cache/huggingface`). Non sono inclusi negli installer MTA.
 
 Il primo passaggio Demucs resta necessario; il risultato SAM Audio usa un prompt dedicato. Non tutte le percussioni vengono isolate perfettamente. Il DSP rimane disponibile come metodo alternativo selezionabile, senza spacciarlo per AI.
+
+## Autenticazione del servizio server / Server service authentication
+
+Il server verificato usa `root` e `HF_HOME=/var/lib/mta/models/huggingface`, senza `HF_TOKEN` o `HF_TOKEN_PATH` nell’ambiente. Il runtime SAM era `/opt/mta/ai-7f176167db5671ae/sam/bin/python`; il percorso è specifico dell’installazione e può cambiare. Le istruzioni complete per verificare l’utente e le variabili effettive senza esporre token, autenticare il runtime, controllare l’accesso ai repository gated Base/Large e diagnosticare 401/403 sono nel manuale amministratore IT/EN, online e PDF, sezione “SAM Audio: accesso e diagnosi del servizio”. Verificare approvazione e condizioni del modello con l’account usato dal servizio.
+
+The inspected server uses `root`, `HF_HOME=/var/lib/mta/models/huggingface` and no `HF_TOKEN` or `HF_TOKEN_PATH` in its environment. Its SAM runtime was `/opt/mta/ai-7f176167db5671ae/sam/bin/python`; this path is installation-specific and can change. The IT/EN online and PDF administrator manuals contain the complete procedure to inspect the effective service user and environment without exposing tokens, authenticate the runtime, check gated Base/Large access and diagnose 401/403. Check model approval and terms using the service account.

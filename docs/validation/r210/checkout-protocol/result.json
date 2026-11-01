@@ -1,0 +1,11 @@
+{
+  "distinct_passed": 278,
+  "checkout_passed": 100,
+  "http_passed": 18,
+  "overlap": 15,
+  "reconciliation_passed": 175,
+  "criteria_verified": 32,
+  "criteria_total": 42,
+  "twenty_substantial_cycles_complete": false,
+  "provider_real_tested": false
+}

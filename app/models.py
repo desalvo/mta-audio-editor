@@ -428,11 +428,17 @@ class SampleEditRequest(BaseModel):
 
 
 class SampleEffectRequest(BaseModel):
-    effect: Literal["pitch", "autotune", "normalizer", "maximizer", "eq32"]
+    effect: Literal["pitch", "autotune", "normalizer", "maximizer", "eq32", "gain", "match"]
     start_sample: int = Field(default=0, ge=0)
     end_sample: int = Field(default=0, ge=0)
     preset: str = Field(default="default", max_length=80)
     params: dict[str, float | str | bool | list[float]] = Field(default_factory=dict)
+
+
+class TrackMatchAnalysisRequest(BaseModel):
+    reference_track_id: str = Field(min_length=1, max_length=128)
+    start_sample: int = Field(default=0, ge=0)
+    end_sample: int = Field(default=0, ge=0)
 
 
 

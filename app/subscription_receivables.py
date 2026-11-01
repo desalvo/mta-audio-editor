@@ -60,16 +60,43 @@ def authorize_account_erasure(c,uid,actor):
     c.create_function('mta_subscription_erasure',2,lambda table,key:int(key in allowed.get(table,set())))
 
 
+def _effective_amounts(c,sources):
+    """Apply cash corrections to immutable sources, covering paid money first."""
+    from .subscription_cash_reconciliation import position
+    groups={};effective={}
+    for source in sources:groups.setdefault(source[1],[]).append(source)
+    for oid,items in groups.items():
+        order=c.execute('SELECT * FROM paypal_orders WHERE id=?',(oid,)).fetchone()
+        proof=position(c,order) if order is not None and order['kind']=='subscription' else None
+        if proof is None:continue
+        left=proof['fee_loss_micro'];covered={}
+        for rid,_,owner,_,amount in items:
+            paid=0
+            for allocated,net,user,kind,status in c.execute('''SELECT a.amount_micro,p.net_micro,o.user_id,o.kind,o.status
+                    FROM subscription_repayment_allocations a JOIN paypal_orders o ON o.id=a.order_id
+                    JOIN payment_reconciliation_positions p ON p.provider='paypal' AND p.order_id=o.id
+                    WHERE a.refund_id=? ORDER BY a.created_at,a.order_id''',(rid,)):
+                if (user,kind,status)!=(owner,'subscription_reversal','paid') or not 0<=allocated<=amount:
+                    raise FenceBlocked('Subscription repayment position or owner mismatch')
+                paid+=min(allocated,max(0,net),amount-paid)
+            covered[rid]=paid;effective[rid]=min(left,paid);left-=effective[rid]
+        for rid,_,_,_,amount in items:
+            extra=min(left,amount-effective[rid]);effective[rid]+=extra;left-=extra
+    return effective
+
+
 def rows(c,uid=None):
     tables={r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     if 'paypal_subscription_reversals' not in tables:return []
     if uid is None:
-        sources=c.execute('SELECT refund_id,order_id,user_id,period_start,amount_micro FROM paypal_subscription_reversals ORDER BY period_start,refund_id').fetchall()
+        sources=c.execute('SELECT refund_id,order_id,user_id,period_start,amount_micro FROM paypal_subscription_reversals ORDER BY period_start,rowid').fetchall()
     else:
-        sources=c.execute('SELECT refund_id,order_id,user_id,period_start,amount_micro FROM paypal_subscription_reversals WHERE user_id=? ORDER BY period_start,refund_id',(uid,)).fetchall()
+        sources=c.execute('SELECT refund_id,order_id,user_id,period_start,amount_micro FROM paypal_subscription_reversals WHERE user_id=? ORDER BY period_start,rowid',(uid,)).fetchall()
+    effective=_effective_amounts(c,sources)
     result=[]
     for rid,order,user,period,amount in sources:
         if type(amount) is not int or amount<0:raise FenceBlocked('Invalid subscription reversal receivable')
+        original_amount=amount;amount=effective.get(rid,amount)
         issue = _collection_issue(c, order, user, period)
         paid=0;payments=[]
         if 'subscription_repayment_allocations' in tables:
@@ -79,7 +106,7 @@ def rows(c,uid=None):
                                      'refund_due_micro':None})
                     continue
                 position=c.execute("SELECT p.net_micro,o.user_id,o.kind,o.status FROM payment_reconciliation_positions p JOIN paypal_orders o ON o.id=p.order_id WHERE p.provider='paypal' AND p.order_id=?",(oid,)).fetchone()
-                if position is None or tuple(position[1:])!=(user,'subscription_reversal','paid') or not 0<=allocated<=amount:
+                if position is None or tuple(position[1:])!=(user,'subscription_reversal','paid') or not 0<=allocated<=original_amount:
                     raise FenceBlocked('Subscription repayment position or owner mismatch')
                 coverage=min(allocated,max(0,position[0]),amount-paid);paid+=coverage
                 payments.append({'order_id':oid,'allocated_micro':allocated,'covered_micro':coverage,
@@ -92,6 +119,7 @@ def rows(c,uid=None):
                 if active[0][1]!=user:raise FenceBlocked('Subscription repayment checkout owner mismatch')
                 pending=active[0][0];checkout_url=active[0][2];reference_known=bool(active[0][3])
         result.append({'refund_id':rid,'order_id':order,'user_id':user,'period_start':period,
+                       'original_amount_micro':original_amount,
                        'amount_micro':None if issue else amount,'covered_micro':None if issue else paid,
                        'due_micro':None if issue else amount-paid,
                        'collection_verified':issue is None,'collection_issue':issue,
@@ -174,6 +202,9 @@ def original_loss_position(c, order):
         return None
     if issue:
         raise FenceBlocked('Original subscription payment evidence does not verify')
+    from .subscription_cash_reconciliation import position
+    cash=position(c,order)
+    if cash is not None:return cash['fee_loss_micro'],cash['remaining_surplus_micro']
     basis = c.execute('SELECT * FROM subscription_payment_basis WHERE order_id=?', (order['id'],)).fetchone()
     total = 0
     holds = c.execute("SELECT 1 FROM sqlite_master WHERE name='paypal_financial_holds'").fetchone()
@@ -197,8 +228,11 @@ def _collection_issue(c, order_id, user_id, period_start):
         return issue
     amounts = [r[0] for r in c.execute('SELECT amount_micro FROM paypal_subscription_reversals WHERE order_id=?',
                                      (order_id,))]
-    if (any(type(n) is not int or n < 0 for n in amounts)
-            or sum(amounts) > original_loss_position(c, order)[0]):
+    from .subscription_cash_reconciliation import has_receipt,position
+    proof=position(c,order)
+    if has_receipt(c,order_id) and proof is None:return 'original_cash_position_stale'
+    cap=proof['basis']['fee_micro'] if proof is not None else original_loss_position(c,order)[0]
+    if (any(type(n) is not int or n < 0 for n in amounts) or sum(amounts)>cap):
         return 'original_obligation_allocation_unproved'
     return None
 
@@ -207,16 +241,19 @@ def accrue_original_loss(c, order, hold_id):
     """Allocate one immutable incremental obligation within the original fee cap."""
     if not c.in_transaction:
         raise FenceBlocked('Subscription loss requires authenticated payment transaction')
+    from .subscription_cash_reconciliation import has_receipt,position as cash_position
+    cash=cash_position(c,order)
+    if has_receipt(c,order['id']) and cash is None:return False
     position = original_loss_position(c, order)
     if position is None:
         return False  # legacy payment requires independent original basis evidence
     target, remaining_surplus = position
-    c.execute('UPDATE paypal_orders SET refund_due_micro=min(refund_due_micro,?) WHERE id=?',
-              (remaining_surplus,order['id']))
+    if cash is not None:c.execute('UPDATE paypal_orders SET refund_due_micro=? WHERE id=?',(remaining_surplus,order['id']))
+    else:c.execute('UPDATE paypal_orders SET refund_due_micro=min(refund_due_micro,?) WHERE id=?',(remaining_surplus,order['id']))
     allocated = c.execute('SELECT coalesce(sum(amount_micro),0) FROM paypal_subscription_reversals WHERE order_id=?', (order['id'],)).fetchone()[0]
-    if allocated > target:
+    if allocated > target and cash is None:
         raise FenceBlocked('Subscription obligation exceeds proved original loss')
-    due = target-allocated
+    due = max(0,target-allocated)
     if due:
         import hashlib
         reference = 'LOSS' + hashlib.sha256((order['id']+'|'+hold_id).encode()).hexdigest().upper()[:60]
@@ -235,6 +272,11 @@ def original_loss_review(c):
         basis = c.execute('SELECT * FROM subscription_payment_basis WHERE order_id=?', (order['id'],)).fetchone() if 'subscription_payment_basis' in tables else None
         if basis is None:
             gaps.append({'order_id': order['id'], 'reason': 'original_payment_basis_missing'})
+            continue
+        from .subscription_cash_reconciliation import position,has_receipt
+        if position(c,order) is not None:continue
+        if has_receipt(c,order['id']):
+            gaps.append({'order_id':order['id'],'reason':'original_cash_position_stale'})
             continue
         movement = c.execute('''SELECT 1 FROM paypal_financial_holds h JOIN paypal_captures p ON p.id=h.capture_id
           WHERE h.order_id=? AND h.status='permanent' AND h.kind!='reversal'

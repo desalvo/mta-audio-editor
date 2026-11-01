@@ -1874,7 +1874,13 @@ def build_lyrics_pdf(
             # ensure() may call showPage(), which resets ReportLab graphics state.
             # Perform the page break before applying the chord font/color so a
             # page beginning with chords uses the exact same style as any other row.
-            ensure(chord_size+16)
+            # Keep the whole wrapped lyric with its chord row when it fits on a
+            # page. Exceptionally long lyrics still keep the first row with the
+            # chords, then continue naturally instead of overflowing the page.
+            lyric_size = st("lyrics")[1]
+            whole = chord_size + 7 + len(lyric_lines) * (lyric_size + 6) + 2
+            first = chord_size + 7 + lyric_size + 8
+            ensure(whole if whole <= height - 54 - 56 else first)
             c.setFont(chord_font, chord_size)
             # Chords always use their own PDF style; marker/section colors never leak into them.
             c.setFillColor(st("chords")[2])

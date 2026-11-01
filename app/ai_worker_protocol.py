@@ -53,7 +53,7 @@ def worker_command(worker: Path) -> list[str]:
             python = str(managed)
         elif getattr(sys, 'frozen', False):
             raise WorkerUnavailable('Native Python worker runtime is not installed')
-    return [python, str(worker)]
+    return [python, '-I', str(worker)]
 
 
 def _snapshot_preview_wav(path: Path) -> tuple[bytes, dict]:
@@ -107,6 +107,8 @@ def _run_supervised_legacy_worker(command: list[str], directory: Path, timeout_s
     The legacy protocol does not provide trusted CPU/GPU usage and must not be
     promoted to a billable, metered inference execution merely by this runner.
     """
+    from .ai_execution_policy import isolated_env
+    env=isolated_env(env)
     if sys.platform == 'linux':
         from .ai_process_guard import run
         try:
@@ -353,9 +355,9 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
         request.write_bytes(raw)
         request.chmod(0o600)
         command = worker_command(worker) + ['--request', str(request), '--output', str(output)]
-        from .ai_execution_policy import admitted_env
-        environment = {**os.environ, **admitted_env('ace-step', decision),
-                       **({'MTA_AI_PROGRESS_FILE': str(progress_file)} if progress_file else {})}
+        from .ai_execution_policy import admitted_env,isolated_env
+        environment = isolated_env({**os.environ, **admitted_env('ace-step', decision),
+                       **({'MTA_AI_PROGRESS_FILE': str(progress_file)} if progress_file else {})})
         # The trusted local process is reaped with wait4, so billed CPU time
         # is observed rather than inferred from elapsed wall time. A worker
         # spawning descendants cannot be billed as fully metered by wait4.
@@ -441,8 +443,9 @@ def probe_worker(*, timeout_seconds: float = 2.0) -> dict:
     if path is None:
         return result
     try:
+        from .ai_execution_policy import isolated_env
         completed = subprocess.run(worker_command(path) + ['--capabilities'], shell=False,
-            capture_output=True, timeout=timeout_seconds, check=False)
+            capture_output=True, timeout=timeout_seconds, check=False,env=isolated_env())
         if completed.returncode or len(completed.stdout) > 16_384:
             return result
         payload = json.loads(completed.stdout)

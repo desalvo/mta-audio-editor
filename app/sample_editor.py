@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import hashlib, json, os, shutil, subprocess, uuid
+import hashlib, json, os, shutil, subprocess, tempfile, uuid
 from pathlib import Path
 import numpy as np
 import soundfile as sf
@@ -17,7 +17,7 @@ EQ_PRESETS={
  "warm":[0,.5,1,1.5,2,2,2,1.5,1,.5,0,-.5,-1,-1,-.5,0,0,0,0,0,0,0,0,0,.5,.5,0,0,-.5,-1,-1,-2],
  "smile":[2,2,2,1.5,1.5,1,.5,0,-.5,-1,-1,-1,-1,-1,-.5,0,0,0,0,0,0,0,0,.5,1,1.5,2,2.5,2.5,2,1.5,1],
 }
-PRESETS={"pitch":["subtle","up-semitone","down-semitone","up-octave","down-octave"],"autotune":["gentle","balanced","hard"],"normalizer":["streaming","broadcast","music","gentle"],"maximizer":["gentle","balanced","loud","live"],"eq32":list(EQ_PRESETS)}
+PRESETS={"pitch":["subtle","up-semitone","down-semitone","up-octave","down-octave"],"autotune":["gentle","balanced","hard"],"normalizer":["streaming","broadcast","music","gentle"],"maximizer":["gentle","balanced","loud","live"],"eq32":list(EQ_PRESETS),"gain":["default"]}
 
 
 def run(cmd:list[str])->None:
@@ -44,6 +44,18 @@ def pitch_filter(sr:int,semitones:float)->str:
 
 def effect_filter(req:SampleEffectRequest,sr:int)->str:
  p=req.params or {}
+ if req.effect=="match":
+  import math
+  from .audio_engine import _atempo_chain
+  ratio=float(p.get("tempo_ratio",1));semitones=float(p.get("semitones",0))
+  if not math.isfinite(ratio) or not .25<=ratio<=4 or not math.isfinite(semitones) or not -12<=semitones<=12:
+   raise ValueError("Tempo ratio must be 0.25-4 and pitch -12 to +12 semitones")
+  return pitch_filter(sr,semitones)+','+_atempo_chain(ratio)
+ if req.effect=="gain":
+  import math
+  gain=float(p.get("gain_db",0))
+  if not math.isfinite(gain) or not -60<=gain<=24:raise ValueError("Gain must be finite and between -60 and +24 dB")
+  return f"volume={gain:.3f}dB"
  if req.effect=="pitch":
   defaults={"up-semitone":1,"down-semitone":-1,"up-octave":12,"down-octave":-12};return pitch_filter(sr,float(p.get("semitones",defaults.get(req.preset,0)))+float(p.get("cents",0))/100)
  if req.effect=="normalizer":
@@ -84,13 +96,22 @@ def autotune_regions(src:Path,start:float,end:float,params:dict)->list[tuple[flo
   step=int(np.ceil(len(out)/256));out=[[g[0][0],g[-1][1],float(np.median([x[2] for x in g]))] for i in range(0,len(out),step) if (g:=out[i:i+step])]
  return [tuple(x) for x in out]
 
-def effect_graph(src:Path,req:SampleEffectRequest,sr:int,dur:float,preview:bool)->str:
+def effect_graph(src:Path,req:SampleEffectRequest,sr:int,dur:float,preview:bool,tempo_plan=None,leading_silence_ms=0)->str:
  total=max(1,round(dur*sr));a=min(max(0,req.start_sample),total);b=min(max(a+1,req.end_sample or total),total);start=a/sr;end=b/sr;parts=[];labels=[]
  def add(x,y,f='anull'):
   if y-x<=1e-5:return
   n=len(labels);parts.append(f"[0:a]atrim=start={x:.9f}:end={y:.9f},asetpts=PTS-STARTPTS,{f}[p{n}]");labels.append(f"[p{n}]")
  if not preview:add(0,start)
- if req.effect=='autotune':
+ if req.effect=='match' and tempo_plan is not None:
+  from .audio_engine import _atempo_chain
+  pitch=float((req.params or {}).get('semitones',0))
+  if not np.isfinite(pitch) or not -12<=pitch<=12:raise ValueError('Pitch must be -12 to +12 semitones')
+  if leading_silence_ms>.001:
+   n=len(labels);parts.append(f'anullsrc=r={sr}:cl=stereo,atrim=duration={leading_silence_ms/1000:.9f},asetpts=PTS-STARTPTS[p{n}]');labels.append(f'[p{n}]')
+  for x,y,ratio in tempo_plan:
+   expected=(y-x)/1000/ratio
+   add(start+x/1000,start+y/1000,pitch_filter(sr,pitch)+','+_atempo_chain(ratio)+f',apad,atrim=duration={expected:.9f}')
+ elif req.effect=='autotune':
   for x,y,c in autotune_regions(src,start,end,req.params or {}):add(start+x,start+y,pitch_filter(sr,c) if abs(c)>=.01 else 'anull')
  else:add(start,end,effect_filter(req,sr))
  if not preview:add(end,dur)
@@ -179,4 +200,28 @@ def edit(project:Project,track:Track,req:SampleEditRequest)->dict:
  raise ValueError('operazione non valida')
 
 def apply_effect(project:Project,track:Track,req:SampleEffectRequest,preview:bool)->Path:
- src=rendered_source(project.id,track);sr=sample_rate(src);dur=sf.info(src).frames/sr;graph=effect_graph(src,req,sr,dur,preview);suffix='.mp3' if preview else '.wav';base=storage.session_preview_dir(project.id) if preview else storage.pdir(project.id);out=base/f".sample-fx-{uuid.uuid4().hex}{suffix}";cmd=["ffmpeg","-y","-v","error","-i",str(src),"-filter_complex",graph,"-map","[out]"]+(["-c:a","libmp3lame","-b:a","192k"] if preview else ["-c:a","pcm_s24le"])+[str(out)];run(cmd);return out
+ src=rendered_source(project.id,track);sr=sample_rate(src);dur=sf.info(src).frames/sr
+ plan=None;leading_silence_ms=0
+ if req.effect=='match' and 'reference_track_id' in req.params:
+  from .beat_sync import sync_plan
+  reference=next((t for t in project.tracks if t.id==req.params['reference_track_id']),None)
+  if reference is None:raise ValueError('Traccia di riferimento non trovata')
+  try:source_bpm=float(req.params['source_bpm']);target_bpm=float(req.params['target_bpm'])
+  except (KeyError,TypeError,ValueError) as exc:raise ValueError('BPM sorgente e destinazione obbligatori') from exc
+  ref=rendered_source(project.id,reference)
+  plan,details=sync_plan(project,track,reference,src,ref,req.start_sample,req.end_sample,source_bpm,target_bpm)
+  leading_silence_ms=details['leading_silence_ms']
+ elif req.effect=='match' and 'source_bpm' in req.params:
+  from .track_match import tempo_sections
+  a=min(max(0,req.start_sample),round(dur*sr));b=min(max(a+1,req.end_sample or round(dur*sr)),round(dur*sr))
+  try: source_bpm=float(req.params['source_bpm']);target_bpm=float(req.params['target_bpm'])
+  except (KeyError,TypeError,ValueError) as exc:raise ValueError('BPM sorgente e destinazione obbligatori') from exc
+  plan=tempo_sections(project,a*1000/sr+float(track.delay_ms or 0),(b-a)*1000/sr,source_bpm,target_bpm)
+ graph=effect_graph(src,req,sr,dur,preview,plan,leading_silence_ms);suffix='.mp3' if preview else '.wav';base=storage.session_preview_dir(project.id) if preview else storage.pdir(project.id);out=base/f".sample-fx-{uuid.uuid4().hex}{suffix}"
+ # Long beat maps must not exceed the OS argument-size limit.
+ with tempfile.TemporaryDirectory(prefix='mta-match-graph-') as temp:
+  graph_path=Path(temp)/'filter.txt';graph_path.write_text(graph)
+  cmd=["ffmpeg","-y","-v","error","-i",str(src),"-filter_complex_script",str(graph_path),"-map","[out]"]+(["-c:a","libmp3lame","-b:a","192k"] if preview else ["-c:a","pcm_s24le"])+[str(out)]
+  try:run(cmd)
+  except Exception:out.unlink(missing_ok=True);raise
+ return out

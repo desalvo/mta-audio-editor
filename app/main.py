@@ -84,6 +84,7 @@ from .storage import (
 )
 from .rights_registry import (provider_catalog as rights_provider_catalog, search_provider as search_rights_provider, search_musicbrainz_metadata, resolve_musicbrainz_metadata)
 from . import sample_editor as sample_editor_engine
+from .models import TrackMatchAnalysisRequest
 from .version import APP_RELEASE, APP_RELEASE_CHANNEL, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY, runtime_installation, runtime_acceleration
 
 from .ai_arranger import RearrangeRequest, RemixRequest, catalog as arranger_catalog, prepare_plan as arranger_plan, prepare_remix_plan, assess_plan
@@ -2853,6 +2854,8 @@ def sample_editor_edit(pid: str, track_id: str, req: SampleEditRequest, request:
     if track is None:
         raise HTTPException(404, "traccia non trovata")
     try:
+        if req.action != 'copy':
+            _register_track_source_in_library(project, track, "Sample editor original")
         result = sample_editor_engine.edit(project, track, req)
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(400, str(exc)) from exc
@@ -2861,6 +2864,20 @@ def sample_editor_edit(pid: str, track_id: str, req: SampleEditRequest, request:
     _register_track_source_in_library(project, track, "Sample editor commit")
     save_project(project)
     return {"ok": True, "project": project, "track": track}
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/sample-editor/match-analysis")
+def sample_editor_match_analysis(pid: str, track_id: str, req: TrackMatchAnalysisRequest, request: Request):
+    from .track_match import analyze
+    project = _project_for_actor(request, pid)
+    track = next((x for x in project.tracks if x.id == track_id), None)
+    reference = next((x for x in project.tracks if x.id == req.reference_track_id), None)
+    if track is None or reference is None:
+        raise HTTPException(404, "Traccia non trovata")
+    try:
+        return analyze(project, track, reference, req.start_sample, req.end_sample)
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(400, str(exc)) from exc
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/sample-editor/effect-preview")
@@ -2884,6 +2901,7 @@ def sample_editor_effect_apply(pid: str, track_id: str, req: SampleEffectRequest
     if track is None:
         raise HTTPException(404, "traccia non trovata")
     try:
+        _register_track_source_in_library(project, track, "Sample editor original")
         out = sample_editor_engine.apply_effect(project, track, req, False)
         sample_editor_engine.commit(project, track, out)
     except (ValueError, RuntimeError) as exc:
@@ -7245,9 +7263,9 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
             ]
             requested_slots = [slot for slot in requested_slots if slot.track_ids]
             slots = validate_slot_mapping(export_project, requested_slots, req.mta_device_profile)
-            export_mta(export_project, out, slots, req.mta_device_profile)
+            export_mta(export_project, out, slots, req.mta_device_profile, normalize_peak_db=float(req.normalize_peak_db) if req.normalize_audio else None)
         else:
-            export_mta(export_project, out, profile=req.mta_device_profile)
+            export_mta(export_project, out, profile=req.mta_device_profile, normalize_peak_db=float(req.normalize_peak_db) if req.normalize_audio else None)
         media_type = "application/octet-stream"
     elif fmt in {"wav", "mp3", "mlive_mp3", "mp3g", "flac"}:
         if fmt == "mp3g" and not any(not line.disabled and not line.deleted and str(line.text).strip() for line in source_project.lyrics):

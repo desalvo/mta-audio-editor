@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.703" timestamp="2026-11-01T01:30:12.970654+01:00" hostname="7e84db133b6b"><testcase classname="tests.test_r210_stripe_paid_history" name="test_initial_paid_webhook_discovers_existing_provider_refund" time="0.213"><failure message="assert 5000000 == 3000000">history = ('ed35b80e806a47bc84434a0eae2533e4', {'session': {'id': 'cs_test_ed35b80e806a47bc84434a0eae2533e4', 'mode': 'payment',...: 0, ...}], 'refunds': [{'id': 're_test', 'charge': 'ch_test', 'payment_intent': 'pi_test', 'amount': 200, ...}], ...})
+account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f336d4e48c0&gt;
+
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='Known gap: initial Stripe paid webhook does not discover already completed refunds')
+    def test_initial_paid_webhook_discovers_existing_provider_refund(history,account,monkeypatch):
+        local,state=history
+        client_type=httpx.Client
+        monkeypatch.setattr(shop.httpx,'Client',lambda *args,**kwargs:client_type(transport=state['transport']))
+        shop.event(*signed(paid_event(local)))
+&gt;       assert resources.state(account)['credits_micro']==3_000_000
+E       assert 5000000 == 3000000
+
+tests/test_r210_stripe_paid_history.py:76: AssertionError</failure></testcase></testsuite></testsuites>

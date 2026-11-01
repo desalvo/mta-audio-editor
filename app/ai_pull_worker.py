@@ -199,7 +199,7 @@ def _run(client, journal, state):
         request = directory / 'request.json'
         request.write_text(protocol.encode(plan))
         request.chmod(0o600)
-        command = [worker_python(task['kind']), str(worker)] if worker.suffix == '.py' else [str(worker)]
+        command = [worker_python(task['kind']), '-I', str(worker)] if worker.suffix == '.py' else [str(worker)]
         command += ['--request', str(request), '--output', str(directory / 'preview.wav')]
         # Durable barrier before Popen. A restarted worker NEVER re-enters here
         # from dispatched, including after uncertain supervisor/partition loss.

@@ -61,6 +61,9 @@ def history(uid, offset=0, limit=20):
             for row in rows[:limit]:
                 if c.execute("SELECT 1 FROM payment_reconciliation_events WHERE provider=? AND order_id=? AND state='pending' LIMIT 1",(row['provider'],row['id'])).fetchone():
                     review.add((row['provider'],row['id']))
+            if 'paypal_financial_holds' in tables:
+                from .subscription_receivables import original_loss_review
+                review.update(('paypal',item['order_id']) for item in original_loss_review(c)['unresolved'])
         if 'payment_reconciliation_positions' in tables:
             for row in rows[:limit]:
                 position=c.execute('SELECT held_minor FROM payment_reconciliation_positions WHERE provider=? AND order_id=? AND user_id=?',(row['provider'],row['id'],uid)).fetchone()

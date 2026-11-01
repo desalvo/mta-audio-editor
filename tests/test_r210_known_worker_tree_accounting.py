@@ -41,7 +41,7 @@ def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated
     monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
     called=[]
     def measured(args,**kwargs):
-        assert Path(args[1]).name=='ai_unified_adapter.py'
+        assert args[1]=='-I' and Path(args[2]).name=='ai_unified_adapter.py'
         called.append(args)
         measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
         if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)

@@ -1,0 +1,11 @@
+[
+  {
+    "path": "app/sample_editor.py",
+    "finding": "B404",
+    "reason": "Import line adds tempfile only. FFmpeg filter scripts are private and constructed from validated audio values; command execution remains argument-vector based and project-scoped."
+  },
+  {
+    "new_file": "app/beat_sync.py",
+    "reason": "No process/network execution. Reads authenticated project-resolved audio via soundfile; finite bounds, onset confidence, phase consistency and output ratios validated by beat sync tests."
+  }
+]

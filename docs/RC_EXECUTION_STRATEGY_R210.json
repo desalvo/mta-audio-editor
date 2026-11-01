@@ -1,26 +1,20 @@
 {
   "schema": "mta-rc-delivery-plan-2",
-  "date": "2026-10-30",
+  "date": "2026-11-01",
   "release": "0.3.0-r210 PRE-RC",
   "measure": "Equal-weight RC checklist revision precommercial-20261030; no legacy monetary migration. Not directly comparable to v1 and not full-product completion.",
   "progress": {
-    "verified": 32,
+    "verified": 34,
     "total": 42,
-    "percent": 76.2,
+    "percent": 81.0,
     "whole_macroareas_accepted": 2
   },
-  "accepted_this_cycle": [
-    "C3(v2)",
-    "C5(v2)",
-    "D6(v2)"
-  ],
-  "latest_handoff": "docs/PRECOMMERCIAL_MODEL_R210.md",
-  "latest_proof": "docs/validation/r210/precommercial-model/result.json",
-  "code_resume_handoff": "docs/PRECOMMERCIAL_MODEL_R210.md",
-  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-precommercial-model-cumulative.zip",
+  "accepted_this_cycle": [],
+  "latest_handoff": "docs/BEAT_SYNC_R210.md",
+  "latest_proof": "docs/validation/r210/beat-sync/result.json",
+  "code_resume_handoff": "docs/BEAT_SYNC_R210.md",
+  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-beat-sync-cumulative.zip",
   "remaining_original_criteria": [
-    "A4",
-    "A5",
     "A6",
     "B6",
     "C6",
@@ -55,16 +49,16 @@
     {
       "id": "A4",
       "criterion": "Canonical history for payments created by this release, refunded initial captures, exact multicapture attribution and unresolved ambiguous PayPal dispute/payout movements; no import of pre-release merchant history",
-      "state": "implementation_pending",
-      "evidence": "Partial implementation: tests/test_r210_paypal_history_reconciliation.py; complete dispute/payout discovery and allocation still pending New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Exact partial multicapture allocation is now supported when canonical item amounts uniquely bind every capture and sum to the dispute total;private movement observations are operator-visible but never settlement authority.392 distinct affected cases/30 Chromium;PAYPAL_ITEM_MOVEMENT_HANDOFF_R210.md. Missing/ambiguous item allocation,global history and actual payout/protection transaction proof remain open. MERCHANT_HISTORY_HANDOFF_R210.md:merchant-wide requested-window stable acquisition/private admin API/IT-EN panel implemented;61 affected cases pass,23 new,4 browser prerequisite skips. No complete account-history,actual cash settlement,global conservation or whole A4 acceptance. 2026-10-28: MERCHANT_LEDGER_RECOVERY_R210.md;immutable reporting principal -> exact canonical history -> atomic original ledger and private IT/EN API/UI;368distinct passes/40new/12actualChromium. Full merchant coverage,payout/protection allocation and legacy proof remain incomplete;original criterion NOT promoted. PAYPAL_SETTLEMENT_RECOVERY_R210.md: scoped operator-only authenticated ACM/STL S6 exact completed credit -> original ledger,one-case immutable movement,actor audit and same-document replay;348distinct passes/46new. Broader account/payout/legacy proof and actual report target remain unaccepted;original state unchanged. 2026-10-28:PAYPAL_PARTIAL_SETTLEMENT_R210.md;exact partial multicapture report allocation,claim-bound ordinary replay and refund/subscription conservation implemented;357 distinct passes/40new. Whole historical/general financial criterion remains open;no target provider acceptance. PRECOMMERCIAL_MODEL_R210.md;validation/r210/precommercial-model/result.json. Explicit user-authorized scope revision: no historical commercial billing/refunds exist. Configuration is not monetary history; new quotes freeze before dispatch; checkout-start marker prevents reusing pre-commercial eligibility. No original v1 whole-history closure claimed.",
+      "state": "verified",
+      "evidence": "docs/PAYPAL_CASH_HISTORY_ACCEPTANCE_R210.md; docs/validation/r210/paypal-cash-history/result.json. Complete software acceptance in authorized precommercial scope: canonical original histories/refunded first funding; final cases and exact per-capture complete cash, no guessed case splits; conservative unresolved unknown/provisional evidence. Actual provider campaign remains A6.",
       "weight": 1,
       "scope_revision": "precommercial-20261030"
     },
     {
       "id": "A5",
       "criterion": "New checkout/refund/reversal lifecycle with immutable original quotes, terminal and uncertain response recovery and subscription repayment; no adoption of pre-release financial obligations",
-      "state": "implementation_pending",
-      "evidence": "Partial: strict authenticated failed-charge closure, proof audit and owner/admin recovery/re-admission; immutable PayPal final outcome conflicts with private owner IT/EN review status. 243 affected cases incl. 12 Chromium, no current failures. docs/FINANCIAL_OUTCOME_HANDOFF_R210.md. Partial: private owner paginated Stripe/PayPal local history, trusted resumption, GET-only authenticated reconciliation, same-owner serialized cross-provider pending credit and same-period subscription admission, actual account/credits IT/EN error/eligibility/locale recovery. 231 affected cases incl. 24 Chromium. docs/OWNER_PAYMENT_RECOVERY_HANDOFF_R210.md. Partial: exact subscription refund receivables, authenticated empty terminal Stripe/PayPal closure, known-ID uncertain-create recovery and IT/EN owner/operator workflows; tests/test_r210_terminal_checkout_e2e.py; tests/test_r210_checkout_reference_recovery.py; tests/test_r210_terminal_recovery_browser.py; docs/TERMINAL_CHECKOUT_HANDOFF_R210.md. Legacy, unknown references, failed-charge histories, original subscription risks and operator refunds still pending. Operator refunds now locally completed for exact reconciled Stripe credit payments and PayPal captures (credits/subscription/repayment/surplus), with single dispatch, GET-only recovery, immutable audit, private IT/EN UI and erasure integration. 254 affected cases /10 Chromium. docs/OPERATOR_REFUNDS_HANDOFF_R210.md. This does not close complete legacy/provider-wide history or original fee-loss obligations; state remains implementation_pending. New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged. 2026-10-26: complete-set original subscription basis audit before losses, private admin-only no-store API/IT-EN paged error/retry panel, ledger/combined-readiness blocker. Historical split proof missing, no guessed migration/debt. SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md; whole criterion remains open. 2026-10-27: STRIPE_CHECKOUT_HISTORY_R210.md:stable complete known-intent attempts/refunds/disputes,webhook serialization and empty-terminal rereads integrated through owner/admin APIs;global/legacy obligations remain unaccepted. PRECOMMERCIAL_MODEL_R210.md;validation/r210/precommercial-model/result.json. Explicit user-authorized scope revision: no historical commercial billing/refunds exist. Configuration is not monetary history; new quotes freeze before dispatch; checkout-start marker prevents reusing pre-commercial eligibility. No original v1 whole-history closure claimed.",
+      "state": "verified",
+      "evidence": "docs/A5_LIFECYCLE_ACCEPTANCE_R210.md; docs/validation/r210/a5-lifecycle/result.json. Complete software acceptance in authorized precommercial-20261030 scope, including cash-proved partial original subscription loss, overlap, reimbursement, actual repayment excess refund and crash recovery. Prior checkout/terminal/uncertain/refund flows revalidated in final financial selection. Provider APIs simulated; A6 actual sandbox remains separate and open. Unknown principal/payout evidence stays blocked under A4. Criterion text, weight and denominator unchanged.",
       "weight": 1,
       "scope_revision": "precommercial-20261030"
     },
@@ -271,7 +265,7 @@
       "id": "F4",
       "criterion": "Rights and bypass acceptance for every legacy executor",
       "state": "implementation_pending",
-      "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending. 2026-10-29:CI_40858_REPAIR_R210.md;actual Apple40858613243 supersedes the earlier SDK block:32exact checks,real Keychain,unsigned iOS app build and13current source hashes verified. No real neural or installed-device/full-F4 acceptance;criterion remains open. 2026-10-30:RESTORED_MODEL_RIGHTS_R210.md;strict imported-review contract,cached chord/Madmom/Mega53/profile and ACE/MRMT3 diagnostics guarded;1104distinct affected passes,305new,7explicit prerequisite skips.72actual token API denials cover18registered kinds/two transports before worker/ledger. Opaque executable/model identity and dynamic/native universal acceptance remain open;criterion not promoted. 2026-10-30:PINNED_TRANSCRIPTION_LOADERS_R210.md;789passes,3skips.Independent shipped MT3 source/tensor pins,source-only importlib and immutable tensor input,per-forward permissions.OriginalF4 remains pending external interpreter/dependency/ACE model contracts;PS refused without independent tensor pin.",
+      "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending. 2026-10-29:CI_40858_REPAIR_R210.md;actual Apple40858613243 supersedes the earlier SDK block:32exact checks,real Keychain,unsigned iOS app build and13current source hashes verified. No real neural or installed-device/full-F4 acceptance;criterion remains open. 2026-10-30:RESTORED_MODEL_RIGHTS_R210.md;strict imported-review contract,cached chord/Madmom/Mega53/profile and ACE/MRMT3 diagnostics guarded;1104distinct affected passes,305new,7explicit prerequisite skips.72actual token API denials cover18registered kinds/two transports before worker/ledger. Opaque executable/model identity and dynamic/native universal acceptance remain open;criterion not promoted. 2026-10-30:PINNED_TRANSCRIPTION_LOADERS_R210.md;789passes,3skips.Independent shipped MT3 source/tensor pins,source-only importlib and immutable tensor input,per-forward permissions.OriginalF4 remains pending external interpreter/dependency/ACE model contracts;PS refused without independent tensor pin. 2026-11-01: WORKER_STARTUP_ISOLATION_R210.md;real guardian/ACE startup injection blocked and legacy Demucs paths isolated; independent interpreter/dependency/remote ACE identity and complete rights acceptance remain pending.",
       "weight": 1
     },
     {
@@ -332,20 +326,17 @@
     }
   ],
   "critical_path": [
-    "A4/A5 new payment lifecycle",
-    "A6 provider sandbox",
-    "C6/B6 target acceptance",
-    "F4/F6 rights",
-    "F5/G5/G6 installed targets"
+    "F4/F6 independent runtime/model rights",
+    "C6/B6 distributed acceptance",
+    "A6/F5/G5/G6 actual targets"
   ],
   "workstreams": [
     {
       "id": "payments",
       "criteria": [
-        "A4",
-        "A5"
+        "A6"
       ],
-      "next": "Complete remaining new-payment/refund/dispute and uncertain lifecycle cases with immutable quote/target receipts. No bulk legacy importer."
+      "next": "Run actual isolated Stripe/PayPal sandbox campaign when prerequisites are supplied. A4/A5 software accepted; do not recreate them."
     },
     {
       "id": "rights",
@@ -368,7 +359,7 @@
       "next": "Real sandbox,independent hosts,installed OS/container/GPU/VST targets. Builds and local processes do not replace target acceptance."
     }
   ],
-  "active_workstream": "future_payment_lifecycle",
+  "active_workstream": "F4_runtime_backend_identity",
   "work_in_progress_limit": 1,
   "agents_authorized": false,
   "operating_rules": [
@@ -379,7 +370,7 @@
     "Report current v2 RC and retain v1 comparison; scope reductions are not original-scope implementation gains.",
     "Run affected checks; commit/push/tag/CI dispatch and real provider/server actions stay user-controlled."
   ],
-  "delivery": "One complete cumulative, including all uncommitted changes afterda300396. No legacy financial migration work required.",
+  "delivery": "Complete cumulative after confirmed ee4e37fd30c39a72638b303b01ca0cd5b090f272; commit deferred to user.",
   "guardrails": {
     "commit_deferred": true,
     "staging": false,
@@ -390,28 +381,23 @@
     "release_candidate": false,
     "general_transition_enabled": false
   },
-  "parent_code_archive_sha256": "24ea175561c8a55950949435b77d6df8dd1010f3aa9ce6ffab96e808958ca490",
+  "parent_code_archive_sha256": "a6f9809c8a53c23196e5ee6255d919e7b39771d73f8d015fe00758162ef7f651",
   "latest_functional_checkpoint": {
-    "date": "2026-10-30",
-    "handoff": "docs/PRECOMMERCIAL_MODEL_R210.md",
-    "proof": "docs/validation/r210/precommercial-model/result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-precommercial-model-cumulative.zip",
-    "base_commit": "da300396a8dc9f7b84703565959b4df36dd7c15e",
-    "accepted_criteria": 32,
+    "date": "2026-11-01",
+    "handoff": "docs/PAYPAL_CASH_HISTORY_ACCEPTANCE_R210.md",
+    "proof": "docs/validation/r210/paypal-cash-history/result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-paypal-cash-history-cumulative.zip",
+    "base_commit": "ee4e37fd30c39a72638b303b01ca0cd5b090f272",
+    "accepted_criteria": 34,
     "criteria_total": 42,
-    "percent": 76.2,
+    "percent": 81.0,
     "scope_revision": "precommercial-20261030",
-    "original_scope_percent": 69.0,
-    "original_scope_accepted": 29,
-    "accepted_revised_scope_checks": [
-      "C3",
-      "C5",
-      "D6"
-    ],
     "release_candidate": false,
     "commit_deferred": true,
-    "local_distinct_passed": 938,
-    "new_remote_ci": false
+    "local_distinct_passed": 927,
+    "new_remote_ci": false,
+    "new_cases": 48,
+    "browser_prerequisite_skips": 20
   },
   "scope_revision": {
     "id": "precommercial-20261030",
@@ -461,5 +447,87 @@
     "legacy_migration_required": false,
     "post_checkout_regime_migration_supported": false,
     "comparison": "docs/validation/r210/precommercial-model/scope-comparison.json"
-  }
+  },
+  "acceleration_20261101": {
+    "plan": "docs/RC_ACCELERATION_20261101_R210.md",
+    "priority_streams": [
+      [
+        "F4",
+        "F6"
+      ],
+      [
+        "B6",
+        "C6"
+      ],
+      [
+        "A6",
+        "F5",
+        "G5",
+        "G6"
+      ]
+    ],
+    "verified": 34,
+    "total": 42,
+    "percent": 81.0,
+    "criteria_reweighted": false,
+    "scope": "precommercial-20261030",
+    "latest_local_tests_passed": 927,
+    "stripe_refund_discovery": {
+      "state": "local_path_implemented",
+      "evidence": "docs/STRIPE_REFUND_DISCOVERY_R210.md",
+      "real_provider_verified": false,
+      "criterion_a5_closed": false
+    },
+    "refund_discovery_both_providers": {
+      "state": "local_path_implemented",
+      "evidence": "docs/PAYMENT_REFUND_RECOVERY_BATCH_R210.md",
+      "real_provider_verified": false,
+      "criterion_a5_closed": false
+    },
+    "completed_payment_recovery": {
+      "state": "local_path_implemented",
+      "evidence": "docs/PAYMENT_COMPLETED_RECOVERY_R210.md",
+      "final_financial_tests_passed": 461,
+      "real_provider_verified": false,
+      "criterion_a4_closed": false,
+      "criterion_a5_closed": false
+    },
+    "initial_payment_history": {
+      "state": "local_paths_implemented",
+      "evidence": "docs/PAYMENT_FIRST_FUNDING_R210.md",
+      "broad_tests_before_final_regime_adjustment": 577,
+      "browser_skips_in_targeted_suite": 22,
+      "real_provider_verified": false,
+      "criterion_a4_closed": false,
+      "criterion_a5_closed": false
+    },
+    "paypal_unknown_creation_webhook": {
+      "state": "local_path_completed",
+      "evidence": "docs/PAYPAL_LOST_CREATION_HANDOFF_R210.md",
+      "proof": "docs/validation/r210/paypal-lost-creation/result.json",
+      "distinct_local_passed": 723,
+      "new_cases": 26,
+      "real_provider_verified": false,
+      "criterion_a5_closed": false,
+      "remaining_a5_case": "Superseded by a5_lifecycle acceptance; retained entry describes the earlier checkpoint only."
+    },
+    "a5_lifecycle": {
+      "state": "verified",
+      "evidence": "docs/A5_LIFECYCLE_ACCEPTANCE_R210.md",
+      "proof": "docs/validation/r210/a5-lifecycle/result.json",
+      "criterion_a5_closed": true,
+      "real_provider_verified": false,
+      "distinct_local_passed": 879,
+      "new_cases": 61
+    },
+    "paypal_cash_history": {
+      "state": "verified",
+      "accepted_criterion": "A4",
+      "evidence": "docs/PAYPAL_CASH_HISTORY_ACCEPTANCE_R210.md",
+      "proof": "docs/validation/r210/paypal-cash-history/result.json",
+      "real_provider_verified": false
+    }
+  },
+  "sam_reported_problem": "Original SAM model-load errors identified as gated Hugging Face HTTP 401; service configuration documented, login/access and retry on target remain unverified.",
+  "editor_requested_remaining": "Real-music beat tracking quality and native UI target tests remain unverified."
 }

@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import time
+import httpx
 import pytest
 from app import auth,resource_accounts as r,resource_entitlements as e,credit_purchases as shop
 from test_r210_subscriptions import account as quota_account,plan,finish  # noqa: F401
@@ -24,11 +25,48 @@ def prepare(account,monkeypatch):
     def provider(data,key,order):
         calls.append((data,key,order));return {'id':'cs_test_'+order,'url':'https://checkout.stripe.com/c/pay/'+order}
     monkeypatch.setattr(shop,'_stripe',provider)
+    # The checkout tests exercise the real authenticated readback protocol with
+    # a known, unrefunded provider snapshot; individual history tests can
+    # replace this transport with their own nonempty or adversarial history.
+    def readback():
+        def handle(request):
+            path=request.url.path
+            if path.startswith('/v1/checkout/sessions/'):
+                session=path.rsplit('/',1)[1];oid=session.removeprefix('cs_test_')
+                with auth.db() as c:row=c.execute('SELECT amount_cents FROM credit_purchase_orders WHERE id=?',(oid,)).fetchone()
+                assert row is not None
+                body={'id':session,'mode':'payment','status':'complete','payment_status':'paid','amount_total':row[0],
+                      'currency':'eur','client_reference_id':oid,'metadata':{'mta_order':oid},'payment_intent':'pi_test','livemode':False}
+            elif path=='/v1/payment_intents/pi_test':
+                body={'id':'pi_test','status':'succeeded','amount':500,'amount_received':500,'amount_capturable':0,
+                      'currency':'eur','latest_charge':'ch_test','livemode':False}
+            else:
+                charge={'id':'ch_test','payment_intent':'pi_test','amount':500,'amount_captured':500,'currency':'eur',
+                        'status':'succeeded','paid':True,'captured':True,'amount_refunded':0,'refunded':False,
+                        'disputed':False,'balance_transaction':'txn_paid','failure_balance_transaction':None,'livemode':False}
+                if path=='/v1/charges/ch_test':body=charge
+                elif path=='/v1/charges':body={'data':[charge],'has_more':False}
+                elif path in ('/v1/refunds','/v1/disputes'):body={'data':[],'has_more':False}
+                else:raise AssertionError(path)
+            return httpx.Response(200,json=body)
+        return httpx.Client(transport=httpx.MockTransport(handle))
+    monkeypatch.setattr(shop,'_webhook_readback_client',readback)
     return calls
 
 
 def paid_event(order,identifier='evt_paid'):
     return {'id':identifier,'type':'checkout.session.completed','data':{'object':{'id':'cs_test_'+order,'metadata':{'mta_order':order},'client_reference_id':order,'amount_total':500,'currency':'eur','payment_status':'paid','payment_intent':'pi_test'}}}
+
+
+def test_paid_stripe_retry_returns_original_receipt_after_credit_service_disabled(account,monkeypatch):
+    calls=prepare(account,monkeypatch)
+    local=shop.checkout(account,500,'paid-retry-after-disable')['order_id']
+    raw,signature=signed(paid_event(local));shop.event(raw,signature)
+    r.configure({'credits_enabled':False})
+    assert shop.checkout(account,500,'paid-retry-after-disable')=={'status':'paid','order_id':local}
+    with pytest.raises(ValueError,match='Conflicting purchase retry'):
+        shop.checkout(account,600,'paid-retry-after-disable')
+    assert len(calls)==1 and r.state(account)['credits_micro']==5_000_000
 
 
 def test_eligibility_and_global_switch_are_enforced_on_backend(account):

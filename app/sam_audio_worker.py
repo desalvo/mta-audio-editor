@@ -9,6 +9,37 @@ import sys
 from pathlib import Path
 
 
+def _failure_reason(error):
+    """Return only fixed diagnostic codes; never expose exception messages."""
+    seen = set()
+    for _ in range(8):
+        if error is None or id(error) in seen:
+            break
+        seen.add(id(error))
+        name = type(error).__name__
+        if name in {'OutOfMemoryError', 'MemoryError'}:
+            return 'insufficient_memory'
+        if name == 'RuntimeError' and 'out of memory' in str(error).lower():
+            return 'insufficient_memory'
+        if name in {'GatedRepoError', 'HfHubHTTPError', 'HTTPError', 'HTTPStatusError'}:
+            status = getattr(getattr(error, 'response', None), 'status_code', None)
+            if name == 'GatedRepoError' or status in (401, 403):
+                return 'checkpoint_access_denied'
+            if status == 404:
+                return 'checkpoint_not_found_or_inaccessible'
+            if status == 429:
+                return 'hub_rate_limited'
+        if name in {'RepositoryNotFoundError', 'RevisionNotFoundError', 'EntryNotFoundError'}:
+            return 'checkpoint_not_found_or_inaccessible'
+        if name in {'LocalEntryNotFoundError', 'OfflineModeIsEnabled', 'ConnectionError',
+                    'ConnectTimeout', 'ReadTimeout', 'TimeoutError', 'SSLError'}:
+            return 'hub_unavailable_or_cache_missing'
+        if name in {'SafetensorError', 'UnpicklingError'}:
+            return 'checkpoint_format_invalid'
+        error = error.__cause__ or error.__context__
+    return None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", required=True)
@@ -30,13 +61,12 @@ def main():
         import torchaudio
         from sam_audio import SAMAudio, SAMAudioProcessor
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        if __package__:
-            from .sam_audio_compat import sam_hub_compat
-        else:
-            from sam_audio_compat import sam_hub_compat
+        from app.sam_audio_compat import sam_hub_compat
         stage = "model_load"
         with sam_hub_compat():
-            model = SAMAudio.from_pretrained(args.model).eval().to(device)
+            model = SAMAudio.from_pretrained(args.model).eval()
+        stage = "device_transfer"
+        model = model.to(device)
         stage = "processor_load"
         processor = SAMAudioProcessor.from_pretrained(args.model)
         prompt_args = {"audios": [args.source], "descriptions": [args.prompt]}
@@ -57,7 +87,10 @@ def main():
         if audio.ndim == 3 and audio.shape[0] == 1:
             audio = audio[0]
         torchaudio.save(str(path), audio, processor.audio_sampling_rate)
-    except Exception:
+    except Exception as exc:
+        reason = _failure_reason(exc)
+        if reason:
+            print("MTA_SAM_REASON:" + reason, file=sys.stderr, flush=True)
         print("MTA_SAM_FAILURE:" + stage, file=sys.stderr, flush=True)
         raise
 

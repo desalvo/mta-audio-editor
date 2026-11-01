@@ -176,7 +176,7 @@ def test_external_demucs_runtime_and_gpu_device_are_forwarded(tmp_path,monkeypat
     source=wav(tmp_path/'source.wav')
     paths=DemucsStemSplitter.split(source,tmp_path/'out')
     args=json.loads(captured.read_text())
-    assert args[1:3]==['-m','demucs.separate'] and args[args.index('--device')+1]=='cuda'
+    assert args[1:4]==['-I','-m','demucs.separate'] and args[args.index('--device')+1]=='cuda'
     assert len(paths)==1 and paths[0].is_file()
     from app.ai_unified_adapter import _backend_command
     monkeypatch.setenv('MTA_AI_TORCH_PROFILER_ENABLED','false')

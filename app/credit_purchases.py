@@ -54,7 +54,10 @@ def _stripe(data,key,order):
             response=client.post('https://api.stripe.com/v1/checkout/sessions',data=data,headers={'Authorization':'Bearer '+key,'Idempotency-Key':'mta-credits-'+order})
     except httpx.HTTPError as exc:raise ValueError('Checkout unavailable; contact the server administrator') from exc
     if response.status_code!=200:raise ValueError('Checkout unavailable; contact the server administrator')
-    return response.json()
+    try:data=response.json()
+    except ValueError as exc:raise ValueError('Invalid checkout response') from exc
+    if not isinstance(data,dict):raise ValueError('Invalid checkout response')
+    return data
 
 
 def checkout(uid,amount,request_id):
@@ -66,17 +69,19 @@ def checkout(uid,amount,request_id):
     if url.scheme!='https' or not url.hostname or url.username or url.password:raise ValueError('Configure the public HTTPS URL first')
     with auth.db() as c:
         from .owner_payments import initialize, guard_pending
-        r.init(c);initialize(c);c.execute('BEGIN IMMEDIATE');s=r._state(c,uid,0,int(time.time()))
-        if not s['credits_enabled']:raise ValueError('Credits require an enabled credit service and an active subscription')
-        cfg=c.execute('SELECT * FROM resource_config WHERE id=1').fetchone()
-        if amount not in json.loads(cfg['credit_denominations']):raise ValueError('Credit denomination changed; refresh the page')
-        keys=c.execute('SELECT * FROM credit_payment_config WHERE id=1').fetchone()
-        if not keys['secret_key'] or not keys['webhook_secret']:raise ValueError('Credit checkout is not configured; contact the administrator')
+        r.init(c);initialize(c);c.execute('BEGIN IMMEDIATE')
         old=c.execute('SELECT * FROM credit_purchase_orders WHERE user_id=? AND request_id=?',(uid,request_id)).fetchone()
         if old:
             if old['amount_cents']!=amount:raise ValueError('Conflicting purchase retry')
             if old['status']=='paid':return {'status':'paid','order_id':old['id']}
             if old['status'] in ('cancelled','canceled','failed','refunded'):return {'status':old['status'],'order_id':old['id']}
+        s=r._state(c,uid,0,int(time.time()))
+        if not s['credits_enabled']:raise ValueError('Credits require an enabled credit service and an active subscription')
+        cfg=c.execute('SELECT * FROM resource_config WHERE id=1').fetchone()
+        if amount not in json.loads(cfg['credit_denominations']):raise ValueError('Credit denomination changed; refresh the page')
+        keys=c.execute('SELECT * FROM credit_payment_config WHERE id=1').fetchone()
+        if not keys['secret_key'] or not keys['webhook_secret']:raise ValueError('Credit checkout is not configured; contact the administrator')
+        if old:
             if old['checkout_url']:
                 from .owner_payments import safe_url
                 target=safe_url(old['checkout_url'],'stripe',None)
@@ -99,14 +104,34 @@ def checkout(uid,amount,request_id):
         c.execute('BEGIN IMMEDIATE')
         mark_attempt_uncertain(c, 'checkout:stripe:'+order)
     from .owner_payments import safe_url
+    import re
     session=_stripe(data,key,order)
-    if not safe_url(session.get('url'),'stripe') or not isinstance(session.get('id'),str):raise ValueError('Invalid checkout response')
+    if (not isinstance(session,dict) or not safe_url(session.get('url'),'stripe')
+        or not isinstance(session.get('id'),str) or not re.fullmatch(r'cs_[A-Za-z0-9_]{1,110}',session['id'])):
+        raise ValueError('Invalid checkout response')
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE')
         from .regime_payment_outbox import confirm
         confirm(c, 'checkout:stripe:'+order, provider_reference=session['id'])
         c.execute('UPDATE credit_purchase_orders SET session_id=?,checkout_url=? WHERE id=? AND status=?',(session['id'],session['url'],order,'pending'))
     return {'checkout_url':session['url'],'order_id':order}
+
+
+def _webhook_readback_client():
+    return httpx.Client(timeout=15,follow_redirects=False)
+
+
+def _known_paid_webhook(payload,raw):
+    from .payment_reconciliation import stripe_normalize
+    from .regime_operation_fence import FenceBlocked
+    normalized=json.dumps(stripe_normalize(payload),sort_keys=True,separators=(',',':'),allow_nan=False)
+    digest=hashlib.sha256(raw).hexdigest()
+    with auth.db() as c:
+        if not c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='payment_reconciliation_events'").fetchone():return False
+        row=c.execute("SELECT digest,normalized_json,state FROM payment_reconciliation_events WHERE provider='stripe' AND event_id=?",(payload['id'],)).fetchone()
+        if row is None:return False
+        if tuple(row[:2])!=(digest,normalized):raise FenceBlocked('Financial event identity reused with conflicting payload')
+        return row['state']=='applied'
 
 
 def event(raw,signature):
@@ -126,6 +151,34 @@ def event(raw,signature):
     if not isinstance(identifier,str) or not 1<=len(identifier)<=200:raise ValueError('Invalid payment event')
     if kind not in ('checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.expired','checkout.session.async_payment_failed','charge.refunded','charge.dispute.created','charge.dispute.updated','charge.dispute.closed','charge.dispute.funds_withdrawn','charge.dispute.funds_reinstated'):return {'received':True}
     from .payment_reconciliation import process_stripe
+    if kind in ('checkout.session.completed','checkout.session.async_payment_succeeded'):
+        from .payment_reconciliation import stripe_normalize
+        normalized=stripe_normalize(payload)
+        if normalized.get('payment_status')=='paid':
+            if _known_paid_webhook(payload,raw):return {'received':True,'duplicate':True}
+            order_id=normalized.get('order_id')
+            if not isinstance(order_id,str) or not order_id:raise ValueError('Invalid credit purchase')
+            with auth.db() as c:
+                c.execute('BEGIN IMMEDIATE')
+                from .checkout_terminal_outcomes import terminal_receipt
+                if terminal_receipt(c,'stripe',order_id) is not None:
+                    return process_stripe(c,payload,raw)
+                order=c.execute('SELECT session_id FROM credit_purchase_orders WHERE id=?',(order_id,)).fetchone()
+                if order is None:raise ValueError('Unknown credit purchase')
+                missing_reference=order['session_id'] is None
+            from .payment_reconcile_service import reconcile_stripe,StripeJournalChanged
+            for attempt in range(2):
+                try:
+                    with _webhook_readback_client() as client:
+                        if missing_reference:
+                            from .checkout_reference_recovery import recover
+                            recover('stripe',order_id,normalized.get('id'),client=client)
+                        reconcile_stripe(order_id,client=client,_webhook_payload=payload,_webhook_raw=raw)
+                    break
+                except StripeJournalChanged:
+                    if _known_paid_webhook(payload,raw):return {'received':True,'duplicate':True}
+                    if attempt:raise
+            return {'received':True}
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE')
         return process_stripe(c,payload,raw)

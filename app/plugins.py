@@ -614,11 +614,11 @@ class DemucsStemSplitter:
         from .demucs_runtime import python_path,device_arguments
         external_python = python_path()
         if external_python is not None:
-            cmd = [str(external_python), "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
+            cmd = [str(external_python), "-I", "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
         elif shutil.which("demucs"):
             cmd = ["demucs", "-n", model, "--out", str(output_dir)]
         else:
-            cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
+            cmd = [sys.executable, "-I", "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
         cmd += device_arguments()
         if local_repo:
             cmd += ["--repo", local_repo]
@@ -628,12 +628,14 @@ class DemucsStemSplitter:
         if progress:
             progress(20, "Avvio del modello Demucs")
         evaluate('demucs', {'model': model})
+        from .ai_execution_policy import isolated_env
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
+            env=isolated_env(),
         )
         tail: list[str] = []
         percent_re = re.compile(r"(?<!\d)(\d{1,3})%")

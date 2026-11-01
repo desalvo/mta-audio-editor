@@ -1,0 +1,8 @@
+{
+  "baseline": "ee4e37fd30c39a72638b303b01ca0cd5b090f272",
+  "base_blobs_verified": 4361,
+  "unique_passed": 62,
+  "real_provider_tested": false,
+  "rc_criteria_passed": 32,
+  "rc_criteria_total": 42
+}

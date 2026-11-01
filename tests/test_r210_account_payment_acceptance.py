@@ -114,8 +114,10 @@ def test_noncommercial_blocks_capture_and_foreign_epoch_but_original_epoch_readb
     with auth.db() as c:pid=c.execute('SELECT provider_order FROM paypal_orders WHERE id=?',(local,)).fetchone()[0]
     paypal._api({},'POST','/v2/checkout/orders/'+pid+'/capture')
     before=len(provider[1])
-    with pytest.raises(FenceBlocked):paypal.capture(account,local)
+    with pytest.raises(FenceBlocked,match='different regime epoch'):paypal.capture(account,local)
     assert all(method=='GET' for method,_,_,_ in provider[1][before:]) and balance(account)['due_micro']==3_000_000
+    with auth.db() as c:
+        assert not c.execute("SELECT 1 FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='pending' AND normalized_json LIKE '%paypal_history_gap%'",(local,)).fetchone()
     # Only restoration of the exact original admission epoch permits settlement.
     (auth.data_root()/'service-regime.json').write_text(json.dumps({'regime':'COMMERCIAL','revision':0}))
     with auth.db() as c:c.execute("UPDATE regime_fence_state SET regime='COMMERCIAL'")

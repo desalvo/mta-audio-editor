@@ -11,7 +11,7 @@ from app import auth, credit_purchases as shop, resource_accounts as resources
 from app import payment_reconcile_service as service
 from app.regime_operation_fence import FenceBlocked
 from test_r210_subscriptions import account as account  # noqa: F401
-from test_r210_payment_reconciliation_e2e import purchase, dispute
+from test_r210_payment_reconciliation_e2e import purchase, dispute, refund
 from test_r210_credit_checkout import signed, paid_event
 from test_r210_owner_payments import client as web_client
 
@@ -65,6 +65,70 @@ def reconcile(history):
     local,state=history
     with httpx.Client(transport=state['transport']) as remote:
         return service.reconcile_stripe(local,client=remote)
+
+
+def test_initial_paid_webhook_discovers_existing_provider_refund(history,account,monkeypatch):
+    local,state=history
+    client_type=httpx.Client
+    monkeypatch.setattr(shop,'_webhook_readback_client',lambda:client_type(transport=state['transport']))
+    raw,signature=signed(paid_event(local))
+    shop.event(raw,signature);shop.event(raw,signature)
+    assert resources.state(account)['credits_micro']==3_000_000
+    with auth.db() as c:
+        assert c.execute("SELECT count(*) FROM credit_payment_events WHERE id='evt_paid'").fetchone()[0]==1
+
+
+def test_initial_paid_webhook_applies_refund_and_dispute_together(history,account,monkeypatch):
+    local,state=history;client_type=httpx.Client
+    state['charges'][0]['disputed']=True
+    state['disputes']=[{'id':'dp_test','charge':'ch_test','payment_intent':'pi_test','amount':100,'currency':'eur','status':'under_review'}]
+    monkeypatch.setattr(shop,'_webhook_readback_client',lambda:client_type(transport=state['transport']))
+    assert shop.event(*signed(paid_event(local)))['received']
+    assert resources.state(account)['credits_micro']==2_000_000
+    with auth.db() as c:
+        assert tuple(c.execute("SELECT refunded_minor,held_minor FROM payment_reconciliation_positions WHERE provider='stripe' AND order_id=?",(local,)).fetchone())==(200,100)
+
+
+def test_initial_paid_webhook_http_endpoint_applies_verified_net(history,account,monkeypatch):
+    from fastapi.testclient import TestClient
+    from app import main
+    local,state=history;client_type=httpx.Client
+    monkeypatch.setattr(shop,'_webhook_readback_client',lambda:client_type(transport=state['transport']))
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',False);monkeypatch.setattr(main,'check_basic_auth',lambda _:False)
+    monkeypatch.delenv('MTA_ALLOW_INSECURE_NO_AUTH',raising=False)
+    raw,signature=signed(paid_event(local))
+    response=TestClient(main.app).post('/api/billing/credits/stripe-webhook',content=raw,headers={'stripe-signature':signature})
+    assert response.status_code==200,response.text
+    assert resources.state(account)['credits_micro']==3_000_000
+
+
+@pytest.mark.parametrize('problem',['incomplete_refund','unpaid','wrong_intent','wrong_amount'])
+def test_initial_paid_webhook_rejects_incomplete_or_conflicting_history(history,account,monkeypatch,problem):
+    local,state=history;client_type=httpx.Client
+    monkeypatch.setattr(shop,'_webhook_readback_client',lambda:client_type(transport=state['transport']))
+    payload=paid_event(local)
+    if problem=='incomplete_refund':state['refunds']=[]
+    if problem=='unpaid':state['session']['payment_status']='unpaid'
+    if problem=='wrong_intent':payload['data']['object']['payment_intent']='pi_other'
+    if problem=='wrong_amount':payload['data']['object']['amount_total']=600
+    with pytest.raises((ValueError,FenceBlocked)):shop.event(*signed(payload))
+    assert resources.state(account)['credits_micro']==0
+    with auth.db() as c:
+        assert c.execute("SELECT 1 FROM credit_payment_events WHERE id='evt_paid'").fetchone() is None
+
+
+def test_paid_webhook_retries_journal_race_and_preserves_newer_refund(history,account,monkeypatch):
+    local,state=history;client_type=httpx.Client
+    monkeypatch.setattr(shop,'_webhook_readback_client',lambda:client_type(transport=state['transport']))
+    def race(path,body,count):
+        if path=='/v1/charges' and count==1:
+            assert shop.event(*signed(refund(300,'evt_refund_during_readback')))['pending']
+    state['mutate']=race
+    assert shop.event(*signed(paid_event(local)))['received']
+    assert resources.state(account)['credits_micro']==2_000_000
+    with auth.db() as c:
+        assert c.execute("SELECT refunded_minor FROM payment_reconciliation_positions WHERE provider='stripe' AND order_id=?",(local,)).fetchone()[0]==300
+        assert c.execute("SELECT state FROM payment_reconciliation_events WHERE provider='stripe' AND event_id='evt_refund_during_readback'").fetchone()[0]=='applied'
 
 
 def accounting():
@@ -170,6 +234,7 @@ def test_actual_confirmed_api_refuses_unstable_then_recovers_original_payment(hi
 
 def test_signed_hold_during_readback_cannot_be_overwritten_by_old_won_snapshot(history,account):
     local,state=history;shop.event(*signed(paid_event(local)))
+    with auth.db() as c:before=c.execute('SELECT count(*) FROM regime_financial_evidence').fetchone()[0]
     state['charges'][0]['disputed']=True
     state['disputes']=[{'id':'dp_test','charge':'ch_test','payment_intent':'pi_test','amount':500,'currency':'eur','status':'won'}]
     def mutate(path,body,count):
@@ -180,7 +245,7 @@ def test_signed_hold_during_readback_cannot_be_overwritten_by_old_won_snapshot(h
     assert resources.state(account)['credits_micro']==0
     with auth.db() as c:
         assert c.execute("SELECT status FROM payment_reconciliation_disputes WHERE dispute_id='dp_test'").fetchone()[0]=='under_review'
-        assert not c.execute("SELECT 1 FROM sqlite_master WHERE name='regime_financial_evidence'").fetchone()
+        assert c.execute('SELECT count(*) FROM regime_financial_evidence').fetchone()[0]==before
 
 
 def test_two_individually_valid_passes_with_different_money_are_refused(history):

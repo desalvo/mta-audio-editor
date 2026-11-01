@@ -1,0 +1,40 @@
+{
+  "schema": "mta-sam-model-load-diagnostics-1",
+  "date": "2026-11-01",
+  "rc": {
+    "verified": 34,
+    "total": 42,
+    "percent": 81.0
+  },
+  "original_diagnostics": {
+    "sam_model_load_failed_events": 2,
+    "exception_types": [
+      "CalledProcessError"
+    ],
+    "root_cause_identified": false,
+    "raw_user_diagnostics_included": false
+  },
+  "previous_archive_regression": "Isolated SAM entrypoint could not import app.sam_audio_compat from an arbitrary working directory",
+  "before_tests_failed": 3,
+  "tests": {
+    "cases": 338,
+    "passed": 338,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "limitations": [
+    "No real SAM checkpoint, service credentials or target ROCm GPU in this environment",
+    "Synthetic model tests do not establish actual inference or rights",
+    "Original model-load error needs server journal or a new classified diagnostic"
+  ],
+  "gates": {
+    "ruff": "pass",
+    "execution_inventory": "pass",
+    "service_admission_inventory": "pass",
+    "remote_transport_inventory": "pass",
+    "security_review": "pass",
+    "bandit_findings": 168,
+    "bandit_high": 0
+  }
+}

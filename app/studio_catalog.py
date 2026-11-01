@@ -117,6 +117,7 @@ def capabilities():
 def install_basic_pitch(cancelled,progress):
     """Explicit administrator action only. Publish receipt after real inference."""
     from .ai_project_lock import project_publication_lock
+    from .ai_execution_policy import isolated_env
     from .storage import _atomic_json_write
     with project_publication_lock('studio-model:basic-pitch'):
         existing=receipt()
@@ -135,7 +136,7 @@ def install_basic_pitch(cancelled,progress):
         def run(command,phase):
             progress(phase)
             with (root()/'installation.log').open('ab') as log:
-                process=subprocess.Popen(list(map(str,command)),stdout=log,stderr=log,stdin=subprocess.DEVNULL,start_new_session=os.name=='posix')
+                process=subprocess.Popen(list(map(str,command)),stdout=log,stderr=log,stdin=subprocess.DEVNULL,start_new_session=os.name=='posix',env=isolated_env())
                 deadline=time.monotonic()+1800
                 try:
                     while process.poll() is None:
@@ -153,7 +154,7 @@ def install_basic_pitch(cancelled,progress):
         run([*pip,'-r',Path(__file__).resolve().parents[1]/'requirements-studio-basic-pitch.txt'],'installing-dependencies')
         run([*pip,'--no-deps','basic-pitch==0.4.0'],'installing-model')
         # This produces notes using the real ONNX backend, not merely an import.
-        run([binary,Path(__file__).with_name('ai_studio_adapter.py'),'--self-test',runtime/'self-test.json'],'testing-model')
+        run([binary,'-I',Path(__file__).with_name('ai_studio_adapter.py'),'--self-test',runtime/'self-test.json'],'testing-model')
         test=json.loads((runtime/'self-test.json').read_text())
         model=Path(test['model_path'])
         if not model.resolve().is_relative_to(runtime.resolve()) or test.get('sha256')!=MODEL_SHA:
@@ -170,6 +171,7 @@ def test_basic_pitch(cancelled,progress):
     """A fresh inference test, not a replay of the installation receipt."""
     import tempfile
     from .ai_project_lock import project_publication_lock
+    from .ai_execution_policy import isolated_env
     from .studio_compute import terminate
     from .storage import _atomic_json_write
     with project_publication_lock('studio-model:basic-pitch'):
@@ -179,9 +181,9 @@ def test_basic_pitch(cancelled,progress):
             target=Path(raw)/'test.json'
             progress('testing-model')
             with (root()/'installation.log').open('ab') as log:
-                process=subprocess.Popen([value['python'],str(Path(__file__).with_name('ai_studio_adapter.py')),
+                process=subprocess.Popen([value['python'],'-I',str(Path(__file__).with_name('ai_studio_adapter.py')),
                     '--self-test',str(target)],stdin=subprocess.DEVNULL,stdout=log,stderr=log,
-                    start_new_session=os.name=='posix',env={**os.environ,'ORT_DISABLE_TELEMETRY':'1'})
+                    start_new_session=os.name=='posix',env=isolated_env({**os.environ,'ORT_DISABLE_TELEMETRY':'1'}))
                 deadline=time.monotonic()+180
                 try:
                     while process.poll() is None:

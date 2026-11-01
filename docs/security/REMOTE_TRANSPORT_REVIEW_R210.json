@@ -64,7 +64,7 @@
       "line": 69,
       "call": "http.client.HTTPSConnection",
       "call_sha256": "7d699db894bae95facb054b74f994127231d0704684bbd305e8df575e93156a5",
-      "source_sha256": "619a63069a8c3073d71679c0732aa03d7337ce0d6672f2cb4dca8c28987fffc4",
+      "source_sha256": "77d125bc2fb83fb636050a011baf2e1815c710d58da799be1ee24808d59e5305",
       "category": "inference_guarded",
       "boundary": "Private operator-owned pull control only: fixed validated HTTPS origin and paths, verified system/operator CA, no redirects/proxies; bearer grants only exact claim/heartbeat/completion routes. Authority and node recheck NC model policy; no checkpoint attestation or commercial enablement.",
       "verification": "Actual TLS and independent worker processes, untrusted CA before credential transmission, redirect rejection, credential/CA journal drift rejection, exact API scope, partition and SIGKILL recovery in test_r210_pull_transport.py and companion acceptance tests."
@@ -160,10 +160,10 @@
     {
       "path": "app/checkout_reference_recovery.py",
       "function": "recover",
-      "line": 37,
+      "line": 38,
       "call": "httpx.Client",
       "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
-      "source_sha256": "062633e7aaefd8abad99f11164a7623111c3f78628c19cf3edd06ce9bc40714f",
+      "source_sha256": "b94176ebea634d2d8b08c7e6c042d7f8eeeec806012a609ac4601db1c6c22a9c",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -185,10 +185,21 @@
       "line": 53,
       "call": "httpx.Client",
       "call_sha256": "1a0599f0d91a80de9b631fae1009e7cbcfa6c2007deb0fa81a14dff3be3f35c3",
-      "source_sha256": "850f4580e1c2077456c24b10129b05c9c5263637ccf18a50bb02c18555abf8b0",
+      "source_sha256": "6ab3c6a4f9a37b4e6ccd95e9ab72a26592141fe5b561f77f7a78013be1002ea6",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
+    },
+    {
+      "path": "app/credit_purchases.py",
+      "function": "_webhook_readback_client",
+      "line": 121,
+      "call": "httpx.Client",
+      "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
+      "source_sha256": "6ab3c6a4f9a37b4e6ccd95e9ab72a26592141fe5b561f77f7a78013be1002ea6",
+      "category": "payment_provider",
+      "boundary": "Authenticated Stripe readback uses the fixed provider host with redirects disabled; webhook signatures are checked before the client is created.",
+      "verification": "Stripe paid-history tests verify exact merchant, original checkout, stable refund and dispute snapshots; network is simulated and provider target remains unverified."
     },
     {
       "path": "app/gm_installer.py",
@@ -204,10 +215,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5698,
+      "line": 5716,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "b42393500b23f15c14b7e8b3b1ce41d5875e01d9d904156d060c31f989e8b997",
+      "source_sha256": "fdc948eed70d29c98c25f20cd989ad06e8dc7deb17c7ec2c22494d30d4ed1af3",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -262,18 +273,29 @@
       "line": 240,
       "call": "httpx.Client",
       "call_sha256": "1a0599f0d91a80de9b631fae1009e7cbcfa6c2007deb0fa81a14dff3be3f35c3",
-      "source_sha256": "02ca302453559952a0226cd7079002d412f7798b3d329ba4af4cedcc6fe360b2",
+      "source_sha256": "3a51f34eb8c16673ef0e4fafb3ff82bccf5702b2c2c9880c8786a50aeeac0cc6",
       "category": "payment_provider",
       "boundary": "Exact Stripe refund POST on fixed HTTPS host; active admin, immutable local origin/amount/merchant and committed uncertainty barrier permit one dispatch only. No automatic POST retry.",
       "verification": "tests/test_r210_operator_refunds.py; tests/test_r210_operator_refunds_recovery.py; tests/test_r210_operator_refunds_ui.py; mock provider I/O only, durable real database and Chromium workflows."
     },
     {
       "path": "app/operator_refunds.py",
-      "function": "verify",
-      "line": 292,
+      "function": "_discover_stripe_refund",
+      "line": 284,
       "call": "httpx.Client",
       "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
-      "source_sha256": "02ca302453559952a0226cd7079002d412f7798b3d329ba4af4cedcc6fe360b2",
+      "source_sha256": "3a51f34eb8c16673ef0e4fafb3ff82bccf5702b2c2c9880c8786a50aeeac0cc6",
+      "category": "payment_provider",
+      "boundary": "GET-only bounded Stripe refund list on fixed API host, filtered by original payment intent; two stable full reads identify one exact immutable local metadata token before individual verification. No refund POST or settlement from listing.",
+      "verification": "tests/test_r210_operator_refunds_recovery.py and tests/test_r210_operator_refunds_ui.py use simulated provider, actual SQLite ledger and authenticated admin API; ambiguous or changing history remains uncertain."
+    },
+    {
+      "path": "app/operator_refunds.py",
+      "function": "verify",
+      "line": 369,
+      "call": "httpx.Client",
+      "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
+      "source_sha256": "3a51f34eb8c16673ef0e4fafb3ff82bccf5702b2c2c9880c8786a50aeeac0cc6",
       "category": "payment_provider",
       "boundary": "GET-only exact Stripe refund resource on fixed HTTPS host; authenticated current original merchant, strict operation metadata/origin/currency/amount binding and canonical ledger readback required before settlement.",
       "verification": "tests/test_r210_operator_refunds.py; tests/test_r210_operator_refunds_recovery.py; tests/test_r210_operator_refunds_ui.py; mock provider I/O only, durable real database and Chromium workflows."
@@ -281,10 +303,10 @@
     {
       "path": "app/payment_reconcile_service.py",
       "function": "reconcile_checkout",
-      "line": 229,
+      "line": 266,
       "call": "httpx.Client",
       "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
-      "source_sha256": "359d631353e79ba12a9aac62ce4f4fe4febde72b35c4d8df67a67e6c5e1963e9",
+      "source_sha256": "2f81d2af1cebfc5269c04d16d145f82aa12dd46b15a8334026b59ec61fd5204a",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -295,7 +317,7 @@
       "line": 64,
       "call": "httpx.Client",
       "call_sha256": "1a0599f0d91a80de9b631fae1009e7cbcfa6c2007deb0fa81a14dff3be3f35c3",
-      "source_sha256": "09f249ecda75757e875b31e28ef2d476e3e2d1554e8a4c725bae5b3121b152af",
+      "source_sha256": "3a2809302a6250b5c55366306a91c2e408a89d8fba1af6f8b1752b98625520fd",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."
@@ -436,5 +458,22 @@
     "boundary": "No new provider endpoint,process or network call. Marker is local immutable epoch metadata; source-bound quote exists before dispatch. Noncommercial statements and financial rows are preserved. Post-checkout migration stays refused.",
     "unchanged": "Scanner/checker code,findings,AST boundary shape,classification,thresholds and suppressions.",
     "source_inventory": "309app Python sources;556runtime sources;780execution,173admission,30transport boundaries."
+  },
+  "a5_cash_lifecycle_review": {
+    "date": "2026-11-01",
+    "boundary": "GET-only complete balance-affecting cash reporting through existing PayPal fixed endpoint; original merchant/captures/refunds/final cases, quote and journal pinned before atomic debt correction. Movement claims cannot cross original orders. No new process, service, inference, credentials, provider mutation or automatic retry. Owner/admin existing private reconciliation only.",
+    "evidence": [
+      "tests/test_r210_subscription_cash_lifecycle.py"
+    ],
+    "limits": "Provider simulation is software evidence only; A6 actual sandbox and A4 general payout/unknown movement remain open."
+  },
+  "paypal_cash_history_review": {
+    "date": "2026-11-01",
+    "evidence": [
+      "tests/test_r210_paypal_cash_history.py",
+      "tests/test_r210_subscription_cash_lifecycle.py"
+    ],
+    "boundary": "Exact original owner/merchant/admitted checkout plus stable complete canonical cases/captures/refunds and bounded balance-only cash, no caller amount or payout label authority. Cash claims and original ledger commit atomically, before any gross first funding becomes visible. No new transport, interpreter, inference, process, grant or automatic monetary retry.",
+    "unchanged": "All checker bytes, AST call shapes, classifications, findings, thresholds and suppressions. Provider and browser target acceptance remain separate."
   }
 }

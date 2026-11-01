@@ -139,7 +139,7 @@ def _list(cfg,cid,budget,observed):
     raise HistoryBlocked('PayPal dispute history exceeds page bound')
 
 
-def _discover(canonical,cfg,observed,settlement_context=None):
+def _discover(canonical,cfg,observed,settlement_context=None,*,documents_only=False):
     captures={x['id']:paypal._cents(x['amount']) for x in canonical['purchase_units'][0]['payments']['captures']}
     budget=[0];first={cid:_list(cfg,cid,budget,observed) for cid in captures};documents={};members={}
     if sum(map(len,first.values()))>2000:raise HistoryBlocked('PayPal dispute references exceed bound')
@@ -156,15 +156,28 @@ def _discover(canonical,cfg,observed,settlement_context=None):
                 if field not in summary or summary[field]!=detail.get(field):raise HistoryBlocked('PayPal dispute summary changed')
     rows=[]
     for did,detail in documents.items():
-        normalized=normalize(detail,cfg,captures=captures,settlement_context=settlement_context)
-        if {x['capture_id'] for x in normalized}!=members[did]:raise HistoryBlocked('PayPal filtered dispute collection is incomplete')
-        rows.extend(normalized)
+        if documents_only:
+            transactions=detail.get('disputed_transactions')
+            if not isinstance(transactions,list) or not 1<=len(transactions)<=100 or any(not isinstance(x,dict) for x in transactions):
+                raise HistoryBlocked('Invalid PayPal dispute capture collection')
+            ids=[x.get('seller_transaction_id') for x in transactions]
+            if any(not isinstance(x,str) for x in ids) or len(ids)!=len(set(ids)) or set(ids)!=members[did]:
+                raise HistoryBlocked('PayPal filtered dispute collection is incomplete')
+        else:
+            normalized=normalize(detail,cfg,captures=captures,settlement_context=settlement_context)
+            if {x['capture_id'] for x in normalized}!=members[did]:raise HistoryBlocked('PayPal filtered dispute collection is incomplete')
+            rows.extend(normalized)
     # Re-read every detail and complete filtered collection, including empties.
     for did,detail in documents.items():
         if _read(cfg,'/v1/customer/disputes/'+did,budget)!=detail:raise HistoryBlocked('PayPal dispute changed during discovery')
     if {cid:_list(cfg,cid,budget,observed) for cid in captures}!=first:raise HistoryBlocked('PayPal dispute collection changed during discovery')
     if _read(cfg,'/v2/checkout/orders/'+canonical['id'],budget)!=canonical:raise HistoryBlocked('PayPal order changed during dispute discovery')
-    return rows
+    return documents if documents_only else rows
+
+
+def documents(canonical,cfg):
+    """Stable canonical documents; no inferred allocation or settlement."""
+    return _discover(canonical,cfg,set(),documents_only=True)
 
 
 def discover(canonical,cfg,*,settlement_context=None):

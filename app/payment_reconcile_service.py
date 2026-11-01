@@ -18,6 +18,10 @@ from .regime_operation_fence import FenceBlocked
 from .regime_provider_probe import _get, _reference, ProviderProbeError
 
 
+class StripeJournalChanged(FenceBlocked):
+    """The local event journal changed while a Stripe snapshot was read."""
+
+
 def _pages(client,path,headers,params,*,max_items=None):
     items=[];seen=set();cursor=None
     for _ in range(100):
@@ -48,7 +52,7 @@ def _stripe_journal_version(c):
     return version.hexdigest()
 
 
-def reconcile_stripe(order_id,*,client,expected_owner=None):
+def reconcile_stripe(order_id,*,client,expected_owner=None,_webhook_payload=None,_webhook_raw=None):
     from . import credit_purchases as shop
     from .payment_reconciliation import process_stripe
     from .regime_financial_evidence import record_observation
@@ -68,11 +72,21 @@ def reconcile_stripe(order_id,*,client,expected_owner=None):
     headers={'Authorization':'Bearer '+key}
     first=_get(client,'https://api.stripe.com/v1/checkout/sessions/'+session_id,headers)
     if first.get('status')!='complete' or first.get('payment_status')!='paid':
+        if _webhook_payload is not None:raise ProviderProbeError('Paid Stripe webhook requires a completed original payment')
         return _stripe_unpaid(initial,key,first,client=client,journal=journal)
     document = collect(client, key, initial)
     if collect(client, key, initial) != document:
         raise ProviderProbeError('Stripe financial history changed during readback')
     session, intent, charge = (document[name] for name in ('session', 'intent', 'charge'))
+    if _webhook_payload is not None:
+        from .payment_reconciliation import stripe_normalize
+        item=stripe_normalize(_webhook_payload)
+        if (_webhook_raw is None or item.get('type') not in ('checkout.session.completed','checkout.session.async_payment_succeeded')
+            or item.get('order_id')!=order_id or item.get('id')!=session['id']
+            or item.get('payment_intent')!=intent['id'] or item.get('payment_status')!='paid'
+            or type(item.get('amount_total')) is not int or item['amount_total']!=initial['amount_cents']
+            or item.get('currency')!='eur' or item.get('client_reference_id')!=order_id):
+            raise ProviderProbeError('Stripe webhook conflicts with verified checkout')
     refunds, disputes = document['refunds'], document['disputes']
     total = sum(item['amount'] for item in refunds if item['status'] == 'succeeded')
     observation = {'provider': 'stripe', 'reference': session_id, 'payment_intent': intent['id'],
@@ -94,7 +108,7 @@ def reconcile_stripe(order_id,*,client,expected_owner=None):
         if auth._open(c.execute('SELECT secret_key FROM credit_payment_config WHERE id=1').fetchone()[0])!=key:
             raise FenceBlocked('Provider configuration changed during reconciliation')
         if _stripe_journal_version(c) != journal:
-            raise FenceBlocked('Stripe event journal changed during readback; refresh again')
+            raise StripeJournalChanged('Stripe event journal changed during readback; refresh again')
         operation='checkout:stripe:'+order_id
         evidence=record_observation(c,operation,observation,evidence_id='stripe:'+snapshot)
         events=[{'id':'reconcile:paid:'+snapshot,'type':'checkout.session.completed','data':{'object':session}},
@@ -107,23 +121,42 @@ def reconcile_stripe(order_id,*,client,expected_owner=None):
                 if previous:event['created']=json.loads(previous[0])['event_created']
             raw=json.dumps(event,sort_keys=True,allow_nan=False).encode()
             process_stripe(c,event,raw)
+        if _webhook_payload is not None:
+            process_stripe(c,_webhook_payload,_webhook_raw)
         return {'provider':'stripe','order_id':order_id,'ledger_reconciled':True,
                 'evidence_id':evidence['evidence_id'],'snapshot_digest':snapshot,
                 'refunds':len(refunds),'disputes':len(disputes),'transition_authorized':False}
 
 
-def reconcile_paypal(order_id,*,expected_owner=None,_merchant_context=None,_settlement_context=None):
+def reconcile_paypal(order_id,*,expected_owner=None,_merchant_context=None,_settlement_context=None,_ordinary_capture=False,_webhook_event_id=None,_webhook_digest=None,_expected_provider_order=None,_expected_config=None,_resolve_cash=False):
     from . import paypal_payments as paypal
     with auth.db() as c:
-        paypal.init(c)
+        paypal.init(c);c.execute('BEGIN IMMEDIATE')
         row=c.execute('SELECT * FROM paypal_orders WHERE id=?',(order_id,)).fetchone();cfg=paypal._keys(c)
         if row is None or (expected_owner is not None and (type(expected_owner) is not int or row['user_id']!=expected_owner)):
             raise ValueError('Payment unavailable')
         order=dict(row)
+        if (_expected_provider_order is not None and order['provider_order']!=_expected_provider_order) or (_expected_config is not None and cfg!=_expected_config):
+            raise FenceBlocked('PayPal webhook order or configuration changed')
+        # Check a known transient regime block before provider discovery. An
+        # epoch mismatch is not itself evidence of an incomplete history.
+        if order['status']=='pending' and c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='regime_payment_outbox'").fetchone():
+            op='checkout:paypal:'+order_id
+            if c.execute('SELECT 1 FROM regime_payment_outbox WHERE operation_id=?',(op,)).fetchone():
+                from .regime_outcome_receipt import require_open_commercial_checkout
+                require_open_commercial_checkout(c,op)
         if _settlement_context is not None:_settlement_context.verify(c,order,cfg)
         if _merchant_context is not None:
             from .paypal_merchant_reconcile import check_context
             check_context(c,_merchant_context,order,cfg)
+        from . import paypal_cash_history
+        cash_proved=paypal_cash_history.has_receipt(c,order_id)
+    if cash_proved:
+        if _settlement_context is not None:raise FenceBlocked('Original cash payment requires complete cash reconciliation')
+        return paypal_cash_history.reconcile(order_id,expected_owner=expected_owner,
+            _webhook_event_id=_webhook_event_id,_webhook_digest=_webhook_digest,
+            _expected_provider_order=_expected_provider_order,_expected_config=_expected_config,
+            _merchant_context=_merchant_context)
     if order['environment']!=cfg['environment'] or order['client_fingerprint']!=hashlib.sha256(cfg['client_id'].encode()).hexdigest():
         raise FenceBlocked('PayPal merchant configuration changed')
     pid=_reference(order['provider_order'])
@@ -132,6 +165,7 @@ def reconcile_paypal(order_id,*,expected_owner=None,_merchant_context=None,_sett
         with auth.db() as c:_settlement_context.verify(c,order,cfg,canonical)
     if canonical.get('status')!='COMPLETED':
         if _merchant_context is not None:raise FenceBlocked('Merchant discovery requires a completed original payment')
+        if _webhook_event_id is not None:raise FenceBlocked('PayPal completed webhook requires a completed original payment')
         return _paypal_unpaid(order,cfg,canonical)
     from .paypal_reconciliation import discover
     from .paypal_dispute_history import discover as disputes,record_gap
@@ -141,7 +175,10 @@ def reconcile_paypal(order_id,*,expected_owner=None,_merchant_context=None,_sett
     except (ValueError,KeyError,TypeError,AttributeError) as exc:
         record_gap(order,cfg,getattr(exc,'observed',()))
         raise ValueError('PayPal dispute history is incomplete; refresh or contact the administrator') from None
-    try:result=paypal.fulfill(order_id,canonical,_reconciliation=(order,cfg,history),_disputes=risk_history,_merchant_context=_merchant_context,_settlement_context=_settlement_context)
+    if _resolve_cash and any(x['status']=='uncertain' for x in risk_history):
+        record_gap(order,cfg,{x['hold_id'].split(':')[1] for x in risk_history})
+        return paypal_cash_history.reconcile(order_id,expected_owner=expected_owner)
+    try:result=paypal.fulfill(order_id,canonical,webhook_event_id=_webhook_event_id,webhook_digest=_webhook_digest,_reconciliation=(order,cfg,history),_disputes=risk_history,_merchant_context=_merchant_context,_settlement_context=_settlement_context,_ordinary_capture=_ordinary_capture)
     except (FenceBlocked,ValueError):
         record_gap(order,cfg,{x['hold_id'].split(':')[1] for x in risk_history})
         raise
@@ -227,5 +264,27 @@ def reconcile_checkout(provider,order_id,*,expected_owner=None):
                 raise ValueError('Payment unavailable')
     if provider=='stripe':
         with httpx.Client(timeout=15,follow_redirects=False) as client:return reconcile_stripe(order_id,client=client,expected_owner=expected_owner)
-    if provider=='paypal':return reconcile_paypal(order_id,expected_owner=expected_owner)
+    if provider=='paypal':
+        from . import paypal_cash_history
+        with auth.db() as c:proved=paypal_cash_history.has_receipt(c,order_id)
+        if proved:return paypal_cash_history.reconcile(order_id,expected_owner=expected_owner)
+        try:result=reconcile_paypal(order_id,expected_owner=expected_owner,_resolve_cash=True)
+        except ValueError as exc:
+            # Only explicit owner/admin reconciliation can recover a historical
+            # gap through complete cash; ordinary capture/webhooks keep their
+            # existing conservative path.
+            if 'dispute history is incomplete' not in str(exc):raise
+            return paypal_cash_history.reconcile(order_id,expected_owner=expected_owner)
+        if result.get('financial_review_pending'):
+            return paypal_cash_history.reconcile(order_id,expected_owner=expected_owner)
+        if result.get('history_scope')=='original_complete_cash_and_final_cases':return result
+        from .subscription_cash_reconciliation import has_receipt,reconcile as reconcile_loss
+        with auth.db() as c:
+            order=c.execute('SELECT kind,status FROM paypal_orders WHERE id=?',(order_id,)).fetchone()
+            permanent=(c.execute("SELECT 1 FROM sqlite_master WHERE name='paypal_financial_holds'").fetchone()
+                       and c.execute("SELECT 1 FROM paypal_financial_holds WHERE order_id=? AND status='permanent' LIMIT 1",(order_id,)).fetchone())
+            needs_cash=(order is not None and tuple(order)==('subscription','paid')
+                        and (has_receipt(c,order_id) or permanent))
+        if needs_cash:return {**result,**reconcile_loss(order_id,expected_owner=expected_owner)}
+        return result
     raise ValueError('Unsupported payment provider')

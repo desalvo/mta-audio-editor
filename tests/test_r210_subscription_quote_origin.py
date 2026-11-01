@@ -56,6 +56,33 @@ def test_current_plan_price_does_not_change_original_order_quote(account,provide
         assert c.execute('SELECT refund_due_micro FROM paypal_orders').fetchone()[0]==9999
 
 
+@pytest.mark.parametrize('changed',[5_000_002,5_000_003])
+def test_checkout_retry_rejects_subcent_receivable_change_before_returning_approval(account,provider,changed):
+    state=plan(account,price_micro=5_000_001)
+    body={'kind':'subscription','period_start':state['period']['start'],'request_id':'retry-quote-preservation'}
+    original=paypal.checkout(account,body)
+    assert paypal.checkout(account,body)==original
+    calls=len(provider[1])
+    with auth.db() as c:c.execute('UPDATE resource_plan_charges SET amount_micro=?',(changed,))
+    with pytest.raises(ValueError,match='Original subscription receivable changed'):
+        paypal.checkout(account,body)
+    assert len(provider[1])==calls
+    with auth.db() as c:
+        assert c.execute('SELECT fee_micro FROM subscription_payment_basis').fetchone()[0]==5_000_001
+        assert c.execute('SELECT status FROM paypal_orders').fetchone()[0]=='pending'
+
+
+def test_checkout_retry_never_rebuilds_missing_original_quote(account,provider):
+    state=plan(account,price_micro=5_000_001)
+    body={'kind':'subscription','period_start':state['period']['start'],'request_id':'retry-quote-missing'}
+    paypal.checkout(account,body)
+    with auth.db() as c:c.execute('DROP TABLE subscription_payment_basis')
+    calls=len(provider[1])
+    with pytest.raises(FenceBlocked,match='Original subscription quote evidence'):
+        paypal.checkout(account,body)
+    assert len(provider[1])==calls
+
+
 @pytest.mark.parametrize('changed',[5_000_002,4_999_999])
 def test_subcent_receivable_change_is_rejected_before_collecting_money(account,provider,changed):
     local=create(account);before=len(provider[1])

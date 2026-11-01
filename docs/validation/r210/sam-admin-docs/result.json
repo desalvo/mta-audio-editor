@@ -1,0 +1,35 @@
+{
+  "schema": "mta-sam-admin-docs-1",
+  "rc": {
+    "verified": 34,
+    "total": 42,
+    "percent": 81.0
+  },
+  "scope": "Bilingual HTML and PDF administrator manuals; SAM setup guide",
+  "user_observed": {
+    "service_user": "root",
+    "HF_HOME": "/var/lib/mta/models/huggingface",
+    "HOME": "unset",
+    "XDG_CACHE_HOME": "unset",
+    "HF_TOKEN_PATH": "unset",
+    "HF_TOKEN": "unset",
+    "HUGGING_FACE_HUB_TOKEN": "unset",
+    "sam_runtime_python": "/opt/mta/ai-7f176167db5671ae/sam/bin/python",
+    "runtime_path_is_installation_specific": true,
+    "original_error": "GatedRepoError HTTP 401",
+    "models": [
+      "facebook/sam-audio-base",
+      "facebook/sam-audio-large"
+    ]
+  },
+  "validation": {
+    "manual_tests_passed": 18,
+    "manual_tests_failed": 0,
+    "pdf_visual_review": "both languages pages 17 and 18",
+    "pdf_pages_it": 18,
+    "pdf_pages_en": 18,
+    "html_pdf_text_and_embedded_python": "passed",
+    "ruff": "passed"
+  },
+  "limit": "User approval/authentication and real server retry not yet confirmed; credentials are not recorded."
+}

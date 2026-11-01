@@ -27,12 +27,12 @@ def _backend_command(plan, folder, backend, arguments):
         configured=python_path()
         if configured is not None:python=str(configured)
     if enabled() or __import__('app.ai_gpu_verified',fromlist=['readiness']).readiness()['ready']:
-        return [python, str(Path(__file__).with_name('ai_profiled_backend.py')),
+        return [python, '-I', str(Path(__file__).with_name('ai_profiled_backend.py')),
                 '--backend', backend, '--task-id', str(plan.get('gpu_profile_task_id', '')),
                 '--report-dir', str(folder), '--', *arguments]
     if backend == 'demucs':
-        return [python, '-m', 'demucs.separate', *arguments]
-    return [sys.executable, str(Path(__file__).with_name('sam_audio_worker.py')), *arguments]
+        return [python, '-I', '-m', 'demucs.separate', *arguments]
+    return [sys.executable, '-I', str(Path(__file__).with_name('sam_audio_worker.py')), *arguments]
 
 
 def _artifacts(folder: Path, entries: list[tuple[Path, str]]) -> None:

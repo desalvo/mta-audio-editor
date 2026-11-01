@@ -60,6 +60,55 @@ def test_checkout_requires_eligible_subscription(account,provider):
     with pytest.raises(ValueError):paypal.checkout(account,{'kind':'credits','amount_cents':500,'request_id':'disabled-credit-request'})
 
 
+def test_completed_remote_capture_is_recovered_after_credit_service_is_disabled(account,provider):
+    plan(account)
+    local=paypal.checkout(account,{'kind':'credits','amount_cents':500,'request_id':'recover-paid-after-disable'})['order_id']
+    pid=next(iter(provider[0]))
+    paypal._api({},'POST','/v2/checkout/orders/'+pid+'/capture')
+    r.configure({'credits_enabled':False})
+    calls=len(provider[1])
+    assert paypal.capture(account,local)['status']=='paid'
+    assert paypal.capture(account,local)['status']=='paid'
+    assert r.state(account)['credits_micro']==5_000_000
+    assert not any(method=='POST' for method,_,_,_ in provider[1][calls:])
+
+
+def test_approved_checkout_does_not_capture_after_credit_service_is_disabled(account,provider):
+    plan(account)
+    local=paypal.checkout(account,{'kind':'credits','amount_cents':500,'request_id':'no-capture-after-disable'})['order_id']
+    r.configure({'credits_enabled':False});calls=len(provider[1])
+    with pytest.raises(ValueError):paypal.capture(account,local)
+    assert not any(method=='POST' for method,_,_,_ in provider[1][calls:])
+    assert r.state(account)['credits_micro']==0
+
+
+def test_paid_paypal_retry_returns_original_receipt_after_provider_disabled(account,provider):
+    plan(account);body={'kind':'credits','amount_cents':500,'request_id':'paid-paypal-after-disable'}
+    local=paypal.checkout(account,body)['order_id'];paypal.capture(account,local)
+    paypal.settings({'enabled':False});calls=len(provider[1])
+    assert paypal.checkout(account,body)=={'status':'paid','order_id':local}
+    with pytest.raises(ValueError,match='Conflicting purchase retry'):
+        paypal.checkout(account,{**body,'amount_cents':600})
+    assert len(provider[1])==calls and r.state(account)['credits_micro']==5_000_000
+
+
+def test_owner_api_recovers_completed_payment_after_credit_configuration_change(account,provider,monkeypatch):
+    from fastapi.testclient import TestClient
+    from app import main
+    from test_r210_legal_documents import cookie
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',False);monkeypatch.setattr(main,'check_basic_auth',lambda _:False)
+    monkeypatch.delenv('MTA_ALLOW_INSECURE_NO_AUTH',raising=False)
+    plan(account);body={'kind':'credits','amount_cents':500,'request_id':'api-paid-after-disable'}
+    local=paypal.checkout(account,body)['order_id'];pid=next(iter(provider[0]))
+    paypal._api({},'POST','/v2/checkout/orders/'+pid+'/capture');r.configure({'credits_enabled':False})
+    client=TestClient(main.app);url='/api/account/paypal/'+local+'/capture';headers={'X-MTA-Request':'1'}
+    assert client.post(url,headers=headers).status_code==401
+    client.cookies.update(cookie(account));assert client.post(url).status_code==403
+    result=client.post(url,headers=headers)
+    assert result.status_code==200,result.text
+    assert result.json()['status']=='paid' and r.state(account)['credits_micro']==5_000_000
+
+
 def test_subscription_payment_settles_fee_without_adding_overage_credits(account,provider):
     before=plan(account,price_micro=5_000_000)
     order=paypal.checkout(account,{'kind':'subscription','period_start':before['period']['start'],'request_id':'subscription-pay-123'})
@@ -103,6 +152,25 @@ def test_webhook_signature_verified_and_canonical_order_fetched(account,provider
     assert any(c[0]=='GET' and c[1].endswith(pid) for c in calls)
 
 
+def test_completed_webhook_is_not_acknowledged_before_canonical_order_completes(account,provider):
+    from app.regime_operation_fence import FenceBlocked
+    plan(account)
+    local=paypal.checkout(account,{'kind':'credits','amount_cents':500,'request_id':'webhook-order-not-completed'})['order_id']
+    pid=next(iter(provider[0]))
+    payload={'id':'premature-event','event_type':'PAYMENT.CAPTURE.COMPLETED',
+             'resource':{'supplementary_data':{'related_ids':{'order_id':pid}}}}
+    headers={k:'test' for k in ['paypal-auth-algo','paypal-cert-url','paypal-transmission-id','paypal-transmission-sig','paypal-transmission-time']}
+    with pytest.raises(FenceBlocked,match='requires a completed original payment'):
+        paypal.webhook(json.dumps(payload).encode(),headers)
+    assert r.state(account)['credits_micro']==0
+    with auth.db() as c:
+        assert c.execute('SELECT 1 FROM paypal_events WHERE id=?',(payload['id'],)).fetchone() is None
+        assert c.execute('SELECT status FROM paypal_orders WHERE id=?',(local,)).fetchone()[0]=='pending'
+    paypal._api({},'POST','/v2/checkout/orders/'+pid+'/capture')
+    assert paypal.webhook(json.dumps(payload).encode(),headers)=={'received':True}
+    assert r.state(account)['credits_micro']==5_000_000
+
+
 def test_untrusted_approval_url_and_denomination_refused(account,provider,monkeypatch):
     plan(account)
     with pytest.raises(ValueError):paypal.checkout(account,{'kind':'credits','amount_cents':1,'request_id':'bad-amount-request'})
@@ -139,6 +207,25 @@ def test_http_roles_csrf_and_unsigned_webhook_are_enforced(account,provider,monk
     assert client.put('/api/admin/paypal',json={'enabled':True}).status_code==403
     assert client.get('/api/admin/paypal').status_code==200
     assert client.post('/api/admin/optional-vst3/install',json={'plugins':['mverb'],'accept_licenses':False},headers=headers).status_code==422
+
+
+@pytest.mark.parametrize('provider_name,url',[('paypal','/api/billing/paypal/webhook'),('stripe','/api/billing/credits/stripe-webhook')])
+def test_webhook_provider_readback_does_not_block_event_loop(account,provider,monkeypatch,provider_name,url):
+    import asyncio
+    from fastapi.testclient import TestClient
+    from app import main,credit_purchases
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',False);monkeypatch.setattr(main,'check_basic_auth',lambda _:False)
+    monkeypatch.delenv('MTA_ALLOW_INSECURE_NO_AUTH',raising=False)
+    observed=[]
+    def handler(*args):
+        try:asyncio.get_running_loop();observed.append(True)
+        except RuntimeError:observed.append(False)
+        return {'received':True}
+    if provider_name=='paypal':monkeypatch.setattr(paypal,'webhook',handler)
+    else:monkeypatch.setattr(credit_purchases,'event',handler)
+    response=TestClient(main.app).post(url,content=b'{}')
+    assert response.status_code==200,response.text
+    assert observed==[False]
 
 
 def test_prorated_subscription_fee_remains_payable_after_termination(account,provider,monkeypatch):

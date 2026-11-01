@@ -1,0 +1,32 @@
+[
+  {
+    "name": "ruff",
+    "exit_code": 0,
+    "output": "All checks passed!\n"
+  },
+  {
+    "name": "compile",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "name": "check_security_review",
+    "exit_code": 0,
+    "output": "{\"raw_severity\": {\"HIGH\": 0, \"LOW\": 147, \"MEDIUM\": 21}, \"release_candidate\": false, \"reviewed_findings\": 168, \"scan_review_passed\": true, \"source_files\": 310, \"transition_enabled\": false}\n"
+  },
+  {
+    "name": "check_ai_execution_inventory",
+    "exit_code": 0,
+    "output": "{\"families\": 10, \"hardware_model_rights_or_kernel_attestation\": false, \"inventory_passed\": true, \"release_candidate\": false, \"reviewed_boundaries\": 780, \"runtime_source_files\": 557}\n"
+  },
+  {
+    "name": "check_service_admission_inventory",
+    "exit_code": 0,
+    "output": "{\"external_kernel_or_multihost_accepted\": false, \"financial_transition_authorized\": false, \"inventory_passed\": true, \"release_candidate\": false, \"reviewed_sites\": 173, \"scope\": \"Supported single pinned Linux authority replicas and HTTPS-only original workers\", \"source_files\": 310}\n"
+  },
+  {
+    "name": "check_remote_transport_inventory",
+    "exit_code": 0,
+    "output": "{\"inventory_passed\": true, \"release_candidate\": false, \"remote_model_attestation_complete\": false, \"reviewed_sites\": 32, \"source_files\": 21}\n"
+  }
+]

@@ -1,0 +1,2954 @@
+[
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_lead_backing_engine_available",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "oauth_start",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "oauth_callback",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "login_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "login_submit",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "logout",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "register_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "register_submit",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "verify_email_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "resend_verification_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "forgot_password_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "forgot_password_submit",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "reset_password_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "reset_password_submit",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "account_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_users_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "settings_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "server_audio_engine_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "server_audio_engine_select",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_audio_engine_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_session",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "credit_purchase_page",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_account",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_account_update",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_account_password",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_totp_begin",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_totp_qr",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_totp_enable",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_totp_disable",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_account_limits",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_storage",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_storage_shared_rescan",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_diagnostics_settings",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_diagnostics_update",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_diagnostics_create",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_diagnostics_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_web_settings",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_users",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_user_update",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_user_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_smtp",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_smtp_save",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_smtp_test",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_smtp_send_test",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_social_get",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_social_save",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_projects_dump",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "home",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "user_docs",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_docs",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "user_docs_en",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_docs_en",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "user_pdf",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_pdf",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "user_pdf_en",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "vst3_manual",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_pdf_en",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "health",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "health",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "about",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "vst3_plugin_list",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "vst3_parameters",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "vst3_parameters",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "plugins",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "create_custom_preset",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "remove_custom_preset",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_model_cache",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_worker_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_catalog",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_preflight",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_remix_preflight",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_project_plan",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_remix_project_plan",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "create_ai_arranger_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "create_ai_remix_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "list_ai_planning_jobs",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "get_ai_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "cancel_ai_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_generate_ai_preview",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_generate_ai_preview",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_generate",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_remix_generate",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_execution_jobs",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_execution_bulk",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_execution_ack",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_home",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_ai_execution_jobs",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_ai_execution_history",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_ai_execution_settings",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_ai_execution_settings_update",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_ai_execution_cancel",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_ai_execution_move",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "generate",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "generate",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "generate",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_active_generation",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_cancel_generation",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_start_generation",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_remix_start_generation",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_generate_and_add",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_arranger_generate_and_add",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_remix_generate_and_add",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "ai_remix_generate_and_add",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "projects",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_new",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_migrate_flac",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_get",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_put",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_shares",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_share_add",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_share_remove",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_file_list",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_media_cleanup",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_file_upload",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_file_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_file_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_files_batch_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_archive_export",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_save_as",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_archive_import",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_audio",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sample_editor_info",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sample_editor_audio",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sample_editor_edit",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": {
+      "path": "app/main.py",
+      "function": "sample_editor_match_analysis",
+      "line": 2869,
+      "kind": "http_entry",
+      "route": "/api/projects/{pid}/tracks/{track_id}/sample-editor/match-analysis",
+      "shape_sha256": "38d1de8e08c447b28225459044cfe05271c93127f740992ed8c4b66d3e68bf0c"
+    },
+    "review": "New authenticated project audio analysis route; actual HTTP/media/tempo and missing-reference tests; no AI model rights inferred."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sample_editor_effect_preview",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sample_editor_effect_apply",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_normalize_audio_to_project_rate",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_waveform_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_track_import_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_native_remote_infer",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_native_remote_infer",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_native_remote_infer",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_lyrics_extraction",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_chord_extraction",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_marker_extraction",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "reset_project_lyrics",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "reset_project_chords",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "download_project_lyrics",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "download_project_chordpro",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "download_project_lyrics_pdf",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "preview_project_lyrics_pdf_exact",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_project_metadata_search",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_project_metadata_resolve",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_rights_providers",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_project_rights_search",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_project_rights_records",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_youtube_import_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "media_job_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "cancel_media_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "bounce_project_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "bounce_track_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "duplicate_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "add_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "replace_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "update_project_clip",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "instantiate_project_clip",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "delete_tracks",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "set_track_delay",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sync_metronome_to_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "move_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "autosync_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_auto_mix",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "edit_delete_range",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_mta_import_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "import_file",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_split_lead_backing_vocals",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_sam_audio_extract",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_stem_split_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_stem_split_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mobile_demucs_coreml_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mobile_demucs_coreml_bootstrap",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mobile_demucs_coreml_model",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mobile_demucs_onnx_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mobile_demucs_onnx_bootstrap",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mobile_demucs_onnx_model",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "issue_model_access_token",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "revoke_my_model_access_tokens",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "demucs_model_catalog",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "demucs_native_model_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "demucs_coreml_model_by_id",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "demucs_onnx_model_by_id",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_update_demucs_mobile_models",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_demucs_models",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_demucs_models_update",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_demucs_model_update",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_demucs_model_blacklist",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_demucs_model_unblacklist",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_demucs_model_delete_local",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "managed_ai_models",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "managed_lyrics_model_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "managed_lyrics_model_download_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "managed_chord_model_download_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "managed_lyrics_model_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "managed_chord_model_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "managed_chord_model_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_drumsep_extract",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "drumsep_models",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "drumsep_model_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "drumsep_model_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "lead_backing_models",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "lead_backing_model_delete",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "lead_backing_model_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "stem_job_start",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "stem_job_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "stem_job_cancel",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "split_stems_compat",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_track_stem_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "create_metronome_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "set_metronome_zone_bpm",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "refresh_metronome_at_playhead",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "shift_adaptive_metronome",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "set_transport_time_mode",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "create_chords_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "refresh_chords_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "estimate_track_bpm",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "preview_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "preview_mix",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "clear_project_preview_cache",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "export_plan",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "export_mta_with_mapping",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_track_export_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "media_job_download",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "export_single_track",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mta_analysis",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mta_miditk",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "mta_binary_diff",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_render_karaoke_video",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "upload_karaoke_background",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "configured_project_export",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_configured_project_export_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_karaoke_export_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_karaoke_export_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "export",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "desktop_ace_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_settings",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_pending",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_remote_history",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_discovered_artifact",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_pending_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_pending_artifact",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_import_recovered_wav",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_import_discovered_wav",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_import_recovered_json",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_import_recovered_stems",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_import_discovered_json",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_import_discovered_stems",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_workers_configure",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "desktop_ace_connection",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "desktop_ace_install",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "desktop_ace_start",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "desktop_ace_stop",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "desktop_ace_test",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "recovered_stem_orphans_review",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "recovered_stem_quarantine_review",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "recovered_stem_quarantine_restore",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "recovered_stem_orphans_quarantine",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_account_status",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_account_connect",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "native_ai_account_poll",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "admin_social_login_docs",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "timeline_trim",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "metronome_insert",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "configure_metronome_grid",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "vst3_docs_it",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "vst3_docs_en",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/sample_editor.py",
+    "function": "autotune_regions",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_mta_application_lifespan",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "<module>",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_start_diagnostic_cleanup",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_start_background_services",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_lead_backing_engine_available",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_start_kara_checkpoint_repair",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "api_admin_projects_dump",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "vst3_parameters",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "project_archive_export",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sample_editor_audio",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "sample_editor_effect_preview",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_normalize_audio_to_project_rate",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_waveform_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_track_import_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_native_remote_infer",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_text_music_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "download_project_lyrics_pdf",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "download_project_lyrics_pdf",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_youtube_import_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_start_bounce",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_mta_import_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_sam_audio_extract",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_drumsep_extract",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_track_export_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_render_karaoke_video",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_configured_project_export_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_karaoke_export_worker",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "start_karaoke_export_job",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "<module>",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "<module>",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "desktop_ace_test",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/sample_editor.py",
+    "function": "autotune_regions",
+    "changes": [
+      "line"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "inventory": "REMOTE_TRANSPORT_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_download_drumsep_model",
+    "changes": [
+      "line",
+      "source_sha256"
+    ],
+    "review": "Existing call/route AST unchanged; line or complete-source binding updated after sample-editor changes."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B107",
+    "old_line": 964,
+    "new_line": 965,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B107",
+    "old_line": 1014,
+    "new_line": 1015,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B404",
+    "old_line": 1578,
+    "new_line": 1579,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B404",
+    "old_line": 4896,
+    "new_line": 4914,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 274,
+    "new_line": 275,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 1588,
+    "new_line": 1589,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 2952,
+    "new_line": 2970,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 3433,
+    "new_line": 3451,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 3455,
+    "new_line": 3473,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 4908,
+    "new_line": 4926,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 5738,
+    "new_line": 5756,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 7209,
+    "new_line": 7227,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B603",
+    "old_line": 7421,
+    "new_line": 7439,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B607",
+    "old_line": 2952,
+    "new_line": 2970,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B607",
+    "old_line": 3433,
+    "new_line": 3451,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/main.py",
+    "test": "B607",
+    "old_line": 3455,
+    "new_line": 3473,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/sample_editor.py",
+    "test": "B603",
+    "old_line": 62,
+    "new_line": 74,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "bandit": "app/sample_editor.py",
+    "test": "B607",
+    "old_line": 62,
+    "new_line": 74,
+    "review": "Existing unchanged code snippet; finding identity shifted by new route/filter."
+  },
+  {
+    "changes": [
+      [
+        "AI_EXECUTION_REVIEW_R210.json",
+        [
+          "app/static/app.js",
+          "app/track_match.py"
+        ]
+      ],
+      [
+        "SERVICE_ADMISSION_REVIEW_R210.json",
+        [
+          "app/track_match.py"
+        ]
+      ],
+      [
+        "APP_SECURITY_REVIEW_R210.json",
+        [
+          "app/track_match.py"
+        ]
+      ]
+    ],
+    "review": "Audible BPM display added to already-reviewed track comparison; no execution site, network call or Bandit finding changed."
+  },
+  {
+    "changes": [
+      [
+        "AI_EXECUTION_REVIEW_R210.json",
+        [
+          "app/music_text.py"
+        ]
+      ],
+      [
+        "SERVICE_ADMISSION_REVIEW_R210.json",
+        [
+          "app/music_text.py"
+        ]
+      ]
+    ],
+    "review": "PDF reserves wrapped lyric and chord block; no new execution site, network call or Bandit finding."
+  }
+]

@@ -1,21 +1,23 @@
-# MTA0.3.0-r210 — stato corrente, modello pre-commerciale
+# Aggiornamento - sincronizzazione beat r210
 
-**RC v2:32/42=76,2%;D/E complete(2/7);10criteri aperti;PRE-RC.** Il perimetro v1 resta29/42=69,0%,non direttamente comparabile. L'utente ha escluso la migrazione finanziaria commerciale pre-release perché mai attivata. C3/C5/D6 sono ora accettati soltanto sul nuovo profilo iniziale;nessuna migrazione generale è dichiarata completa.
+RC **34/42 = 81,0%, PRE-RC**. Ripresa: `MTA-0.3.0-r210-pre-RC-beat-sync-cumulative.zip`; dettagli e limiti in `BEAT_SYNC_R210.md`. Rilevamento beat di sorgente e fase riferimento con mappe progetto fisse, a zone e adattive implementato; ascolto reale e UI nativa restano da verificare. Nessuna nuova CI remota, nessun commit.
 
-Leggere **PRECOMMERCIAL_MODEL_R210.md**,`validation/r210/precommercial-model/result.json` e `scope-comparison.json`. La cronologia completa precedente è in `development-history/precommercial-scope-20261030/`. Da questo checkpoint le istruzioni storiche che richiedono importazione di pagamenti commerciali mai esistiti sono superate.
+---
 
-Provider/prezzi configurabili prima dell'attivazione;storia monetaria,schemi sconosciuti,intenti e lavori pendenti bloccano. Conservati consumi,saldi,periodi e rendiconti NC. Quote salvate prima del provider,mai ricostruite da prezzi successivi;preventivi non pagati distinti dai pagamenti. Il marcatore d'avvio checkout è immutabile e non personale. Cambio post-checkout automatico non supportato dalla RC semplificata;nessun reset dei libri.
+## Checkpoint precedenti (storici)
 
-Verifica:894test finanziari/regime finali passati;938casi distinti correnti senza errori o skip,23casi nei nuovi file. Ruff/compilazione/JS,Bandit e tre inventari passano. Nessuna nuova prova browser/provider/target o CI remota.
+# Aggiornamento - matching, selezione ed export MTA
 
-Base Git verificata: **019471fb521cd82a96ddd35abfbbe43266975286**, tutti i 4357 blob corrispondono al cumulativo ci-41144. Full CI **41152155203**: 8093 passati, 5 falliti, 126 saltati; coverage 77% arrotondata. SAST e SDK riusciti, target dipendenti saltati. Correzione corrente: scansione archiviata completa dei 309 moduli, medesimi 168 finding ID e revisioni; fixture browser con evento PayPal reale e casi positivi con credenziali preparate. Nessun gate indebolito.
+RC **34/42 = 81,0%, PRE-RC**. Ripresa: `MTA-0.3.0-r210-pre-RC-sync-export-selection-cumulative.zip`, dettagli in `SYNC_EXPORT_SELECTION_R210.md`. Matching a zone/adattivo con BPM sorgente costante; fase beat e sorgenti a tempo variabile ancora da completare. Select all e normalizzazione MTA implementati. Nessuna nuova CI remota, nessun commit.
 
-Validazione locale della correzione: **94 test passati** (92 sicurezza/preflight/attivazione/drain e 2 API che distinguono configurazione da storico), Ruff e gate SAST correnti passati. Browser Chromium non disponibile localmente; nuova full CI necessaria dopo commit. Cumulativo: **MTA-0.3.0-r210-pre-RC-ci-41152-cumulative.zip**. Commit: `Refresh complete security scan and align precommercial browser scenarios`. Nessun commit, push, dispatch o pubblicazione automatici. RC invariata: **32/42=76,2%**, perimetro precommercial-20261030.
+# MTA 0.3.0-r210 - stato corrente
 
-## Coda residua
+**Verso la RC: 34/42 = 81,0%, PRE-RC**, perimetro `precommercial-20261030`; A4/A5 chiusi, nessun criterio promosso in questo checkpoint.
 
-1. **A4/A5:** completare gli esiti dei nuovi checkout/rimborsi/dispute,compresi casi parziali/ambigui e recuperi incerti;usare esclusivamente quote e target originali. Non implementare importatori o ricostruzioni finanziarie pre-release.
-2. **F4/F6:** completare confini runtime/esecutori e revisioni indipendenti dei checkpoint;non sostituire asset o diritti mancanti con un worker sintetico.
-3. **A6/B6/C6/F5/G5/G6:** eseguire i collaudi reali su sandbox,host indipendenti,sistemi installati,container e hardware/modelli autorizzati. C6 mantiene lavoro di integrazione e target;build/skip non equivalgono all'accettazione.
+Riprendere da `MTA-0.3.0-r210-pre-RC-editor-workflows-cumulative.zip`, `EDITOR_WORKFLOWS_R210.md` e `validation/r210/editor-workflows/result.json`. Baseline Git `ee4e37fd30c39a72638b303b01ca0cd5b090f272`, ultima full CI nota `41156985339`; commit all'utente, nessuna nuova CI remota.
 
-Un blocco funzionale per volta,fino ad accettazione o impedimento concreto. Ogni resoconto riporta il perimetro della percentuale. Non ricontare B2 o i vecchi fix CI. Nessuna mutazione remota o commit automatico.
+Implementati matching tempo/pitch a zona costante con riferimento e valori modificabili, guadagno e undo/redo waveform, delay lyrics e protezione PDF chord/lyrics. I tipi progetto, MIDI quantize, transport musicale e le icone erano già presenti e sono stati verificati. La sincronizzazione con fase automatica e BPM sorgente variabile resta incompleta; qualità musicale e zoom Windows/macOS/Linux/Android/iOS richiedono collaudi reali. Manuali utente HTML/PDF IT/EN aggiornati.
+
+Selezione finale 156 passati, 0 skip, zero fallimenti/errori; Ruff e gate di revisione passano. Restano **A6,B6,C6,F4,F5,F6,G5,G6**; accesso SAM gated ancora da verificare sul server. Dettagli e limitazioni nel rapporto.
+
+Commit cumulativo suggerito: `Recover payments and improve AI security, audio editing, and SAM setup`. Versioni precedenti in `development-history/before-editor-workflows-20261101/`.

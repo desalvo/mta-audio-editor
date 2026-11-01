@@ -4,6 +4,7 @@ from .vst3_transport import project_scope
 
 import json
 import logging
+import math
 import os
 import stat
 import subprocess
@@ -351,8 +352,50 @@ def validate_slot_mapping(project: Project, slots: list[MtaSlotMapping] | None, 
     return sorted(slots, key=lambda x: x.slot)
 
 
+def _normalize_mta_slots(paths: list[Path], target_db: float, directory: Path) -> list[Path]:
+    """Apply one common gain, measured on the unclipped sum of physical slots."""
+    import numpy as np
+    import soundfile as sf
+    from contextlib import ExitStack
+
+    if not math.isfinite(target_db) or not -30 <= target_db <= 0:
+        raise ValueError("MTA normalization target must be between -30 and 0 dBFS")
+    peak = slot_peak = 0.0
+    with ExitStack() as stack:
+        readers = [stack.enter_context(sf.SoundFile(str(path))) for path in paths]
+        if any(r.samplerate != 44100 or r.channels != 2 for r in readers):
+            raise ValueError("Invalid MTA slot audio format")
+        while True:
+            blocks = [r.read(65536, dtype='float64', always_2d=True) for r in readers]
+            length = max((len(block) for block in blocks), default=0)
+            if not length:
+                break
+            mix = np.zeros((length, 2), dtype=np.float64)
+            for block in blocks:
+                if len(block):
+                    if not np.isfinite(block).all():
+                        raise ValueError("Non-finite audio in MTA slot")
+                    slot_peak = max(slot_peak, float(np.max(np.abs(block))))
+                    mix[:len(block)] += block
+            peak = max(peak, float(np.max(np.abs(mix))))
+    if peak < 1e-12:
+        raise ValueError("Cannot normalize a silent MTA master")
+    gain = 10 ** (target_db / 20) / peak
+    if slot_peak * gain > 1.0 + 1e-7:
+        raise ValueError("MTA normalization would clip an individual slot; lower the target peak")
+    result = []
+    for index, path in enumerate(paths):
+        dst = directory / f"normalized-slot-{index:02d}.wav"
+        run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-af", f"volume={gain:.12f}",
+             "-c:a", "pcm_s24le", str(dst)])
+        result.append(dst)
+    return result
+
+
 @project_scope
-def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None, profile: str | None = None) -> Path:
+def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None, profile: str | None = None, *, normalize_peak_db: float | None = None) -> Path:
+    if normalize_peak_db is not None and any(insert.enabled for insert in project.master_inserts):
+        raise ValueError("MTA proportional normalization cannot reproduce active master inserts; bypass them before export")
     effective_profile = resolve_mta_device_profile(project, profile)
     slots = validate_slot_mapping(project, slots, effective_profile)
     by_id = {t.id: t for t in project.tracks}
@@ -420,10 +463,13 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
                 filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]")
                 filters.append(f"[mix]{transform}[out]")
             merged = td / f"slot-{slot_number:02d}.wav"
-            cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", "-ar", "44100", "-c:a", "pcm_s24le", str(merged)]
+            cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", "-ar", "44100", "-c:a", "pcm_f32le" if normalize_peak_db is not None else "pcm_s24le", str(merged)]
             run(cmd)
             slot_files.append(merged)
             physical_slots.append(slot)
+
+        if normalize_peak_db is not None:
+            slot_files = _normalize_mta_slots(slot_files, float(normalize_peak_db), td)
 
         cmd = ["ffmpeg", "-y", "-v", "error"]
         for r in slot_files: cmd += ["-i", str(r)]

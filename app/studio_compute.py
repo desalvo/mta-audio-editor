@@ -78,9 +78,9 @@ def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,ti
                 from .studio_score import validate
                 validate(score);(root/'score.json').write_bytes(score);request['source_score']=str(root/'score.json')
             (root/'request.json').write_text(json.dumps(request,allow_nan=False))
-            args=[worker_python(kind),str(worker),'--request',str(root/'request.json'),'--output',str(root/'preview.wav')]
-            from .ai_execution_policy import admitted_env
-            env={**os.environ,**admitted_env(kind,decision),'MTA_AI_PROGRESS_FILE':str(progress or root/'progress.json')}
+            args=[worker_python(kind),'-I',str(worker),'--request',str(root/'request.json'),'--output',str(root/'preview.wav')]
+            from .ai_execution_policy import admitted_env,isolated_env
+            env=isolated_env({**os.environ,**admitted_env(kind,decision),'MTA_AI_PROGRESS_FILE':str(progress or root/'progress.json')})
             usage={}
             if hasattr(os,'wait4'):
                 from .ai_metering_agent import run_supervised_process

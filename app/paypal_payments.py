@@ -64,14 +64,20 @@ def _api(config,method,path,payload=None,request_id=None):
         with httpx.Client(timeout=30,follow_redirects=False) as client:
             token=client.post(base+'/v1/oauth2/token',auth=(config['client_id'],config['client_secret']),data={'grant_type':'client_credentials'})
             if token.status_code!=200:raise ValueError('PayPal authentication unavailable; contact the administrator')
-            bearer=token.json().get('access_token')
+            try:auth_response=token.json()
+            except ValueError as exc:raise ValueError('Invalid PayPal authentication response') from exc
+            if not isinstance(auth_response,dict):raise ValueError('Invalid PayPal authentication response')
+            bearer=auth_response.get('access_token')
             if not isinstance(bearer,str) or not bearer:raise ValueError('Invalid PayPal authentication response')
             headers={'Authorization':'Bearer '+bearer,'Content-Type':'application/json'}
             if request_id:headers['PayPal-Request-Id']=request_id
             result=client.request(method,base+path,json=payload,headers=headers)
     except (httpx.HTTPError,KeyError) as exc:raise ValueError('PayPal unavailable; retry or contact the administrator') from exc
     if result.status_code not in (200,201):raise ValueError('PayPal request failed; retry or contact the administrator')
-    return result.json()
+    try:response=result.json()
+    except ValueError as exc:raise ValueError('Invalid PayPal response') from exc
+    if not isinstance(response,dict):raise ValueError('Invalid PayPal response')
+    return response
 
 
 def _quote(c,uid,kind,amount=None,period_start=None,refund_id=None,expected_micro=None):
@@ -110,7 +116,6 @@ def checkout(uid,body):
     with auth.db() as c:
         from .owner_payments import initialize, guard_pending
         r.init(c);initialize(c);c.execute('BEGIN IMMEDIATE');cfg=_keys(c)
-        if not cfg['enabled'] or not cfg['webhook_id']:raise ValueError('PayPal is not configured')
         old=c.execute('SELECT * FROM paypal_orders WHERE user_id=? AND request_id=?',(uid,key)).fetchone()
         if old:
             if old['kind']!=body['kind'] or (body['kind']=='credits' and old['amount_cents']!=body.get('amount_cents')) or (body['kind']=='subscription' and old['period_start']!=body.get('period_start')):raise ValueError('Conflicting purchase retry')
@@ -119,10 +124,16 @@ def checkout(uid,body):
                 if target is None or tuple(target)!=(body['refund_id'],body['expected_due_micro']):raise ValueError('Conflicting repayment retry')
             if old['status']=='paid':return {'status':'paid','order_id':old['id']}
             if old['status'] in ('cancelled','canceled','failed','refunded'):return {'status':old['status'],'order_id':old['id']}
+        if not cfg['enabled'] or not cfg['webhook_id']:raise ValueError('PayPal is not configured')
         cents,period=_quote(c,uid,body['kind'],body.get('amount_cents'),body.get('period_start'),body.get('refund_id'),body.get('expected_due_micro'))
         fingerprint=hashlib.sha256(cfg['client_id'].encode()).hexdigest()
         if old:
             if (old['kind'],old['amount_cents'],old['period_start'],old['environment'],old['client_fingerprint'])!=(body['kind'],cents,period,cfg['environment'],fingerprint):raise ValueError('Conflicting purchase retry')
+            if old['kind']=='subscription':
+                from .subscription_receivables import original_quote
+                quoted=original_quote(c,old)
+                fee=c.execute("SELECT amount_micro FROM resource_plan_charges WHERE user_id=? AND period_start=? AND status='due'",(uid,period)).fetchone()
+                if fee is None or fee[0]!=quoted['fee_micro']:raise ValueError('Original subscription receivable changed; review the original order')
             if old['checkout_url']:
                 from .owner_payments import safe_url
                 target=safe_url(old['checkout_url'],'paypal',old['environment'])
@@ -156,9 +167,10 @@ def checkout(uid,body):
         mark_attempt_uncertain(c, 'checkout:paypal:'+order)
     payload={'intent':'CAPTURE','purchase_units':[{'reference_id':order,'custom_id':order,'invoice_id':'mta-'+order,'description':'MTA Audio Editor '+body['kind'],'amount':{'currency_code':'EUR','value':f'{cents//100}.{cents%100:02d}'}}], 'payment_source':{'paypal':{'experience_context':{'user_action':'PAY_NOW','shipping_preference':'NO_SHIPPING','return_url':base+('/account?paypal_order=' if body['kind']=='subscription_reversal' else '/account/credits?paypal_order=')+order,'cancel_url':base+'/account/credits?payment=cancelled'}}}}
     result=_api(cfg,'POST','/v2/checkout/orders',payload,'mta-create-'+order)
+    if not isinstance(result,dict) or not isinstance(result.get('links'),list) or any(not isinstance(x,dict) for x in result['links']):raise ValueError('Invalid PayPal checkout response')
     pid=result.get('id','')
-    links=[x.get('href','') for x in result.get('links',[]) if x.get('rel') in ('payer-action','approve')]
-    if not re.fullmatch(r'[A-Z0-9]{6,64}',pid) or len(links)!=1:raise ValueError('Invalid PayPal checkout response')
+    links=[x.get('href','') for x in result['links'] if x.get('rel') in ('payer-action','approve')]
+    if not isinstance(pid,str) or not re.fullmatch(r'[A-Z0-9]{6,64}',pid) or len(links)!=1:raise ValueError('Invalid PayPal checkout response')
     from .owner_payments import safe_url
     if not safe_url(links[0],'paypal',cfg['environment']):raise ValueError('Invalid PayPal approval URL')
     with auth.db() as c:
@@ -177,13 +189,19 @@ def _cents(amount):
     return int(whole)*100+int(fraction.ljust(2,'0'))
 
 
-def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _reconciliation=None, _disputes=(), _merchant_context=None, _settlement_context=None):
+def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _reconciliation=None, _disputes=(), _merchant_context=None, _settlement_context=None, _ordinary_capture=False, _cash_context=None):
     from .regime_operation_fence import FenceBlocked
     with auth.db() as c:
         r.init(c);init(c);c.execute('BEGIN IMMEDIATE')
         order=c.execute('SELECT * FROM paypal_orders WHERE id=?',(local_id,)).fetchone()
         if _disputes and _reconciliation is None:raise ValueError('Authenticated history context required')
         if not order:raise ValueError('Unknown PayPal order')
+        from .paypal_cash_history import has_receipt as has_original_cash
+        if _cash_context is None and has_original_cash(c,local_id):
+            raise FenceBlocked('Original cash payment requires complete cash reconciliation')
+        if _cash_context is not None:
+            if _reconciliation is None:raise FenceBlocked('Original cash reconciliation required')
+            _cash_context.verify(c,order,_reconciliation[1],result)
         if _settlement_context is not None:
             if _reconciliation is None:raise ValueError('Original report reconciliation required')
             _settlement_context.verify(c,order,_reconciliation[1],result)
@@ -217,7 +235,7 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
                     'captures':sorted((x['id'],_cents(x['amount'])) for x in captures)}
         digest=webhook_digest or hashlib.sha256(json.dumps(normalized,sort_keys=True).encode()).hexdigest()
         duplicate=record_event(c,'paypal',financial_id,digest,normalized)
-        if _reconciliation is None:
+        if _reconciliation is None or _ordinary_capture:
             for row in c.execute("SELECT normalized_json FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='pending'",(local_id,)):
                 if json.loads(row[0]).get('type')=='paypal_history_gap':
                     raise FenceBlocked('Complete PayPal history reconciliation before ordinary fulfillment')
@@ -234,14 +252,15 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
                 record_event(c,'paypal','reconcile:risk:'+key,key,data)
             # Existing locally known disputes cannot disappear from a complete
             # collection; an omitted terminal result is still not a release.
-            if c.execute("SELECT 1 FROM sqlite_master WHERE name='paypal_financial_holds'").fetchone():
+            if _cash_context is None and c.execute("SELECT 1 FROM sqlite_master WHERE name='paypal_financial_holds'").fetchone():
                 discovered={x['hold_id'] for x in _disputes}
                 for row in c.execute("SELECT hold_id FROM paypal_financial_holds WHERE order_id=? AND kind='dispute'",(local_id,)):
                     if row[0] not in discovered:raise FenceBlocked('PayPal history omits a recorded dispute')
             from .payment_reconciliation import mark_applied
             for row in c.execute("SELECT normalized_json FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='pending'",(local_id,)):
                 gap=json.loads(row[0])
-                if gap.get('type')=='paypal_history_gap' and not set(gap.get('required_dispute_ids',[]))<={x['hold_id'].split(':')[1] for x in _disputes}:
+                cases=set(_cash_context.cases) if _cash_context is not None else {x['hold_id'].split(':')[1] for x in _disputes}
+                if gap.get('type')=='paypal_history_gap' and not set(gap.get('required_dispute_ids',[]))<=cases:
                     raise FenceBlocked('PayPal history omits a previously observed dispute')
             from .paypal_dispute_history import close_gaps
             close_gaps(c,local_id)
@@ -259,6 +278,7 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
             if merchant_event:mark_applied(c,'paypal',merchant_event,local_id)
             if webhook_event_id is not None:
                 c.execute('INSERT OR IGNORE INTO paypal_events VALUES(?,?)',(webhook_event_id,int(time.time())))
+            if _cash_context is not None:_cash_context.finalize(c,order)
             return {'status':'paid','order_id':local_id,'duplicate':duplicate}
         for capture in captures:
             if not re.fullmatch(r'[A-Z0-9]{6,64}',str(capture.get('id',''))):raise ValueError('Invalid capture ID')
@@ -286,6 +306,7 @@ def fulfill(local_id,result, *, webhook_event_id=None, webhook_digest=None, _rec
         if merchant_event:mark_applied(c,'paypal',merchant_event,local_id)
         if webhook_event_id is not None:
             c.execute('INSERT INTO paypal_events VALUES(?,?)',(webhook_event_id,int(time.time())))
+        if _cash_context is not None:_cash_context.finalize(c,c.execute('SELECT * FROM paypal_orders WHERE id=?',(local_id,)).fetchone())
     return {'status':'paid','order_id':local_id,'refund_due_micro':refund}
 
 
@@ -298,12 +319,22 @@ def capture(uid,local_id):
         if order['environment']!=cfg['environment'] or order['client_fingerprint']!=hashlib.sha256(cfg['client_id'].encode()).hexdigest():raise ValueError('Payment configuration changed; contact the administrator')
         pid=order['provider_order']
         if not pid:raise ValueError('Checkout is not ready')
-        # Revalidate the quote before collecting money after a quota/contract change.
-        target=c.execute('SELECT refund_id,quoted_micro FROM subscription_repayment_targets WHERE order_id=?',(local_id,)).fetchone() if order['kind']=='subscription_reversal' else None
-        if order['kind']=='subscription_reversal' and target is None:raise ValueError('Subscription repayment target missing')
-        cents,_=_quote(c,uid,order['kind'],order['amount_cents'],order['period_start'],target[0] if target else None,target[1] if target else None)
-        if cents!=order['amount_cents']:raise ValueError('Payment amount changed; refresh the page')
     current=_api(cfg,'GET','/v2/checkout/orders/'+pid)
+    if current.get('status')=='COMPLETED':
+        # A prior attempt may have completed while the response was lost.
+        # Reconcile its complete authenticated refund/dispute history before
+        # recording money, independent of today's eligibility to create a sale.
+        # Previously observed unknown histories require explicit reconciliation;
+        # an ordinary owner capture must not silently clear those gaps.
+        with auth.db() as c:
+            has_events=c.execute("SELECT 1 FROM sqlite_master WHERE name='payment_reconciliation_events'").fetchone()
+            if has_events:
+                pending=c.execute("SELECT normalized_json FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='pending'",(local_id,))
+                if any(json.loads(row[0]).get('type')=='paypal_history_gap' for row in pending):
+                    from .regime_operation_fence import FenceBlocked
+                    raise FenceBlocked('Complete PayPal history reconciliation before ordinary fulfillment')
+        from .payment_reconcile_service import reconcile_paypal
+        return reconcile_paypal(local_id,expected_owner=uid,_ordinary_capture=True)
     if current.get('status')=='APPROVED':
         from .service_regime import require_commercial
         require_commercial('capture')
@@ -322,6 +353,8 @@ def capture(uid,local_id):
             has_events=c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='payment_reconciliation_events'").fetchone()
             if has_events and c.execute("SELECT 1 FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='pending' LIMIT 1",(local_id,)).fetchone():
                 raise ValueError('Resolve pending payment evidence before capture')
+            target=c.execute('SELECT refund_id,quoted_micro FROM subscription_repayment_targets WHERE order_id=?',(local_id,)).fetchone() if order['kind']=='subscription_reversal' else None
+            if order['kind']=='subscription_reversal' and target is None:raise ValueError('Subscription repayment target missing')
             cents,period=_quote(c,uid,order['kind'],order['amount_cents'],order['period_start'],target[0] if target else None,target[1] if target else None)
             if cents!=order['amount_cents'] or period!=order['period_start']:raise ValueError('Payment quote changed during approval verification')
             if order['kind']=='subscription':
@@ -335,7 +368,10 @@ def capture(uid,local_id):
             dispatch=c.execute('SELECT state,provider_reference FROM regime_payment_outbox WHERE operation_id=?',('checkout:paypal:'+local_id,)).fetchone()
             if dispatch is None or tuple(dispatch)!=('confirmed',pid):raise ValueError('Verified original checkout dispatch required')
         _api(cfg,'POST','/v2/checkout/orders/'+pid+'/capture',{},'mta-capture-'+local_id)
-        current=_api(cfg,'GET','/v2/checkout/orders/'+pid)
+        # The capture may already be refunded or disputed by the time the
+        # provider answers. Discover the complete history before funding.
+        from .payment_reconcile_service import reconcile_paypal
+        return reconcile_paypal(local_id,expected_owner=uid,_ordinary_capture=True,_expected_provider_order=pid,_expected_config=cfg)
     return fulfill(local_id,current)
 
 
@@ -358,11 +394,28 @@ def webhook(raw,headers):
     if not re.fullmatch(r'[A-Z0-9]{6,64}',str(pid)):raise ValueError('Invalid PayPal order ID')
     with auth.db() as c:
         order=c.execute('SELECT * FROM paypal_orders WHERE provider_order=?',(pid,)).fetchone()
+    if order is None:
+        # A verified completion can arrive after PayPal accepted creation but
+        # its response was lost. Select the local candidate only from the
+        # authenticated canonical order, then use the normal binding protocol.
+        canonical=_api(cfg,'GET','/v2/checkout/orders/'+pid)
+        if not isinstance(canonical,dict) or canonical.get('id')!=pid or canonical.get('status')!='COMPLETED':
+            raise ValueError('PayPal completed webhook requires a completed original payment')
+        units=canonical.get('purchase_units')
+        if not isinstance(units,list) or len(units)!=1 or not isinstance(units[0],dict):raise ValueError('Invalid PayPal payment identity')
+        local=units[0].get('custom_id')
+        if not isinstance(local,str) or not 1<=len(local)<=120 or units[0].get('reference_id')!=local:
+            raise ValueError('Invalid PayPal payment identity')
+        from .checkout_reference_recovery import recover
+        recover('paypal',local,pid,_expected_config=cfg)
+        with auth.db() as c:
+            order=c.execute('SELECT * FROM paypal_orders WHERE id=? AND provider_order=?',(local,pid)).fetchone()
     if not order:raise ValueError('Unknown PayPal order')
     if order['environment']!=cfg['environment'] or order['client_fingerprint']!=hashlib.sha256(cfg['client_id'].encode()).hexdigest():raise ValueError('Payment configuration changed')
     # Commit the verified webhook identity and economic fulfillment together.
     # Retrying after a crash cannot leave money credited but the event unrecorded.
-    fulfill(order['id'],_api(cfg,'GET','/v2/checkout/orders/'+pid),webhook_event_id=payload['id'],webhook_digest=hashlib.sha256(raw).hexdigest())
+    from .payment_reconcile_service import reconcile_paypal
+    reconcile_paypal(order['id'],_ordinary_capture=True,_webhook_event_id=payload['id'],_webhook_digest=hashlib.sha256(raw).hexdigest(),_expected_provider_order=pid,_expected_config=cfg)
     return {'received':True}
 
 
@@ -383,6 +436,18 @@ def _record_position(c,order,event_id):
     initialize(c)
     refunded=c.execute('SELECT coalesce(sum(amount_cents),0) FROM paypal_refunds WHERE order_id=?',(order['id'],)).fetchone()[0]
     held=_held_minor(c,order['id'])
+    from .paypal_cash_history import position as original_cash
+    proof=original_cash(c,order)
+    if proof is not None:
+        held=order['amount_cents']-refunded-proof['net_minor']
+        if held<0:raise ValueError('PayPal cash proof contradicts recorded refunds')
+    elif order['kind']=='subscription':
+        from .subscription_cash_reconciliation import position as cash_position, _money as cash_money
+        cash=cash_position(c,order)
+        if cash is not None:
+            cash_net=sum(cash_money(row) for row in cash['movements'])
+            held=order['amount_cents']-refunded-cash_net
+            if held<0:raise ValueError('Subscription cash proof contradicts recorded refunds')
     net=max(0,order['amount_cents']-refunded-held)*10000
     if not 0<=refunded<=order['amount_cents']:raise ValueError('Invalid PayPal refund balance')
     c.execute('''INSERT INTO payment_reconciliation_positions
@@ -433,7 +498,9 @@ def _apply_refund(c,normalized,event_id):
             # Record authenticated cash even for legacy orders, but never infer
             # the original fee from today's mutable refundable balance.
             from .subscription_receivables import original_loss_position
-            position=original_loss_position(c,order)
+            from .subscription_cash_reconciliation import has_receipt,position as cash_position
+            stale_cash=has_receipt(c,order['id']) and cash_position(c,order) is None
+            position=None if stale_cash else original_loss_position(c,order)
             if position is not None:
                 target, remaining_surplus = position
                 allocated=c.execute('SELECT coalesce(sum(amount_micro),0) FROM paypal_subscription_reversals WHERE order_id=?',(order['id'],)).fetchone()[0]

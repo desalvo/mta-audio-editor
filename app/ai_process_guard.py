@@ -181,7 +181,9 @@ def run(argv, *, cwd, timeout_seconds=3600, cancel_check=None, env=None, owner_r
         if cancelled:
             raise WorkerNotStarted('AI worker cancelled before execution', cancelled=True)
     scope = uuid.uuid4().hex if owner_receipt else ''
-    guard_env = dict(os.environ)
+    from .ai_execution_policy import isolated_env
+    guard_env = isolated_env()
+    env = isolated_env(env)
     if owner_receipt:
         from . import auth
         guard_env['MTA_DATA_DIR'] = str(auth.data_root())
@@ -190,7 +192,7 @@ def run(argv, *, cwd, timeout_seconds=3600, cancel_check=None, env=None, owner_r
     process = None
     launched = False
     try:
-        process = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
+        process = subprocess.Popen([sys.executable, '-I', str(Path(__file__).resolve()),
             str(control_r), str(reply_w), scope], env=guard_env, pass_fds=(control_r, reply_w),
             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             start_new_session=True, close_fds=True)

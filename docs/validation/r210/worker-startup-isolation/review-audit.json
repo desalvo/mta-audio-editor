@@ -1,0 +1,221 @@
+[
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/ace_step_live_smoke.py",
+      "test_live_inference"
+    ],
+    "review": "Diagnostic uses the fixed worker command and a sanitized environment; isolated Python applies to scripts."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/ai_cgroup_metering.py",
+      "run_cgroup_process"
+    ],
+    "review": "Trusted cgroup bootstrap starts isolated and receives sanitized environment; accounting boundary is unchanged."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/ai_process_guard.py",
+      "run"
+    ],
+    "review": "Guardian starts isolated with a sanitized environment; control descriptors and process ownership remain unchanged."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/ai_worker_protocol.py",
+      "probe_worker"
+    ],
+    "review": "Fixed ACE capability probe uses sanitized environment; probe remains non-authoritative for inference rights."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/studio_catalog.py",
+      "run"
+    ],
+    "review": "Operator installer subprocess environment is sanitized; self-test uses isolated Python."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/studio_catalog.py",
+      "test_basic_pitch"
+    ],
+    "review": "Fixed Studio inference self-test uses isolated Python and sanitized environment."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/ace_step_live_smoke.py",
+      "test_live_inference"
+    ],
+    "review": "Diagnostic uses the fixed worker command and a sanitized environment; isolated Python applies to scripts."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/ai_cgroup_metering.py",
+      "run_cgroup_process"
+    ],
+    "review": "Trusted cgroup bootstrap starts isolated and receives sanitized environment; accounting boundary is unchanged."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/ai_process_guard.py",
+      "run"
+    ],
+    "review": "Guardian starts isolated with a sanitized environment; control descriptors and process ownership remain unchanged."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/ai_worker_protocol.py",
+      "probe_worker"
+    ],
+    "review": "Fixed ACE capability probe uses sanitized environment; probe remains non-authoritative for inference rights."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/studio_catalog.py",
+      "run"
+    ],
+    "review": "Operator installer subprocess environment is sanitized; self-test uses isolated Python."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/studio_catalog.py",
+      "test_basic_pitch"
+    ],
+    "review": "Fixed Studio inference self-test uses isolated Python and sanitized environment."
+  },
+  {
+    "bandit": "app/ace_step_live_smoke.py",
+    "test": "B404",
+    "old_line": 44,
+    "new_line": 44,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ace_step_live_smoke.py",
+    "test": "B603",
+    "old_line": 50,
+    "new_line": 51,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ai_cgroup_metering.py",
+    "test": "B603",
+    "old_line": 286,
+    "new_line": 287,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ai_metering_agent.py",
+    "test": "B603",
+    "old_line": 156,
+    "new_line": 158,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ai_process_guard.py",
+    "test": "B603",
+    "old_line": 193,
+    "new_line": 195,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ai_worker_protocol.py",
+    "test": "B603",
+    "old_line": 123,
+    "new_line": 125,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ai_worker_protocol.py",
+    "test": "B603",
+    "old_line": 397,
+    "new_line": 399,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ai_worker_protocol.py",
+    "test": "B603",
+    "old_line": 402,
+    "new_line": 404,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/ai_worker_protocol.py",
+    "test": "B603",
+    "old_line": 444,
+    "new_line": 447,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/studio_catalog.py",
+    "test": "B603",
+    "old_line": 138,
+    "new_line": 139,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "bandit": "app/studio_catalog.py",
+    "test": "B603",
+    "old_line": 182,
+    "new_line": 184,
+    "review": "Existing reviewed subprocess/import finding; source change isolates startup or shifts its location, and does not add a new command source."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/demucs_runtime.py",
+      "_installed"
+    ],
+    "review": "The capability check uses isolated Python and a sanitized environment; the executable remains operator-selected and is not independently attested."
+  },
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "site": [
+      "app/plugins.py",
+      "split"
+    ],
+    "review": "Legacy Demucs starts Python in isolated mode and filters startup injection from all subprocess environments; the command and model rights remain independently unverified."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/demucs_runtime.py",
+      "_installed"
+    ],
+    "review": "The capability check uses isolated Python and a sanitized environment; the executable remains operator-selected and is not independently attested."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "site": [
+      "app/plugins.py",
+      "split"
+    ],
+    "review": "Legacy Demucs starts Python in isolated mode and filters startup injection from all subprocess environments; the command and model rights remain independently unverified."
+  },
+  {
+    "bandit": "app/demucs_runtime.py",
+    "test": "B603",
+    "old_line": 20,
+    "new_line": 21,
+    "review": "Existing operator-configured process boundary; isolated Python and filtered environment added. No independent interpreter or model identity is established."
+  },
+  {
+    "bandit": "app/plugins.py",
+    "test": "B603",
+    "old_line": 631,
+    "new_line": 632,
+    "review": "Existing operator-configured process boundary; isolated Python and filtered environment added. No independent interpreter or model identity is established."
+  }
+]

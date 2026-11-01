@@ -50,6 +50,7 @@
         }else if(['uncertain','pending'].includes(item.state)){
           const form=element('form');form.className='settings-form';form.dataset.refundVerify='';
           const input=field(form,tr('ID rimborso del provider da verificare','Provider refund ID to verify'),'reference','text');input.value=item.provider_reference||'';input.maxLength=110;input.autocomplete='off';
+          if(!item.provider_reference){input.required=false;form.append(element('p',tr('Lascia vuoto per cercare il rimborso originale presso il provider.','Leave blank to find the original refund at the provider.')));}
           if(item.provider_reference)input.readOnly=true;
           const button=element('button',tr('Verifica esito senza reinvio','Verify outcome without resending'));button.type='submit';form.append(button);
           form.onsubmit=e=>{e.preventDefault();if(!busy)run(()=>act(item,'verify',input.value.trim()));};article.append(form);

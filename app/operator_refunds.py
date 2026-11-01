@@ -276,6 +276,80 @@ def execute(actor,identifier,revision):
     return verify(actor,identifier,row['revision'])
 
 
+def _discover_stripe_refund(row, config):
+    """Find exactly one original operation by immutable metadata, without posting."""
+    from .payment_reconcile_service import _pages
+    from .stripe_paid_history import ReadbackBudget
+    token='mta-refund-'+row['id']
+    with httpx.Client(timeout=15,follow_redirects=False) as raw:
+        client=ReadbackBudget(raw)
+        def matches():
+            items=_pages(client,'refunds',{'Authorization':'Bearer '+config},
+                         {'payment_intent':row['target']},max_items=1000)
+            found=[]
+            for item in items:
+                metadata=item.get('metadata')
+                if isinstance(metadata,dict) and metadata.get('mta_refund')==token:
+                    ref,state,digest=_receipt(row,item)
+                    found.append((ref,state,digest))
+            return sorted(found)
+        first=matches()
+        if first!=matches():raise FenceBlocked('Refund discovery changed; retry verification')
+    if len(first)!=1:raise FenceBlocked('Unique original refund not found; provider review required')
+    return first[0][0]
+
+
+def _discover_paypal_refund(row, config):
+    """Discover a candidate solely through the original authenticated order."""
+    from .checkout_terminal_outcomes import paypal_identity
+    from .paypal_reconciliation import _payments
+    context=json.loads(row['context_json'])
+    with auth.db() as c:
+        _require_original_payment(c,row)
+        order=dict(c.execute('SELECT * FROM paypal_orders WHERE id=?',(row['order_id'],)).fetchone())
+    deadline=time.monotonic()+45
+    def get(path):
+        if time.monotonic()>=deadline:raise FenceBlocked('PayPal discovery time budget exceeded')
+        result=paypal._api(config,'GET',path)
+        if time.monotonic()>=deadline:raise FenceBlocked('PayPal discovery time budget exceeded')
+        return result
+    def read():
+        original=get('/v2/checkout/orders/'+_reference_paypal_order(order['provider_order']))
+        if not isinstance(original,dict):raise FenceBlocked('Malformed PayPal order')
+        payments=_payments(original)
+        paypal_identity(original,order,require_empty=False)
+        if original.get('status')!='COMPLETED':raise FenceBlocked('Original PayPal order is not completed')
+        items=payments.get('refunds',[])
+        if not isinstance(items,list) or len(items)>100:raise FenceBlocked('PayPal refund discovery exceeds safe bound')
+        refs=set();found=[]
+        for item in items:
+            if not isinstance(item,dict):raise FenceBlocked('Malformed PayPal refund history')
+            ref=_reference(item.get('id'),'paypal')
+            if ref in refs:raise FenceBlocked('Duplicate PayPal refund reference')
+            refs.add(ref)
+            document=get('/v2/payments/refunds/'+ref)
+            if (not isinstance(document,dict) or document.get('id')!=ref
+                or document.get('status')!=item.get('status')
+                or paypal._cents(document.get('amount'))!=paypal._cents(item.get('amount'))):
+                raise FenceBlocked('PayPal refund changed during discovery')
+            if document.get('custom_id')=='mta-refund-'+row['id']:
+                found.append(_receipt(row,document))
+        if get('/v2/checkout/orders/'+order['provider_order'])!=original:
+            raise FenceBlocked('PayPal order changed during discovery')
+        return sorted(found)
+    first=read()
+    if first!=read():raise FenceBlocked('PayPal discovery changed; retry verification')
+    if len(first)!=1:raise FenceBlocked('Unique original refund not found; provider review required')
+    if _fingerprint(config)!=context['merchant']:raise FenceBlocked('Original refund merchant required')
+    return first[0][0]
+
+
+def _reference_paypal_order(value):
+    if not isinstance(value,str) or re.fullmatch(r'[A-Z0-9]{6,64}',value) is None:
+        raise FenceBlocked('Invalid original PayPal order reference')
+    return value
+
+
 def verify(actor,identifier,revision,reference=None):
     """GET-only recovery; caller references are hints requiring exact receipt binding."""
     _actor(actor);_revision(revision);_initialize()
@@ -286,7 +360,10 @@ def verify(actor,identifier,revision,reference=None):
         config=_configuration(c,row['provider'])
     context=json.loads(row['context_json'])
     if _fingerprint(config)!=context['merchant']:raise FenceBlocked('Original refund merchant configuration required')
-    ref=_reference(reference or row['provider_reference'],row['provider'])
+    hint=reference or row['provider_reference']
+    if not hint and row['provider']=='stripe':hint=_discover_stripe_refund(row,config)
+    if not hint and row['provider']=='paypal':hint=_discover_paypal_refund(row,config)
+    ref=_reference(hint,row['provider'])
     if row['provider']=='stripe':
         from .regime_provider_probe import _get
         with httpx.Client(timeout=15,follow_redirects=False) as client:
@@ -298,15 +375,23 @@ def verify(actor,identifier,revision,reference=None):
     # unavailable canonical ledger readback. Pending receipts never settle.
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE');current=_row(c,identifier,revision)
+        if tuple(c.execute('SELECT role,active FROM users WHERE id=?',(actor,)).fetchone() or ())!=('admin',1):raise FenceBlocked('Administrator authorization changed')
         if _fingerprint(_configuration(c,row['provider']))!=context['merchant']:raise FenceBlocked('Refund merchant changed during lookup')
         _change(c,current,actor,'pending',reference=ref,digest=digest)
         row=_row(c,identifier)
     if state=='pending':return _public(row)
-    with auth.db() as c:_require_original_payment(c,row)
-    try:_reconcile(row['provider'],row['order_id'])
-    except (ValueError,FenceBlocked,httpx.HTTPError):return _public(row)
+    from .payment_reconcile_service import StripeJournalChanged
+    for attempt in range(2):
+        with auth.db() as c:_require_original_payment(c,row)
+        try:
+            _reconcile(row['provider'],row['order_id'])
+            break
+        except StripeJournalChanged:
+            if row['provider']!='stripe' or attempt: return _public(row)
+        except (ValueError,FenceBlocked,httpx.HTTPError):return _public(row)
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE');current=_row(c,identifier,row['revision'])
+        if tuple(c.execute('SELECT role,active FROM users WHERE id=?',(actor,)).fetchone() or ())!=('admin',1):raise FenceBlocked('Administrator authorization changed')
         updated=_context(c,row['provider'],row['order_id'],row['target'])
         immutable=('provider','order_id','user_id','target','gross_cents','order_amount_cents','merchant','identity')
         if any(updated[k]!=context[k] for k in immutable):raise FenceBlocked('Original refund payment identity changed')

@@ -145,7 +145,7 @@ def test_demucs_and_sam_commands_profile_actual_child(monkeypatch, tmp_path):
     monkeypatch.setenv('MTA_AI_TORCH_PROFILER', 'true')
     for backend in ('demucs', 'sam-audio'):
         command = _backend_command({'gpu_profile_task_id': 'task'}, tmp_path, backend, ['--model', 'm'])
-        assert command[1].endswith('ai_profiled_backend.py')
+        assert command[1]=='-I' and command[2].endswith('ai_profiled_backend.py')
         assert backend in command and 'task' in command
         assert command[-3:] == ['--', '--model', 'm']
 

@@ -104,8 +104,15 @@ _FAILURE_MARKERS = (
     ('MTA_BACKING_FAILURE:rocm_conversion_failed', 'backing_rocm_conversion_failed'),
     ('MTA_BACKING_FAILURE:unsupported_mdx_runtime', 'backing_runtime_incompatible'),
     ("BaseModel._from_pretrained() missing 2 required keyword-only arguments: 'proxies' and 'resume_download'", 'sam_hub_incompatible'),
+    ('MTA_SAM_REASON:checkpoint_access_denied', 'sam_checkpoint_access_denied'),
+    ('MTA_SAM_REASON:checkpoint_not_found_or_inaccessible', 'sam_checkpoint_not_found_or_inaccessible'),
+    ('MTA_SAM_REASON:hub_rate_limited', 'sam_hub_rate_limited'),
+    ('MTA_SAM_REASON:hub_unavailable_or_cache_missing', 'sam_hub_unavailable_or_cache_missing'),
+    ('MTA_SAM_REASON:checkpoint_format_invalid', 'sam_checkpoint_format_invalid'),
+    ('MTA_SAM_REASON:insufficient_memory', 'sam_insufficient_memory'),
     ('MTA_SAM_FAILURE:imports', 'sam_dependency_failed'),
     ('MTA_SAM_FAILURE:model_load', 'sam_model_load_failed'),
+    ('MTA_SAM_FAILURE:device_transfer', 'sam_device_transfer_failed'),
     ('MTA_SAM_FAILURE:processor_load', 'sam_processor_load_failed'),
     ('MTA_SAM_FAILURE:audio_processing', 'sam_audio_processing_failed'),
     ('MTA_SAM_FAILURE:inference', 'sam_inference_failed'),
@@ -134,6 +141,17 @@ _FAILURE_MARKERS = (
     ('ACE-Step adapter error:', 'ace_adapter_failed'),
 )
 FAILURE_CATEGORIES = frozenset({'worker_exit', *(code for _, code in _FAILURE_MARKERS)})
+
+_FAILURE_HINTS = {
+    'sam_checkpoint_access_denied': 'Check model approval and Hugging Face authentication for the service account.',
+    'sam_checkpoint_not_found_or_inaccessible': 'Check the selected model identifier and account access.',
+    'sam_hub_rate_limited': 'Hugging Face rate limit reached; retry later.',
+    'sam_hub_unavailable_or_cache_missing': 'Check network access, offline mode and the service account model cache.',
+    'sam_checkpoint_format_invalid': 'Check the installed checkpoint and model runtime compatibility.',
+    'sam_insufficient_memory': 'Check available system and GPU memory and consider a smaller SAM model.',
+    'sam_device_transfer_failed': 'Check the selected accelerator and its runtime; inspect the server journal.',
+    'sam_model_load_failed': 'Check the server journal for the model-loading exception.',
+}
 
 
 def _worker_failure(stderr: str, exit_code: int) -> dict:
@@ -283,9 +301,10 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         if owner_receipt is not None:
             from .worker_cgroup_recovery import register
             scope_id = register(job_group, owner_receipt['job_id'], owner_receipt)
-        proc = subprocess.Popen([sys.executable, '-c', _CHILD, str(job_group), cwd, scope_id or '', str(Path(__file__).resolve().parent.parent), *argv],
+        from .ai_execution_policy import isolated_env
+        proc = subprocess.Popen([sys.executable, '-I', '-c', _CHILD, str(job_group), cwd, scope_id or '', str(Path(__file__).resolve().parent.parent), *argv],
                                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                                stderr=subprocess.PIPE, start_new_session=True, env=env)
+                                stderr=subprocess.PIPE, start_new_session=True, env=isolated_env(env))
         stderr_reader = _BoundedStderr(proc.stderr)
         # Optional best-effort per-job diagnostic snapshots. These are never
         # returned as certified gpu_seconds or used in billing: polling can
@@ -343,9 +362,10 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
             _LOG.error('AI metered worker exited nonzero (pid=%s, exit_code=%s): %s',
                        proc.pid, proc.returncode, _safe_worker_error(detail),
                        extra={'mta_worker_failure': failure})
+            hint = _FAILURE_HINTS.get(failure['category'], 'check server diagnostics and journal')
             raise RuntimeError(
                 f'AI worker failed (exit code {proc.returncode}); metering invalid; '
-                f'diagnostic: {failure["category"]}; check server diagnostics and journal')
+                f'diagnostic: {failure["category"]}; {hint}')
         cpu = _cpu(job_group)
         read_bytes, write_bytes = _io(job_group)
         if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):

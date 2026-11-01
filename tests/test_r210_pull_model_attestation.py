@@ -163,7 +163,7 @@ def test_worker_receipt_gate_and_durable_completion_with_explicit_process_double
     client=DirectClient(node['credential']);folder=authority[2]/'receipt-process-double';folder.mkdir(mode=0o700)
     worker._write(folder/'active.json',{'binding':client.binding,'phase':'claimed','instance':assignment['instance'],'task':assignment})
     def process(argv,*,cwd,env,**kwargs):
-        assert argv[1]==str(adapter)
+        assert argv[1:3]==['-I',str(adapter)]
         # Deliberate process double: this tests supervisor receipt validation,
         # not actual model loading (covered by a separate target prerequisite).
         with monkeypatch.context() as context:

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1.097" timestamp="2026-11-01T12:46:27.868962+01:00" hostname="ff4e64d3135d"><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_paypal_completed_webhook_recovers_lost_creation_and_settles_once[credits]" time="0.238"><failure message="ValueError: Unknown PayPal order">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '1d8aa701f5dd41b69a153b7....CAPTURE.COMPLETED', 'resource': {'supplementary_data': {...}}}, 'auth_algo': 'test', 'cert_url': 'test', ...}, None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4dd5ab3ce0&gt;
+kind = 'credits'
+
+    @pytest.mark.parametrize('kind',['credits','subscription'])
+    def test_paypal_completed_webhook_recovers_lost_creation_and_settles_once(account,provider,monkeypatch,kind):
+        body=None
+        if kind=='subscription':
+            state=plan(account,price_micro=5_000_000)
+            body={'kind':'subscription','period_start':state['period']['start'],'request_id':'lost-subscription-create'}
+        local,ref,_=unknown_paypal(account,provider,monkeypatch,body=body)
+        paypal._api({},'POST','/v2/checkout/orders/'+ref+'/capture')
+&gt;       assert completed_paypal_webhook(ref)=={'received':True}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_checkout_reference_recovery.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_r210_checkout_reference_recovery.py:143: in completed_paypal_webhook
+    return paypal.webhook(json.dumps(payload).encode(),HEADERS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+raw = b'{"id": "evt_lost_paypal_creation", "event_type": "PAYMENT.CAPTURE.COMPLETED", "resource": {"supplementary_data": {"related_ids": {"order_id": "ORDER0001"}}}}'
+headers = {'paypal-auth-algo': 'test', 'paypal-cert-url': 'test', 'paypal-transmission-id': 'test', 'paypal-transmission-sig': 'test', ...}
+
+    def webhook(raw,headers):
+        if len(raw)&gt;1024*1024:raise ValueError('Webhook too large')
+        payload=json.loads(raw)
+        if not isinstance(payload,dict) or not isinstance(payload.get('id'),str) or len(payload['id'])&gt;200:raise ValueError('Invalid webhook')
+        with auth.db() as c:init(c);cfg=_keys(c)
+        verification={'webhook_id':cfg['webhook_id'],'webhook_event':payload}
+        for key,header in [('auth_algo','paypal-auth-algo'),('cert_url','paypal-cert-url'),('transmission_id','paypal-transmission-id'),('transmission_sig','paypal-transmission-sig'),('transmission_time','paypal-transmission-time')]:
+            value=headers.get(header,'')
+            if not value or len(value)&gt;4096:raise ValueError('Missing PayPal signature')
+            verification[key]=value
+        if not cfg['webhook_id'] or _api(cfg,'POST','/v1/notifications/verify-webhook-signature',verification).get('verification_status')!='SUCCESS':raise ValueError('Invalid PayPal signature')
+        if payload.get('event_type') in ('PAYMENT.CAPTURE.REVERSED','CUSTOMER.DISPUTE.CREATED','CUSTOMER.DISPUTE.UPDATED','CUSTOMER.DISPUTE.RESOLVED'):
+            return financial_risk_event(payload,cfg,hashlib.sha256(raw).hexdigest())
+        if payload.get('event_type')=='PAYMENT.CAPTURE.REFUNDED':return refund_event(payload,cfg,webhook_digest=hashlib.sha256(raw).hexdigest())
+        if payload.get('event_type')!='PAYMENT.CAPTURE.COMPLETED':return {'received':True}
+        pid=payload.get('resource',{}).get('supplementary_data',{}).get('related_ids',{}).get('order_id','')
+        if not re.fullmatch(r'[A-Z0-9]{6,64}',str(pid)):raise ValueError('Invalid PayPal order ID')
+        with auth.db() as c:
+            order=c.execute('SELECT * FROM paypal_orders WHERE provider_order=?',(pid,)).fetchone()
+&gt;       if not order:raise ValueError('Unknown PayPal order')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: Unknown PayPal order
+
+app/paypal_payments.py:388: ValueError</failure></testcase><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_paypal_completed_webhook_recovers_lost_creation_and_settles_once[subscription]" time="0.200"><failure message="ValueError: Unknown PayPal order">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '60f9e68447bb41b187a5f69....CAPTURE.COMPLETED', 'resource': {'supplementary_data': {...}}}, 'auth_algo': 'test', 'cert_url': 'test', ...}, None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4dd4e04770&gt;
+kind = 'subscription'
+
+    @pytest.mark.parametrize('kind',['credits','subscription'])
+    def test_paypal_completed_webhook_recovers_lost_creation_and_settles_once(account,provider,monkeypatch,kind):
+        body=None
+        if kind=='subscription':
+            state=plan(account,price_micro=5_000_000)
+            body={'kind':'subscription','period_start':state['period']['start'],'request_id':'lost-subscription-create'}
+        local,ref,_=unknown_paypal(account,provider,monkeypatch,body=body)
+        paypal._api({},'POST','/v2/checkout/orders/'+ref+'/capture')
+&gt;       assert completed_paypal_webhook(ref)=={'received':True}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_checkout_reference_recovery.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_r210_checkout_reference_recovery.py:143: in completed_paypal_webhook
+    return paypal.webhook(json.dumps(payload).encode(),HEADERS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+raw = b'{"id": "evt_lost_paypal_creation", "event_type": "PAYMENT.CAPTURE.COMPLETED", "resource": {"supplementary_data": {"related_ids": {"order_id": "ORDER0001"}}}}'
+headers = {'paypal-auth-algo': 'test', 'paypal-cert-url': 'test', 'paypal-transmission-id': 'test', 'paypal-transmission-sig': 'test', ...}
+
+    def webhook(raw,headers):
+        if len(raw)&gt;1024*1024:raise ValueError('Webhook too large')
+        payload=json.loads(raw)
+        if not isinstance(payload,dict) or not isinstance(payload.get('id'),str) or len(payload['id'])&gt;200:raise ValueError('Invalid webhook')
+        with auth.db() as c:init(c);cfg=_keys(c)
+        verification={'webhook_id':cfg['webhook_id'],'webhook_event':payload}
+        for key,header in [('auth_algo','paypal-auth-algo'),('cert_url','paypal-cert-url'),('transmission_id','paypal-transmission-id'),('transmission_sig','paypal-transmission-sig'),('transmission_time','paypal-transmission-time')]:
+            value=headers.get(header,'')
+            if not value or len(value)&gt;4096:raise ValueError('Missing PayPal signature')
+            verification[key]=value
+        if not cfg['webhook_id'] or _api(cfg,'POST','/v1/notifications/verify-webhook-signature',verification).get('verification_status')!='SUCCESS':raise ValueError('Invalid PayPal signature')
+        if payload.get('event_type') in ('PAYMENT.CAPTURE.REVERSED','CUSTOMER.DISPUTE.CREATED','CUSTOMER.DISPUTE.UPDATED','CUSTOMER.DISPUTE.RESOLVED'):
+            return financial_risk_event(payload,cfg,hashlib.sha256(raw).hexdigest())
+        if payload.get('event_type')=='PAYMENT.CAPTURE.REFUNDED':return refund_event(payload,cfg,webhook_digest=hashlib.sha256(raw).hexdigest())
+        if payload.get('event_type')!='PAYMENT.CAPTURE.COMPLETED':return {'received':True}
+        pid=payload.get('resource',{}).get('supplementary_data',{}).get('related_ids',{}).get('order_id','')
+        if not re.fullmatch(r'[A-Z0-9]{6,64}',str(pid)):raise ValueError('Invalid PayPal order ID')
+        with auth.db() as c:
+            order=c.execute('SELECT * FROM paypal_orders WHERE provider_order=?',(pid,)).fetchone()
+&gt;       if not order:raise ValueError('Unknown PayPal order')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: Unknown PayPal order
+
+app/paypal_payments.py:388: ValueError</failure></testcase></testsuite></testsuites>

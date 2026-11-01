@@ -25,6 +25,33 @@ def clients(account,monkeypatch):
     return admin,owner
 
 
+def test_admin_api_discovers_unknown_stripe_refund_reference(stripe_env,account,monkeypatch):
+    admin,owner=clients(account,monkeypatch)
+    item=create(stripe_env);stripe_env['timeout']=True
+    uncertain=refunds.execute(actor(),item['id'],item['revision'])
+    url='/api/admin/payment-refunds/'+item['id']+'/verify'
+    payload={'expected_revision':uncertain['revision']}
+    assert owner.post(url,headers={'X-MTA-Request':'1'},json=payload).status_code==403
+    assert admin.post(url,json=payload).status_code==403
+    response=admin.post(url,headers={'X-MTA-Request':'1'},json=payload)
+    assert response.status_code==200,response.text
+    assert response.json()['state']=='settled' and len(stripe_env['posts'])==1
+    assert resource_accounts.state(account)['credits_micro']==3_000_000
+
+
+def test_admin_api_discovers_unknown_paypal_refund_reference(paypal_env,account,monkeypatch):
+    admin,owner=clients(account,monkeypatch)
+    item=create(paypal_env,provider='paypal',target=paypal_env['target']);paypal_env['timeout']=True
+    uncertain=refunds.execute(actor(),item['id'],item['revision'])
+    url='/api/admin/payment-refunds/'+item['id']+'/verify';payload={'expected_revision':uncertain['revision']}
+    assert owner.post(url,headers={'X-MTA-Request':'1'},json=payload).status_code==403
+    assert admin.post(url,json=payload).status_code==403
+    response=admin.post(url,headers={'X-MTA-Request':'1'},json=payload)
+    assert response.status_code==200,response.text
+    assert response.json()['state']=='settled' and len(paypal_env['posts'])==1
+    assert resource_accounts.state(account)['credits_micro']==3_000_000
+
+
 def server(client,language,admin,calls,errors):
     root=Path(__file__).resolve().parents[1]
     css=(root/'app/static/operator_refunds.css').read_text()+(root/'app/static/auth.css').read_text()
@@ -79,16 +106,22 @@ def test_admin_prepare_confirm_execute_cancel_and_private_owner_view(request,acc
 
 
 @pytest.mark.parametrize('language',['it','en'])
-def test_uncertain_browser_only_recovers_existing_reference(stripe_env,account,monkeypatch,nc_browser_config,language):
+@pytest.mark.parametrize('discovery',['manual','automatic'])
+@pytest.mark.parametrize('environment',['stripe_env','paypal_env'])
+def test_uncertain_browser_only_recovers_existing_reference(request,account,monkeypatch,nc_browser_config,language,discovery,environment):
     from playwright.sync_api import sync_playwright
-    item=create(stripe_env);stripe_env['timeout']=True;refunds.execute(actor(),item['id'],0)
+    env=request.getfixturevalue(environment)
+    item=create(env,provider='paypal',target=env['target']) if environment=='paypal_env' else create(env)
+    env['timeout']=True;refunds.execute(actor(),item['id'],0)
     admin,_=clients(account,monkeypatch);calls=[];errors=[];root=Path(__file__).resolve().parents[1]
     with sync_playwright() as pw:
         browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page()
         page.route('**/*',server(admin,language,True,calls,errors));page.goto('https://mta.test/refund-test');page.add_script_tag(content=(root/'app/static/operator_refunds.js').read_text())
         form=page.locator('[data-refund-verify]');form.wait_for();assert page.locator('[data-refund-execute]').count()==0 and page.locator('[data-refund-cancel]').count()==0
-        form.locator('[name=reference]').fill(next(iter(stripe_env['refunds'])));form.locator('button').click()
-        page.locator('[data-refund-state=settled]').wait_for();assert len(stripe_env['posts'])==1 and not errors
+        if discovery=='manual':form.locator('[name=reference]').fill(next(iter(env['refunds'])))
+        else:assert ('Lascia vuoto' if language=='it' else 'Leave blank') in form.inner_text()
+        form.locator('button').click()
+        page.locator('[data-refund-state=settled]').wait_for();assert len(env['posts'])==1 and not errors
         assert any('/verify' in path for _,path,_ in calls)
         assert not any('/execute' in path for _,path,_ in calls)
         browser.close()
@@ -122,5 +155,5 @@ def test_all_actual_owner_admin_templates_load_the_shared_refund_ui():
     for name,mode in [('admin.html','admin'),('account.html','owner'),('credits.html','owner')]:
         template=(root/'app/templates'/name).read_text()
         assert f'data-payment-refunds="{mode}"' in template
-        assert '/static/operator_refunds.js?v=r210-owner-account-acceptance' in template
+        assert '/static/operator_refunds.js?v=r210-refund-reference-discovery' in template
         assert '/static/operator_refunds.css?v=r210-refund-workflow' in template

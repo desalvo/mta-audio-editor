@@ -151,6 +151,8 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
             raise WorkerNotStarted(str(exc)) from exc
         if before_launch_cancelled:
             raise WorkerNotStarted('AI worker cancelled before execution', cancelled=True)
+    from .ai_execution_policy import isolated_env
+    env=isolated_env(env)
     started = time.monotonic()
     try:
         proc = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL,
@@ -356,7 +358,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
         request_path.write_bytes(encoded)
         request_path.chmod(0o600)
         from .ai_worker_registry import worker_python
-        args = ([worker_python(kind), str(worker)] if worker.suffix == '.py' else [str(worker)])
+        args = ([worker_python(kind), '-I', str(worker)] if worker.suffix == '.py' else [str(worker)])
         args += ['--request', str(request_path), '--output', str(output_path)]
         # Deferred workers reuse the scheduler's owner; publication and billing
         # outboxes retain that same immutable receipt through recovery.

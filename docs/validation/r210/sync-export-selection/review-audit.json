@@ -1,0 +1,43 @@
+[
+  {
+    "inventory": "AI_EXECUTION_REVIEW_R210.json",
+    "path": "app/codec.py",
+    "function": "run",
+    "changes": [
+      "line"
+    ],
+    "reason": "Existing boundary and call shape unchanged; updated line/source binding after reviewed audio export and matching changes."
+  },
+  {
+    "inventory": "SERVICE_ADMISSION_REVIEW_R210.json",
+    "path": "app/codec.py",
+    "function": "run",
+    "changes": [
+      "line"
+    ],
+    "reason": "Existing boundary and call shape unchanged; updated line/source binding after reviewed audio export and matching changes."
+  },
+  {
+    "inventory": "REMOTE_TRANSPORT_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_download_drumsep_model",
+    "changes": [
+      "source_sha256"
+    ],
+    "reason": "Existing boundary and call shape unchanged; updated line/source binding after reviewed audio export and matching changes."
+  },
+  {
+    "path": "app/codec.py",
+    "finding": "B404",
+    "old_line": 9,
+    "new_line": 10,
+    "reason": "Same reviewed snippet shifted by import."
+  },
+  {
+    "path": "app/codec.py",
+    "finding": "B603",
+    "old_line": 99,
+    "new_line": 100,
+    "reason": "Same reviewed snippet shifted by import."
+  }
+]

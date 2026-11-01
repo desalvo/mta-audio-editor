@@ -61,7 +61,7 @@ def stripe_env(account,monkeypatch):
             assert dict(request.url.params)=={'payment_intent':'pi_test','limit':'100'}
             body={'data':[charge],'has_more':False}
         elif path.endswith('/refunds'):
-            assert dict(request.url.params)=={'charge':'ch_test','limit':'100'}
+            assert dict(request.url.params) in ({'charge':'ch_test','limit':'100'},{'payment_intent':'pi_test','limit':'100'})
             body={'data':list(state['refunds'].values()),'has_more':False}
         elif path.endswith('/disputes'):
             assert dict(request.url.params)=={'charge':'ch_test','limit':'100'}
@@ -249,7 +249,7 @@ def test_readiness_detects_inconsistent_refund_journal(stripe_env,tamper):
 def paypal_env(account,provider,monkeypatch):
     from app import paypal_payments as paypal
     plan(account);order=paypal.checkout(account,{'kind':'credits','amount_cents':500,'request_id':'refund-paypal-credit'})
-    paypal.capture(account,order['order_id']);orders,_=provider;canonical=next(iter(orders.values()))
+    paypal.capture(account,order['order_id']);orders,_=provider;canonical=next(iter(orders.values()));canonical['intent']='CAPTURE'
     capture=canonical['purchase_units'][0]['payments']['captures'][0]
     state={'order':order['order_id'],'target':capture['id'],'canonical':canonical,'refunds':{},'posts':[],'status':'COMPLETED','timeout':False}
     def api(cfg,method,path,payload=None,request_id=None):

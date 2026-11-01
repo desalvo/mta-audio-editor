@@ -1,1 +1,1 @@
-Close AI execution entry coverage and preserve cancellation metering
+Complete canonical payment recovery and cash-proven payout reconciliation

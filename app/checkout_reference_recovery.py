@@ -6,7 +6,6 @@ Binding a matched provider object confirms creation, not payment settlement.
 import hashlib
 import json
 import re
-from urllib.parse import urlsplit
 
 import httpx
 from . import auth
@@ -14,7 +13,7 @@ from .regime_operation_fence import FenceBlocked
 from .regime_provider_probe import _get,_reference,ProviderProbeError
 
 
-def recover(provider,order_id,reference,*,client=None,_merchant_context=None):
+def recover(provider,order_id,reference,*,client=None,_merchant_context=None,_expected_config=None):
     if provider not in ('stripe','paypal') or not isinstance(order_id,str) or not 1<=len(order_id)<=120:
         raise ValueError('Invalid checkout recovery request')
     reference=_reference(reference)
@@ -28,6 +27,8 @@ def recover(provider,order_id,reference,*,client=None,_merchant_context=None):
             paypal.init(c)
             row=c.execute('SELECT * FROM paypal_orders WHERE id=?',(order_id,)).fetchone();config=paypal._keys(c)
         if row is None:raise ValueError('Unknown checkout order')
+        if _expected_config is not None and config!=_expected_config:
+            raise FenceBlocked('Payment configuration changed before reference recovery')
         initial=dict(row)
     from .checkout_terminal_outcomes import stripe_identity,paypal_identity
     if provider=='stripe':
@@ -35,7 +36,7 @@ def recover(provider,order_id,reference,*,client=None,_merchant_context=None):
             raise ProviderProbeError('Invalid Stripe reference or credentials')
         if client is None:
             with httpx.Client(timeout=15,follow_redirects=False) as owned:
-                return recover(provider,order_id,reference,client=owned)
+                return recover(provider,order_id,reference,client=owned,_expected_config=_expected_config)
         document=_get(client,'https://api.stripe.com/v1/checkout/sessions/'+reference,{'Authorization':'Bearer '+config})
         stripe_identity(document,{**initial,'session_id':reference})
         if document.get('status') not in ('open','complete','expired') or document.get('payment_status') not in ('paid','unpaid','no_payment_required'):
@@ -46,14 +47,26 @@ def recover(provider,order_id,reference,*,client=None,_merchant_context=None):
             raise FenceBlocked('PayPal merchant configuration changed')
         document=paypal._api(config,'GET','/v2/checkout/orders/'+reference)
         paypal_identity(document,{**initial,'provider_order':reference},require_empty=False)
+        if document['purchase_units'][0].get('invoice_id')!='mta-'+order_id:
+            raise ProviderProbeError('PayPal original invoice identity mismatch')
         if document.get('status') not in ('CREATED','SAVED','APPROVED','VOIDED','COMPLETED','PAYER_ACTION_REQUIRED','PENDING_APPROVAL'):
             raise ProviderProbeError('Unknown PayPal checkout status')
     reference_field='session_id' if provider=='stripe' else 'provider_order'
-    urls=[document.get('url')] if provider=='stripe' else [item.get('href') for item in document.get('links',[]) if item.get('rel') in ('approve','payer-action')]
+    if provider=='stripe':
+        urls=[document.get('url')]
+    else:
+        links=document.get('links',[])
+        if not isinstance(links,list) or any(not isinstance(item,dict) for item in links):
+            raise ProviderProbeError('Invalid recovered checkout links')
+        urls=[item.get('href') for item in links if item.get('rel') in ('approve','payer-action')]
+        if any(not isinstance(url,str) or not url for url in urls):
+            raise ProviderProbeError('Invalid recovered checkout URL')
     approval=None
-    if len(urls)==1 and urls[0]:
-        candidate=urlsplit(urls[0]);host='checkout.stripe.com' if provider=='stripe' else ('www.sandbox.paypal.com' if config['environment']=='sandbox' else 'www.paypal.com')
-        if candidate.scheme!='https' or candidate.hostname!=host or candidate.username or candidate.password or candidate.port not in (None,443):
+    if len(urls)>1:
+        raise ProviderProbeError('Ambiguous recovered checkout links')
+    if urls and urls[0] is not None:
+        from .owner_payments import safe_url
+        if not safe_url(urls[0],provider,config['environment'] if provider=='paypal' else None):
             raise ProviderProbeError('Invalid recovered checkout URL')
         approval=urls[0]
     immutable=('user_id','amount_cents','credit_value_micro') if provider=='stripe' else ('user_id','kind','period_start','amount_cents','environment','client_fingerprint')

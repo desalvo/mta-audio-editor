@@ -1,0 +1,11 @@
+{
+  "financial_passed": 358,
+  "browser_skipped": 16,
+  "targeted_passed": 4,
+  "targeted_new_cases": 2,
+  "stripe_concurrency_repeat": 6,
+  "provider_real": false,
+  "a5_closed": false,
+  "rc_verified": 32,
+  "rc_total": 42
+}

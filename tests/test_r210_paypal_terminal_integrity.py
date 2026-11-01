@@ -74,8 +74,13 @@ def test_new_provisional_result_waits_for_matching_final_evidence(account,risk_s
     assert next(x for x in owner_payments.history(account)['items'] if x['id']==local)['financial_review_pending']
     emit(terminal,4)
     assert snapshot(account,kind)==frozen
-    with auth.db() as c:assert journal.report(c)['pending']==0
-    assert not next(x for x in owner_payments.history(account)['items'] if x['id']==local)['financial_review_pending']
+    with auth.db() as c:
+        report=journal.report(c);assert report['pending']==0
+        if kind=='subscription' and terminal=='permanent':
+            assert report['subscription_original_loss_review']['unresolved']==[{'order_id':local,'reason':'permanent_dispute_movement_unproved'}]
+            assert report['subscription_reversal_due_micro']==0
+    # Finality is resolved, but an original fee loss still needs actual cash.
+    assert next(x for x in owner_payments.history(account)['items'] if x['id']==local)['financial_review_pending']==(kind=='subscription' and terminal=='permanent')
 
 
 @pytest.mark.parametrize('kind',['credits','subscription','repayment'])
@@ -83,5 +88,9 @@ def test_new_provisional_result_waits_for_matching_final_evidence(account,risk_s
 def test_older_provisional_evidence_cannot_reopen_terminal_result(account,risk_source,kind,terminal):
     local,emit=risk_source;emit(terminal,2);frozen=snapshot(account,kind)
     assert not emit('held',1).get('pending') and snapshot(account,kind)==frozen
-    with auth.db() as c:assert journal.report(c)['pending']==0
-    assert not next(x for x in owner_payments.history(account)['items'] if x['id']==local)['financial_review_pending']
+    with auth.db() as c:
+        report=journal.report(c);assert report['pending']==0
+        if kind=='subscription' and terminal=='permanent':
+            assert report['subscription_original_loss_review']['unresolved']==[{'order_id':local,'reason':'permanent_dispute_movement_unproved'}]
+            assert report['subscription_reversal_due_micro']==0
+    assert next(x for x in owner_payments.history(account)['items'] if x['id']==local)['financial_review_pending']==(kind=='subscription' and terminal=='permanent')

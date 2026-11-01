@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.475" timestamp="2026-11-01T18:26:22.680306+01:00" hostname="058579ff9fdd"><testcase classname="tests.test_r210_requested_editor_features" name="test_pdf_chord_and_lyric_stay_together_at_page_break" time="0.280"><failure message="AssertionError: (27, [2], [1])&#10;assert [2] == [1]&#10;  &#10;  At index 0 diff: 2 != 1&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-17/test_pdf_chord_and_lyric_stay_0')
+
+    def test_pdf_chord_and_lyric_stay_together_at_page_break(tmp_path):
+        import pymupdf
+        from app.models import Chord, LyricLine
+        from app.music_text import build_lyrics_pdf
+        lines=[LyricLine(time_ms=i*2000,end_ms=i*2000+1500,text=f'LYRIC{i:03d}') for i in range(80)]
+        chords=[Chord(time_ms=i*2000,chord=f'CHORD{i:03d}') for i in range(80)]
+        out=tmp_path/'song.pdf'
+        build_lyrics_pdf(out,title='Boundary',artist='',lyrics=lines,chords=chords,
+                         pdf_style={'lyrics':{'size':17},'chords':{'size':15},'line_spacing':4})
+        doc=pymupdf.open(out)
+        pages=[p.get_text() for p in doc]
+        assert len(pages)&gt;1
+        for i in range(80):
+            lyric=[n for n,p in enumerate(pages) if f'LYRIC{i:03d}' in p]
+            chord=[n for n,p in enumerate(pages) if f'CHORD{i:03d}' in p]
+            assert len(lyric)==len(chord)==1
+&gt;           assert lyric==chord,(i,lyric,chord)
+E           AssertionError: (27, [2], [1])
+E           assert [2] == [1]
+E             
+E             At index 0 diff: 2 != 1
+E             Use -v to get more diff
+
+tests/test_r210_requested_editor_features.py:23: AssertionError</failure></testcase><testcase classname="tests.test_r210_requested_editor_features" name="test_lyrics_shift_preserves_nested_timing_anchors_and_undo" time="0.058"><failure message="subprocess.CalledProcessError: Command '['node', '-e', &quot;const fs=require('fs'),vm=require('vm'),assert=require('assert');\nconst src=fs.readFileSync('app/static/app.js','utf8');\nconst s=src.indexOf('function shiftLyricsDraft('),e=src.indexOf('\\nfunction ',s+10);\nassert.ok(s&gt;=0);let refresh=0;\nconst c={lyricsChordsEditorLyricsDraft:[{time_ms:100,end_ms:300,words:[{start_ms:110,end_ms:200,syllables:[{start_ms:120,end_ms:140}]}]}],lyricsChordsEditorDraft:[{manual_anchor:true,anchor_line_time_ms:100,time_ms:130},{manual_anchor:false,time_ms:500}],lyricsChordsEditorMarkersDraft:[{manual_lyric_anchor:true,anchor_lyric_time_ms:100,time_ms:99}],refreshLyricsChordsEditor:()=&gt;refresh++,toast:()=&gt;{},Number,JSON,Map,Set};\nvm.createContext(c);vm.runInContext(src.slice(s,e),c);assert.equal(c.shiftLyricsDraft(50),true);\nassert.equal(c.lyricsChordsEditorLyricsDraft[0].time_ms,150);assert.equal(c.lyricsChordsEditorLyricsDraft[0].words[0].syllables[0].start_ms,170);\nassert.equal(c.lyricsChordsEditorDraft[0].anchor_line_time_ms,150);assert.equal(c.lyricsChordsEditorDraft[0].time_ms,180);assert.equal(c.lyricsChordsEditorDraft[1].time_ms,500);\nassert.equal(c.lyricsChordsEditorMarkersDraft[0].anchor_lyric_time_ms,150);assert.equal(c.lyricsChordsEditorMarkersDraft[0].time_ms,99);assert.equal(refresh,1);\nconst before=JSON.stringify(c.lyricsChordsEditorLyricsDraft);assert.equal(c.shiftLyricsDraft(-1000),false);assert.equal(JSON.stringify(c.lyricsChordsEditorLyricsDraft),before);\nassert.equal(c.shiftLyricsDraft(50),true);assert.equal(c.lyricsChordsEditorLyricsDraft[0].time_ms,200);\n&quot;]' returned non-zero exit status 1.">@pytest.mark.skipif(not __import__('shutil').which('node'),reason='Node required')
+    def test_lyrics_shift_preserves_nested_timing_anchors_and_undo():
+        js=r'''const fs=require('fs'),vm=require('vm'),assert=require('assert');
+    const src=fs.readFileSync('app/static/app.js','utf8');
+    const s=src.indexOf('function shiftLyricsDraft('),e=src.indexOf('\nfunction ',s+10);
+    assert.ok(s&gt;=0);let refresh=0;
+    const c={lyricsChordsEditorLyricsDraft:[{time_ms:100,end_ms:300,words:[{start_ms:110,end_ms:200,syllables:[{start_ms:120,end_ms:140}]}]}],lyricsChordsEditorDraft:[{manual_anchor:true,anchor_line_time_ms:100,time_ms:130},{manual_anchor:false,time_ms:500}],lyricsChordsEditorMarkersDraft:[{manual_lyric_anchor:true,anchor_lyric_time_ms:100,time_ms:99}],refreshLyricsChordsEditor:()=&gt;refresh++,toast:()=&gt;{},Number,JSON,Map,Set};
+    vm.createContext(c);vm.runInContext(src.slice(s,e),c);assert.equal(c.shiftLyricsDraft(50),true);
+    assert.equal(c.lyricsChordsEditorLyricsDraft[0].time_ms,150);assert.equal(c.lyricsChordsEditorLyricsDraft[0].words[0].syllables[0].start_ms,170);
+    assert.equal(c.lyricsChordsEditorDraft[0].anchor_line_time_ms,150);assert.equal(c.lyricsChordsEditorDraft[0].time_ms,180);assert.equal(c.lyricsChordsEditorDraft[1].time_ms,500);
+    assert.equal(c.lyricsChordsEditorMarkersDraft[0].anchor_lyric_time_ms,150);assert.equal(c.lyricsChordsEditorMarkersDraft[0].time_ms,99);assert.equal(refresh,1);
+    const before=JSON.stringify(c.lyricsChordsEditorLyricsDraft);assert.equal(c.shiftLyricsDraft(-1000),false);assert.equal(JSON.stringify(c.lyricsChordsEditorLyricsDraft),before);
+    assert.equal(c.shiftLyricsDraft(50),true);assert.equal(c.lyricsChordsEditorLyricsDraft[0].time_ms,200);
+    '''
+&gt;       subprocess.run(['node','-e',js],check=True)
+
+tests/test_r210_requested_editor_features.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = False, timeout = None, check = True
+popenargs = (['node', '-e', "const fs=require('fs'),vm=require('vm'),assert=require('assert');\nconst src=fs.readFileSync('app/sta...before);\nassert.equal(c.shiftLyricsDraft(50),true);assert.equal(c.lyricsChordsEditorLyricsDraft[0].time_ms,200);\n"],)
+kwargs = {}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['node', '-e', "const fs=require('fs'),vm=require('vm'),assert=require('assert');\nconst src=fs.readFileSync('app/static/app.js','utf8');\nconst s=src.indexOf('function shiftLyricsDraft('),e=src.indexOf('\\nfunction ',s+10);\nassert.ok(s&gt;=0);let refresh=0;\nconst c={lyricsChordsEditorLyricsDraft:[{time_ms:100,end_ms:300,words:[{start_ms:110,end_ms:200,syllables:[{start_ms:120,end_ms:140}]}]}],lyricsChordsEditorDraft:[{manual_anchor:true,anchor_line_time_ms:100,time_ms:130},{manual_anchor:false,time_ms:500}],lyricsChordsEditorMarkersDraft:[{manual_lyric_anchor:true,anchor_lyric_time_ms:100,time_ms:99}],refreshLyricsChordsEditor:()=&gt;refresh++,toast:()=&gt;{},Number,JSON,Map,Set};\nvm.createContext(c);vm.runInContext(src.slice(s,e),c);assert.equal(c.shiftLyricsDraft(50),true);\nassert.equal(c.lyricsChordsEditorLyricsDraft[0].time_ms,150);assert.equal(c.lyricsChordsEditorLyricsDraft[0].words[0].syllables[0].start_ms,170);\nassert.equal(c.lyricsChordsEditorDraft[0].anchor_line_time_ms,150);assert.equal(c.lyricsChordsEditorDraft[0].time_ms,180);assert.equal(c.lyricsChordsEditorDraft[1].time_ms,500);\nassert.equal(c.lyricsChordsEditorMarkersDraft[0].anchor_lyric_time_ms,150);assert.equal(c.lyricsChordsEditorMarkersDraft[0].time_ms,99);assert.equal(refresh,1);\nconst before=JSON.stringify(c.lyricsChordsEditorLyricsDraft);assert.equal(c.shiftLyricsDraft(-1000),false);assert.equal(JSON.stringify(c.lyricsChordsEditorLyricsDraft),before);\nassert.equal(c.shiftLyricsDraft(50),true);assert.equal(c.lyricsChordsEditorLyricsDraft[0].time_ms,200);\n"]' returned non-zero exit status 1.
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:571: CalledProcessError</failure></testcase></testsuite></testsuites>

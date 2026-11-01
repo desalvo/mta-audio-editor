@@ -9,7 +9,7 @@ from app import auth,paypal_payments as paypal,resource_accounts as resources
 from app import payment_reconcile_service as service,payment_reconciliation as journal,owner_payments
 from app import paypal_dispute_history as history
 from app.regime_operation_fence import FenceBlocked
-from test_r210_subscriptions import account as account  # noqa: F401
+from test_r210_subscriptions import account as account, plan  # noqa: F401
 from test_r210_paypal import provider as provider  # noqa: F401
 from test_r210_paypal_reconciliation_e2e import setup_order
 
@@ -41,6 +41,45 @@ def fixture(account,provider,monkeypatch,*,paid=False,multi=False,subscription=F
 
 def report():
     with auth.db() as c:return journal.report(c)
+
+
+@pytest.mark.parametrize('entry', ['capture', 'webhook'])
+@pytest.mark.parametrize('incomplete', [False, True])
+def test_first_fulfillment_checks_existing_dispute_history(account,provider,monkeypatch,entry,incomplete):
+    plan(account)
+    local=paypal.checkout(account,{'kind':'credits','amount_cents':500,'request_id':'first-funding-'+entry+str(incomplete)})['order_id']
+    pid=next(iter(provider[0])); original=paypal._api
+    if entry=='webhook':original({},'POST','/v2/checkout/orders/'+pid+'/capture')
+    issue=[incomplete]
+    doc={'dispute_id':'PP-D-777','status':'UNDER_REVIEW','update_time':'2026-10-24T01:00:00Z',
+         'dispute_amount':{'value':'2.00','currency_code':'EUR'},
+         'disputed_transactions':[{'seller_transaction_id':'CAPTURE'+pid,'gross_amount':{'value':'5.00','currency_code':'EUR'}}]}
+    def api(cfg,method,path,*args):
+        if method=='GET' and path.startswith('/v1/customer/disputes?'):
+            if issue[0]:return {}
+            return {'items':[{k:copy.deepcopy(doc[k]) for k in ('dispute_id','status','update_time','dispute_amount')}], 'links':[]}
+        if method=='GET' and path=='/v1/customer/disputes/PP-D-777':return copy.deepcopy(doc)
+        return original(cfg,method,path,*args)
+    monkeypatch.setattr(paypal,'_api',api)
+    def execute():
+        if entry=='capture':return paypal.capture(account,local)
+        payload={'id':'first-dispute-event','event_type':'PAYMENT.CAPTURE.COMPLETED',
+                 'resource':{'supplementary_data':{'related_ids':{'order_id':pid}}}}
+        headers={key:'test' for key in ['paypal-auth-algo','paypal-cert-url','paypal-transmission-id','paypal-transmission-sig','paypal-transmission-time']}
+        return paypal.webhook(json.dumps(payload).encode(),headers)
+    if incomplete:
+        with pytest.raises(ValueError,match='history is incomplete'):execute()
+        assert resources.state(account)['credits_micro']==0
+        assert report()['pending']>=1
+        issue[0]=False
+        assert service.reconcile_paypal(local)['ledger_reconciled']
+        execute()
+        assert resources.state(account)['credits_micro']==3_000_000
+    else:
+        execute()
+        assert resources.state(account)['credits_micro']==3_000_000
+        assert report()['positions'][0]['held_minor']==200
+    assert len([call for call in provider[1] if call[1].endswith('/capture')])==1
 
 
 @pytest.mark.parametrize('paid',[False,True])

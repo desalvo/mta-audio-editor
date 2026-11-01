@@ -17,7 +17,8 @@ def python_path():
 @lru_cache(maxsize=8)
 def _installed(path,stamp):
     try:
-        result=subprocess.run([path,'-c','import demucs.separate'],capture_output=True,timeout=30,check=False)
+        from .ai_execution_policy import isolated_env
+        result=subprocess.run([path,'-I','-c','import demucs.separate'],capture_output=True,timeout=30,check=False,env=isolated_env())
         return result.returncode==0
     except (OSError,subprocess.TimeoutExpired):return False
 

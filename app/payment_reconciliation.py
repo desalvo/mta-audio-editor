@@ -273,7 +273,11 @@ def report(c,*,limit=50,offset=0):
     if 'payment_reconciliation_disputes' in tables:
         active+=c.execute("SELECT count(*) FROM payment_reconciliation_disputes WHERE status NOT IN ('won','lost','warning_closed')").fetchone()[0]
     if 'paypal_financial_holds' in tables:
-        active+=c.execute("SELECT count(*) FROM paypal_financial_holds WHERE status IN ('held','uncertain')").fetchone()[0]
+        from .paypal_cash_history import position as cash_position
+        for oid,hid in c.execute("SELECT order_id,hold_id FROM paypal_financial_holds WHERE status IN ('held','uncertain')"):
+            order=c.execute('SELECT * FROM paypal_orders WHERE id=?',(oid,)).fetchone()
+            proof=cash_position(c,order) if order else None
+            if proof is None or not hid.startswith('dispute:') or hid.split(':')[1] not in proof['cases']:active+=1
     from .subscription_receivables import rows as reversal_rows
     receivables=None;repayment_refunds=None
     try:

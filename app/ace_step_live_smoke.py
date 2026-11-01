@@ -42,13 +42,14 @@ def test_live_inference(*, seconds: float = 5.0, timeout_seconds: int = 1200) ->
                     batch.extend(struct.pack('<h', sample))
                 wav.writeframesraw(batch)
         import subprocess
-        import sys
+        from .ai_execution_policy import isolated_env
+        from .ai_worker_protocol import worker_command
         worker = configured_worker()
         output = Path(tmp) / 'generated.wav'
         try:
             evaluate_model('ace-step')
-            completed = subprocess.run(([sys.executable, str(worker)] if worker.suffix == '.py' else [str(worker)]) + ['--smoke-input', str(source), '--output', str(output)],
-                cwd=tmp, capture_output=True, timeout=timeout_seconds, check=False)
+            completed = subprocess.run(worker_command(worker) + ['--smoke-input', str(source), '--output', str(output)],
+                cwd=tmp, capture_output=True, timeout=timeout_seconds, check=False,env=isolated_env())
         except subprocess.TimeoutExpired:
             return {'attempted': True, 'verified': False, 'reason': 'timeout'}
         if completed.returncode != 0:

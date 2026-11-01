@@ -1,6 +1,7 @@
 """Authenticated owner/admin resource controls, shared across native/web users."""
 import sqlite3
 from fastapi import APIRouter,Request,HTTPException,Response
+from starlette.concurrency import run_in_threadpool
 from . import auth,resource_accounts as resources,resource_entitlements as entitlements
 from .regime_operation_fence import FenceBlocked
 router=APIRouter()
@@ -215,7 +216,7 @@ async def stripe_webhook(request:Request):
     async for chunk in request.stream():
         raw.extend(chunk)
         if len(raw)>1024*1024:raise HTTPException(413,'Payment event too large')
-    try:return event(bytes(raw),request.headers.get('stripe-signature',''))
+    try:return await run_in_threadpool(event,bytes(raw),request.headers.get('stripe-signature',''))
     except (ValueError,TypeError,KeyError,FenceBlocked,sqlite3.IntegrityError):raise HTTPException(400,'Invalid payment event') from None
 
 
@@ -272,7 +273,7 @@ async def paypal_webhook(request:Request):
     async for chunk in request.stream():
         raw.extend(chunk)
         if len(raw)>1024*1024:raise HTTPException(413,'Payment event too large')
-    try:return webhook(bytes(raw),request.headers)
+    try:return await run_in_threadpool(webhook,bytes(raw),request.headers)
     except (ValueError,TypeError,KeyError,FenceBlocked,sqlite3.IntegrityError):raise HTTPException(400,'Invalid PayPal event') from None
 
 

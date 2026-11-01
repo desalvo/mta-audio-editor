@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.318" timestamp="2026-11-01T18:00:50.209454+01:00" hostname="058579ff9fdd"><testcase classname="tests.test_r210_sam_startup_diagnostics" name="test_isolated_worker_imports_installed_bridge_and_reaches_inference" time="0.056"><failure message="AssertionError: MTA_SAM_FAILURE:imports&#10;  Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 33, in &lt;module&gt;&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 287, in run_path&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 98, in _run_module_code&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/workspace/scratch/1911c27a491f/f4-work/app/sam_audio_worker.py&quot;, line 66, in &lt;module&gt;&#10;      main()&#10;    File &quot;/workspace/scratch/1911c27a491f/f4-work/app/sam_audio_worker.py&quot;, line 36, in main&#10;      from sam_audio_compat import sam_hub_compat&#10;  ModuleNotFoundError: No module named 'sam_audio_compat'&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/workspace/scratch/1911c27a491f/f4-work/../verified-env/bin/python', '-I', '-c', &quot;\nimport con...in main\n    from sam_audio_compat import sam_hub_compat\nModuleNotFoundError: No module named \'sam_audio_compat\'\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_isolated_worker_imports_i0')
+
+    def test_isolated_worker_imports_installed_bridge_and_reaches_inference(tmp_path):
+        result=run_worker(tmp_path,'ok')
+&gt;       assert result.returncode==0,result.stderr
+E       AssertionError: MTA_SAM_FAILURE:imports
+E         Traceback (most recent call last):
+E           File "&lt;string&gt;", line 33, in &lt;module&gt;
+E           File "&lt;frozen runpy&gt;", line 287, in run_path
+E           File "&lt;frozen runpy&gt;", line 98, in _run_module_code
+E           File "&lt;frozen runpy&gt;", line 88, in _run_code
+E           File "/workspace/scratch/1911c27a491f/f4-work/app/sam_audio_worker.py", line 66, in &lt;module&gt;
+E             main()
+E           File "/workspace/scratch/1911c27a491f/f4-work/app/sam_audio_worker.py", line 36, in main
+E             from sam_audio_compat import sam_hub_compat
+E         ModuleNotFoundError: No module named 'sam_audio_compat'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/workspace/scratch/1911c27a491f/f4-work/../verified-env/bin/python', '-I', '-c', "\nimport con...in main\n    from sam_audio_compat import sam_hub_compat\nModuleNotFoundError: No module named \'sam_audio_compat\'\n').returncode
+
+tests/test_r210_sam_startup_diagnostics.py:57: AssertionError</failure></testcase><testcase classname="tests.test_r210_sam_startup_diagnostics" name="test_worker_failure_keeps_safe_specific_diagnosis_through_nested_traceback[gated-sam_checkpoint_access_denied]" time="0.052"><failure message="AssertionError: assert 'sam_dependency_failed' == 'sam_checkpoint_access_denied'&#10;  &#10;  - sam_checkpoint_access_denied&#10;  + sam_dependency_failed">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_worker_failure_keeps_safe0')
+mode = 'gated', category = 'sam_checkpoint_access_denied'
+
+    @pytest.mark.parametrize('mode,category',[('gated','sam_checkpoint_access_denied'),('oom','sam_insufficient_memory')])
+    def test_worker_failure_keeps_safe_specific_diagnosis_through_nested_traceback(tmp_path,mode,category):
+        result=run_worker(tmp_path,mode)
+        assert result.returncode!=0
+        failure=_worker_failure(result.stderr+'\nsubprocess.CalledProcessError: PRIVATE nested detail',1)
+        safe=safe_failure_metadata(failure)
+&gt;       assert safe['category']==category
+E       AssertionError: assert 'sam_dependency_failed' == 'sam_checkpoint_access_denied'
+E         
+E         - sam_checkpoint_access_denied
+E         + sam_dependency_failed
+
+tests/test_r210_sam_startup_diagnostics.py:67: AssertionError</failure></testcase><testcase classname="tests.test_r210_sam_startup_diagnostics" name="test_worker_failure_keeps_safe_specific_diagnosis_through_nested_traceback[oom-sam_insufficient_memory]" time="0.051"><failure message="AssertionError: assert 'sam_dependency_failed' == 'sam_insufficient_memory'&#10;  &#10;  - sam_insufficient_memory&#10;  + sam_dependency_failed">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_worker_failure_keeps_safe1')
+mode = 'oom', category = 'sam_insufficient_memory'
+
+    @pytest.mark.parametrize('mode,category',[('gated','sam_checkpoint_access_denied'),('oom','sam_insufficient_memory')])
+    def test_worker_failure_keeps_safe_specific_diagnosis_through_nested_traceback(tmp_path,mode,category):
+        result=run_worker(tmp_path,mode)
+        assert result.returncode!=0
+        failure=_worker_failure(result.stderr+'\nsubprocess.CalledProcessError: PRIVATE nested detail',1)
+        safe=safe_failure_metadata(failure)
+&gt;       assert safe['category']==category
+E       AssertionError: assert 'sam_dependency_failed' == 'sam_insufficient_memory'
+E         
+E         - sam_insufficient_memory
+E         + sam_dependency_failed
+
+tests/test_r210_sam_startup_diagnostics.py:67: AssertionError</failure></testcase></testsuite></testsuites>

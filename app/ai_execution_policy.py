@@ -9,6 +9,16 @@ import os
 
 KEY='MTA_AI_ADMITTED_POLICY'
 
+_STARTUP_INJECTION_KEYS=frozenset({'PYTHONPATH','PYTHONHOME','PYTHONSTARTUP','PYTHONUSERBASE',
+    'PYTHONINSPECT','PYTHONBREAKPOINT','LD_PRELOAD','LD_AUDIT','DYLD_INSERT_LIBRARIES','DYLD_FORCE_FLAT_NAMESPACE'})
+
+
+def isolated_env(environment=None):
+    """Preserve model/device policy while excluding interpreter/loader injection."""
+    source=os.environ if environment is None else environment
+    return {key:value for key,value in source.items()
+            if (key.decode('ascii','ignore') if isinstance(key,bytes) else key).upper() not in _STARTUP_INJECTION_KEYS}
+
 
 def admitted_env(kind,decision):
     return {KEY:json.dumps({'schema':'mta-execution-policy-1','kind':kind,'decision':asdict(decision)},

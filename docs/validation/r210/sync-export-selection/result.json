@@ -1,0 +1,26 @@
+{
+  "rc": {
+    "verified": 34,
+    "total": 42,
+    "percent": 81.0
+  },
+  "tests": {
+    "passed": 84,
+    "failed": 0,
+    "skipped": 0
+  },
+  "gates": {
+    "ruff": "passed",
+    "javascript_syntax": "passed",
+    "inventories": "passed",
+    "security_review": "passed",
+    "bandit_high": 0
+  },
+  "limitations": [
+    "No automatic beat phase alignment.",
+    "Source BPM assumed constant.",
+    "Up to 512 distinct tempo segments.",
+    "Real music, real device, graphical UI and remote CI remain unverified.",
+    "MTA peak is measured before MP3 encoding; active master inserts are rejected."
+  ]
+}
