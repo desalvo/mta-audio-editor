@@ -20,3 +20,5 @@ A4/A5 sono chiusi nel perimetro software autorizzato: 927 casi distinti passati,
 SAM Audio: il journal originale del 1 novembre 2026 ha identificato `GatedRepoError` HTTP 401 sui modelli Base e Large. Autenticazione/autorizzazione, login e nuova prova sul server restano da verificare. I manuali amministratore IT/EN documentano la configurazione osservata; vedi `SAM_AUDIO_ADMIN_GUIDE_R210.md`.
 
 Richieste editing: matching automatico beat e fase implementato; stime musicali su brani reali e zoom nativo richiedono prove sui rispettivi target. Vedi `BEAT_SYNC_R210.md`.
+
+Merish5 / Xynthia2: l’utente segnala che gli export MTA non vengono caricati. L’estensione .mta e l’encoding CBR sono corretti ma il writer e gli attachment differiscono dagli originali; compatibilità hardware non risolta. Vedi `MERISH5_CI_41340688815_R210.md`.

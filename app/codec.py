@@ -471,10 +471,19 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
         if normalize_peak_db is not None:
             slot_files = _normalize_mta_slots(slot_files, float(normalize_peak_db), td)
 
+        # Stock M-Live material uses CBR 320 kb/s stereo streams. Pad every
+        # physical slot to the same sample count before encoding so a shorter
+        # track does not end ahead of the others. This does not establish the
+        # remaining proprietary container/metadata compatibility on hardware.
+        import soundfile as sf
+        slot_frames = [sf.info(str(path)).frames for path in slot_files]
+        common_frames = max(slot_frames)
         cmd = ["ffmpeg", "-y", "-v", "error"]
         for r in slot_files: cmd += ["-i", str(r)]
         for i in range(len(slot_files)): cmd += ["-map", f"{i}:a:0"]
-        cmd += ["-c:a", "libmp3lame", "-q:a", "2"]
+        for i in range(len(slot_files)):
+            cmd += [f"-filter:a:{i}", f"apad=whole_len={common_frames},atrim=end_sample={common_frames}"]
+        cmd += ["-c:a", "libmp3lame", "-b:a", "320k", "-ar", "44100", "-ac", "2"]
         for i, slot in enumerate(physical_slots):
             cmd += [f"-metadata:s:a:{i}", f"title={slot.name}", f"-metadata:s:a:{i}", f"MTA_TYPE={slot.type}"]
         attachments = []

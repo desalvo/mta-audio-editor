@@ -218,7 +218,7 @@
       "line": 5716,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "fdc948eed70d29c98c25f20cd989ad06e8dc7deb17c7ec2c22494d30d4ed1af3",
+      "source_sha256": "f00a34a7415da214d40f74c33aa8179e734e0f3f2be2a6dc5b7bea5f09345580",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."

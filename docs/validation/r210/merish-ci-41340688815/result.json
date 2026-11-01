@@ -1,0 +1,30 @@
+{
+  "rc": {
+    "verified": 34,
+    "total": 42,
+    "percent": 81.0
+  },
+  "commit": "f544db6acb02216b33e0cdc6e69610f7102180c2",
+  "ci_run": 41340688815,
+  "ci_failure": "two F401 unused imports",
+  "tests": {
+    "passed": 74,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gates": {
+    "ruff_full_scope": "passed",
+    "javascript_syntax": "passed",
+    "inventories": "passed",
+    "security_review": "passed",
+    "bandit_high": 0,
+    "manuals_visual": "IT and EN"
+  },
+  "limits": [
+    "Merish5 loading remains unresolved and untested on hardware.",
+    "Original reference has ten streams, not verified MTA8.",
+    "Generated container lacks stock ORG/MOD SYL/XML and Info frame; timing and cluster layout differ.",
+    "The failed CI did not reach unit tests; no new remote CI has run."
+  ]
+}

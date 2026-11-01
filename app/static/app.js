@@ -4152,8 +4152,7 @@ async function doExport(format=exportFormat){
   current.export_format=format;
   markDirty(100);
   const safe=(current.title||'project').replace(/[^A-Za-z0-9._ -]+/g,'_').trim()||'project';
-  const initialMtaTarget=!projectIsMta()?'MTA16':current.target;
-  const targetExt=initialMtaTarget==='MTA8'?'mta8':'mta16';
+  const targetExt='mta';
   const ext=format==='mta'?targetExt:(format==='mlive_mp3'?'mp3':format==='mp3g'?'zip':format);
   const mtaProfile=current.mta_device_profile||'auto';
   const mtaTargetField=format==='mta'&&!projectIsMta()?`<label class="workflow-field"><span>Formato MTA di destinazione</span><select id="exportMtaTarget"><option value="MTA8">MTA8</option><option value="MTA16" selected>MTA16</option></select></label>`:'';
@@ -4181,6 +4180,7 @@ async function doExport(format=exportFormat){
       ${mtaProfileField}
       ${audioParams}
       ${normalizeParams}
+      ${format==='mta'?`<div class="export-warning">${tr('MTA export uses the .mta extension. Playback on Merish5 / Xynthia2 is not yet verified; choose the matching device profile.','L’export MTA usa l’estensione .mta. Il caricamento su Merish5 / Xynthia2 non è ancora verificato; scegli il profilo del dispositivo.')}</div>`:''}
       <div class="workflow-note">${format==='mta'?'Il profilo MTA controlla l’ordine fisico delle tracce Click/Melody nel file. MTA8 mantiene le posizioni specifiche del dispositivo; per MTA16 il default derivato dal corpus è Click 1 / Melody 9. Se servono stream intermedi vengono creati slot silenziosi. ':''}${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':isMobileClient()?'L’app mobile userà il selettore file del sistema operativo. Puoi anche condividere direttamente l’output.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
       <div class="utility-actions">
         <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}',false)">Conferma export</button>
@@ -4227,8 +4227,7 @@ async function confirmConfiguredExport(format,share=false){
 async function executeConfiguredExport(config,slots=[]){
   if(!current)return;
   try{
-    const exportMtaTarget=config.mta_target||(!projectIsMta()?'MTA16':current.target);
-    const ext=config.format==='mta'?(exportMtaTarget==='MTA8'?'mta8':'mta16'):(config.format==='mlive_mp3'?'mp3':config.format==='mp3g'?'zip':config.format);
+    const ext=config.format==='mta'?'mta':(config.format==='mlive_mp3'?'mp3':config.format==='mp3g'?'zip':config.format);
     const safeName=(config.filename||'project').replace(/[^A-Za-z0-9._ -]+/g,'_').trim()||'project';
     let nativeOutputPath='';
     if(currentUser?.native_single_user&&window.pywebview?.api?.choose_export_save_path){

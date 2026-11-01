@@ -1,3 +1,9 @@
+# Aggiornamento CI e Merish5 / Xynthia2
+
+RC **34/42 = 81,0%, PRE-RC**. Baseline Git confermata `f544db6acb02216b33e0cdc6e69610f7102180c2`; la CI 41340688815 falliva su due import non utilizzati, ora corretti e Ruff completo locale passato. L'export usa `.mta`, CBR 320 kbit/s e stream di durata uguale. **Il caricamento su Merish5 rimane aperto**: il confronto con un originale MTA16 evidenzia differenze strutturali/metadata; serve un MTA8 originale e la prova hardware. Dettagli: `MERISH5_CI_41340688815_R210.md`. Nessun commit o CI remota dopo la correzione.
+
+---
+
 # Aggiornamento - sincronizzazione beat r210
 
 RC **34/42 = 81,0%, PRE-RC**. Ripresa: `MTA-0.3.0-r210-pre-RC-beat-sync-cumulative.zip`; dettagli e limiti in `BEAT_SYNC_R210.md`. Rilevamento beat di sorgente e fase riferimento con mappe progetto fisse, a zone e adattive implementato; ascolto reale e UI nativa restano da verificare. Nessuna nuova CI remota, nessun commit.

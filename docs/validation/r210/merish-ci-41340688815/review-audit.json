@@ -1,0 +1,19 @@
+[
+  {
+    "inventory": "REMOTE_TRANSPORT_REVIEW_R210.json",
+    "path": "app/main.py",
+    "function": "_download_drumsep_model",
+    "changes": [
+      "source_sha256"
+    ],
+    "reason": "Existing call/route identity unchanged; rebinding after filename, FFmpeg CBR and stream padding changes."
+  },
+  {
+    "path": "app/codec.py",
+    "reason": "Fixed FFmpeg arguments set 320 kbps stereo and internally calculated numeric sample count; no shell invocation or user-supplied filter expression. Destination atomic publication unchanged."
+  },
+  {
+    "path": "app/main.py and native/mta_audio_editor_native.py",
+    "reason": "Generated export extension changes to mta; native allowlist explicitly includes mta, existing suffix validation retained."
+  }
+]

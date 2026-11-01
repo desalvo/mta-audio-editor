@@ -137,6 +137,8 @@ def test_render_track_export_all_formats(tmp_path, monkeypatch):
 def test_export_mta_merge_executes_slot_mix(tmp_path, monkeypatch):
     import app.codec as codec
     import app.storage as storage
+    import soundfile as sf
+    import numpy as np
     monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
     monkeypatch.setattr(codec, "pdir", storage.pdir)
     p = storage.create_project("Merge", "MTA8")
@@ -149,7 +151,7 @@ def test_export_mta_merge_executes_slot_mix(tmp_path, monkeypatch):
     def fake_run(cmd):
         commands.append(cmd)
         if cmd and str(cmd[-1]).endswith('.wav'):
-            Path(cmd[-1]).write_bytes(b"merged")
+            sf.write(str(cmd[-1]), np.zeros((441, 2)), 44100)
         elif cmd and str(cmd[-1]).endswith('.mta8'):
             Path(cmd[-1]).write_bytes(b"mta")
         return ""

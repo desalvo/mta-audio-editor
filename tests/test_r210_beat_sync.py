@@ -49,7 +49,7 @@ def test_variable_source_and_project_tempo_map_with_beat_phase(tmp_path,monkeypa
 
 
 def test_actual_ffmpeg_render_aligns_pulses_and_preserves_outer_selection(tmp_path,monkeypatch):
-    from app import sample_editor,storage
+    from app import sample_editor
     p,source,reference=_fixture(tmp_path,monkeypatch)
     req=SampleEffectRequest(effect='match',start_sample=0,end_sample=8*44100,
         params={'reference_track_id':'ref','source_bpm':120,'target_bpm':120,'semitones':0})

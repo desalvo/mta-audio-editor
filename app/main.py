@@ -7016,7 +7016,7 @@ def export_mta_with_mapping(pid: str, req: MtaExportRequest, request: Request):
         ]
         requested_slots = [slot for slot in requested_slots if slot.track_ids]
         slots = validate_slot_mapping(export_project, requested_slots)
-        ext = "mta8" if export_project.target == "MTA8" else "mta16"
+        ext = "mta"
         out = pdir(pid) / f"export.{ext}"
         export_mta(export_project, out, slots)
     except Exception as exc:
@@ -7252,7 +7252,7 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
         export_project = _musical_export_project(source_project)
         if export_project.target not in {"MTA8", "MTA16"}:
             export_project.target = req.mta_target or "MTA16"
-        ext = "mta8" if export_project.target == "MTA8" else "mta16"
+        ext = "mta"
         out = pdir(pid) / f"configured-export.{ext}"
         limit = 8 if export_project.target == "MTA8" else 16
         if len(export_project.tracks) > limit or req.slots:
@@ -7489,7 +7489,7 @@ def export(pid: str, request: Request, format: str = "mta"):
                 raise HTTPException(409, "DAW projects require choosing MTA8 or MTA16 in configured export")
             if len(export_project.tracks) > (8 if export_project.target == "MTA8" else 16):
                 raise HTTPException(409, "MTA export mapping required; use /export-plan and /export-mta")
-            ext = "mta8" if export_project.target == "MTA8" else "mta16"
+            ext = "mta"
             out = pdir(pid) / f"export.{ext}"
             export_mta(_musical_export_project(project), out)
             media_type = "application/octet-stream"

@@ -10,10 +10,10 @@
     "whole_macroareas_accepted": 2
   },
   "accepted_this_cycle": [],
-  "latest_handoff": "docs/BEAT_SYNC_R210.md",
-  "latest_proof": "docs/validation/r210/beat-sync/result.json",
-  "code_resume_handoff": "docs/BEAT_SYNC_R210.md",
-  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-beat-sync-cumulative.zip",
+  "latest_handoff": "docs/MERISH5_CI_41340688815_R210.md",
+  "latest_proof": "docs/validation/r210/merish-ci-41340688815/result.json",
+  "code_resume_handoff": "docs/MERISH5_CI_41340688815_R210.md",
+  "code_resume_archive": "MTA-0.3.0-r210-pre-RC-merish-ci-hotfix-cumulative.zip",
   "remaining_original_criteria": [
     "A6",
     "B6",
@@ -529,5 +529,6 @@
     }
   },
   "sam_reported_problem": "Original SAM model-load errors identified as gated Hugging Face HTTP 401; service configuration documented, login/access and retry on target remain unverified.",
-  "editor_requested_remaining": "Real-music beat tracking quality and native UI target tests remain unverified."
+  "editor_requested_remaining": "Real-music beat tracking quality and native UI target tests remain unverified.",
+  "merish_hardware_remaining": "User reports exported MTA is rejected; extension and CBR changed, but stock MTA8 sample and physical device validation are required."
 }
