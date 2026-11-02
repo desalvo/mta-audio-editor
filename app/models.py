@@ -5,6 +5,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, Field, field_validator
 
 TrackType = Literal["drums", "bass", "guitars", "keyboards", "orchestra", "winds", "melody", "click", "choirs", "other"]
+DEFAULT_MERISH_USER_ID = "068336"
 PluginType = Literal[
     "eq", "normalizer", "compressor", "limiter", "delay", "reverb_lexicon",
     "room_ambience", "graphic_eq_32", "amplify", "stereo_imager",
@@ -406,7 +407,7 @@ class ProjectExportRequest(BaseModel):
     format: Literal["mta", "wav", "mp3", "mlive_mp3", "mp3g", "flac", "mp4"] = "mta"
     filename: str = Field(default="project", min_length=1, max_length=240)
     mta_target: Literal["MTA8", "MTA16"] | None = None
-    mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto" 
+    mta_device_profile: Literal["auto", "merish5_xynthia2", "merish5_xynthia2_experimental", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto" 
     mp3_bitrate_kbps: int = Field(default=320, ge=96, le=320)
     sample_rate: Literal[44100, 48000, 96000] = 44100
     wav_bit_depth: Literal[16, 24, 32] = 24
@@ -471,7 +472,10 @@ class Project(BaseModel):
     project_kind_version: Literal[0, 1] = 0
     sample_rate: Literal[44100, 48000, 96000] = 44100
     audio_storage_mode: Literal["wav", "flac"] = "wav"
-    mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
+    mta_device_profile: Literal["auto", "merish5_xynthia2", "merish5_xynthia2_experimental", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
+    merish_user_id: str = Field(default=DEFAULT_MERISH_USER_ID, pattern=r"^(?:[0-9]{6})?$")
+    merish_syl_key: str = Field(default="", pattern=r"^(?:[0-9a-f]{512})?$")
+    merish_lyric_highlight: Literal["word", "character"] = "word"
     tracks: list[Track] = Field(default_factory=list)
     archived_tracks: list[Track] = Field(default_factory=list, max_length=1024)
     clip_library: list[ProjectClip] = Field(default_factory=list, max_length=512)

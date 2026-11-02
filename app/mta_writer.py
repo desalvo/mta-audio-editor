@@ -2,10 +2,9 @@
 
 FFmpeg writes a valid Matroska file but may place Cues after media Clusters. Stock
 MTA keeps SeekHead/Cues readable before the XOR-transformed media region. This
-module rewrites only the top-level Matroska layout: Info/Tracks/Tags/Attachments
-are preserved byte-for-byte, Cues are regenerated with adjusted Cluster
-positions, a SeekHead including the first Cluster is generated, then the raw
-Cluster bytes are appended unchanged.
+module arranges the top-level Matroska layout, places attachment descriptions
+after the other file fields, regenerates Cues and SeekHead, then appends raw
+Cluster bytes unchanged.
 """
 from __future__ import annotations
 
@@ -13,6 +12,7 @@ import mmap
 import os
 import stat
 import tempfile
+import zlib
 from pathlib import Path
 
 from .mta_reverse import _ebml_children, _ebml_vint
@@ -55,6 +55,55 @@ def _elem(element_id: int, payload: bytes) -> bytes:
     return ID_BYTES.get(element_id, element_id.to_bytes((element_id.bit_length() + 7) // 8, "big")) + _size_vint(len(payload)) + payload
 
 
+def _complete_children(data: bytes) -> list[tuple[int, bytes, bytes]]:
+    """Parse an entire EBML payload without silently accepting truncated data."""
+    children = list(_ebml_children(data, 0, len(data)))
+    if (children and children[-1][4] != len(data)) or (data and not children):
+        raise ValueError("malformed attachment EBML")
+    return [(eid, data[pos:end], data[start:end]) for pos, eid, _, start, end in children]
+
+
+def _refresh_crc(original: list[tuple[int, bytes, bytes]], rewritten: list[tuple[int, bytes, bytes]]) -> bytes:
+    """Validate and refresh an existing EBML CRC-32, preserving its position."""
+    checks = [(raw, payload) for eid, raw, payload in original if eid == 0xBF]
+    if len(checks) > 1 or (checks and len(checks[0][1]) != 4):
+        raise ValueError("invalid attachment CRC element")
+    if not checks:
+        return b"".join(raw for _, raw, _ in rewritten)
+    expected = zlib.crc32(b"".join(raw for eid, raw, _ in original if eid != 0xBF))
+    if int.from_bytes(checks[0][1], "little") != expected:
+        raise ValueError("attachment CRC mismatch")
+    checksum = zlib.crc32(b"".join(raw for eid, raw, _ in rewritten if eid != 0xBF)).to_bytes(4, "little")
+    return b"".join(raw[:-4] + checksum if eid == 0xBF else raw for eid, raw, _ in rewritten)
+
+
+def _normalize_attachment_order(element: bytes) -> bytes:
+    """Move FileDescription to the end of each AttachedFile, keeping file data intact."""
+    outer = _complete_children(element)
+    if len(outer) != 1 or outer[0][0] != IDS["Attachments"]:
+        raise ValueError("invalid Attachments element")
+    children = _complete_children(outer[0][2])
+    rewritten = []
+    changed = False
+    for eid, raw, payload in children:
+        if eid != 0x61A7:
+            rewritten.append((eid, raw, payload))
+            continue
+        fields = _complete_children(payload)
+        other = [field for field in fields if field[0] != 0x467E]
+        descriptions = [field for field in fields if field[0] == 0x467E]
+        ordered = other + descriptions
+        if ordered == fields:
+            rewritten.append((eid, raw, payload))
+            continue
+        updated = _refresh_crc(fields, ordered)
+        rewritten.append((eid, _elem(eid, updated), updated))
+        changed = True
+    if not changed:
+        return element
+    return _elem(IDS["Attachments"], _refresh_crc(children, rewritten))
+
+
 def _void88() -> bytes:
     # EC + one-byte size VINT + 86 payload bytes = 88 total bytes.
     return b"\xec" + _size_vint(86, 1) + (b"\x00" * 86)
@@ -94,10 +143,12 @@ def _parse_cues(mm: mmap.mmap, start: int, end: int) -> list[tuple[int, int, int
     return points
 
 
-def _build_cues(points: list[tuple[int, int, int]], delta: int) -> bytes:
+def _build_cues(points: list[tuple[int, int, int]], cluster_positions: dict[int, int]) -> bytes:
     payload = bytearray()
     for cue_time, track, old_pos in points:
-        positions = _elem(0xF7, _uint(track)) + _elem(0xF1, _uint(old_pos + delta))
+        if old_pos not in cluster_positions:
+            raise ValueError("Cue references a missing Cluster")
+        positions = _elem(0xF7, _uint(track)) + _elem(0xF1, _uint(cluster_positions[old_pos]))
         point = _elem(0xB3, _uint(cue_time)) + _elem(0xB7, positions)
         payload += _elem(0xBB, point)
     return _elem(IDS["Cues"], bytes(payload))
@@ -141,16 +192,16 @@ def normalize_matroska_for_mta(source: Path, target: Path) -> int:
             elif element_id == IDS["Cues"]:
                 cue_points = _parse_cues(mm, payload_start, payload_end)
             elif element_id in {IDS["Info"], IDS["Tracks"], IDS["Tags"], IDS["Attachments"]} and element_id not in raw:
-                raw[element_id] = full
+                raw[element_id] = _normalize_attachment_order(full) if element_id == IDS["Attachments"] else full
 
         if not clusters:
             raise ValueError("canonical Matroska has no Cluster")
         if IDS["Info"] not in raw or IDS["Tracks"] not in raw:
             raise ValueError("canonical Matroska is missing Info/Tracks")
 
-        old_first_cluster = clusters[0][0]
         void = _void88()
-        cues = _build_cues(cue_points, 0) if cue_points else _elem(IDS["Cues"], b"")
+        original_positions = {pos: pos for pos, _blob in clusters}
+        cues = _build_cues(cue_points, original_positions) if cue_points else _elem(IDS["Cues"], b"")
         seek = b""
 
         # Seek width and Cue position widths can affect their own offsets. Iterate
@@ -169,9 +220,11 @@ def normalize_matroska_for_mta(source: Path, target: Path) -> int:
             positions[IDS["Cues"]] = cursor
             cursor += len(cues)
             positions[IDS["Cluster"]] = cursor
-            new_first_cluster = cursor
-            delta = new_first_cluster - old_first_cluster
-            new_cues = _build_cues(cue_points, delta) if cue_points else _elem(IDS["Cues"], b"")
+            new_cluster_positions = {}
+            for old_pos, blob in clusters:
+                new_cluster_positions[old_pos] = cursor
+                cursor += len(blob)
+            new_cues = _build_cues(cue_points, new_cluster_positions) if cue_points else _elem(IDS["Cues"], b"")
             positions[IDS["Cues"]] = sum(
                 [len(seek), len(void)] +
                 [len(raw[eid]) for eid in (IDS["Info"], IDS["Tracks"], IDS["Tags"], IDS["Attachments"]) if eid in raw]

@@ -4159,9 +4159,10 @@ async function doExport(format=exportFormat){
   const mtaProfileField=format==='mta'?`<label class="workflow-field"><span>Profilo dispositivo MTA</span><select id="exportMtaProfile">
     <option value="auto" ${mtaProfile==='auto'?'selected':''}>Auto (MTA8: B.Beat/DIVO · MTA16: Click 1, Melody 9)</option>
     <option value="merish5_xynthia2" ${mtaProfile==='merish5_xynthia2'?'selected':''}>Merish5 / Xynthia2 · MTA8 (Melody 7, Click 8)</option>
+    <option value="merish5_xynthia2_experimental" ${mtaProfile==='merish5_xynthia2_experimental'?'selected':''}>Merish5 / Xynthia2 · MTA8 sperimentale</option>
     <option value="bbeat_divo" ${mtaProfile==='bbeat_divo'?'selected':''}>B.Beat / B.Beat Plus / Evo / Pro16 / DIVO · MTA8 (Click 7, Melody 8)</option>
     <option value="mlive_mta16_default" ${mtaProfile==='mlive_mta16_default'?'selected':''}>MTA16 M-Live · default corpus (Click 1, Melody 9)</option>
-    <option value="merish5_plus_mta16" ${mtaProfile==='merish5_plus_mta16'?'selected':''}>Merish5+ PLUS · compatibilità MTA16 (Click 1, Melody 9 modificabili)</option>
+    <option value="merish5_plus_mta16" ${mtaProfile==='merish5_plus_mta16'?'selected':''}>Merish5+ PLUS · MTA16 sperimentale</option>
     <option value="generic" ${mtaProfile==='generic'?'selected':''}>Generic MTA · ordine manuale</option>
   </select></label>`:'';
   const audioParams=format==='wav'
@@ -4180,7 +4181,7 @@ async function doExport(format=exportFormat){
       ${mtaProfileField}
       ${audioParams}
       ${normalizeParams}
-      ${format==='mta'?`<div class="export-warning">${tr('MTA export uses the .mta extension. Playback on Merish5 / Xynthia2 is not yet verified; choose the matching device profile.','L’export MTA usa l’estensione .mta. Il caricamento su Merish5 / Xynthia2 non è ancora verificato; scegli il profilo del dispositivo.')}</div>`:''}
+      ${format==='mta'?`<div class="export-warning">${tr('MTA export uses the .mta extension. Experimental Merish profiles require your M-Live identifier. For lyrics and chords, import metadata from your own MTA with synchronized lyrics. Word or character highlighting uses timed words; the project key is included as display metadata. Markers set the Merish pre-count to zero. An already generated zoned or adaptive metronome is exported as audio when its track is mapped; BPM metadata stays fixed and the variable tempo map is not transferred. Lyrics may advance by line, or by timed words when every active line includes them. Synthetic granular probes were verified on one Merish5+; three generated granular exports were verified on one Merish5+; other projects and devices require validation.','L’export MTA usa l’estensione .mta. I profili Merish sperimentali richiedono il tuo identificativo M-Live. Per testo e accordi importa i metadati da un tuo MTA con testo sincronizzato. L’evidenziazione per parola o lettera usa i tempi delle parole; la tonalità viene inclusa come metadato visualizzabile. I marker azzerano il preconteggio Merish. Un metronomo a zone o adattivo già generato viene esportato come audio se la sua traccia è mappata; i metadata BPM restano fissi e la mappa variabile non viene trasferita. Le lyrics possono avanzare per righe oppure per parole se tutte le righe attive sono sincronizzate. Le prove sintetiche granulari sono state verificate su un Merish5+; tre export granulari generati sono stati verificati sul Merish5+; altri progetti e dispositivi richiedono verifica.')}</div>`:''}
       <div class="workflow-note">${format==='mta'?'Il profilo MTA controlla l’ordine fisico delle tracce Click/Melody nel file. MTA8 mantiene le posizioni specifiche del dispositivo; per MTA16 il default derivato dal corpus è Click 1 / Melody 9. Se servono stream intermedi vengono creati slot silenziosi. ':''}${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':isMobileClient()?'L’app mobile userà il selettore file del sistema operativo. Puoi anche condividere direttamente l’output.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
       <div class="utility-actions">
         <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}',false)">Conferma export</button>
@@ -4438,7 +4439,7 @@ function editProjectMeta(){
   if(!current)return;
   const signatures=['2/4','3/4','4/4','5/4','6/8','7/8','9/8','12/8'];
   const targets=['DAW','DAW_MIDI','MIDI','MTA8','MTA16'];
-  const profiles=[['auto','Auto'],['merish5_xynthia2','Merish5 / Xynthia2'],['bbeat_divo','B.Beat / Divo'],['mlive_mta16_default','M-Live MTA16'],['merish5_plus_mta16','Merish5+ MTA16'],['generic','Generic']];
+  const profiles=[['auto','Auto'],['merish5_xynthia2','Merish5 / Xynthia2'],['merish5_xynthia2_experimental','Merish5 / Xynthia2 MTA8 sperimentale'],['bbeat_divo','B.Beat / Divo'],['mlive_mta16_default','M-Live MTA16'],['merish5_plus_mta16','Merish5+ MTA16'],['generic','Generic']];
   const row=(label,control)=>`<tr><th>${esc(label)}</th><td>${control}</td></tr>`;
   const input=(id,value,max=300,type='text')=>`<input id="${id}" type="${type}" value="${esc(value??'')}" maxlength="${max}" class="project-meta-input">`;
   const select=(id,value,options)=>`<select id="${id}" class="project-meta-input">${options.map(([v,l])=>`<option value="${esc(v)}" ${String(value)===String(v)?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
@@ -4453,14 +4454,38 @@ function editProjectMeta(){
     row('Sample rate progetto',`<select id="projectMetaSampleRate" class="project-meta-input" ${((current.tracks||[]).length||(current.archived_tracks||[]).length)?'disabled':''}><option value="44100" ${Number(current.sample_rate||44100)===44100?'selected':''}>44.1 kHz</option><option value="48000" ${Number(current.sample_rate||44100)===48000?'selected':''}>48 kHz</option><option value="96000" ${Number(current.sample_rate||44100)===96000?'selected':''}>96 kHz</option></select>${(current.tracks||[]).length?'<small>Modificabile solo quando il progetto non contiene tracce attive o conservate.</small>':''}`),
     row('Tipo progetto',select('projectMetaTarget',current.target||'MTA8',targets.map(x=>[x,projectFormatLabel(x)])).replace('id="projectMetaTarget"','id="projectMetaTarget" onchange="updateProjectKindPreview()"')+`<small id="projectKindPreview">${tr('Incompatible tracks are preserved inactive and restored when switching back. Preserved tracks:','Le tracce incompatibili vengono conservate inattive e ripristinate tornando a un tipo compatibile. Tracce conservate:')} ${(current.archived_tracks||[]).length}</small>`),
     row('Profilo MTA',select('projectMetaDeviceProfile',current.mta_device_profile||'auto',profiles)),
+    row('Identificativo M-Live',input('projectMetaMerishUserId',current.merish_user_id||'068336',6)+`<small>Valore suggerito 068336, ricavato dagli MTA di prova. Puoi sostituirlo con il tuo; la compatibilità con altri dispositivi non è verificata.</small><div><label class="utility-btn secondary">Importa metadati da un tuo MTA<input type="file" accept=".mta,.mta8,.mta16" hidden onchange="importMerishMetadata(this)"></label><small id="merishMetadataStatus">${current.merish_syl_key?'Metadati per testo disponibili':'Importa un MTA con testo per abilitare l’export testuale sperimentale.'}</small></div>`),
+    row('Evidenziazione testo Merish',select('projectMetaMerishHighlight',current.merish_lyric_highlight||'word',[['word','Per parola'],['character','Per lettera']])+`<small>Usa i tempi delle parole; per lettera usa anche i tempi delle sillabe disponibili.</small>`),
     row('Società repertorio',input('projectMetaRightsSocieties',(current.rights_societies||[]).join(', '),500)),
   ].join('')}</tbody></table></div><p class="hint">Tutti i campi vengono salvati insieme nel progetto. Se modifichi il time signature, i BPM vengono ricalcolati usando la nuova metrica.</p><div class="utility-actions"><button class="utility-btn primary" onclick="saveProjectMetaEditor()">Save</button><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
   updateProjectKindPreview();
+}
+async function importMerishMetadata(input){
+  const file=input?.files?.[0],projectId=current?.id;if(!file||!projectId)return;
+  clearTimeout(autosaveTimer);autosaveTimer=null;
+  while(autosaveBusy)await new Promise(resolve=>setTimeout(resolve,25));
+  if(current?.id!==projectId)return;
+  autosaveBusy=true;input.disabled=true;
+  const status=$('#merishMetadataStatus');if(status)status.textContent='Analisi metadati MTA…';
+  const body=new FormData();body.append('file',file);
+  try{
+    if(projectDirty){collect();await persistCurrentProject(false);if(projectDirty)throw Error('Attendere il salvataggio delle modifiche in corso')}
+    const result=await api(`/api/projects/${encodeURIComponent(projectId)}/merish-metadata`,{method:'POST',body});
+    if(current?.id!==projectId)return;
+    current.merish_user_id=result.project.merish_user_id;current.merish_syl_key=result.project.merish_syl_key;
+    if(persistedProjectSnapshot){persistedProjectSnapshot.merish_user_id=current.merish_user_id;persistedProjectSnapshot.merish_syl_key=current.merish_syl_key}
+    const idField=$('#projectMetaMerishUserId');if(idField)idField.value=current.merish_user_id;
+    if(status)status.textContent='Metadati per testo disponibili';
+    toast('Metadati MTA importati nel progetto');
+  }catch(e){if(status)status.textContent='Importazione metadati non riuscita';toast(e.message)}
+  finally{input.value='';input.disabled=false;autosaveBusy=false;if(autosaveQueued){autosaveQueued=false;markDirty(50)}}
 }
 async function saveProjectMetaEditor(){
   if(!current)return;
   const title=($('#projectMetaTitle')?.value||'').trim();
   if(!title){toast('Il titolo del progetto non può essere vuoto');return}
+  const merishId=($('#projectMetaMerishUserId')?.value||'').trim();
+  if(merishId&&!/^[0-9]{6}$/.test(merishId)){toast('L’identificativo M-Live deve contenere sei cifre');return}
   clearTimeout(autosaveTimer);autosaveTimer=null;
   while(autosaveBusy)await new Promise(resolve=>setTimeout(resolve,25));
   autosaveBusy=true;
@@ -4478,6 +4503,9 @@ async function saveProjectMetaEditor(){
   if(!(draft.tracks||[]).length&&!(draft.archived_tracks||[]).length)draft.sample_rate=Number($('#projectMetaSampleRate')?.value||draft.sample_rate||44100);
   draft.target=$('#projectMetaTarget')?.value||draft.target||'MTA8';
   draft.mta_device_profile=$('#projectMetaDeviceProfile')?.value||'auto';
+  if(merishId!==draft.merish_user_id)draft.merish_syl_key='';
+  draft.merish_user_id=merishId;
+  draft.merish_lyric_highlight=$('#projectMetaMerishHighlight')?.value||'word';
   draft.rights_societies=($('#projectMetaRightsSocieties')?.value||'').split(/[,;\n]/).map(x=>x.trim().toUpperCase()).filter(Boolean).slice(0,16);
   draft.time_signature=newSig;
   try{

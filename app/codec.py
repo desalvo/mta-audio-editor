@@ -14,12 +14,14 @@ from pathlib import Path
 
 from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track, master_fade_filter
 from .models import Chord, Clip, LyricLine, Marker, MtaSlotMapping, Project, RightsRecord, Track
+from .merish_mta16 import build_minimal_syl, build_settings_xml, extract_consistent_syl_key, extract_consistent_user_id, validate_audio_only
 from .mta_writer import normalize_matroska_for_mta
 from .mta_reverse import (
     analyze_mta,
     deobfuscate_media_copy,
     inspect_cluster_transport,
     obfuscate_media_copy,
+    _scan_matroska_filedata,
 )
 from .storage import attachment_path, audio_path, pdir, save_project
 from .music_text import synchronized_plain_text
@@ -46,6 +48,10 @@ MTA8_DEVICE_LAYOUTS = {
         "drums": 1, "bass": 2, "guitars": 3, "keyboards": 4,
         "orchestra": 5, "winds": 6, "melody": 7, "click": 8,
     },
+    "merish5_xynthia2_experimental": {
+        "drums": 1, "bass": 2, "guitars": 3, "keyboards": 4,
+        "orchestra": 5, "winds": 6, "melody": 7, "click": 8,
+    },
     "bbeat_divo": {
         "drums": 1, "bass": 2, "guitars": 3, "keyboards": 4,
         "orchestra": 5, "winds": 6, "click": 7, "melody": 8,
@@ -53,6 +59,7 @@ MTA8_DEVICE_LAYOUTS = {
 }
 MTA8_SLOT_TYPES = {
     "merish5_xynthia2": ["drums","bass","guitars","keyboards","orchestra","winds","melody","click"],
+    "merish5_xynthia2_experimental": ["drums","bass","guitars","keyboards","orchestra","winds","melody","click"],
     "bbeat_divo": ["drums","bass","guitars","keyboards","orchestra","winds","click","melody"],
 }
 
@@ -150,6 +157,20 @@ def import_mta(path: Path, project: Project) -> Project:
 
         preserved = []
         attachment_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "attachment"]
+        xml_sizes = [s.get("extradata_size") for s in attachment_streams
+                     if str((s.get("tags") or {}).get("filename") or "").lower().endswith(".xml")
+                     and isinstance(s.get("extradata_size"), int) and 0 < s["extradata_size"] <= 1_000_000]
+        if xml_sizes:
+            identifier = extract_consistent_user_id(_scan_matroska_filedata(path, xml_sizes))
+            if identifier:
+                project.merish_user_id = identifier
+        syl_sizes = [s.get("extradata_size") for s in attachment_streams
+                     if str((s.get("tags") or {}).get("filename") or "").lower().endswith(".syl")
+                     and isinstance(s.get("extradata_size"), int) and 0 < s["extradata_size"] <= 1_000_000]
+        if syl_sizes:
+            syl_key = extract_consistent_syl_key(_scan_matroska_filedata(path, syl_sizes))
+            if syl_key:
+                project.merish_syl_key = syl_key
         for aidx, stream in enumerate(attachment_streams):
             idx = stream.get("index")
             tags = stream.get("tags") or {}
@@ -166,6 +187,8 @@ def import_mta(path: Path, project: Project) -> Project:
                             project.lyrics = [LyricLine(**item) for item in sync.get("lyrics", [])]
                             project.chords = [Chord(**item) for item in sync.get("chords", [])]
                             project.markers = [Marker(**item) for item in sync.get("markers", [])]
+                            if sync.get("merish_lyric_highlight") in {"word", "character"}:
+                                project.merish_lyric_highlight = sync["merish_lyric_highlight"]
                             project.original_title = str(sync.get("original_title") or project.original_title or "")[:300]
                             project.authors = [str(x)[:200] for x in (sync.get("authors") or []) if str(x).strip()][:64]
                             project.rights_records = [RightsRecord(**item) for item in (sync.get("rights_records") or [])][:32]
@@ -199,7 +222,7 @@ def import_mta(path: Path, project: Project) -> Project:
 def _metadata_attachment(project: Project) -> Path:
     out = pdir(project.id) / "attachments" / "mta-editor.json"
     out.write_text(json.dumps({
-        "schema": "mta-audio-editor/v3", "title": project.title, "original_title": project.original_title, "artist": project.artist, "authors": project.authors, "bpm": project.bpm, "time_signature": project.time_signature, "key": project.key, "mta_device_profile": project.mta_device_profile,
+        "schema": "mta-audio-editor/v3", "title": project.title, "original_title": project.original_title, "artist": project.artist, "authors": project.authors, "bpm": project.bpm, "time_signature": project.time_signature, "key": project.key, "mta_device_profile": project.mta_device_profile, "merish_lyric_highlight": project.merish_lyric_highlight,
         "tracks": [{"id": t.id, "name": t.name, "type": t.type, "mta_slot": t.mta_slot, "pan": t.pan, "clips": [c.model_dump() for c in t.clips], "inserts": [x.model_dump() for x in t.inserts]} for t in project.tracks],
         "master": {"fade_enabled": project.master_fade_enabled, "fade_in_ms": project.master_fade_in_ms, "fade_out_ms": project.master_fade_out_ms, "volume_db": project.master_volume_db, "inserts": [x.model_dump() for x in project.master_inserts]},
         "lyrics": [x.model_dump() for x in project.lyrics], "chords": [x.model_dump() for x in project.chords], "markers": [x.model_dump() for x in project.markers],
@@ -239,6 +262,7 @@ def _synchronized_text_attachments(project: Project) -> list[Path]:
         sync.write_text(json.dumps({
             "schema": "mta-audio-editor/synchronized-text-v2",
             "timebase": "milliseconds-from-project-start",
+            "merish_lyric_highlight": project.merish_lyric_highlight,
             "title": project.title,
             "original_title": project.original_title,
             "artist": project.artist,
@@ -397,8 +421,20 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
     if normalize_peak_db is not None and any(insert.enabled for insert in project.master_inserts):
         raise ValueError("MTA proportional normalization cannot reproduce active master inserts; bypass them before export")
     effective_profile = resolve_mta_device_profile(project, profile)
+    experimental_merish = effective_profile in {"merish5_plus_mta16", "merish5_xynthia2_experimental"}
+    if experimental_merish:
+        expected_target = "MTA8" if effective_profile == "merish5_xynthia2_experimental" else "MTA16"
+        if project.target != expected_target:
+            raise ValueError(f"Il profilo Merish sperimentale richiede un export {expected_target}")
+        validate_audio_only(project)
     slots = validate_slot_mapping(project, slots, effective_profile)
     by_id = {t.id: t for t in project.tracks}
+    if effective_profile == "merish5_xynthia2_experimental":
+        for slot in slots:
+            for tid in slot.track_ids:
+                typ = by_id[tid].type
+                if (typ == "click" and slot.slot != 8) or (typ == "melody" and slot.slot != 7):
+                    raise ValueError("MTA8 Xynthia2 richiede melodia nello slot 7 e click nello slot 8")
     out = Path(out)
     if out.is_symlink() or (out.exists() and not stat.S_ISREG(out.stat().st_mode)):
         raise ValueError("MTA destination must be a regular non-symlink file")
@@ -443,6 +479,8 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
                 slot_files.append(silent)
                 physical_slots.append(MtaSlotMapping(slot=slot_number, name=typ.title(), type=typ, track_ids=[project.tracks[0].id]))
                 continue
+            if effective_profile == "merish5_xynthia2_experimental":
+                slot = slot.model_copy(update={"type": MTA8_SLOT_TYPES[effective_profile][slot_number - 1]})
             tracks = [by_id[tid] for tid in slot.track_ids]
             cmd = ["ffmpeg", "-y", "-v", "error"]
             for t in tracks:
@@ -486,19 +524,41 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
         cmd += ["-c:a", "libmp3lame", "-b:a", "320k", "-ar", "44100", "-ac", "2"]
         for i, slot in enumerate(physical_slots):
             cmd += [f"-metadata:s:a:{i}", f"title={slot.name}", f"-metadata:s:a:{i}", f"MTA_TYPE={slot.type}"]
-        attachments = []
+        attachments: list[tuple[Path, str, str]] = []
+        if experimental_merish:
+            duration_ms = math.ceil(common_frames * 1000 / 44100)
+            syl = build_minimal_syl(project, duration_ms)
+            xml = build_settings_xml(project, physical_slots, duration_ms)
+            for label in ("ORG", "MOD"):
+                folder = td / label
+                folder.mkdir()
+                for name, data, mime, title in (
+                    ("project.syl", syl, "application/octet-stream", f"{label}: ID3 LYRICS COLORS MIDITK(+MARKER) CHORDS"),
+                    ("project.xml", xml, "application/xml", f"{label}: MTX SETTINGS"),
+                ):
+                    path = folder / name
+                    path.write_bytes(data)
+                    attachments.append((path, mime, title))
+            # The observed device layout orders both SYLs before both XMLs.
+            attachments.sort(key=lambda item: (item[0].suffix != ".syl", item[2].startswith("MOD")))
         for name in project.preserved_attachments:
             try: f = attachment_path(project.id, name)
             except ValueError: continue
-            if f.exists(): attachments.append(f)
+            if f.exists():
+                mime = "application/json" if f.suffix.lower() == ".json" else ("text/plain" if f.suffix.lower() in {".lrc", ".tsv", ".txt"} else "application/octet-stream")
+                attachments.append((f, mime, ""))
         meta = _metadata_attachment(project)
-        if meta not in attachments: attachments.append(meta)
+        if all(path != meta for path, _, _ in attachments): attachments.append((meta, "application/json", ""))
         for synced in _synchronized_text_attachments(project):
-            if synced not in attachments:
-                attachments.append(synced)
-        for a in attachments:
-            mimetype = "application/json" if a.suffix.lower() == ".json" else ("text/plain" if a.suffix.lower() in {".lrc", ".tsv", ".txt"} else "application/octet-stream")
-            cmd += ["-attach", str(a), "-metadata:s:t", f"filename={a.name}", "-metadata:s:t", f"mimetype={mimetype}"]
+            if experimental_merish and synced.name != "mta-synchronized-text.json":
+                continue
+            if all(path != synced for path, _, _ in attachments):
+                mimetype = "application/json" if synced.suffix.lower() == ".json" else "text/plain"
+                attachments.append((synced, mimetype, ""))
+        for i, (a, mimetype, title) in enumerate(attachments):
+            cmd += ["-attach", str(a), f"-metadata:s:t:{i}", f"filename={a.name}", f"-metadata:s:t:{i}", f"mimetype={mimetype}"]
+            if title:
+                cmd += [f"-metadata:s:t:{i}", f"title={title}"]
         canonical = td / "canonical-export.mka"
         cmd += [
             "-metadata", f"TITLE={project.title}",

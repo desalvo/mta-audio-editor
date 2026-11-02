@@ -7003,6 +7003,43 @@ def export_plan(pid: str, request: Request, profile: str | None = None, target: 
     }
 
 
+@app.post("/api/projects/{pid}/merish-metadata")
+async def import_merish_metadata(pid: str, request: Request, file: UploadFile = File(...)):
+    """Read device metadata from a user's MTA without retaining the uploaded song."""
+    _project_for_actor(request, pid, owner_only=True)
+    if Path(file.filename or "").suffix.lower() not in {".mta", ".mta8", ".mta16"}:
+        raise HTTPException(400, "Seleziona un tuo file MTA")
+    from .merish_mta16 import extract_consistent_syl_key, extract_consistent_user_id
+    from .mta_reverse import _scan_matroska_filedata
+    with tempfile.TemporaryDirectory() as td:
+        source = Path(td) / "source.mta"
+        _copy_limited(file.file, source)
+        try:
+            attachments = [s for s in ffprobe(source).get("streams", []) if s.get("codec_type") == "attachment"]
+            def sizes(extension):
+                return [s["extradata_size"] for s in attachments
+                        if str((s.get("tags") or {}).get("filename") or "").lower().endswith(extension)
+                        and isinstance(s.get("extradata_size"), int) and 0 < s["extradata_size"] <= 1_000_000]
+            xml_sizes, syl_sizes = sizes(".xml"), sizes(".syl")
+            identifier = extract_consistent_user_id(_scan_matroska_filedata(source, xml_sizes))
+            key = extract_consistent_syl_key(_scan_matroska_filedata(source, syl_sizes))
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise HTTPException(400, "Impossibile analizzare i metadati del file MTA") from exc
+    if not identifier or not key:
+        raise HTTPException(400, "Il file deve contenere metadati XML coerenti e un SYL con testo sincronizzato valido")
+    from .ai_project_lock import project_publication_lock
+    with project_publication_lock(pid):
+        project = _project_for_actor(request, pid, owner_only=True)
+        from .models import DEFAULT_MERISH_USER_ID
+        is_unpaired_default = project.merish_user_id == DEFAULT_MERISH_USER_ID and not project.merish_syl_key
+        if project.merish_user_id and project.merish_user_id != identifier and not is_unpaired_default:
+            raise HTTPException(409, "L'identificativo del file non coincide con quello del progetto")
+        project.merish_user_id = identifier
+        project.merish_syl_key = key
+        save_project(project)
+    return {"ok": True, "project": project}
+
+
 @app.post("/api/projects/{pid}/export-mta")
 def export_mta_with_mapping(pid: str, req: MtaExportRequest, request: Request):
     project = _project_for_actor(request, pid)
