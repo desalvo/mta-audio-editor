@@ -85,7 +85,9 @@ def test_approved_repayment_cannot_capture_after_original_proof_disappears(paid,
     before = len(provider[1])
     with pytest.raises(ValueError, match='original evidence'):
         paypal.capture(account, local)
-    assert len(provider[1]) == before
+    # Readback can recover an already completed payment, but cannot collect.
+    assert not any(method == 'POST' and path.endswith('/capture')
+                   for method, path, *_ in provider[1][before:])
     with auth.db() as c:
         assert c.execute('SELECT status FROM paypal_orders WHERE id=?', (local,)).fetchone()[0] == 'pending'
         assert c.execute('SELECT count(*) FROM subscription_repayment_allocations').fetchone()[0] == 0

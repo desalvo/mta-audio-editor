@@ -50,8 +50,8 @@ def worker_python(kind):
     configured=os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON')
     override=item.get('python') or configured or os.getenv('MTA_AI_DEFAULT_PYTHON')
     if override:
-        from .ai_adapter_identity import require_current_interpreter
-        require_current_interpreter(override)
+        from .ai_adapter_identity import require_worker_interpreter
+        require_worker_interpreter(override, kind)
     studio_python=python_for(kind) if kind in KINDS and not item.get('python') and not configured else None
     value=item.get('python') or configured or studio_python or os.getenv('MTA_AI_DEFAULT_PYTHON') or sys.executable
     path=Path(value)
@@ -71,9 +71,9 @@ def resolve_worker(kind: str) -> Path | None:
               or os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON')
               or os.getenv('MTA_AI_DEFAULT_PYTHON'))
     if override:
-        from .ai_adapter_identity import require_current_interpreter
+        from .ai_adapter_identity import require_worker_interpreter
         try:
-            require_current_interpreter(override)
+            require_worker_interpreter(override, kind)
         except (ValueError, OSError):
             return None
     env_name = 'MTA_AI_WORKER_' + re.sub(r'[^A-Z0-9]', '_', kind.upper()) + '_EXECUTABLE'
@@ -93,6 +93,8 @@ def resolve_worker(kind: str) -> Path | None:
     # Only our fixed internal Studio/ACE adapter is launched through the validated
     # Python interpreter; external configured executables keep the X_OK check.
     internal_adapter=(kind in KINDS and path==Path(__file__).with_name('ai_studio_adapter.py').resolve()) or (
+        kind in {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals', 'markers'}
+        and path==Path(__file__).with_name('ai_unified_adapter.py').resolve()) or (
         kind in {'ace-step','arranger','remix'} and path==Path(__file__).with_name('ace_step_http_worker.py').resolve())
     if not path.is_absolute() or path.is_symlink() or not path.is_file() or (not internal_adapter and not os.access(path, os.X_OK)):
         return None

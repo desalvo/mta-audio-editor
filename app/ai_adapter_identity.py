@@ -6,6 +6,10 @@ is admitted here. Its loader still owns checkpoint and current-policy checks.
 This is not confinement against an administrator who can replace installed code.
 """
 from pathlib import Path
+import json
+import os
+import re
+import stat
 import sys
 
 
@@ -14,6 +18,8 @@ UNIFIED_KINDS = frozenset({
     'singer-separation', 'backing-vocals', 'markers',
 })
 ACE_KINDS = frozenset({'ace-step', 'arranger', 'remix'})
+MANAGED_RUNTIME_ROOT = Path('/opt/mta')
+MANAGED_RUNTIME_OWNER = 0
 
 
 def require_current_interpreter(value):
@@ -28,6 +34,53 @@ def require_current_interpreter(value):
             or str(path) != sys.executable or not path.is_file()):
         raise ValueError('Configured AI Python has no verified interpreter/import contract')
     return str(path)
+
+
+def require_worker_interpreter(value, kind):
+    """Accept the server Python or an installer-owned, group-matched venv.
+
+    A managed venv is an operator trust boundary: ownership and the installer
+    marker do not attest the integrity of every installed dependency.
+    """
+    try:
+        return require_current_interpreter(value)
+    except ValueError:
+        pass
+    from .ai_install_catalog import ENGINE_GROUPS
+    path = Path(value)
+    root = MANAGED_RUNTIME_ROOT
+    group = ENGINE_GROUPS.get(kind)
+    if os.name != 'posix' or group not in {'audio', 'sam'} or not path.is_absolute():
+        raise ValueError('Configured AI Python has no verified interpreter/import contract')
+    try:
+        relative = path.relative_to(root)
+        parts = relative.parts
+        if (len(parts) != 4 or not re.fullmatch(r'ai-[0-9a-f]{16}', parts[0])
+                or parts[1:] != (group, 'bin', 'python')):
+            raise ValueError('Unexpected managed runtime')
+        folder = root / parts[0] / group
+        marker = folder / '.mta-ai-ready.json'
+        # Existing installations create python as a venv symlink. The containing
+        # directories and marker, however, must never be writable by non-root.
+        config_file = folder / 'pyvenv.cfg'
+        for item in (root, root / parts[0], folder, folder / 'bin', marker, config_file):
+            info = item.lstat()
+            if stat.S_ISLNK(info.st_mode) or info.st_uid != MANAGED_RUNTIME_OWNER or info.st_mode & 0o022:
+                raise ValueError('Unsafe managed runtime ownership')
+        binary_info = path.stat()
+        if binary_info.st_uid != MANAGED_RUNTIME_OWNER or binary_info.st_mode & 0o022:
+            raise ValueError('Unsafe managed runtime executable')
+        data = json.loads(marker.read_text())
+        if (not isinstance(data, dict) or data.get('group') != group
+                or data.get('fingerprint') != parts[0][3:]
+                or not path.is_file() or not os.access(path, os.X_OK)):
+            raise ValueError('Invalid managed runtime marker')
+        config = config_file.read_text().lower()
+        if not re.search(r'^\s*include-system-site-packages\s*=\s*false\s*$', config, re.M):
+            raise ValueError('Managed runtime must isolate system packages')
+        return str(path)
+    except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
+        raise ValueError('Configured AI Python has no verified interpreter/import contract') from exc
 
 
 def supported_worker(kind: str, worker: Path) -> bool:

@@ -18,7 +18,16 @@ SCHEMA='mta-paypal-cash-position-1'
 
 def has_receipt(c,oid):
     if not c.execute("SELECT 1 FROM sqlite_master WHERE name='payment_reconciliation_events'").fetchone():return False
-    return any(json.loads(x[0]).get('type')==TYPE for x in c.execute("SELECT normalized_json FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='applied'",(oid,)))
+    found = False
+    for row in c.execute("SELECT normalized_json FROM payment_reconciliation_events WHERE provider='paypal' AND order_id=? AND state='applied'",(oid,)):
+        try:
+            evidence = json.loads(row[0])
+        except (ValueError, TypeError) as exc:
+            raise FenceBlocked('Original PayPal evidence cannot be verified') from exc
+        if not isinstance(evidence, dict):
+            raise FenceBlocked('Original PayPal evidence cannot be verified')
+        found = found or evidence.get('type') == TYPE
+    return found
 
 
 def position(c,order):

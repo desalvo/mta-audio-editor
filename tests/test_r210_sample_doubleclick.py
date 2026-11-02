@@ -4,7 +4,7 @@ from test_r210_decimal_bpm_shortcuts import function
 
 
 def test_real_doubleclick_uses_preclick_range():
-    setup=r'''const assert=require('assert/strict');let sampleEditor=null,sampleEditorRangeHint=null,sampleEditorPreviewAbort=null,audioCtx={decodeAudioData:async()=>({length:10000,numberOfChannels:1,getChannelData(){return new Float32Array(10000)}})};let sel={a:1000,b:2000};const pxPerSec=100,current={id:'p'},performance={now:()=>100},window={},URL={revokeObjectURL(){}},elements={'#timelinePane':{scrollLeft:0,getBoundingClientRect(){return {left:0}}},'#sampleCanvas':{clientWidth:164},'#sampleAudio':{}};
+    setup=r'''const assert=require('assert/strict');let undoStack=[],redoStack=[],sampleEditor=null,sampleEditorRangeHint=null,sampleEditorPreviewAbort=null,audioCtx={decodeAudioData:async()=>({length:10000,numberOfChannels:1,getChannelData(){return new Float32Array(10000)}})};let sel={a:1000,b:2000};const pxPerSec=100,current={id:'p'},performance={now:()=>100},window={},URL={revokeObjectURL(){}},elements={'#timelinePane':{scrollLeft:0,getBoundingClientRect(){return {left:0}}},'#sampleCanvas':{clientWidth:164},'#sampleAudio':{}};
     function $(id){return elements[id]}function trackById(){return {kind:'audio'}}function tr(en){return en}function selectedTrackIds(){return ['track']}function esc(value){return value}function showUtilityModal(){}function seDefaults(){return {}}function seEffectHtml(){return ''}function seBind(){}function seDraw(){}function toast(message){throw Error(message)}
     async function api(){return {sample_rate:1000,total_samples:10000,audio_url:'/audio',name:'Track',timeline_offset_ms:0}}
     async function fetch(){return {ok:true,arrayBuffer:async()=>new ArrayBuffer(1)}};

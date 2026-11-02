@@ -110,6 +110,9 @@ def test_codec_export_builds_container(tmp_path, monkeypatch):
     monkeypatch.setattr(codec, "render_track", lambda track, source, out: Path(out).write_bytes(b"wav"))
     seen = []
     monkeypatch.setattr(codec, "run", lambda cmd: seen.append(cmd) or "")
+    import soundfile as sf
+    from types import SimpleNamespace
+    monkeypatch.setattr(sf, "info", lambda path: SimpleNamespace(frames=44100))
     monkeypatch.setattr(codec, "normalize_matroska_for_mta", lambda source, target: target.write_bytes(b"normalized") or 0)
     monkeypatch.setattr(codec, "obfuscate_media_copy", lambda source, target, offset: target.write_bytes(b"mta") or target)
     monkeypatch.setattr(codec, "inspect_cluster_transport", lambda path: {"first_cluster_is_canonical": True} if path.name == "mta-layout.mka" else {"media_xor_validated": True})

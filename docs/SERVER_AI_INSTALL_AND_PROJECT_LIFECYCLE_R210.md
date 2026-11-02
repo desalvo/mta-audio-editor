@@ -20,6 +20,14 @@ setup with `install_mta.sh` installs the AI runtimes automatically.
 - Demucs, Whisper, chord/marker dependencies, ONNX DrumSep, audio-separator and SAM
   Audio/singer separation are provisioned by default. Common audio and SAM runtimes
   are separate, and neither replaces the web runtime nor ACE's installed torch.
+- On Linux the built-in registry accepts the installer's `/opt/mta/ai-<fingerprint>/audio/bin/python`
+  or `sam/bin/python` only for engines in the matching group, with the ready marker,
+  an isolated venv and root-owned non-group-writable runtime directories and files.
+  These checks trust the administrator-managed installation; they are not an
+  integrity attestation of the dependencies or model weights. Other interpreter
+  overrides remain refused. If a worker is unavailable, check the service's
+  configured bindings, runtime permissions and installer status without exposing
+  credentials, then consult the server journal.
 - CPU, CUDA and ROCm select their appropriate torch wheel triplets. ROCm also uses
   the CUDA API exposed by PyTorch. GPU setup verifies availability and a small
   actual tensor operation; it does not certify GPU accounting or enable billing.
