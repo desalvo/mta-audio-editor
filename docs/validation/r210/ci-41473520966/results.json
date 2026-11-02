@@ -1,0 +1,31 @@
+{
+  "baseline_commit": "8bc97f4385b609a601da898d51dbb8f07937a1ab",
+  "run_url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41473520966",
+  "baseline_run": {
+    "failed": 8,
+    "passed": 8549,
+    "skipped": 126,
+    "errors": 1
+  },
+  "focused": {
+    "tests": 112,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "review_gates": {
+    "tests": 61,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "ruff": "passed",
+  "bandit_review": {
+    "passed": true,
+    "findings": 183,
+    "high": 0,
+    "new_contexts": 0
+  },
+  "remote_ci_after_fix": "not run",
+  "rc_completion": "34/42 = 81.0%"
+}

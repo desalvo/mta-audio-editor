@@ -1,9 +1,9 @@
 from pathlib import Path
+from test_r210_decimal_bpm_shortcuts import function
 
 
 def test_timeline_tools_update_buttons_without_render():
-    source = (Path(__file__).resolve().parents[1] / "app/static/app.js").read_text()
-    block = source.split("function setTimelineTool(tool){", 1)[1].split("function copyTimelineSelection", 1)[0]
+    block = function("setTimelineTool") + function("toggleRippleTool")
     assert "refreshTimelineToolControls();" in block
     assert "render();" not in block
 

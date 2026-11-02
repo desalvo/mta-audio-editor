@@ -189,3 +189,11 @@ Tracce vuote audio/MIDI da menu contestuale; inserimento dei file del progetto n
 Divisione delle lyrics >=40 caratteri su import JSON, estrazioni Whisper e recupero remoto, con tempi affidabili conservati oppure stimati e ancoraggi degli accordi rimappati. Avvisi e azione Dividi negli editor. Dettagli e limiti: `TIMELINE_MEDIA_R210.md`.
 
 **RC generale invariata: 34/42 = 81,0%.** Le funzionalità di questo batch sono implementate e verificate localmente; nessun criterio esterno viene promosso senza la relativa evidenza. CI remota, browser grafico e prova hardware nativa restano da verificare.
+
+### Hotfix CI 41473520966 — dopo il commit 8bc97f4
+
+Baseline confermata: `8bc97f4385b609a601da898d51dbb8f07937a1ab`. Corretti i test non aggiornati alle modifiche di menu, slot/ritardo, lyrics e tastiera. Il worker ritenta esclusivamente la lettura originale dei limiti quando SQLite è temporaneamente occupato; nessuna ripetizione di scritture contabili e nessun fallback che ignori limiti/barriere. Danni e contesa persistente conservano il comportamento di arresto.
+
+La suite mirata che comprende tutti i fallimenti del run, guardian/cutover, contesa DB e regressioni di timeline/lyrics passa con 112 test. Le revisioni di sicurezza sono riallineate ai sorgenti senza nuove disposizioni automatiche: i contesti Bandit/AST dei processi e delle chiamate di rete restano identici. Dettagli: `CI_41473520966_R210.md`.
+
+RC **34/42 = 81,0%**, senza promozione di criteri esterni; nuova full CI remota da verificare sul commit successivo. Il messaggio di commit suggerito riguarda soltanto questo hotfix.

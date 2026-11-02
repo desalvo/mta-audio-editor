@@ -19,6 +19,26 @@ from dataclasses import dataclass
 from typing import Callable
 
 
+def _worker_has_resource_limits(user_id):
+    """Retry only a fresh, read-only policy lookup after transient DB contention.
+
+    Never substitute cached policy, retry a financial write or treat unavailable
+    barrier evidence as no limits. Exhaustion reaches the guardian's existing
+    cancellation path with the original error.
+    """
+    import sqlite3
+    from .resource_accounts import has_limits
+    from .sqlite_availability import BarrierUnavailable, is_busy
+    for attempt in range(4):
+        try:
+            return has_limits(user_id)
+        except (BarrierUnavailable, sqlite3.OperationalError) as exc:
+            retryable = exc.retryable if isinstance(exc, BarrierUnavailable) else is_busy(exc)
+            if not retryable or attempt == 3:
+                raise
+            time.sleep(.05)
+
+
 @dataclass(frozen=True)
 class Measurement:
     exit_code: int
@@ -416,8 +436,8 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                     import logging
                     logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
             if not final:
-                from .resource_accounts import has_limits,checkpoint
-                if license_decision.billable and has_limits(user_id) and checkpoint(user_id,job_id,counters if 'counters' in locals() else {}):
+                from .resource_accounts import checkpoint
+                if license_decision.billable and _worker_has_resource_limits(user_id) and checkpoint(user_id,job_id,counters if 'counters' in locals() else {}):
                     return True
             return cancel_check() if not final and cancel_check is not None else False
         worker_cancel_check = diagnostic_checkpoint

@@ -481,5 +481,11 @@
     "evidence": "docs/TIMELINE_MEDIA_R210.md",
     "explicitly_reviewed_new_or_changed": 0,
     "scope": "Local timeline/lyrics plus inherited media/profile boundaries; no RC, payment or hardware authorization."
+  },
+  "ci_41473520966_review": {
+    "date": "2026-11-02",
+    "commit_baseline": "8bc97f4385b609a601da898d51dbb8f07937a1ab",
+    "scope": "Read-only worker limit lookup retries only explicit transient SQLite contention; existing financial writes/cancellation remain unchanged.",
+    "evidence": "docs/CI_41473520966_R210.md"
   }
 }

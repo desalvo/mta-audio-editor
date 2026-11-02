@@ -60,7 +60,7 @@
     "app/ai_job_queue.py": "sha256:1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
     "app/ai_job_views.py": "sha256:d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
     "app/ai_media_identity.py": "sha256:c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "sha256:c7c39324aab4fce58de8c7ca0ffeaa11cab19ef3d6cd6ff2f3d651b47d24aca4",
+    "app/ai_metering_agent.py": "sha256:169b9e9a67a63c86498093520f6580da43b9b9f85c232c4031258d8a828080b2",
     "app/ai_metering_bridge.py": "sha256:792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
     "app/ai_model_attestation.py": "sha256:640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "sha256:fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
@@ -755,7 +755,7 @@
     {
       "path": "app/ai_metering_agent.py",
       "function": "run_metered_process",
-      "line": 158,
+      "line": 178,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "ast_sha256": "73f85c67d1ee19e1fb08ec894a61451a99f0983872e7da6cd9e92042abf4e846",
@@ -2501,5 +2501,11 @@
     "evidence": "docs/TIMELINE_MEDIA_R210.md",
     "explicitly_reviewed_new_or_changed": 7,
     "scope": "Local timeline/lyrics plus inherited media/profile boundaries; no RC, payment or hardware authorization."
+  },
+  "ci_41473520966_review": {
+    "date": "2026-11-02",
+    "commit_baseline": "8bc97f4385b609a601da898d51dbb8f07937a1ab",
+    "scope": "Read-only worker limit lookup retries only explicit transient SQLite contention; existing financial writes/cancellation remain unchanged.",
+    "evidence": "docs/CI_41473520966_R210.md"
   }
 }

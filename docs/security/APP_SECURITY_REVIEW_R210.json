@@ -60,7 +60,7 @@
     "app/ai_job_queue.py": "1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
     "app/ai_job_views.py": "d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
     "app/ai_media_identity.py": "c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "c7c39324aab4fce58de8c7ca0ffeaa11cab19ef3d6cd6ff2f3d651b47d24aca4",
+    "app/ai_metering_agent.py": "169b9e9a67a63c86498093520f6580da43b9b9f85c232c4031258d8a828080b2",
     "app/ai_metering_bridge.py": "792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
     "app/ai_model_attestation.py": "640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
@@ -618,7 +618,7 @@
       "verification": "tests/test_r210_execution_entry_acceptance.py:all18 kinds/extension actualAPI/process/CPU,queue/running revocation,private cancellation,observer failure and no replay;test_r207_process_metering.py."
     },
     {
-      "id": "7d81442adca3ff6e91c418fb2a4a796434fa7581a69b6fbcaa131e5e8cace8dd",
+      "id": "2edaade78f02999fffc05cb77de38649e6eccf3782770c09efb7fbed399cbddd",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Reviewed fixed operator-selected worker subprocess. Original scheduler/account/token checks precede dispatch; no caller command is accepted. Cancellation/reaping and unknown measurement retain explicit ownership.",
       "boundary": "Server original scheduler/ledger/claim; native standalone unbilled. Missing measurement/tree evidence is held without publication or fabricated zero usage.",
@@ -1628,7 +1628,7 @@
     "review": "New owner-derived account financial context validates UID through parameterized SQL, verifies private NC/loss histories, exposes only aggregate own totals and no combined debt. Account limits begins a read snapshot after schema setup and includes verified NC closed period ranges. The authenticated limits route returns a generic 409 for unverifiable context without leaking journal identities. No new subprocess, dynamic SQL or suppression. All existing findings matched unchanged code after line-number shifts.",
     "evidence": "tests/test_r210_account_financial_context.py; tests/test_r210_account_financial_browser.py; account-financial-final.xml"
   },
-  "current_scan": "docs/validation/r210/timeline-media/bandit.json",
+  "current_scan": "docs/validation/r210/ci-41473520966/bandit.json",
   "owner_payment_continuation": {
     "date": "2026-10-23",
     "reviewed_sources": [
@@ -1800,7 +1800,7 @@
     "evidence": "docs/validation/r210/executor-boundaries-result.json",
     "native_error_mapping": "Denied or unverifiable native compatibility-model rights now return readable HTTP409 before upload copy; no unchecked exception or model side effect."
   },
-  "current_scan_sha256": "59bee676daf15609911ec7f206b019b6ced0990d41f575179e0974275bffe632",
+  "current_scan_sha256": "986dd58ea6152d4c71f4ad36c699f82dfbc8dd8fe2251f968218bc7f9a163faa",
   "date": "2026-11-02",
   "export_exclusive_contention_review": {
     "date": "2026-10-27",
@@ -2799,5 +2799,11 @@
     "evidence": "docs/TIMELINE_MEDIA_R210.md",
     "explicitly_reviewed_new_or_changed": 17,
     "scope": "Local timeline/lyrics plus inherited media/profile boundaries; no RC, payment or hardware authorization."
+  },
+  "ci_41473520966_review": {
+    "date": "2026-11-02",
+    "commit_baseline": "8bc97f4385b609a601da898d51dbb8f07937a1ab",
+    "scope": "Read-only worker limit lookup retries only explicit transient SQLite contention; existing financial writes/cancellation remain unchanged.",
+    "evidence": "docs/CI_41473520966_R210.md"
   }
 }

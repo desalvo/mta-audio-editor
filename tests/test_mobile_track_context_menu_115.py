@@ -13,7 +13,7 @@ def test_touch_long_press_opens_existing_track_context_menu():
     assert "data-track-context-id" in js
     assert "trackContextPointerDown" in js
     assert "trackContextPointerMove" in js
-    assert "openTrackContextMenuAt(state.id,state.x,state.y)" in js
+    assert "openTrackContextMenuAt(state.id,state.x,state.y,!!state.target.closest?.('#timelinePane'))" in js
     assert "event.pointerType!=='touch'&&event.pointerType!=='pen'" in js
 
 

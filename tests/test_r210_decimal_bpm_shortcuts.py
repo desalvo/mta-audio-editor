@@ -35,7 +35,7 @@ def function(name):
 
 
 def node(source):
-    subprocess.run(['node','-e',source],check=True,capture_output=True,text=True)
+    subprocess.run(['node'],input=source,check=True,capture_output=True,text=True)
 
 
 @pytest.fixture
@@ -160,11 +160,11 @@ def test_pdf_rounds_only_the_displayed_bpm(tmp_path):
 
 def test_r_shortcut_through_registered_capture_handler_for_click_and_chords():
     helper=function('handleGeneratedTrackShortcut')
-    begin=JS.index("window.addEventListener('keydown',e=>{\n  if(handleBounceShortcut(e)||handleGeneratedTrackShortcut(e))")
+    begin=JS.index("\nwindow.addEventListener('keydown',e=>{")+1
     end=JS.index('\n},true);',begin)+len('\n},true);')
     node('''const assert=require('assert/strict');class Input{};class Area{};class Select{};
 const HTMLInputElement=Input,HTMLTextAreaElement=Area,HTMLSelectElement=Select;
-let current={},selectedTrackId='click',timelineTool='select',timelineChordSelectedIndices=new Set(),calls=[],closed=0,handler;
+let timelineMediaBusy=false,current={},selectedTrackId='click',timelineTool='select',timelineChordSelectedIndices=new Set(),calls=[],closed=0,handler;
 const tracks={click:{id:'click',type:'click'},chords:{id:'chords',type:'keyboards',name:'Chords'},music:{id:'music',type:'audio'}};
 function trackById(id){return tracks[id]}function isGeneratedChordsTrack(t){return t.id==='chords'}
 function closeTrackContextMenu(){closed++}async function refreshGeneratedTrackFromContext(id){calls.push(id)}

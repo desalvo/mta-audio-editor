@@ -50,7 +50,8 @@ const heads=elements('head-'),lanes=elements('');let updates=0;
 const ctx={current:{tracks:[{id:'a'},{id:'b'}]},selectedTrackId:'a',selectedTrackIdSet:new Set(['a']),$$:s=>s==='.track-head'?heads:lanes,updateSel:()=>updates++};
 vm.createContext(ctx);vm.runInContext(src.slice(a,b),ctx);ctx.selectAllTracks();
 assert.deepEqual(Array.from(ctx.selectedTrackIdSet),['a','b']);assert.ok(heads[1].classList.values.selected);assert.ok(lanes[1].classList.values['edit-selected']);assert.equal(updates,1);
-assert.ok(src.includes('closeTrackContextMenu();selectAllTracks()'));assert.ok(src.includes("key==='a'&&!e.shiftKey"));
+// The context menu's track/timeline dispatch is exercised by test_r210_bounce_master.
+assert.ok(src.includes("key==='a'&&!e.shiftKey"));
 '''
     subprocess.run(['node','-e',js],check=True)
 
