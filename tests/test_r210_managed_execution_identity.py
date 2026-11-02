@@ -5,6 +5,7 @@ This certifies portable admission identity, not a loaded real neural checkpoint.
 import hashlib
 import io
 import json
+from types import SimpleNamespace
 import zipfile
 
 import pytest
@@ -19,7 +20,7 @@ PLAN={'options':{'asset_id':'identity-piano'}}
 KIND='audio-to-midi-transkun'
 
 
-def install_at(root, monkeypatch, *, checkpoint=b'synthetic piano A', runtime=b'# synthetic adapter\n'):
+def install_at(root, monkeypatch, *, checkpoint=b'synthetic piano A', runtime=b'# synthetic adapter\n', policy_snapshot=None):
     from app import studio_catalog
     monkeypatch.setattr(studio_catalog,'root',lambda:root)
     files={'runtime/model.pt':checkpoint,'runtime/config.json':b'{}',
@@ -37,9 +38,14 @@ def install_at(root, monkeypatch, *, checkpoint=b'synthetic piano A', runtime=b'
         archive.writestr('manifest.json',json.dumps(value))
         for name,payload in files.items():archive.writestr(name,payload)
     assets.install(data.getvalue())
-    rights.configure('transkun-assets',{'mode':'free_only','acknowledge_responsibility':True,
-        'evidence_url':'https://example.test/synthetic','reason':'Synthetic test permission only',
-        'free_access_confirmed':True,'authorization_basis':'written_permission','confirm_risk_twice':True},1)
+    if policy_snapshot is None:
+        rights.configure('transkun-assets',{'mode':'free_only','acknowledge_responsibility':True,
+            'evidence_url':'https://example.test/synthetic','reason':'Synthetic test permission only',
+            'free_access_confirmed':True,'authorization_basis':'written_permission','confirm_risk_twice':True},1)
+    else:
+        # Moving an installation transfers the exact reviewed policy. Calling
+        # configure again creates a different review (including reviewed_at).
+        rights._path().write_bytes(policy_snapshot)
     assets.configure('identity-piano',True)
     return root/'managed/identity-piano'
 
@@ -49,13 +55,32 @@ def installed(tmp_path,monkeypatch):
     return install_at(tmp_path/'assets',monkeypatch)
 
 
-def test_identity_is_portable_and_retains_unchanged_unmanaged_policy(installed,tmp_path,monkeypatch):
+@pytest.mark.parametrize('elapsed_seconds',[0,60])
+def test_identity_is_portable_and_retains_unchanged_unmanaged_policy(installed,tmp_path,monkeypatch,elapsed_seconds):
     first=rights.evaluate(KIND,PLAN)
     base=rights.evaluate('whisper',{})
     assert base==rights.evaluate_model('whisper')
-    install_at(tmp_path/'second-host',monkeypatch)
-    assert rights.evaluate(KIND,PLAN)==first
+    snapshot=rights._path().read_bytes()
+    reviewed_at=json.loads(snapshot)['transkun-assets']['reviewed_at']
+    # Freeze only the policy module's clock, not time shared by the worker/DB.
+    # Crossing a wall-clock second must not invent a new operator review.
+    with monkeypatch.context() as clock:
+        clock.setattr(rights,'time',SimpleNamespace(time=lambda:reviewed_at+elapsed_seconds))
+        install_at(tmp_path/'second-host',monkeypatch,policy_snapshot=snapshot)
+        assert rights.evaluate(KIND,PLAN)==first
+        assert rights._path().read_bytes()==snapshot
     assert first.mode=='free_only' and not first.billable
+
+
+def test_a_new_operator_review_changes_identity_even_with_identical_model_bytes(installed,tmp_path,monkeypatch):
+    first=rights.evaluate(KIND,PLAN)
+    reviewed_at=rights.overrides()['transkun-assets']['reviewed_at']
+    with monkeypatch.context() as clock:
+        clock.setattr(rights,'time',SimpleNamespace(time=lambda:reviewed_at+60))
+        install_at(tmp_path/'reviewed-again',monkeypatch)
+        second=rights.evaluate(KIND,PLAN)
+    assert second.policy_sha256!=first.policy_sha256
+    assert second.mode==first.mode and second.source==first.source
 
 
 @pytest.mark.parametrize('change',['checkpoint','runtime','config','notice','added-file','link','directory-link','hardlink','disabled'])
@@ -86,7 +111,8 @@ def test_authority_rejects_changed_inventory_before_dispatch(authority,monkeypat
     job=central.enqueue(authority[0],KIND,PLAN,source_wav=source_audio())
     before=task(job)['policy_json']
     # Complete, independently valid replacement under the same asset ID.
-    install_at(authority[2]/'replacement',monkeypatch,checkpoint=b'synthetic piano B')
+    install_at(authority[2]/'replacement',monkeypatch,checkpoint=b'synthetic piano B',
+               policy_snapshot=rights._path().read_bytes())
     with pytest.raises(FenceBlocked,match='policy changed'):
         central.assignment(node['credential'],'a'*32)
     assert task(job)['state']=='queued' and task(job)['policy_json']==before
@@ -101,11 +127,13 @@ def test_worker_compares_real_installed_identity_and_never_reexecutes(authority,
     node_root=authority[2]/'node-assets'
     install_at(authority_root,monkeypatch)
     admitted=rights.evaluate(KIND,PLAN)
+    policy_snapshot=rights._path().read_bytes()
     node=setup_pull(authority,monkeypatch)
     job=central.enqueue(authority[0],KIND,PLAN,source_wav=source_audio())
     install_at(node_root,monkeypatch,
                checkpoint=b'synthetic piano B' if difference=='checkpoint' else b'synthetic piano A',
-               runtime=b'# synthetic changed adapter\n' if difference=='runtime' else b'# synthetic adapter\n')
+               runtime=b'# synthetic changed adapter\n' if difference=='runtime' else b'# synthetic adapter\n',
+               policy_snapshot=policy_snapshot)
     class NodeClient(DirectClient):
         def call(self,*args,**kwargs):
             with monkeypatch.context() as context:

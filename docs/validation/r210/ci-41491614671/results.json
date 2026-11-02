@@ -1,0 +1,23 @@
+{
+  "baseline_commit": "5e9743d1a2938be9689d9e88e1afb98468b4fe77",
+  "run_url": "https://github.com/desalvo/mta-audio-editor/actions/runs/41491614671",
+  "failed_job": 125435795253,
+  "remote_baseline": {
+    "failed": 1,
+    "passed": 8563,
+    "skipped": 126
+  },
+  "regressions": {
+    "tests": 550,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "ruff": "passed",
+  "runtime_sources_unchanged": 566,
+  "security_review": "existing source-bound scan validated; 183 reviewed findings and no high severity",
+  "initial_local_validation": "One supervisor exit timeout in first managed suite run; that case passed isolated and the subsequent full related suite passed all 550 tests.",
+  "deterministic_cases": "same review copied at 0 and 60 seconds; new review at 60 seconds must change identity",
+  "remote_ci_after_fix": "not run",
+  "rc_completion": "34/42 = 81.0%"
+}

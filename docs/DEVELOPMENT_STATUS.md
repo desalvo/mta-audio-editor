@@ -197,3 +197,11 @@ Baseline confermata: `8bc97f4385b609a601da898d51dbb8f07937a1ab`. Corretti i test
 La suite mirata che comprende tutti i fallimenti del run, guardian/cutover, contesa DB e regressioni di timeline/lyrics passa con 112 test. Le revisioni di sicurezza sono riallineate ai sorgenti senza nuove disposizioni automatiche: i contesti Bandit/AST dei processi e delle chiamate di rete restano identici. Dettagli: `CI_41473520966_R210.md`.
 
 RC **34/42 = 81,0%**, senza promozione di criteri esterni; nuova full CI remota da verificare sul commit successivo. Il messaggio di commit suggerito riguarda soltanto questo hotfix.
+
+### Hotfix CI 41491614671 — revisione dei test di identità gestita
+
+Baseline: `5e9743d1a2938be9689d9e88e1afb98468b4fe77`. Il run ha un solo fallimento: il test di portabilità creava due revisioni dei permessi e ne pretendeva la stessa impronta. La fixture ora trasferisce la stessa revisione ai due host; i test forzano anche uno scarto di 60 secondi e confermano separatamente che una nuova revisione debba cambiare l'impronta. I test authority/worker condividono lo stesso documento di policy quando intendono variare soltanto l'installazione del modello.
+
+Nessuna modifica ai sorgenti applicativi, alle licenze o ai manifest di sicurezza. Rapporto: `CI_41491614671_R210.md`. **RC 34/42 = 81,0%**, nuova CI remota da verificare sul prossimo commit.
+
+Verifica finale hotfix 41491614671: **550 test passati, zero skip/fallimenti/errori**, Ruff superato; 566 sorgenti runtime invariati e revisione di sicurezza coerente.
