@@ -857,6 +857,13 @@ def project_files(pid: str) -> list[dict]:
             if f.is_symlink() or not f.is_file() or f.name.startswith('.'):
                 continue
             busy = f.name in pending.get(category,set())
+            tracks = []
+            if category == 'audio':
+                source_ids = {c.id for c in project.clip_library if c.filename == f.name}
+                tracks = [{'id': t.id, 'name': t.name, 'inactive': inactive}
+                          for inactive, group in ((False, project.tracks), (True, project.archived_tracks))
+                          for t in group if t.filename == f.name or t.source_clip_id in source_ids]
+            backups = [b for b in project.media_backups if category == 'original' and b.filename == f.name]
             items.append({
                 "category": category,
                 "name": f.name,
@@ -865,6 +872,9 @@ def project_files(pid: str) -> list[dict]:
                 "timeline": category == "audio" and f.name in referenced_audio,
                 "reusable": category == "audio" and f.name in library,
                 "pending_job": busy,
+                "tracks": tracks,
+                "backup_id": backups[0].id if backups else None,
+                "backup_for": backups[0].current_filename if backups else None,
             })
     src = pdir(pid) / "source.mta"
     if src.is_file():
@@ -910,6 +920,9 @@ def delete_project_file(pid: str, category: str, filename: str) -> None:
             reconcile_project_gc(pid,{filename})
             run_project_gc(pid)
         else:
+            if category == 'original' and any(item.filename == filename for item in project.media_backups):
+                project.media_backups = [item for item in project.media_backups if item.filename != filename]
+                save_project(project, _skip_flac_conversion=True)
             path.unlink()
 
 
@@ -996,6 +1009,14 @@ def write_project_archive(pid: str, archive_path: Path) -> Path:
                 if path.name == "preview-master.mp3" or path.name.startswith(".sample-fx-"):
                     continue
                 if path.parent == (base / "audio") and path.name in pending_gc:
+                    continue
+                if rel == Path('project.json'):
+                    # Legacy projects may still contain user-specific M-Live
+                    # data on disk; never copy it into a portable project.
+                    data = json.loads(path.read_text(encoding='utf-8'))
+                    data.pop('merish_user_id', None)
+                    data.pop('merish_syl_key', None)
+                    z.writestr('project/project.json', json.dumps(data, ensure_ascii=False, indent=2))
                     continue
                 z.write(path, Path("project") / path.relative_to(base))
         # Windows FlushFileBuffers requires write access to the file handle.

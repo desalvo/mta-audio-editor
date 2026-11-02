@@ -47,7 +47,7 @@ let zoomPreviewState=null;
 let zoomCommitSerial=0;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 let selectedTimelineSegments=new Set(), segmentSelectionProject=null, timelineAudioDirty=false, timelineAudioRevision=0;
-let selectedTrackIdSet=new Set(), timelineTool='range', rippleEnabled=false, timelineClipDrag=null;
+let timelineSelectionOnly=false, selectedTrackIdSet=new Set(), timelineTool='range', rippleEnabled=false, timelineClipDrag=null;
 let projectMutationSerial=0;
 let persistedProjectSnapshot=null, projectLeavePending=null, projectNavigationApproved=false;
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
@@ -251,12 +251,13 @@ function ensureTrackSelection(){
   const known=new Set((current.tracks||[]).map(t=>t.id));
   selectedTrackIdSet=new Set([...selectedTrackIdSet].filter(id=>known.has(id)));
   if(selectedTrackId&&!known.has(selectedTrackId))selectedTrackId=null;
-  if(!selectedTrackIdSet.size&&current.tracks?.length){const id=selectedTrackId||current.tracks[0].id;selectedTrackId=id;selectedTrackIdSet.add(id)}
+  if(!timelineSelectionOnly&&!selectedTrackIdSet.size&&current.tracks?.length){const id=selectedTrackId||current.tracks[0].id;selectedTrackId=id;selectedTrackIdSet.add(id)}
   if(selectedTrackId&&!selectedTrackIdSet.has(selectedTrackId))selectedTrackId=[...selectedTrackIdSet][0]||null;
 }
 function selectedTrackIds(){ensureTrackSelection();return (current?.tracks||[]).filter(t=>selectedTrackIdSet.has(t.id)).map(t=>t.id)}
 function selectAllTracks(){
   if(!current?.tracks?.length)return;
+  timelineSelectionOnly=false;
   selectedTrackIdSet=new Set(current.tracks.map(t=>t.id));
   if(!selectedTrackIdSet.has(selectedTrackId))selectedTrackId=current.tracks[0].id;
   $$('.track-head').forEach(el=>{const id=el.id.replace(/^head-/,'');el.classList.toggle('selected',selectedTrackIdSet.has(id));el.classList.toggle('primary-selected',id===selectedTrackId)});
@@ -266,7 +267,10 @@ function selectAllTracks(){
 function selectAllTimelineSegments(){
   if(!current?.tracks?.length)return;
   selectedTimelineSegments=new Set(current.tracks.flatMap(t=>(t.clips||[]).map(c=>MtaTimelineRules.key(t,c))));
-  selectAllTracks();paintSegmentSelection();
+  timelineSelectionOnly=true;selectedTrackIdSet.clear();selectedTrackId=null;
+  $$('.track-head').forEach(el=>el.classList.remove('selected','primary-selected'));
+  $$('.lane').forEach(el=>el.classList.remove('edit-selected'));
+  updateSel();paintSegmentSelection();$('#timelinePane')?.focus({preventScroll:true});
 }
 function trackHeightPx(t){return Math.max(78,Math.min(420,Math.round(Number(t?.height_px)||78)))}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
@@ -685,7 +689,7 @@ function render(){
   updateTransportToggleButtons();
   if(!selectedTrackId||!trackById(selectedTrackId))selectedTrackId=current.tracks[0]?.id||null;
   ensureTrackSelection();
-  const W=widthPx(),trackWidth=Math.max(160,Math.min(520,Number(current.track_panel_width_px)||225));
+  const W=widthPx(),trackWidth=Math.max(projectIsMta()?210:160,Math.min(520,Number(current.track_panel_width_px)||225));
   $('#editor').innerHTML=`
     ${toolbarHtml()}
     ${clipBrowserHtml()}
@@ -1144,12 +1148,12 @@ function trackHead(t,i){
         <input class="track-mini-slider track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)">
         <input class="track-db-input volume-number" id="db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
       </div>
-      <div class="track-delay-row" onclick="event.stopPropagation()">
+      <div class="track-delay-row ${projectIsMta()?'has-mta-slot':''}" onclick="event.stopPropagation()">
+        ${projectIsMta()?`<label class="track-mta-slot"><span>MTA Slot</span><select aria-label="MTA Slot ${esc(t.name)}" onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="">Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select></label>`:''}
         <label for="track-delay-${t.id}">${esc(tr('Delay','Ritardo'))}</label>
         <input id="track-delay-${t.id}" class="track-delay-input" data-delay-track="${t.id}" type="${trackDelayUnit(t)==='bars_beats'?'text':'number'}" step="${trackDelayUnit(t)==='ms'?'1':'0.001'}" value="${trackDelayInputValue(t)}" onkeydown="if(event.key==='Enter'){this.blur()}" onchange="setTrackDelayFromInput('${t.id}',this.value)" title="${esc(tr('Track delay (positive or negative)','Ritardo traccia (positivo o negativo)'))}">
         <select class="track-delay-unit" aria-label="${tr('Track delay unit','Unità delay traccia')}" onchange="setTrackDelayUnit('${t.id}',this.value)">${delayUnitOptions(trackDelayUnit(t))}</select>
       </div>
-      ${projectIsMta()?`<div class="track-mta-slot" onclick="event.stopPropagation()"><label>MTA Slot <select aria-label="MTA Slot ${esc(t.name)}" onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="">Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select></label></div>`:''}
       ${t.type==='click'?`<div class="track-metronome-kind" title="${esc(metronomeTrackModeLabel(t))}" aria-label="${esc(metronomeTrackModeLabel(t))}">${esc(metronomeTrackModeLabel(t))}</div>`:''}
     </div>
     <div class="track-height-resizer" title="Trascina per modificare l'altezza della traccia" onpointerdown="beginTrackHeightResize(event,'${t.id}')"></div>
@@ -1199,13 +1203,12 @@ function handleBounceShortcut(event){
   const track=trackById(selectedTrackId);if(!track)return false;
   event.preventDefault();event.stopPropagation();closeTrackContextMenu();void bounceToTrack(track.id);return true;
 }
-function openTrackContextMenuAt(id,clientX,clientY){
+function openTrackContextMenuAt(id,clientX,clientY,fromTimeline=false){
   closeTrackContextMenu();
   const track=trackById(id);if(!track)return;
-  if(!selectedTrackIdSet.has(id)){selectedTrackIdSet=new Set([id])}
-  selectedTrackId=id;
-  refreshSelectedTrackInspector();
-  $$('.track-head').forEach(el=>{const tid=el.id.replace(/^head-/,'');el.classList.toggle('selected',selectedTrackIdSet.has(tid));el.classList.toggle('primary-selected',tid===id)});
+  if(!fromTimeline){timelineSelectionOnly=false;if(!selectedTrackIdSet.has(id)){selectedTrackIdSet=new Set([id])}
+  selectedTrackId=id;refreshSelectedTrackInspector();
+  $$('.track-head').forEach(el=>{const tid=el.id.replace(/^head-/,'');el.classList.toggle('selected',selectedTrackIdSet.has(tid));el.classList.toggle('primary-selected',tid===id)});}
   const stem=pluginInfo.stem_splitter||{};
   const disabled=stem.available?'':'disabled';
   const menu=document.createElement('div');
@@ -1214,7 +1217,7 @@ function openTrackContextMenuAt(id,clientX,clientY){
   menu.setAttribute('role','menu');
   menu.tabIndex=-1;
   menu.innerHTML=`<details class="context-category" open><summary>${tr('Track','Traccia')}</summary><div role="group">
-    <button type="button" aria-keyshortcuts="Control+A Meta+A" onclick="closeTrackContextMenu();selectAllTracks()">☑ <span>${tr('Select all tracks','Seleziona tutte le tracce')}</span><kbd class="context-shortcut">Ctrl/⌘ A</kbd></button>
+    <button type="button" aria-keyshortcuts="Control+A Meta+A" onclick="closeTrackContextMenu();${fromTimeline?'selectAllTimelineSegments()':'selectAllTracks()'}">☑ <span>${fromTimeline?tr('Select all timeline segments','Seleziona tutti i segmenti della timeline'):tr('Select all tracks','Seleziona tutte le tracce')}</span><kbd class="context-shortcut">Ctrl/⌘ A</kbd></button>
     ${timelineTool==='split'?`<button type="button" aria-keyshortcuts="S" onclick="closeTrackContextMenu();splitSelectedTracksAt(playCursorMs)">✂ <span>${tr('Split selected tracks at transport','Dividi tracce selezionate alla posizione del transport')}</span><kbd class="context-shortcut">S</kbd></button>`:''}
     ${track.kind==='midi'?`<button type="button" onclick="closeTrackContextMenu();openMidiEditor('${id}')">♬ <span>${tr('MIDI / VST instrument','MIDI / Strumento VST')}</span></button>`:''}
     <button type="button" onclick="closeTrackContextMenu();duplicateTrack('${id}')">⧉ <span>Duplica traccia</span></button>
@@ -1262,7 +1265,7 @@ function openTrackContextMenu(event,id){
   event?.preventDefault?.();event?.stopPropagation?.();
   let x=event?.clientX,y=event?.clientY;
   if((!x&&!y)&&event?.currentTarget?.getBoundingClientRect){const b=event.currentTarget.getBoundingClientRect();x=b.right;y=b.bottom}
-  openTrackContextMenuAt(id,x,y);
+  openTrackContextMenuAt(id,x,y,!!event?.currentTarget?.closest?.('#timelinePane'));
 }
 
 async function syncMetronomeToTrack(id){
@@ -2572,7 +2575,7 @@ function beginTimelineClipDrag(event,trackId,clipId){
   const key=MtaTimelineRules.key(track,clip),multiple=event.shiftKey||event.ctrlKey||event.metaKey;
   if(multiple&&selectedTimelineSegments.has(key)){selectedTimelineSegments.delete(key);paintSegmentSelection();return}
   if(!multiple&&!selectedTimelineSegments.has(key))selectedTimelineSegments.clear();
-  selectedTimelineSegments.add(key);selectedTrackId=trackId;selectedTrackIdSet=new Set(selectedSegmentItems().map(x=>x.track.id));sel={a:0,b:0};refreshSelectedTrackInspector();updateSel();paintSegmentSelection();$('#timelinePane')?.focus({preventScroll:true});
+  selectedTimelineSegments.add(key);sel={a:0,b:0};updateSel();paintSegmentSelection();$('#timelinePane')?.focus({preventScroll:true});
   const items=selectedSegmentItems().map(x=>({...x,el:document.querySelector(`.clip-block[data-track-id="${CSS.escape(x.track.id)}"][data-clip-id="${CSS.escape(x.clip.id)}"]`)}));
   const pid=event.pointerId,startX=event.clientX,pane=$('#timelinePane'),clickMs=pane?Math.max(0,(startX-pane.getBoundingClientRect().left+pane.scrollLeft)/pxPerSec*1000):playCursorMs;let delta=0,moved=false;
   timelineClipDrag={pointerId:pid};document.body.classList.add('moving-timeline-clip');
@@ -2679,6 +2682,7 @@ function handleGeneratedTrackShortcut(event){
   event.preventDefault();closeTrackContextMenu();void refreshGeneratedTrackFromContext(track.id);return true;
 }
 function selectTrack(id,event=null){
+  timelineSelectionOnly=false;
   if(!trackById(id))return;
   const multi=!!(event&&(event.ctrlKey||event.metaKey));
   if(multi){
@@ -2897,9 +2901,9 @@ function bindTrackTimelineScroll(){
 function bindTrackResizer(){
   const handle=$('#trackResizer'),grid=$('#editorGrid');if(!handle||!grid)return;
   handle.onmousedown=e=>{
-    e.preventDefault();const startX=e.clientX,startWidth=Number(current.track_panel_width_px)||225;
+    e.preventDefault();const startX=e.clientX,startWidth=grid.getBoundingClientRect().width?$('#trackColumn').getBoundingClientRect().width:(Number(current.track_panel_width_px)||225);
     document.body.classList.add('resizing-tracks');
-    const move=ev=>{const width=Math.max(160,Math.min(520,startWidth+ev.clientX-startX));current.track_panel_width_px=Math.round(width);grid.style.setProperty('--track-column-width',`${width}px`)};
+    const move=ev=>{const width=Math.max(projectIsMta()?210:160,Math.min(520,startWidth+ev.clientX-startX));current.track_panel_width_px=Math.round(width);grid.style.setProperty('--track-column-width',`${width}px`)};
     const up=()=>{window.removeEventListener('mousemove',move);window.removeEventListener('mouseup',up);document.body.classList.remove('resizing-tracks');markDirty(150)};
     window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   };
@@ -3004,6 +3008,8 @@ function bindTimeline(){
     if(!moved){sel={a:0,b:0};updateSel();goToTimestamp(downMs)}
   };
   if(ruler)ruler.onclick=e=>{
+    pane.focus({preventScroll:true});
+    selectedTimelineSegments.clear();paintSegmentSelection();
     const r=pane.getBoundingClientRect();
     goToTimestamp(Math.max(0,(e.clientX-r.left+pane.scrollLeft)/pxPerSec*1000));
   };
@@ -4193,7 +4199,8 @@ async function doExport(format=exportFormat){
       ${mtaProfileField}
       ${audioParams}
       ${normalizeParams}
-      ${format==='mta'?`<div class="export-warning">${tr('MTA export uses the .mta extension. Experimental Merish profiles require your M-Live identifier. For lyrics and chords, import metadata from your own MTA with synchronized lyrics. Word or character highlighting uses timed words; the project key is included as display metadata. Merish pre-count is zero to preserve the beginning; include the generated click track for audio pre-roll. An already generated zoned or adaptive metronome is exported as audio when its track is mapped; BPM metadata stays fixed and the variable tempo map is not transferred. Lyrics may advance by line, or by timed words when every active line includes them. Synthetic granular probes were verified on one Merish5+; three generated granular exports were verified on one Merish5+; other projects and devices require validation.','L’export MTA usa l’estensione .mta. I profili Merish sperimentali richiedono il tuo identificativo M-Live. Per testo e accordi importa i metadati da un tuo MTA con testo sincronizzato. L’evidenziazione per parola o lettera usa i tempi delle parole; la tonalità viene inclusa come metadato visualizzabile. Il preconteggio Merish è zero per preservare l’inizio; includi la traccia click generata per il pre-roll audio. Un metronomo a zone o adattivo già generato viene esportato come audio se la sua traccia è mappata; i metadata BPM restano fissi e la mappa variabile non viene trasferita. Le lyrics possono avanzare per righe oppure per parole se tutte le righe attive sono sincronizzate. Le prove sintetiche granulari sono state verificate su un Merish5+; tre export granulari generati sono stati verificati sul Merish5+; altri progetti e dispositivi richiedono verifica.')}</div>`:''}
+      ${format==='mta'?`<div class="export-warning">${tr('MTA export uses the .mta extension. Experimental Merish profiles require your M-Live identifier. M-Live export settings can be edited or imported in your user profile. Word or character highlighting uses timed words; the project key is included as display metadata. Merish pre-count is zero to preserve the beginning; include the generated click track for audio pre-roll. An already generated zoned or adaptive metronome is exported as audio when its track is mapped; BPM metadata stays fixed and the variable tempo map is not transferred. Lyrics may advance by line, or by timed words when every active line includes them. Synthetic granular probes were verified on one Merish5+; three generated granular exports were verified on one Merish5+; other projects and devices require validation.','L’export MTA usa l’estensione .mta. I profili Merish sperimentali richiedono il tuo identificativo M-Live. Le impostazioni di export M-Live si modificano o importano nel profilo utente. L’evidenziazione per parola o lettera usa i tempi delle parole; la tonalità viene inclusa come metadato visualizzabile. Il preconteggio Merish è zero per preservare l’inizio; includi la traccia click generata per il pre-roll audio. Un metronomo a zone o adattivo già generato viene esportato come audio se la sua traccia è mappata; i metadata BPM restano fissi e la mappa variabile non viene trasferita. Le lyrics possono avanzare per righe oppure per parole se tutte le righe attive sono sincronizzate. Le prove sintetiche granulari sono state verificate su un Merish5+; tre export granulari generati sono stati verificati sul Merish5+; altri progetti e dispositivi richiedono verifica.')}</div>`:''}
+      ${format==='mta'&&(()=>{const lines=(current.lyrics||[]).filter(x=>!x.disabled&&!x.deleted&&String(x.text||'').trim());return lines.some(x=>(x.words||[]).length)&&lines.some(x=>!(x.words||[]).length)})()?`<div class="export-warning" role="status">${tr('Some lyrics lack word timings: Merish export will advance all lyrics by line. The project timings remain unchanged.','Alcune lyrics non hanno parole sincronizzate: nell’export Merish tutte le lyrics avanzeranno per righe. I tempi nel progetto restano invariati.')}</div>`:''}
       <div class="workflow-note">${format==='mta'?'Il profilo MTA controlla l’ordine fisico delle tracce Click/Melody nel file. MTA8 mantiene le posizioni specifiche del dispositivo; per MTA16 il default derivato dal corpus è Click 1 / Melody 9. Se servono stream intermedi vengono creati slot silenziosi. ':''}${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':isMobileClient()?'L’app mobile userà il selettore file del sistema operativo. Puoi anche condividere direttamente l’output.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
       <div class="utility-actions">
         <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}',false)">Conferma export</button>
@@ -4467,38 +4474,15 @@ function editProjectMeta(){
     row('Sample rate progetto',`<select id="projectMetaSampleRate" class="project-meta-input" ${((current.tracks||[]).length||(current.archived_tracks||[]).length)?'disabled':''}><option value="44100" ${Number(current.sample_rate||44100)===44100?'selected':''}>44.1 kHz</option><option value="48000" ${Number(current.sample_rate||44100)===48000?'selected':''}>48 kHz</option><option value="96000" ${Number(current.sample_rate||44100)===96000?'selected':''}>96 kHz</option></select>${(current.tracks||[]).length?'<small>Modificabile solo quando il progetto non contiene tracce attive o conservate.</small>':''}`),
     row('Tipo progetto',select('projectMetaTarget',current.target||'MTA8',targets.map(x=>[x,projectFormatLabel(x)])).replace('id="projectMetaTarget"','id="projectMetaTarget" onchange="updateProjectKindPreview()"')+`<small id="projectKindPreview">${tr('Incompatible tracks are preserved inactive and restored when switching back. Preserved tracks:','Le tracce incompatibili vengono conservate inattive e ripristinate tornando a un tipo compatibile. Tracce conservate:')} ${(current.archived_tracks||[]).length}</small>`),
     row('Profilo MTA',select('projectMetaDeviceProfile',current.mta_device_profile||'auto',profiles)),
-    row('Identificativo M-Live',input('projectMetaMerishUserId',current.merish_user_id||'068336',6)+`<small>Valore suggerito 068336, ricavato dagli MTA di prova. Puoi sostituirlo con il tuo; la compatibilità con altri dispositivi non è verificata.</small><div><label class="utility-btn secondary">Importa metadati da un tuo MTA<input type="file" accept=".mta,.mta8,.mta16" hidden onchange="importMerishMetadata(this)"></label><small id="merishMetadataStatus">${current.merish_syl_key?'Metadati per testo disponibili':'Importa un MTA con testo per abilitare l’export testuale sperimentale.'}</small></div>`),
     row('Evidenziazione testo Merish',select('projectMetaMerishHighlight',current.merish_lyric_highlight||'word',[['word','Per parola'],['character','Per lettera']])+`<small>Usa i tempi delle parole; per lettera usa anche i tempi delle sillabe disponibili.</small>`),
     row('Società repertorio',input('projectMetaRightsSocieties',(current.rights_societies||[]).join(', '),500)),
   ].join('')}</tbody></table></div><p class="hint">Tutti i campi vengono salvati insieme nel progetto. Se modifichi il time signature, i BPM vengono ricalcolati usando la nuova metrica.</p><div class="utility-actions"><button class="utility-btn primary" onclick="saveProjectMetaEditor()">Save</button><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
   updateProjectKindPreview();
 }
-async function importMerishMetadata(input){
-  const file=input?.files?.[0],projectId=current?.id;if(!file||!projectId)return;
-  clearTimeout(autosaveTimer);autosaveTimer=null;
-  while(autosaveBusy)await new Promise(resolve=>setTimeout(resolve,25));
-  if(current?.id!==projectId)return;
-  autosaveBusy=true;input.disabled=true;
-  const status=$('#merishMetadataStatus');if(status)status.textContent='Analisi metadati MTA…';
-  const body=new FormData();body.append('file',file);
-  try{
-    if(projectDirty){collect();await persistCurrentProject(false);if(projectDirty)throw Error('Attendere il salvataggio delle modifiche in corso')}
-    const result=await api(`/api/projects/${encodeURIComponent(projectId)}/merish-metadata`,{method:'POST',body});
-    if(current?.id!==projectId)return;
-    current.merish_user_id=result.project.merish_user_id;current.merish_syl_key=result.project.merish_syl_key;
-    if(persistedProjectSnapshot){persistedProjectSnapshot.merish_user_id=current.merish_user_id;persistedProjectSnapshot.merish_syl_key=current.merish_syl_key}
-    const idField=$('#projectMetaMerishUserId');if(idField)idField.value=current.merish_user_id;
-    if(status)status.textContent='Metadati per testo disponibili';
-    toast('Metadati MTA importati nel progetto');
-  }catch(e){if(status)status.textContent='Importazione metadati non riuscita';toast(e.message)}
-  finally{input.value='';input.disabled=false;autosaveBusy=false;if(autosaveQueued){autosaveQueued=false;markDirty(50)}}
-}
 async function saveProjectMetaEditor(){
   if(!current)return;
   const title=($('#projectMetaTitle')?.value||'').trim();
   if(!title){toast('Il titolo del progetto non può essere vuoto');return}
-  const merishId=($('#projectMetaMerishUserId')?.value||'').trim();
-  if(merishId&&!/^[0-9]{6}$/.test(merishId)){toast('L’identificativo M-Live deve contenere sei cifre');return}
   clearTimeout(autosaveTimer);autosaveTimer=null;
   while(autosaveBusy)await new Promise(resolve=>setTimeout(resolve,25));
   autosaveBusy=true;
@@ -4516,8 +4500,6 @@ async function saveProjectMetaEditor(){
   if(!(draft.tracks||[]).length&&!(draft.archived_tracks||[]).length)draft.sample_rate=Number($('#projectMetaSampleRate')?.value||draft.sample_rate||44100);
   draft.target=$('#projectMetaTarget')?.value||draft.target||'MTA8';
   draft.mta_device_profile=$('#projectMetaDeviceProfile')?.value||'auto';
-  if(merishId!==draft.merish_user_id)draft.merish_syl_key='';
-  draft.merish_user_id=merishId;
   draft.merish_lyric_highlight=$('#projectMetaMerishHighlight')?.value||'word';
   draft.rights_societies=($('#projectMetaRightsSocieties')?.value||'').split(/[,;\n]/).map(x=>x.trim().toUpperCase()).filter(Boolean).slice(0,16);
   draft.time_signature=newSig;
@@ -4799,8 +4781,8 @@ window.addEventListener('keydown',e=>{
     if(editable)return;
     const key=e.key.toLowerCase();if(key==='a'&&!e.shiftKey&&current&&!target?.closest?.('[role="dialog"],dialog,.utility-modal,.utility-backdrop')){e.preventDefault();closeTrackContextMenu();if(target?.closest?.('#timelinePane'))selectAllTimelineSegments();else selectAllTracks();return}if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}
   }
-  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&timelineTool==='select'&&selectedSegmentItems().length&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();moveSelectedSegments((e.key==='ArrowRight'?1:-1)*(current.timeline_snap&&current.timeline_snap!=='off'?MtaTimelineRules.step(current,Math.max(0,MtaTimelineRules.start(selectedSegmentItems()[0].track,selectedSegmentItems()[0].clip))):10));return}
-  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&(document.activeElement?.closest?.('#timeline')||document.activeElement?.closest?.('.timeline')||document.activeElement===document.body)){e.preventDefault();const increment=Math.max(1,Math.round(4/Math.max(0.01,pxPerSec)*1000));goToTimestamp(playCursorMs+(e.key==='ArrowRight'?increment:-increment));return}
+  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.shiftKey&&timelineTool==='select'&&selectedSegmentItems().length&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();moveSelectedSegments((e.key==='ArrowRight'?1:-1)*(current.timeline_snap&&current.timeline_snap!=='off'?MtaTimelineRules.step(current,Math.max(0,MtaTimelineRules.start(selectedSegmentItems()[0].track,selectedSegmentItems()[0].clip))):10));return}
+  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&(document.activeElement?.closest?.('#timelinePane')||document.activeElement?.closest?.('#timeline')||document.activeElement?.closest?.('.timeline')||document.activeElement===document.body)){e.preventDefault();const increment=Math.max(1,Math.round(4/Math.max(0.01,pxPerSec)*1000));goToTimestamp(playCursorMs+(e.key==='ArrowRight'?increment:-increment));return}
   if(e.key==='Escape'){closeTrackContextMenu();return}
   if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&e.key.toLowerCase()==='s'&&!target?.closest?.('[role="dialog"],dialog,.utility-modal,.utility-backdrop')&&!document.querySelector('.utility-backdrop:not(.hidden)')){e.preventDefault();e.stopPropagation();splitSelectedTracksAt(playCursorMs);return}
   if(!editable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.repeat&&(e.key==='Backspace'||e.key==='Delete')&&timelineChordSelectedIndices.size){e.preventDefault();e.stopPropagation();deleteSelectedTimelineChords();return}
@@ -5009,12 +4991,14 @@ async function manageProjectFiles(){
   if(!current){toast('Apri prima un progetto');return}
   try{
     const files=await api(`/api/projects/${current.id}/files`);
+    const backupTargets=files.filter(f=>f.category==='audio'&&!f.pending_job&&(f.timeline||f.reusable));
     const rows=files.map((f,i)=>{
       const deletable=!f.referenced&&f.category!=='source';
       return `<tr>
         <td>${deletable?`<input class="project-file-check" type="checkbox" data-category="${esc(f.category)}" data-name="${encodeURIComponent(f.name)}">`:''}</td>
-        <td>${esc(f.category)}</td><td>${esc(f.name)}</td><td>${(f.size/1024/1024).toFixed(2)} MB</td><td>${f.pending_job?tr('Pending job / publication','Job o pubblicazione in attesa'):f.timeline?tr('Used on timeline','Usato nella timeline'):f.reusable?tr('Reusable library · removable','Libreria riutilizzabile · eliminabile'):''}</td>
-        <td><a class="mini-link" href="/api/projects/${current.id}/files/${encodeURIComponent(f.category)}/${encodeURIComponent(f.name)}">Scarica</a>${deletable?` <button onclick="deleteProjectFile('${esc(f.category)}','${encodeURIComponent(f.name)}')">Elimina</button>`:''}</td>
+        <td>${esc(f.category)}</td><td>${esc(f.name)}</td><td>${(f.size/1024/1024).toFixed(2)} MB</td><td>${f.pending_job?tr('Pending job / publication','Job o pubblicazione in attesa'):f.timeline?tr('Used on timeline','Usato nella timeline'):f.reusable?tr('Reusable library · removable','Libreria riutilizzabile · eliminabile'):f.backup_id?'Backup di '+esc(f.backup_for||''):''}</td>
+        <td>${(f.tracks||[]).map(t=>esc(t.name)+(t.inactive?' (inattiva)':'')).join(', ')||'—'}</td>
+        <td><a class="mini-link" href="/api/projects/${current.id}/files/${encodeURIComponent(f.category)}/${encodeURIComponent(f.name)}">Scarica</a>${f.category==='audio'&&!f.pending_job&&(f.timeline||f.reusable)&&/\.(wav|flac)$/i.test(f.name)?` <button type="button" onclick="convertProjectMedia('${encodeURIComponent(f.name)}','${/\.wav$/i.test(f.name)?'flac':'wav'}')">Converti ${/\.wav$/i.test(f.name)?'FLAC':'WAV'}</button>`:''}${f.backup_id&&!f.pending_job?` <label>Assegna a <select id="backupTarget-${esc(f.backup_id)}" aria-label="File da sostituire con il backup">${backupTargets.map(t=>`<option value="${encodeURIComponent(t.name)}" ${t.name===f.backup_for?'selected':''}>${esc(t.name)}${(t.tracks||[]).length?' · '+esc(t.tracks.map(x=>x.name).join(', ')):''}</option>`).join('')}</select></label> <button type="button" ${backupTargets.length?'':'disabled'} onclick="restoreProjectMedia('${esc(f.backup_id)}')">Ripristina</button>`:''}${deletable?` <button onclick="deleteProjectFile('${esc(f.category)}','${encodeURIComponent(f.name)}')">Elimina</button>`:''}</td>
       </tr>`;
     }).join('');
     showUtilityModal('File del progetto',`
@@ -5025,10 +5009,21 @@ async function manageProjectFiles(){
         <button class="utility-btn danger-action" onclick="deleteSelectedProjectFiles()">Elimina selezionati</button>
         <button class="utility-btn" onclick="cleanupUnusedProjectMedia()">${tr('Clean unused media','Pulisci media inutilizzati')}</button>
       </div>
-      <div class="table-scroll"><table class="users-table"><thead><tr><th></th><th>Tipo</th><th>File</th><th>Dimensione</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Nessun file.</td></tr>'}</tbody></table></div>
+      <div class="table-scroll"><table class="users-table"><thead><tr><th></th><th>Tipo</th><th>File</th><th>Dimensione</th><th>Stato</th><th>Tracce</th><th>Azioni</th></tr></thead><tbody>${rows||'<tr><td colspan="7">Nessun file.</td></tr>'}</tbody></table></div>
       <p class="hint">I media della timeline, dei job e il source MTA non sono selezionabili. Le clip riutilizzabili sono eliminabili insieme al relativo file. La pulizia automatica conserva originali e allegati. I dump completi includono project.json, audio, attachment, source MTA e originali.</p>`);
     $('#extraProjectFile').addEventListener('change',uploadExtraProjectFile);
   }catch(e){toast(e.message)}
+}
+async function convertProjectMedia(encodedName,format){
+ if(!current)return;if(playbackActuallyRunning())return toast('Ferma la riproduzione prima di convertire il file');
+ const name=decodeURIComponent(encodedName);if(!confirm(`Convertire ${name} in ${format.toUpperCase()}? Verrà conservato un backup.`))return;
+ try{await save();const result=await api(`/api/projects/${current.id}/files/convert`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({filename:name,format})});current=result.project;for(const t of current.tracks||[])invalidateTrackAudioCache(t.id);clearPlaybackWarmCache();resetSessionHistory();render();await syncNativeProjectFile(current.id);await manageProjectFiles();toast('Conversione completata; backup conservato.')}catch(e){toast(e.message)}
+}
+async function restoreProjectMedia(backupId){
+ if(!current)return;if(playbackActuallyRunning())return toast('Ferma la riproduzione prima di ripristinare il backup');
+ const selected=$(`#backupTarget-${backupId}`)?.value;if(!selected)return toast('Seleziona il file da sostituire');const target=decodeURIComponent(selected);
+ if(!confirm(`Ripristinare il backup al posto di ${target} su tutte le tracce associate? Verrà conservata anche una copia del file corrente.`))return;
+ try{await save();const result=await api(`/api/projects/${current.id}/files/restore-backup`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({backup_id:backupId,target_filename:target})});current=result.project;for(const t of current.tracks||[])invalidateTrackAudioCache(t.id);clearPlaybackWarmCache();resetSessionHistory();render();await syncNativeProjectFile(current.id);await manageProjectFiles();toast('Backup ripristinato.')}catch(e){toast(e.message)}
 }
 function toggleAllProjectFiles(value){$$('.project-file-check').forEach(x=>x.checked=!!value)}
 async function deleteSelectedProjectFiles(){

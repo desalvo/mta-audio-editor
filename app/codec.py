@@ -14,14 +14,13 @@ from pathlib import Path
 
 from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track, master_fade_filter
 from .models import Chord, Clip, LyricLine, Marker, MtaSlotMapping, Project, RightsRecord, Track
-from .merish_mta16 import build_minimal_syl, build_settings_xml, extract_consistent_syl_key, extract_consistent_user_id, validate_audio_only
+from .merish_mta16 import build_minimal_syl, build_settings_xml, validate_audio_only
 from .mta_writer import normalize_matroska_for_mta
 from .mta_reverse import (
     analyze_mta,
     deobfuscate_media_copy,
     inspect_cluster_transport,
     obfuscate_media_copy,
-    _scan_matroska_filedata,
 )
 from .storage import attachment_path, audio_path, pdir, save_project
 from .music_text import synchronized_plain_text
@@ -157,20 +156,6 @@ def import_mta(path: Path, project: Project) -> Project:
 
         preserved = []
         attachment_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "attachment"]
-        xml_sizes = [s.get("extradata_size") for s in attachment_streams
-                     if str((s.get("tags") or {}).get("filename") or "").lower().endswith(".xml")
-                     and isinstance(s.get("extradata_size"), int) and 0 < s["extradata_size"] <= 1_000_000]
-        if xml_sizes:
-            identifier = extract_consistent_user_id(_scan_matroska_filedata(path, xml_sizes))
-            if identifier:
-                project.merish_user_id = identifier
-        syl_sizes = [s.get("extradata_size") for s in attachment_streams
-                     if str((s.get("tags") or {}).get("filename") or "").lower().endswith(".syl")
-                     and isinstance(s.get("extradata_size"), int) and 0 < s["extradata_size"] <= 1_000_000]
-        if syl_sizes:
-            syl_key = extract_consistent_syl_key(_scan_matroska_filedata(path, syl_sizes))
-            if syl_key:
-                project.merish_syl_key = syl_key
         for aidx, stream in enumerate(attachment_streams):
             idx = stream.get("index")
             tags = stream.get("tags") or {}

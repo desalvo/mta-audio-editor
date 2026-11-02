@@ -59,6 +59,10 @@ def test_admin_canonical_movement_observations_have_no_settlement_action(account
         page.once('dialog',lambda dialog:dialog.accept())
         with page.expect_response(lambda r:r.url.endswith('/reconcile-payment') and r.request.method=='POST') as response:button.click()
         assert response.value.status in (409,422)
+        # The error handler refreshes the report before posting its status;
+        # opening the old details element while that refresh runs races with
+        # replacement of the entire finance panel.
+        page.get_by_text('Impossibile completare la verifica: HTTP' if language=='it' else 'Unable to complete verification: HTTP',exact=False).wait_for()
         panel=page.locator('[data-movement-review]');panel.wait_for();panel.locator('summary').click()
         assert 'DISPUTE_FEE' in panel.inner_text() and '90.071.992.547.409,93' in panel.inner_text() if language=='it' else 'DISPUTE_FEE' in panel.inner_text() and '90,071,992,547,409.93' in panel.inner_text()
         assert 'NEVER EXPOSE' not in panel.inner_text() and 'private buyer' not in panel.inner_text()

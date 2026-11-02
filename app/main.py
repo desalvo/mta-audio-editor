@@ -835,9 +835,14 @@ def _project_for_actor(request: Request, pid: str, *, owner_only: bool = False) 
         project.owner_user_id = actor["id"]
         save_project(project)
     if actor["id"] == 0 and actor["role"] == "admin":
+        from . import mlive_profile
+        mlive_profile.adopt_legacy(0, project)
         return project
     if not project_access(project, actor["id"], actor["role"], owner_only=owner_only):
         raise HTTPException(404, "project not found")
+    if project.owner_user_id == actor["id"]:
+        from . import mlive_profile
+        mlive_profile.adopt_legacy(actor["id"], project)
     return project
 
 
@@ -2661,6 +2666,30 @@ def project_media_cleanup(pid: str, request: Request, body: dict):
         return cleanup(pid, remove_unused_library=body['remove_unused_library'])
     except ValueError as exc:
         raise HTTPException(409, str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/files/convert')
+def project_media_convert(pid: str, request: Request, body: dict):
+    _project_for_actor(request, pid)
+    if set(body) != {'filename', 'format'} or not isinstance(body['filename'], str) or not isinstance(body['format'], str):
+        raise HTTPException(422, 'File e formato richiesti')
+    from .project_media_conversion import convert
+    try:
+        return convert(pid, body['filename'], body['format'].lower(), capacity_check=_ensure_workspace_capacity)
+    except (ValueError, OSError, subprocess.SubprocessError) as exc:
+        raise HTTPException(400, str(exc)[:500]) from exc
+
+
+@app.post('/api/projects/{pid}/files/restore-backup')
+def project_media_restore_backup(pid: str, request: Request, body: dict):
+    _project_for_actor(request, pid)
+    if not {'backup_id'} <= set(body) <= {'backup_id', 'target_filename'} or not isinstance(body['backup_id'], str) or ('target_filename' in body and not isinstance(body['target_filename'], str)):
+        raise HTTPException(422, 'Backup richiesto')
+    from .project_media_conversion import restore
+    try:
+        return restore(pid, body['backup_id'], body.get('target_filename'), capacity_check=_ensure_workspace_capacity)
+    except (ValueError, OSError, subprocess.SubprocessError) as exc:
+        raise HTTPException(400, str(exc)[:500]) from exc
 
 
 @app.post("/api/projects/{pid}/files/upload")
@@ -7013,14 +7042,36 @@ def export_plan(pid: str, request: Request, profile: str | None = None, target: 
     }
 
 
-@app.post("/api/projects/{pid}/merish-metadata")
-async def import_merish_metadata(pid: str, request: Request, file: UploadFile = File(...)):
-    """Read device metadata from a user's MTA without retaining the uploaded song."""
-    _project_for_actor(request, pid, owner_only=True)
-    if Path(file.filename or "").suffix.lower() not in {".mta", ".mta8", ".mta16"}:
-        raise HTTPException(400, "Seleziona un tuo file MTA")
+@app.get("/api/account/m-live")
+def get_mlive_profile(request: Request, response: Response):
+    from . import mlive_profile
+    response.headers['Cache-Control'] = 'no-store'
+    return mlive_profile.get(require_user(request)["id"])
+
+
+@app.put("/api/account/m-live")
+def put_mlive_profile(request: Request, body: dict, response: Response):
+    from . import mlive_profile
+    response.headers['Cache-Control'] = 'no-store'
+    user = require_user(request)
+    if set(body) != {"merish_user_id", "merish_syl_key"}:
+        raise HTTPException(422, "Identificativo e parametro SYL richiesti")
+    try:
+        return mlive_profile.save(user["id"], body["merish_user_id"], body["merish_syl_key"])
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post("/api/account/m-live/import")
+async def import_mlive_profile(request: Request, response: Response, file: UploadFile = File(...)):
+    """Import only device metadata into the requesting user's profile."""
+    from . import mlive_profile
     from .merish_mta16 import extract_consistent_syl_key, extract_consistent_user_id
     from .mta_reverse import _scan_matroska_filedata
+    response.headers['Cache-Control'] = 'no-store'
+    user = require_user(request)
+    if Path(file.filename or "").suffix.lower() not in {".mta", ".mta8", ".mta16"}:
+        raise HTTPException(400, "Seleziona un tuo file MTA")
     with tempfile.TemporaryDirectory() as td:
         source = Path(td) / "source.mta"
         _copy_limited(file.file, source)
@@ -7030,24 +7081,13 @@ async def import_merish_metadata(pid: str, request: Request, file: UploadFile = 
                 return [s["extradata_size"] for s in attachments
                         if str((s.get("tags") or {}).get("filename") or "").lower().endswith(extension)
                         and isinstance(s.get("extradata_size"), int) and 0 < s["extradata_size"] <= 1_000_000]
-            xml_sizes, syl_sizes = sizes(".xml"), sizes(".syl")
-            identifier = extract_consistent_user_id(_scan_matroska_filedata(source, xml_sizes))
-            key = extract_consistent_syl_key(_scan_matroska_filedata(source, syl_sizes))
+            identifier = extract_consistent_user_id(_scan_matroska_filedata(source, sizes(".xml")))
+            key = extract_consistent_syl_key(_scan_matroska_filedata(source, sizes(".syl")))
         except (OSError, RuntimeError, ValueError) as exc:
             raise HTTPException(400, "Impossibile analizzare i metadati del file MTA") from exc
     if not identifier or not key:
         raise HTTPException(400, "Il file deve contenere metadati XML coerenti e un SYL con testo sincronizzato valido")
-    from .ai_project_lock import project_publication_lock
-    with project_publication_lock(pid):
-        project = _project_for_actor(request, pid, owner_only=True)
-        from .models import DEFAULT_MERISH_USER_ID
-        is_unpaired_default = project.merish_user_id == DEFAULT_MERISH_USER_ID and not project.merish_syl_key
-        if project.merish_user_id and project.merish_user_id != identifier and not is_unpaired_default:
-            raise HTTPException(409, "L'identificativo del file non coincide con quello del progetto")
-        project.merish_user_id = identifier
-        project.merish_syl_key = key
-        save_project(project)
-    return {"ok": True, "project": project}
+    return mlive_profile.save(user["id"], identifier, key)
 
 
 @app.post("/api/projects/{pid}/export-mta")
@@ -7055,7 +7095,8 @@ def export_mta_with_mapping(pid: str, req: MtaExportRequest, request: Request):
     project = _project_for_actor(request, pid)
     try:
         validate_project_files(project)
-        export_project = _musical_export_project(project)
+        from . import mlive_profile
+        export_project = mlive_profile.apply(_musical_export_project(project), mlive_profile.get(_actor(request)["id"]))
         known = {track.id for track in export_project.tracks}
         requested_slots = [
             slot.model_copy(update={"track_ids": [track_id for track_id in slot.track_ids if track_id in known]})
@@ -7290,13 +7331,16 @@ async def upload_karaoke_background(pid: str, request: Request, file: UploadFile
     return {"name": name}
 
 
-def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tuple[Path, str, str, str]:
+def _render_configured_project_export(pid: str, req: ProjectExportRequest, mlive_settings: dict | None = None) -> tuple[Path, str, str, str]:
     source_project = load_project(pid)
     fmt = req.format.lower()
     validate_project_files(source_project)
     safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
     if fmt == "mta":
         export_project = _musical_export_project(source_project)
+        if mlive_settings is not None:
+            from . import mlive_profile
+            export_project = mlive_profile.apply(export_project, mlive_settings)
         if export_project.target not in {"MTA8", "MTA16"}:
             export_project.target = req.mta_target or "MTA16"
         ext = "mta"
@@ -7368,7 +7412,9 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
 def configured_project_export(pid: str, req: ProjectExportRequest, request: Request):
     _project_for_actor(request, pid)
     try:
-        out, final_name, media_type, fmt = _render_configured_project_export(pid, req)
+        from . import mlive_profile
+        settings = mlive_profile.get(_actor(request)["id"]) if req.format.lower() == "mta" else None
+        out, final_name, media_type, fmt = _render_configured_project_export(pid, req, settings)
         if req.output_path:
             if not NATIVE_SINGLE_USER:
                 raise HTTPException(403, "Filesystem export path is available only in native mode")
@@ -7404,11 +7450,11 @@ def configured_project_export(pid: str, req: ProjectExportRequest, request: Requ
         raise HTTPException(400, f"export failed: {str(exc)[:300]}") from exc
 
 
-def _configured_export_worker(job_id: str, pid: str, req_data: dict) -> None:
+def _configured_export_worker(job_id: str, pid: str, req_data: dict, mlive_settings: dict | None = None) -> None:
     try:
         _media_job_update(job_id, status="running", progress=12, message="Preparazione export")
         req = ProjectExportRequest.model_validate(req_data)
-        out, final_name, media_type, fmt = _render_configured_project_export(pid, req)
+        out, final_name, media_type, fmt = _render_configured_project_export(pid, req, mlive_settings)
         _media_job_update(job_id, progress=94, message="Preparazione download")
         _media_job_update(
             job_id,
@@ -7431,6 +7477,8 @@ def _configured_export_worker(job_id: str, pid: str, req_data: dict) -> None:
 @app.post("/api/projects/{pid}/configured-export-jobs")
 def start_configured_project_export_job(pid: str, req: ProjectExportRequest, request: Request):
     _project_for_actor(request, pid)
+    from . import mlive_profile
+    settings = mlive_profile.get(_actor(request)["id"]) if req.format.lower() == "mta" else None
     now = time.time()
     job_id = uuid.uuid4().hex[:16]
     job = {
@@ -7449,7 +7497,7 @@ def start_configured_project_export_job(pid: str, req: ProjectExportRequest, req
         MEDIA_JOBS[job_id] = job
     worker_thread(
         target=_configured_export_worker,
-        args=(job_id, pid, req.model_dump(mode="json")),
+        args=(job_id, pid, req.model_dump(mode="json"), settings),
         daemon=True,
         name=f"project-export-{job_id}",
     ).start()
@@ -7538,7 +7586,8 @@ def export(pid: str, request: Request, format: str = "mta"):
                 raise HTTPException(409, "MTA export mapping required; use /export-plan and /export-mta")
             ext = "mta"
             out = pdir(pid) / f"export.{ext}"
-            export_mta(_musical_export_project(project), out)
+            from . import mlive_profile
+            export_mta(mlive_profile.apply(_musical_export_project(project), mlive_profile.get(_actor(request)["id"])), out)
             media_type = "application/octet-stream"
         elif format in {"wav", "mp3", "mlive_mp3", "mp3g", "flac"}:
             if format == "mp3g" and not any(not line.disabled and not line.deleted and str(line.text).strip() for line in project.lyrics):

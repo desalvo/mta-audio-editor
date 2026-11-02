@@ -119,6 +119,8 @@ def _erase(uid,*,actor=None):
         from .operator_refunds import authorize_account_erasure as authorize_refund_erasure
         authorize_refund_erasure(con,uid,intent.get('actor'))
         record_erasure(con,uid)
+        if con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='mlive_user_profiles'").fetchone():
+            con.execute('DELETE FROM mlive_user_profiles WHERE user_id=?', (uid,))
         for name, rows in selected.items():
             for key in rows:
                 con.execute('DELETE FROM ' + meta[name][0] + ' WHERE rowid=?', (key,))  # noqa: S608 -- quoted SQLite schema

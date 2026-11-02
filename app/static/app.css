@@ -1716,3 +1716,10 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 
 /* Four-field musical position must remain readable at every UI scale. */
 .topbar .transport-time-input{width:17ch;min-width:15ch;max-width:42vw;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums}
+
+/* Keep the MTA slot alongside delay even at the narrowest track width. */
+.track-delay-row.has-mta-slot{gap:2px}
+.track-delay-row .track-mta-slot{display:flex;align-items:center;gap:2px;min-width:0;white-space:nowrap}
+.track-mta-slot select{height:23px;width:43px;min-width:0;padding:1px 0;border:1px solid #385570;border-radius:4px;background:#0b1721;color:#f0f7fd;font-size:10px}
+.track-delay-row.has-mta-slot .track-delay-input{flex:1 1 28px;width:28px}
+.track-delay-row.has-mta-slot .track-delay-unit{flex:0 1 46px;min-width:34px}

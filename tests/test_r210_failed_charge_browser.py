@@ -44,7 +44,10 @@ def test_failed_checkout_actual_page_closure_or_preserved_hold(account,monkeypat
         page.once('dialog',lambda dialog:dialog.accept());verify.click()
         if failure:
             panel.get_by_text('Payment history unavailable' if language=='en' else 'Storico pagamenti non disponibile',exact=False).wait_for()
-            assert panel.get_by_role('button',name='Verifica esito senza incassare' if language=='it' else 'Verify status without collecting payment').count()==0
+            # Failed verification preserves the refreshed local history and a
+            # retry control; it must not release the existing checkout hold.
+            assert verify.count()==1 and verify.is_enabled()
+            panel.get_by_text(local,exact=False).wait_for()
             pending(local,account)
             page.reload();panel.get_by_text(local,exact=False).wait_for()
             assert page.locator('[data-credit-content] .plan-grid button').count()==0

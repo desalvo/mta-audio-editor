@@ -70,7 +70,7 @@ def validate_audio_only(project: Project) -> None:
         except ValueError:
             key = b""
         if len(key) != 256 or len(set(key)) != 256:
-            raise ValueError("Merish MTA: importa i metadati di un tuo MTA con testo prima di esportare lyrics, accordi o marker")
+            raise ValueError("Merish MTA: importa i metadati di un tuo MTA con testo nel profilo M-Live prima di esportare lyrics, accordi o marker")
     if any(Path(x).suffix.lower() in {".syl", ".xml"} for x in project.preserved_attachments):
         raise ValueError("Merish MTA sperimentale non sostituisce allegati SYL/XML conservati di un progetto importato")
 
@@ -359,7 +359,10 @@ def build_minimal_syl(project: Project, duration_ms: int) -> bytes:
             raise ValueError("Merish MTA: gli eventi testuali devono precedere la fine del brano")
         if lines:
             frames += _synchronized_section("LYRICS", lines, key)
-            if any(x.words for x in project.lyrics if not x.disabled and not x.deleted and x.text.strip()):
+            active_lines = [x for x in project.lyrics if not x.disabled and not x.deleted and x.text.strip()]
+            # Missing word timings cannot be invented: retain every line and
+            # use the device-tested line mode instead of rejecting the export.
+            if all(x.words for x in active_lines):
                 frames += _colors_section(project, duration_ms, key)
         if markers:
             frames += _experimental_marker_miditk(project, duration_ms, key)

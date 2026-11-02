@@ -1,3 +1,29 @@
+# File progetto: tracce, conversione e backup — 2 novembre 2026
+
+La finestra File del progetto mostra le tracce attive e inattive associate alle sorgenti. I file WAV PCM interi a 8/16/24 bit e FLAC possono essere convertiti fra WAV e FLAC: prima della sostituzione vengono verificati canali, frequenza e campioni decodificati, aggiornando tutte le tracce e le clip che condividono il file. Una copia originale rimane nell'area originali; è ripristinabile e manualmente eliminabile, mentre la pulizia automatica la conserva. Il ripristino conserva una copia della versione corrente. Le conversioni sono bloccate in presenza di job di progetto attivi e non coprono PCM floating-point o formati compressi con perdita. Passando a WAV viene disattivata la conversione automatica FLAC del progetto. Dettagli: `docs/PROJECT_MEDIA_CONVERSION_R210_IT.md`.
+
+Sono passati 147 test mirati e altri 19 test mirati su profilo/conversione/UI, con sovrapposizione fra i gruppi; Ruff e sintassi JavaScript passano. Comprendono verifica audio senza perdita, file condivisi, scelta della sorgente da sostituire, ripristino, cancellazione manuale, quota, symlink e job attivi. Playwright e prove native reali non sono disponibili localmente; la CI completa e i registri di sicurezza rimangono da verificare.
+
+# M-Live nel profilo utente — 2 novembre 2026
+
+ID e parametro SYL sono configurati in **Profilo → M-Live**, con un pulsante per importarli da un proprio MTA. I valori predefiniti andrebbero sostituiti con quelli personali. Ogni export usa il profilo dell'utente che lo avvia; un job in background conserva uno snapshot all'avvio. I valori non vengono serializzati nei nuovi progetti. All'apertura di un progetto preesistente, una coppia completa personale può essere adottata nel profilo del proprietario solo se questo non è già stato configurato; in caso di più coppie diverse viene adottata la prima. Le coppie incomplete non vengono trasferite automaticamente. Gli allegati originali conservati da un MTA importato non vengono eliminati.
+
+La CI precedente resta bloccata dalle revisioni sicurezza già documentate. RC **34/42 = 81,0% PRE-RC**.
+
+# Merish: metadati predefiniti e lyrics miste — 2 novembre 2026
+
+I valori predefiniti M-Live sono modificabili e andrebbero sostituiti con quelli personali. Questa versione sposta impostazioni e importazione nel profilo: l'export usa il profilo di chi avvia l'operazione e il progetto serializzato non contiene ID o parametro SYL. I dettagli di verifica e migrazione sono riportati nel checkpoint sopra.
+
+Con righe lyrics a sincronizzazione mista, l'export mantiene tutte le righe, accordi e marker e passa a evidenziazione per riga, avvisando nella finestra di export. La temporizzazione originale delle parole nel progetto rimane intatta. Superati 90 test mirati MTA, compresi export completi MTA8/MTA16 con lyrics miste e marker e controllo del pulsante; Ruff e sintassi JS passano. I file sintetici per righe sono stati provati in precedenza, ma questa nuova combinazione e i metadati di default non sono ancora stati verificati su un nuovo export reale del progetto dell'utente. La CI resta bloccata dai quattro registri sicurezza obsoleti e le ultime modifiche browser non sono state ancora testate in CI. RC **34/42 = 81,0% PRE-RC**.
+
+# CI 41419661058 — 2 novembre 2026
+
+Il run completo sul commit `28b0e0f435de9d9cc2ea1e5d8d7f133dcd6db2ef` segnala 12 test falliti, 8.505 superati e 126 saltati. SAST e compilazione VST3 sono passati; i job dipendenti non sono stati eseguiti. Le correzioni della run precedente hanno ridotto i fallimenti da 24 a 12.
+
+Quattro casi browser Stripe verificavano ancora che il pulsante di verifica scomparisse dopo un errore; ora controllano che la cronologia e il comando di riprova restino disponibili e che il pagamento rimanga sospeso. In quattro casi browser PayPal il pannello dei movimenti poteva essere aperto prima della fine dell'aggiornamento asincrono successivo alla risposta: il test attende ora il messaggio che viene pubblicato dopo il refresh, prima di aprire il pannello. Superati 193 test locali di regressione e Ruff; i 20 casi browser dei due file sono stati raccolti correttamente, ma Playwright/Chromium non sono disponibili nell'ambiente locale: occorre eseguirli in CI.
+
+Restano quattro test di revisione sicurezza source-bound obsoleti. La scansione locale Bandit 1.9.4 ha rilevato zero HIGH, 21 MEDIUM e 150 LOW, con 11 nuove identità rispetto al registro: non sono state approvate automaticamente né sono stati aggiornati i soli hash. L'inventario dei delta è `docs/security/CI_41419661058_REVIEW_DELTA.md`, senza attribuire approvazioni. La CI resta quindi attesa rossa fino a una revisione effettiva dei sorgenti e dei finding. RC **34/42 = 81,0% PRE-RC**.
+
 # CI 41387688751 — 2 novembre 2026
 
 Sul commit `eb37017fb52aee5bac10b080a8a5bafcb6b9160f`, il job Quality fallisce con 24 test: 4 test di selezione/transport/lyrics non aggiornati, 16 test browser PayPal che aspettavano il successo su esiti ambigui, e 4 registri di revisione sicurezza non aggiornati. Altri 8.489 test superati, 126 saltati. I job SAST e VST3 SDK sono passati; i job dipendenti sono stati saltati.

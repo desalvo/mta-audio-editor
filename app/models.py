@@ -2,10 +2,20 @@ from pathlib import Path
 import uuid
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 TrackType = Literal["drums", "bass", "guitars", "keyboards", "orchestra", "winds", "melody", "click", "choirs", "other"]
 DEFAULT_MERISH_USER_ID = "068336"
+DEFAULT_MERISH_SYL_KEY = (
+    "96f3dc391a07604dae8bf4d1321f786546a38ce9ca37107d5ebba481e2cf2815"
+    "7653bc99fae7c02d0e6b54b192ffd8c526036c49aa97f0dd3e1b046142af88f5"
+    "d6331c795a47a08deecb3411725fb8a586e3cc290a7750bd9efbe4c1220f6855"
+    "b693fcd93a27006d4eab94f1d23f18056643ac89ead7301d7e5b44a182efc835"
+    "16735cb99a87e0cd2e0b7451b29ff8e5c6230c694ab790fdde3b2401624fa895"
+    "f6d33c197a6740ad8eebd431127f5845a683ecc92a17705dbe9b84e1c22f0875"
+    "56b39cf9dac7200d6e4bb491f2df382506634ca98af7d03d1e7b6441a28fe8d5"
+    "36137c59baa780edce2b147152bf9885e6c32c096a57b09dfedbc421026f48b5"
+)
 PluginType = Literal[
     "eq", "normalizer", "compressor", "limiter", "delay", "reverb_lexicon",
     "room_ambience", "graphic_eq_32", "amplify", "stereo_imager",
@@ -41,6 +51,13 @@ class ProjectClip(BaseModel):
     embedded_metadata: dict[str, str] = Field(default_factory=dict)
     notes: str = Field(default="", max_length=4000)
     metadata_scanned: bool = False
+
+
+class ProjectMediaBackup(BaseModel):
+    id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    filename: str = Field(min_length=1, max_length=128)
+    current_filename: str = Field(min_length=1, max_length=128)
+    original_filename: str = Field(min_length=1, max_length=128)
 
 
 class InstantiateProjectClipRequest(BaseModel):
@@ -450,6 +467,13 @@ class AdaptiveTempoPoint(BaseModel):
     beat_index: int = Field(ge=0)
 
 class Project(BaseModel):
+    @model_validator(mode="after")
+    def _merish_default_metadata(self):
+        # Pair the device-tested defaults only; a different ID needs its own key.
+        if self.merish_user_id == DEFAULT_MERISH_USER_ID and not self.merish_syl_key:
+            self.merish_syl_key = DEFAULT_MERISH_SYL_KEY
+        return self
+
     master_fade_enabled: bool = False
     master_fade_in_ms: int = Field(default=0, ge=0, le=86400000)
     master_fade_out_ms: int = Field(default=0, ge=0, le=86400000)
@@ -473,12 +497,13 @@ class Project(BaseModel):
     sample_rate: Literal[44100, 48000, 96000] = 44100
     audio_storage_mode: Literal["wav", "flac"] = "wav"
     mta_device_profile: Literal["auto", "merish5_xynthia2", "merish5_xynthia2_experimental", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
-    merish_user_id: str = Field(default=DEFAULT_MERISH_USER_ID, pattern=r"^(?:[0-9]{6})?$")
-    merish_syl_key: str = Field(default="", pattern=r"^(?:[0-9a-f]{512})?$")
+    merish_user_id: str = Field(default=DEFAULT_MERISH_USER_ID, pattern=r"^(?:[0-9]{6})?$", exclude=True)
+    merish_syl_key: str = Field(default="", pattern=r"^(?:[0-9a-f]{512})?$", exclude=True)
     merish_lyric_highlight: Literal["word", "character"] = "word"
     tracks: list[Track] = Field(default_factory=list)
     archived_tracks: list[Track] = Field(default_factory=list, max_length=1024)
     clip_library: list[ProjectClip] = Field(default_factory=list, max_length=512)
+    media_backups: list[ProjectMediaBackup] = Field(default_factory=list, max_length=2048)
     markers: list[Marker] = Field(default_factory=list)
     lyrics: list[LyricLine] = Field(default_factory=list)
     chords: list[Chord] = Field(default_factory=list)

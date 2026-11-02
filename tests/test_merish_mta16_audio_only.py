@@ -2,7 +2,7 @@ import pytest
 from defusedxml import ElementTree as ET
 
 from app.merish_mta16 import build_minimal_syl, build_settings_xml, extract_consistent_user_id, validate_audio_only
-from app.models import Chord, LyricLine, Marker, MtaSlotMapping, Project
+from app.models import Chord, DEFAULT_MERISH_SYL_KEY, LyricLine, Marker, MtaSlotMapping, Project
 
 
 def _project():
@@ -11,8 +11,66 @@ def _project():
 
 def test_new_project_default_and_existing_explicit_identity_are_preserved():
     assert Project(id="new", title="New").merish_user_id == "068336"
+    assert Project(id="new", title="New").merish_syl_key == DEFAULT_MERISH_SYL_KEY
+    assert Project(id="old", title="Old", merish_user_id="068336", merish_syl_key="").merish_syl_key == DEFAULT_MERISH_SYL_KEY
     assert Project(id="old", title="Old", merish_user_id="654321").merish_user_id == "654321"
+    assert Project(id="old", title="Old", merish_user_id="654321").merish_syl_key == ""
+    custom = bytes(range(256)).hex()
+    assert Project(id="custom", title="Custom", merish_syl_key=custom).merish_syl_key == custom
     assert Project(id="old-empty", title="Old", merish_user_id="").merish_user_id == ""
+
+
+def test_default_metadata_can_export_lyrics_chords_and_markers():
+    from app.mta_reverse import _decode_miditk_observed, _decode_variable_section_observed, _raw_proprietary_section_body
+
+    project = Project(id="new", title="New", target="MTA16")
+    project.lyrics = [LyricLine(time_ms=0, text="CIAO"), LyricLine(time_ms=3000, text="TEST")]
+    project.chords = [Chord(time_ms=0, chord="C"), Chord(time_ms=3000, chord="G")]
+    project.markers = [Marker(time_ms=2000, label="INTRO")]
+    syl = build_minimal_syl(project, 12000)
+    key = list(bytes.fromhex(DEFAULT_MERISH_SYL_KEY))
+    lyrics = _decode_variable_section_observed(_raw_proprietary_section_body(syl, "LYRICS"), key, section="LYRICS")
+    chords = _decode_variable_section_observed(_raw_proprietary_section_body(syl, "CHORDS"), key, section="CHORDS")
+    markers = _decode_miditk_observed(_raw_proprietary_section_body(syl, "MIDITK"), key)
+    assert lyrics["validated"] and chords["validated"] and markers["validated"]
+    assert [(x["text"], round(x["time_ms"])) for x in markers["markers"]] == [("INTRO", 2000)]
+
+
+@pytest.mark.parametrize('target,profile', [('MTA8', 'merish5_xynthia2_experimental'), ('MTA16', 'merish5_plus_mta16')])
+@pytest.mark.skipif(__import__('shutil').which('ffmpeg') is None, reason='FFmpeg required')
+def test_mixed_lyrics_export_default_metadata_and_keep_markers(tmp_path, monkeypatch, target, profile):
+    import subprocess
+    from app import storage
+    from app.codec import export_mta, ffprobe
+    from app.models import Clip, LyricWord, Track
+    from app.mta_reverse import _decode_miditk_observed, _raw_proprietary_section_body, _scan_matroska_filedata, deobfuscate_media_copy
+
+    monkeypatch.setattr(storage, 'ROOT', tmp_path.resolve())
+    project = storage.create_project('Mixed lyrics', target=target)
+    project.lyrics = [LyricLine(time_ms=0, text='CIAO', words=[LyricWord(start_ms=0, end_ms=1000, text='CIAO')]),
+                      LyricLine(time_ms=2000, text='TEST')]
+    project.chords = [Chord(time_ms=0, chord='C'), Chord(time_ms=2000, chord='G')]
+    project.markers = [Marker(time_ms=1000, label='INTRO')]
+    source = storage.audio_path(project.id, 'tone.wav')
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', 'sine=duration=4', str(source)], check=True)
+    project.tracks = [Track(id='t', name='Tone', type='other', filename=source.name, duration_ms=4000,
+                            clips=[Clip(id='c', source_end_ms=4000)])]
+    original = project.model_dump(mode='json')
+    output = tmp_path / 'output.mta'
+    export_mta(project, output, profile=profile)
+    canonical = tmp_path / 'output.mka'
+    deobfuscate_media_copy(output, canonical)
+    attachments = [s for s in ffprobe(canonical)['streams'] if s.get('codec_type') == 'attachment']
+    blobs = _scan_matroska_filedata(canonical, [s['extradata_size'] for s in attachments])
+    syls = [blob for blob in blobs if blob.startswith(b'ID3')]
+    assert len(syls) == 2
+    for syl in syls:
+        assert _raw_proprietary_section_body(syl, 'LYRICS')
+        assert _raw_proprietary_section_body(syl, 'CHORDS')
+        assert _raw_proprietary_section_body(syl, 'COLORS') is None
+        markers = _decode_miditk_observed(_raw_proprietary_section_body(syl, 'MIDITK'), list(bytes.fromhex(DEFAULT_MERISH_SYL_KEY)))
+        assert [(x['text'], round(x['time_ms'])) for x in markers['markers']] == [('INTRO', 1000)]
+    assert project.model_dump(mode='json') == original
 
 
 def test_generated_metadata_is_user_specific_and_not_a_template():
@@ -106,7 +164,9 @@ def test_marker_export_allows_nonfixed_tempo_with_absolute_times(mode):
     assert decoded["validated"] and [(e["text"], round(e["time_ms"])) for e in decoded["markers"]] == [("INTRO", 2000)]
 
 
-def test_marker_export_requires_key_and_rejects_mixed_lyric_timings():
+def test_marker_export_requires_key_and_falls_back_for_mixed_lyric_timings():
+    from app.mta_reverse import _decode_miditk_observed, _raw_proprietary_section_body
+
     project = _granular_project()
     project.markers = [Marker(time_ms=2000, label="INTRO")]
     project.merish_syl_key = ""
@@ -114,8 +174,13 @@ def test_marker_export_requires_key_and_rejects_mixed_lyric_timings():
         validate_audio_only(project)
     project.merish_syl_key = bytes(range(256)).hex()
     project.lyrics[0].words = []
-    with pytest.raises(ValueError, match="tutte le righe"):
-        build_minimal_syl(project, 12000)
+    original = project.model_dump(mode="json")
+    syl = build_minimal_syl(project, 12000)
+    assert _raw_proprietary_section_body(syl, "LYRICS") is not None
+    assert _raw_proprietary_section_body(syl, "COLORS") is None
+    markers = _decode_miditk_observed(_raw_proprietary_section_body(syl, "MIDITK"), list(bytes(range(256))))
+    assert [(x["text"], round(x["time_ms"])) for x in markers["markers"]] == [("INTRO", 2000)]
+    assert project.model_dump(mode="json") == original
 
 
 def test_marker_export_accepts_whole_line_lyrics_without_colors():
@@ -211,7 +276,7 @@ def test_colors_preserve_minutes_and_centisecond_boundaries():
     assert actual[62000] == 127 and actual[63600] == 5 and actual[65000] == 11
 
 
-@pytest.mark.parametrize("case,match", [("mixed", "tutte le righe"), ("mismatch", "non corrispondenti"),
+@pytest.mark.parametrize("case,match", [("mismatch", "non corrispondenti"),
                                         ("overlap", "sovrapposti"), ("long", "99 caratteri"),
                                         ("syllables", "sillabe non corrispondenti"), ("short", "2,56"),
                                         ("missing", "parole sincronizzate mancanti"), ("fast", "tempi delle parole")])
@@ -219,7 +284,6 @@ def test_granular_export_rejects_invalid_timelines(case, match):
     from app.models import LyricSyllable
 
     project = _granular_project("character")
-    if case == "mixed": project.lyrics[1].words = []
     if case == "mismatch": project.lyrics[0].words[0].text = "ALTRO"
     if case == "overlap": project.lyrics[0].words[1].start_ms = 800
     if case == "long": project.lyrics[0].text += "x" * 100
@@ -390,12 +454,12 @@ def test_extract_syl_key_requires_consistent_valid_synthetic_records():
 
 
 @pytest.mark.skipif(__import__('shutil').which('ffmpeg') is None, reason='FFmpeg required')
-def test_import_merish_metadata_from_uploaded_file_and_reject_conflict(tmp_path, monkeypatch):
+def test_import_merish_metadata_into_requesting_user_profile(tmp_path, monkeypatch):
     import asyncio
     import subprocess
 
-    from fastapi import HTTPException, UploadFile
-    from app import main
+    from fastapi import Response, UploadFile
+    from app import auth, main, mlive_profile
 
     key = bytes(range(256))
     syl = tmp_path / 'source.syl'
@@ -407,24 +471,13 @@ def test_import_merish_metadata_from_uploaded_file_and_reject_conflict(tmp_path,
                     '-attach', str(syl), '-metadata:s:t:0', 'mimetype=application/octet-stream',
                     '-attach', str(xml), '-metadata:s:t:1', 'mimetype=application/xml',
                     '-f', 'matroska', str(source)], check=True)
-    project = Project(id="test", title="Test", target="MTA16")
-    saved = []
-    def authorize(request, pid, *, owner_only=False):
-        assert owner_only and pid == project.id
-        return project
-    monkeypatch.setattr(main, '_project_for_actor', authorize)
-    monkeypatch.setattr(main, 'save_project', lambda value: saved.append(value.model_copy(deep=True)))
+    monkeypatch.setattr(auth, 'DATA_ROOT', tmp_path / 'auth')
+    monkeypatch.setattr(main, 'require_user', lambda request: {'id': 42})
     with source.open('rb') as file:
-        result = asyncio.run(main.import_merish_metadata(project.id, None, UploadFile(filename='test.mta', file=file)))
-    assert result['ok'] and saved[0].merish_user_id == '123456' and saved[0].merish_syl_key == key.hex()
-    project.merish_user_id = '654321'
-    with source.open('rb') as file, pytest.raises(HTTPException) as exc:
-        asyncio.run(main.import_merish_metadata(project.id, None, UploadFile(filename='test.mta', file=file)))
-    assert exc.value.status_code == 409 and len(saved) == 1
-    project.merish_user_id = '068336'
-    with source.open('rb') as file, pytest.raises(HTTPException) as exc:
-        asyncio.run(main.import_merish_metadata(project.id, None, UploadFile(filename='test.mta', file=file)))
-    assert exc.value.status_code == 409 and len(saved) == 1
+        result = asyncio.run(main.import_mlive_profile(None, Response(), UploadFile(filename='test.mta', file=file)))
+    assert result == {'merish_user_id': '123456', 'merish_syl_key': key.hex()}
+    assert mlive_profile.get(42) == result
+    assert mlive_profile.get(43)['merish_user_id'] == '068336'
 
 
 @pytest.mark.parametrize('target,profile,mode', [
