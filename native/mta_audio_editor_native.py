@@ -534,7 +534,7 @@ class NativeApi:
         import webview
 
         ext = str(extension or "").lower().lstrip(".")
-        if ext not in {"mta", "mta8", "mta16", "wav", "mp3", "flac", "pdf", "txt", "cho", "zip", "mp4"}:
+        if ext not in {"mta", "mta8", "mta16", "wav", "mp3", "flac", "pdf", "txt", "cho", "json", "zip", "mp4"}:
             raise ValueError("unsupported export extension")
         safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
         if not safe_name:
@@ -553,6 +553,7 @@ class NativeApi:
             "pdf": "PDF Document (*.pdf)",
             "txt": "Text File (*.txt)",
             "cho": "ChordPro (*.cho)",
+            "json": "JSON (*.json)",
         }
         chosen = self._file_dialog(
             webview.FileDialog.SAVE,
@@ -596,7 +597,7 @@ class NativeApi:
     def save_generated_file_to_path(self, path: str, data_base64: str) -> dict:
         """Persist bytes to a destination returned by choose_export_save_path()."""
         target = Path(str(path or "")).expanduser().resolve()
-        if target.suffix.lower().lstrip(".") not in {"wav", "mp3", "flac", "pdf", "txt", "cho", "mta", "mta8", "mta16"}:
+        if target.suffix.lower().lstrip(".") not in {"wav", "mp3", "flac", "pdf", "txt", "cho", "json", "mta", "mta8", "mta16"}:
             raise ValueError("unsupported generated-file extension")
         return self._write_generated_file_to_path(str(target), data_base64)
 

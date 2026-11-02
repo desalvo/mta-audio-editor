@@ -23,12 +23,29 @@ def test_generated_metadata_is_user_specific_and_not_a_template():
     parsed = ET.fromstring(xml.rstrip(b"\0"))
     assert parsed.findtext("Identity/UserId") == "123456"
     assert parsed.findtext("General/DurataSec") == "10"
-    assert parsed.findtext("General/PreCntUSec") == "2000000"
+    assert parsed.findtext("General/PreCntUSec") == "0"
     assert parsed.findtext("TrkAudio/Track/Nome") == "Click & time"
     assert len(parsed.findall("TrkAudio/Track")) == 2
     syl = build_minimal_syl(project, 10448)
     assert syl.startswith(b"ID3\x03\x00\x00") and b"Test & title" in syl
     assert b"LYRICSBEGIN" not in syl
+
+
+@pytest.mark.parametrize('target,count', [('MTA8', 8), ('MTA16', 9)])
+@pytest.mark.parametrize('content', ['audio', 'lyrics_chords', 'markers', 'combined'])
+def test_merish_precount_is_zero_with_or_without_annotations(target, count, content):
+    project = _project()
+    project.target = target
+    project.merish_syl_key = bytes(range(256)).hex()
+    if content in ('lyrics_chords', 'combined'):
+        project.lyrics = [LyricLine(time_ms=1000, text='TEST')]
+        project.chords = [Chord(time_ms=1000, chord='C')]
+    if content in ('markers', 'combined'):
+        project.markers = [Marker(time_ms=2000, label='INTRO')]
+    slots = [MtaSlotMapping(slot=i, name=f'Track {i}', type='other', track_ids=[f't{i}'])
+             for i in range(1, count + 1)]
+    xml = ET.fromstring(build_settings_xml(project, slots, 12000).rstrip(b'\0'))
+    assert xml.findtext('General/PreCntUSec') == '0'
 
 
 def test_device_track_roles_use_observed_names():
@@ -147,6 +164,25 @@ def test_granular_colors_match_verified_word_and_character_patterns(mode, expect
     assert result["validated"] and result["normal_event_count"] == 256
     actual = {x["time_ms"]: x["highlight_position"] for x in result["events"]}
     assert {t: actual[t] for t in expected} == expected
+
+
+@pytest.mark.parametrize("mode", ["word", "character"])
+@pytest.mark.parametrize("duration_ms", [12000, 70000, 256 * 60000 + 1000])
+def test_granular_colors_terminate_at_audio_end_with_correct_minute(mode, duration_ms):
+    from app.mta_reverse import _decode_colors_observed, _raw_proprietary_section_body
+
+    body = _raw_proprietary_section_body(build_minimal_syl(_granular_project(mode), duration_ms), "COLORS")
+    result = _decode_colors_observed(body)
+    assert result["validated"]
+    last_normal = result["events"][-1]
+    expected_end = min(duration_ms - 1, 256 * 60000 - 1)
+    assert last_normal["next_minute_block"] == expected_end // 60000
+    index = result["normal_event_count"]
+    cipher = bytes.fromhex(result["terminal_record_hex"])
+    plain = bytes(value ^ ((index - 17 * j) % 256) ^ 10 for j, value in enumerate(cipher))
+    centiseconds = plain[1] * 1000 + plain[2] * 100 + plain[4] * 10 + plain[5]
+    assert last_normal["next_minute_block"] * 60000 + centiseconds * 10 == expected_end // 10 * 10
+    assert plain[7:] == b"\x00\x00\x00=:0=:"
 
 
 def test_character_highlighting_uses_syllable_timing():

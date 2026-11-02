@@ -40,7 +40,7 @@ def infer(kind,source,options=None,*,cancel_check=None,raw=False):
     with tempfile.TemporaryDirectory(prefix='mta-server-input-') as folder:
         wav=Path(folder)/'input.wav'
         prepared=run_supervised_process(['ffmpeg','-nostdin','-y','-v','error','-i',str(source),
-            '-fs',str(MAX_SOURCE_BYTES+1),'-acodec','pcm_s16le',str(wav)],cwd=folder,
+            '-fs',str(MAX_SOURCE_BYTES+1),'-ar','44100','-ac','2','-acodec','pcm_s16le',str(wav)],cwd=folder,
             timeout_seconds=budget,cancel_check=cancelled)
         if prepared.exit_code or time.monotonic()-started>=budget:
             raise RuntimeError('AI source preparation failed or timed out')

@@ -182,6 +182,21 @@ def chord_engine_available(engine_id: str) -> bool:
         from .chord_ml import engine_available
         return engine_available(engine_id)
     if engine_id in {"madmom-deep-chroma", "madmom-cnn-crf"}:
+        # Web service and inference can use separate virtual environments.
+        # Check the actual registered worker interpreter, not just the web venv.
+        if os.getenv('MTA_AI_UNIFIED_WORKERS_ENABLED') == 'true':
+            from .ai_worker_registry import resolve_worker, worker_python
+            if resolve_worker('chords-ml') is not None:
+                import subprocess
+                try:
+                    result = subprocess.run([worker_python('chords-ml'), '-I', '-c',
+                        'import importlib.util as u; assert u.find_spec("madmom_infer.features.chords") and u.find_spec("madmom_infer.audio.chroma")'],
+                        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10, check=False)
+                    return result.returncode == 0
+                except (OSError, ValueError, subprocess.SubprocessError):
+                    return False
+            if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+                return False
         # Check the actual lazily-imported modules, not only the top-level package.
         # This keeps frozen/native builds from advertising an engine whose PyInstaller
         # bundle is missing the chord recogniser modules.

@@ -89,7 +89,7 @@ def test_text_music_worker_updates_project_for_lyrics_and_chords(monkeypatch, tm
     monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
     from app.models import Chord, LyricLine, Project, Track
 
-    source = tmp_path / "voice.wav"; source.write_bytes(b"x")
+    source = tmp_path / "voice.wav"; _triad_wav(source, 1)
     project = Project(id="p1", title="Song", target="DAW", tracks=[Track(id="t1", name="Voice", filename="voice.wav", duration_ms=1000)])
     saved = []
     monkeypatch.setattr(main, "load_project", lambda pid: project)
@@ -119,6 +119,7 @@ def test_text_music_worker_failure_is_reported(monkeypatch, tmp_path):
     monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
     from app.models import Project, Track
     project = Project(id="p2", title="Song", target="DAW", tracks=[Track(id="t2", name="Voice", filename="x.wav", duration_ms=100)])
+    _triad_wav(tmp_path / "x.wav", .1)
     monkeypatch.setattr(main, "load_project", lambda pid: project)
     monkeypatch.setattr(main, "audio_path", lambda pid, filename: tmp_path / filename)
     monkeypatch.setattr(main, "extract_lyrics", lambda path: (_ for _ in ()).throw(RuntimeError("boom")))

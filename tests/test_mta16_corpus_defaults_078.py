@@ -24,5 +24,5 @@ def test_export_plan_exposes_default_roles_without_forcing_manual_mapping():
     assert '"requires_explicit_click_mapping": False' in MAIN
 
 def test_ui_explains_corpus_default():
-    assert "MTA16 M-Live · default corpus (Click 1, Melody 9)" in JS
+    assert "Merish5+ PLUS · MTA16 sperimentale" in JS
     assert "Default MTA16:" in JS

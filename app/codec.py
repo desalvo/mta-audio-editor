@@ -420,6 +420,8 @@ def _normalize_mta_slots(paths: list[Path], target_db: float, directory: Path) -
 def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None, profile: str | None = None, *, normalize_peak_db: float | None = None) -> Path:
     if normalize_peak_db is not None and any(insert.enabled for insert in project.master_inserts):
         raise ValueError("MTA proportional normalization cannot reproduce active master inserts; bypass them before export")
+    if any(insert.enabled for insert in project.master_inserts):
+        raise ValueError("MTA multitrack cannot reproduce active master inserts independently on each slot; bypass them before export")
     effective_profile = resolve_mta_device_profile(project, profile)
     experimental_merish = effective_profile in {"merish5_plus_mta16", "merish5_xynthia2_experimental"}
     if experimental_merish:
@@ -494,7 +496,7 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
                 pan = min(1.0, max(-1.0, t.pan))
                 filters.append(f"[{idx}:a]aformat=channel_layouts=stereo,volume={gain:.3f}dB,stereotools=balance_out={pan:.4f}[s{idx}]")
                 labels.append(f"[s{idx}]")
-            transform = master_fade_filter(project) + "," + project_time_pitch_filter(project)
+            transform = f"volume={project.master_volume_db:.3f}dB," + master_fade_filter(project) + "," + project_time_pitch_filter(project)
             if len(labels) == 1:
                 filters.append(f"{labels[0]}{transform}[out]")
             else:

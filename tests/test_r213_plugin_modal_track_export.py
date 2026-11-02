@@ -25,14 +25,14 @@ def test_native_bridge_can_write_preselected_generated_audio_path():
     native = Path("native/mta_audio_editor_native.py").read_text()
     js = Path("app/static/app.js").read_text()
     assert "def save_generated_file_to_path(self, path: str, data_base64: str) -> dict:" in native
-    assert '{"wav", "mp3", "flac", "pdf", "txt", "cho", "mta", "mta8", "mta16"}' in native
+    assert '{"wav", "mp3", "flac", "pdf", "txt", "cho", "json", "mta", "mta8", "mta16"}' in native
     assert "async function saveGeneratedBlobToNativePath(blob,path)" in js
     assert "save_generated_file_to_path(path,dataUrl)" in js
 
 
 def test_browser_generated_audio_uses_save_picker_when_available():
     js = Path("app/static/app.js").read_text()
-    assert "const saveableExts=['pdf','txt','cho','wav','mp3','flac'];" in js
+    assert "const saveableExts=['pdf','txt','cho','json','wav','mp3','flac'];" in js
     assert "wav:'WAV Audio',mp3:'MP3 Audio',flac:'FLAC Audio'" in js
 
 

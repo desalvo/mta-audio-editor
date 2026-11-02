@@ -3460,19 +3460,23 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
         track = next((item for item in project.tracks if item.id == track_id), None)
         if track is None:
             raise ValueError("track not found")
+        analysis_ignored = {'name', 'type', 'mta_slot', 'volume_db', 'pan', 'mute', 'solo', 'color', 'waveform_peaks', 'waveform_revision', 'height_px', 'delay_unit'}
+        analysis_track_snapshot = track.model_dump(mode='json', exclude=analysis_ignored)
         source = audio_path(pid, track.filename)
         range_mode = range_start_ms is not None and range_end_ms is not None and int(range_end_ms) > int(range_start_ms)
-        if range_mode and kind in {"lyrics", "chords"}:
-            _media_job_update(job_id, status="running", progress=2, message="Preparazione intervallo selezionato")
+        if kind in {"lyrics", "chords"}:
+            _media_job_update(job_id, status="running", progress=2, message="Preparazione audio della timeline")
             tmp_dir = Path(tempfile.mkdtemp(prefix=f"mta-{kind}-range-"))
-            rendered = tmp_dir / "track.wav"
-            clipped = tmp_dir / "range.wav"
-            render_track(track, source, rendered, apply_inserts=True, sample_rate=int(getattr(project,"sample_rate",44100) or 44100),host_project=project)
-            start_s=max(0,int(range_start_ms))/1000.0
-            duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)
-            subprocess.run(["ffmpeg","-y","-v","error","-ss",f"{start_s:.6f}","-t",f"{duration_s:.6f}","-i",str(rendered),"-vn","-acodec","pcm_s16le",str(clipped)],check=True)
-            source = clipped
             range_tmp = tmp_dir
+            rendered = tmp_dir / "track.wav"
+            render_track(track.model_copy(deep=True), source, rendered, apply_inserts=True, sample_rate=int(getattr(project,"sample_rate",44100) or 44100),host_project=project)
+            source = rendered
+            if range_mode:
+                clipped = tmp_dir / "range.wav"
+                start_s=max(0,int(range_start_ms))/1000.0
+                duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)
+                subprocess.run(["ffmpeg","-y","-v","error","-ss",f"{start_s:.6f}","-t",f"{duration_s:.6f}","-i",str(rendered),"-vn","-acodec","pcm_s16le",str(clipped)],check=True)
+                source = clipped
         _media_job_update(job_id, status="running", progress=3, message="Preparazione analisi e verifica sorgente")
         if kind == "lyrics":
             selected_model=model_or_engine or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"]
@@ -3503,13 +3507,16 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Lyrics extraction cancelled")
             _media_job_update(job_id, progress=96, message="Sincronizzazione lyrics sulla timeline")
-            mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else map_source_events_to_timeline(track, events)
+            mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else events
             # AI inference stays outside the project lock. Refuse to overwrite
             # annotations that changed while the expensive job was running.
             with project_publication_lock(pid):
                 latest = load_project(pid)
                 if latest.lyrics != project.lyrics:
                     raise RuntimeError("lyrics changed during analysis; result not published")
+                latest_track = next((item for item in latest.tracks if item.id == track_id), None)
+                if latest_track is None or latest_track.model_dump(mode='json', exclude=analysis_ignored) != analysis_track_snapshot:
+                    raise RuntimeError("track changed during analysis; result not published")
                 latest.lyrics = _replace_timed_range(latest.lyrics, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
                 latest.lyrics_engine = "OpenAI Whisper"
                 latest.lyrics_model = selected_model
@@ -3534,7 +3541,7 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 # intermediate chords that disappear in the final full-pass result.
                 _media_job_update(job_id,progress=pct,message=message,partial={"kind":"chords","items":[]})
             if _ai_external_engine('chords-ml'):
-                payload,remote_id = _native_remote_infer('chords-ml',source,{'engine':selected_engine, 'options':chord_options or {}, 'bpm':project.bpm, 'beat_origin_ms':getattr(project,'beat_origin_ms',0)})
+                payload,remote_id = _native_remote_infer('chords-ml',source,{'engine':selected_engine, 'options':chord_options or {}, 'bpm':project.bpm, 'beat_origin_ms':int(getattr(project,'beat_origin_ms',0) or 0)-(int(range_start_ms) if range_mode else 0)})
                 from .models import Chord
                 doc = payload['json'].get('chords.json')
                 if not isinstance(doc,dict) or not isinstance(doc.get('chords'),list):
@@ -3550,18 +3557,21 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                     source,engine=selected_engine,progress=chords_progress,
                     cancelled=(lambda: bool(cancel_event and cancel_event.is_set())),
                     options=chord_options, bpm=float(project.bpm or 120.0),
-                    beat_origin_ms=(-int(getattr(track, "delay_ms", 0) or 0)),
+                    beat_origin_ms=int(getattr(project, "beat_origin_ms", 0) or 0)-(int(range_start_ms) if range_mode else 0),
                 )
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Chord extraction cancelled")
             _media_job_update(job_id, progress=96, message="Sincronizzazione chords sulla timeline")
-            mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else map_source_events_to_timeline(track, events)
+            mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else events
             # AI inference stays outside the project lock. Refuse to overwrite
             # annotations that changed while the expensive job was running.
             with project_publication_lock(pid):
                 latest = load_project(pid)
                 if latest.chords != project.chords:
                     raise RuntimeError("chords changed during analysis; result not published")
+                latest_track = next((item for item in latest.tracks if item.id == track_id), None)
+                if latest_track is None or latest_track.model_dump(mode='json', exclude=analysis_ignored) != analysis_track_snapshot:
+                    raise RuntimeError("track changed during analysis; result not published")
                 latest.chords = _replace_timed_range(latest.chords, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
                 latest.chords_engine = selected_engine
                 latest.chords_model = selected_model
@@ -5194,7 +5204,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     "piano": "keyboards",
                     "vocals": "melody",
                     "lead_vocals": "melody",
-                    "backing_vocals": "melody",
+                    "backing_vocals": "choirs",
                     "percussions": "drums",
                     "drums_without_percussions": "drums",
                     "kick": "drums", "snare": "drums", "toms": "drums", "cymbals": "drums",

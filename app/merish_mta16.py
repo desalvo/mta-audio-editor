@@ -181,7 +181,8 @@ def _colors_section(project: Project, duration_ms: int, key: bytes) -> bytes:
         prepared.append(prepared_words)
     if last_word_end >= 256 * 60_000:
         raise ValueError("Merish MTA: gli eventi testuali devono trovarsi entro 256 minuti")
-    until = min((duration_ms - 1) // 10 * 10, max(10240, last_word_end + 1240))
+    end_time = min(duration_ms - 1, 256 * 60_000 - 1)
+    until = min(end_time // 10 * 10, max(10240, last_word_end + 1240))
     interval = max(10, min(40, ((duration_ms - 10) // 255 // 10) * 10))
     interval = max(interval, math.ceil(until / 5000 / 10) * 10)
     times = set(range(0, until, interval))
@@ -215,10 +216,9 @@ def _colors_section(project: Project, duration_ms: int, key: bytes) -> bytes:
                             break
                 break
         digits = bytes(int(x) for x in f"{position:03d}")
-        next_minute = times[index + 1] // 60_000 if index + 1 < len(times) else time_ms // 60_000
+        next_minute = times[index + 1] // 60_000 if index + 1 < len(times) else end_time // 60_000
         plain = _event_stamp(time_ms) + digits + b"=:k\x00" + bytes((next_minute,))
         records.append(bytes(value ^ key[(index - 17 * j) % 256] ^ 10 for j, value in enumerate(plain)))
-    end_time = min(duration_ms - 1, times[-1] + 40, 256 * 60_000 - 1)
     terminal = _event_stamp(end_time) + b"\x00\x00\x00=:0=:"
     index = len(records)
     records.append(bytes(value ^ key[(index - 17 * j) % 256] ^ 10 for j, value in enumerate(terminal)))
@@ -382,9 +382,11 @@ def build_settings_xml(project: Project, slots: list[MtaSlotMapping], duration_m
     for key, value in (("UserId", project.merish_user_id), ("AProId", "0")):
         ET.SubElement(identity, key).text = value
     general = ET.SubElement(root, "General")
-    has_markers = any(not x.disabled and not x.deleted for x in project.markers)
+    # Merish5+ skipped approximately four seconds on the otherwise identical
+    # 2,000,000-us probe. Zero preserved the complete audio from the beginning.
+    # The project's generated click/pre-roll is already carried as audio.
     for key, value in (("BaseKey", "26"), ("BaseBpm", str(round(project.bpm))),
-                       ("DurataSec", str(max(1, duration_ms // 1000))), ("PreCntUSec", "0" if has_markers else "2000000")):
+                       ("DurataSec", str(max(1, duration_ms // 1000))), ("PreCntUSec", "0")):
         ET.SubElement(general, key).text = value
     ET.SubElement(root, "TrkVideo")
     tracks = ET.SubElement(root, "TrkAudio")
