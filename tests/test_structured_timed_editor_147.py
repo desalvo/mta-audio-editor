@@ -24,7 +24,8 @@ def test_timed_editor_supports_add_remove_sort_and_time_formats():
 
 
 def test_edited_lyrics_invalidate_stale_word_timing_only_when_changed():
-    assert "item.words=prev.words||[]" in JS
+    assert "JSON.parse(JSON.stringify(prev.words||[]))" in JS
+    assert "item.words=words}else item.words=[]" in JS
     assert "else if(kind==='lyrics')item.words=[]" in JS
 
 

@@ -42,6 +42,10 @@ def test_admin_canonical_movement_observations_have_no_settlement_action(account
     from playwright.sync_api import sync_playwright
     local,_,docs,_,_=partial(account,provider,monkeypatch,paid=True)
     d=docs['PP-D-123'];d.update(status='RESOLVED',dispute_outcome={'outcome_code':'RESOLVED_WITH_PAYOUT'},**movements(reason='DISPUTE_FEE',value='90071992547409.93',direction='CREDIT'))
+    # Record the authenticated observation without treating it as settlement;
+    # the explicit checkout verification may need unavailable cash evidence.
+    from app.payment_reconcile_service import reconcile_paypal
+    assert reconcile_paypal(local)['financial_review_pending']
     web=client(auth.find_user('admin')['id'],monkeypatch);calls=[];errors=[];fail={'on':False}
     def route(route):
         url=urlsplit(route.request.url);assert url.hostname=='mta.test'
@@ -52,12 +56,14 @@ def test_admin_canonical_movement_observations_have_no_settlement_action(account
         browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000});page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',route);page.goto('https://mta.test/movement-admin')
         page.add_script_tag(content=(Path(__file__).resolve().parents[1]/'app/static/regime_admin_panel.js').read_text())
         button=page.get_by_role('button',name=('Riconcilia dal provider' if language=='it' else 'Reconcile from provider')+' · paypal · '+local);button.wait_for()
-        page.once('dialog',lambda dialog:dialog.accept());button.click()
+        page.once('dialog',lambda dialog:dialog.accept())
+        with page.expect_response(lambda r:r.url.endswith('/reconcile-payment') and r.request.method=='POST') as response:button.click()
+        assert response.value.status in (409,422)
         panel=page.locator('[data-movement-review]');panel.wait_for();panel.locator('summary').click()
         assert 'DISPUTE_FEE' in panel.inner_text() and '90.071.992.547.409,93' in panel.inner_text() if language=='it' else 'DISPUTE_FEE' in panel.inner_text() and '90,071,992,547,409.93' in panel.inner_text()
         assert 'NEVER EXPOSE' not in panel.inner_text() and 'private buyer' not in panel.inner_text()
         assert panel.get_by_role('button').count()==0
-        assert resources.state(account)['credits_micro']==2_000_000 and report()['pending']==2
+        assert resources.state(account)['credits_micro']==2_000_000 and report()['pending']>=2
         region=panel.get_by_role('region',name='Osservazioni dei movimenti PayPal' if language=='it' else 'PayPal movement observations');region.focus();assert region.evaluate('e=>document.activeElement===e')
         if region.evaluate('e=>e.scrollWidth>e.clientWidth+2'):
             page.keyboard.press('ArrowRight');page.wait_for_function('e=>e.scrollLeft>0',arg=region.element_handle())

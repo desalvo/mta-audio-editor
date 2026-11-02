@@ -58,14 +58,14 @@ async function web(){
  c.goToTimestamp(12000);assert.equal(c.waStartCursorMs,12000);assert.equal(c.playCursorMs,12000);cases.push('WebAudio paused seek updates clock anchor');
  c.waPlaybackPaused=false;c.goToTimestamp(17000);assert.equal(c.scheduled,17000);cases.push('WebAudio running seek schedules requested offset');
  const nodes={};c.$=s=>nodes[s]||null;c.$$=()=>[];c.followPlayhead=()=>{};
- const pane=nodes['#timelinePane']={scrollLeft:100,getBoundingClientRect:()=>({left:10})},lanes=nodes['#lanes']={addEventListener:()=>{}},ruler=nodes['#ruler']={};
+ const pane=nodes['#timelinePane']={scrollLeft:100,getBoundingClientRect:()=>({left:10}),focus:()=>{}},lanes=nodes['#lanes']={addEventListener:()=>{}},ruler=nodes['#ruler']={};
  c.rememberSampleRange=()=>{};c.selectedTimelineSegments=new Set();c.paintSegmentSelection=()=>{};c.updateSel=()=>{};c.timelineTool='select';c.pxPerSec=100;c.sel={a:0,b:0};c.splitSelectedTracksAt=()=>{};c.dragging=false;
  vm.runInContext(part(source,'function bindTimeline(){','function updateSel()'),c);c.bindTimeline();
  const event={button:0,clientX:410,preventDefault:()=>{}};lanes.onmousedown(event);assert.equal(c.scheduled,5000);ruler.onclick({...event,clientX:610});assert.equal(c.scheduled,7000);
  c.timelineTool='range';lanes.onmousedown({...event,clientX:810});c.onmouseup(event);assert.equal(c.scheduled,9000);cases.push('timeline Select, Range and ruler clicks seek the audio engine');
  vm.runInContext(part(source.slice(source.lastIndexOf('function seekTransport(deltaMs)')),'function seekTransport(deltaMs)','async function previewMaster()'),c);c.seekTransport(1000);assert.equal(c.scheduled,10000);c.goTransportStart();assert.equal(c.scheduled,0);c.current.musical_origin_ms=2500;c.goTransportStart();assert.equal(c.scheduled,2500);delete c.current.musical_origin_ms;cases.push('arrow and start commands seek zero or musical origin through manual-position path');
  const clip={id:'c',timeline_start_ms:0,source_start_ms:0,source_end_ms:30000},track={id:'t',clips:[clip]};
- c.trackById=()=>track;c.selectedSegmentItems=()=>[{track,clip}];c.MtaTimelineRules={key:()=> 't:c',delta:(_p,_s,wanted)=>wanted};c.CSS={escape:s=>s};c.cancelTrackContextLongPress=()=>{};c.focusTrackShortcuts=()=>{};c.drawWave=()=>{};
+ c.trackById=()=>track;c.selectedSegmentItems=()=>[{track,clip}];c.MtaTimelineRules={key:()=> 't:c',delta:(_p,_s,wanted)=>wanted};c.CSS={escape:s=>s};c.cancelTrackContextLongPress=()=>{};c.refreshSelectedTrackInspector=()=>{};c.drawWave=()=>{};
  c.document={body:{classList:{add:()=>{},remove:()=>{}}},querySelector:()=>null};c.removeEventListener=(name,fn)=>{if(c.events.get(name)===fn)c.events.delete(name)};c.moveSelectedSegments=()=>{c.moved=true};c.timelineTool='select';c.selectedTimelineSegments.clear();
  vm.runInContext(part(source,'function beginTimelineClipDrag(','function refreshTimelineToolControls('),c);
  const pointer={...event,pointerId:1,stopPropagation:()=>{}};c.beginTimelineClipDrag(pointer,'t','c');c.events.get('pointerup')(pointer);assert.equal(c.scheduled,5000);

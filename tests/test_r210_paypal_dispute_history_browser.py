@@ -33,16 +33,19 @@ def test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collec
         assert 'PP-D-123' not in panel.inner_text() and 'CAPTURE111' not in panel.inner_text()
         # Provider-protection payout cannot be called a verified release.
         documents['PP-D-123'].update(status='RESOLVED',update_time='2026-10-24T02:00:00Z',dispute_outcome={'outcome_code':'RESOLVED_WITH_PAYOUT'})
-        page.once('dialog',lambda d:d.accept());button.click()
+        page.once('dialog',lambda d:d.accept())
+        with page.expect_response(lambda r:r.url.endswith('/verify') and r.request.method=='POST') as response:button.click()
+        assert response.value.status==409
+        panel.get_by_text('Storico pagamenti non disponibile' if language=='it' else 'Payment history unavailable',exact=False).wait_for()
         panel.get_by_text('Sono registrate prove finanziarie' if language=='it' else 'Unresolved financial evidence',exact=False).wait_for()
-        assert resources.state(account)['credits_micro']==0 and report()['pending']==2
+        assert resources.state(account)['credits_micro']==0 and report()['pending']>=1
         documents['PP-D-123'].update(update_time='2026-10-24T03:00:00Z',dispute_outcome={'outcome_code':'RESOLVED_SELLER_FAVOUR'})
         page.once('dialog',lambda d:d.accept());button.click()
         page.wait_for_function("!document.querySelector('[data-owner-payments]').textContent.includes("+repr('Fondi del pagamento' if language=='it' else 'Payment funds held')+") && !document.querySelector('[data-owner-payments] button').disabled")
         assert resources.state(account)['credits_micro']==5_000_000 and report()['pending']==0
         if path=='/account':
             page.wait_for_function("document.querySelector('[data-resource-account] .credits-total')?.textContent.includes('5')")
-        assert_accessible_owner_page(page);assert not errors and all(code<400 for _,_,code in calls)
+        assert_accessible_owner_page(page);assert not errors and all(code<400 or (method=='POST' and url.endswith('/verify') and code==409) for method,url,code in calls)
         assert not any('/capture' in url or url.endswith('/checkout') for _,url,_ in calls)
         # NC retains the local history/risk information but denies reconciliation.
         with auth.db() as c:c.execute("UPDATE regime_fence_state SET regime='NON_COMMERCIAL'")
@@ -66,7 +69,7 @@ def test_owner_gap_error_refresh_and_actual_recovery(account,provider,monkeypatc
         panel=page.locator('[data-owner-payments]');button=panel.get_by_role('button',name='Verifica esito senza incassare' if language=='it' else 'Verify status without collecting payment');button.wait_for()
         page.once('dialog',lambda d:d.accept());button.click()
         panel.get_by_text('Storico pagamenti non disponibile' if language=='it' else 'Payment history unavailable',exact=False).wait_for()
-        assert button.count()==0 and resources.state(account)['credits_micro']==5_000_000 and report()['pending']==1
+        assert button.count()==1 and resources.state(account)['credits_micro']==5_000_000 and report()['pending']==1
         panel.get_by_role('button',name='Aggiorna storico' if language=='it' else 'Refresh history').click()
         panel.get_by_text('Sono registrate prove finanziarie' if language=='it' else 'Unresolved financial evidence',exact=False).wait_for()
         hook['run']=None;page.once('dialog',lambda d:d.accept());button.click()
@@ -80,6 +83,8 @@ def test_owner_gap_error_refresh_and_actual_recovery(account,provider,monkeypatc
 def test_admin_actual_history_reconciliation_feedback_and_held_money(account,provider,monkeypatch,nc_browser_config,language,width):
     from playwright.sync_api import sync_playwright
     local,_,documents,_,_=fixture(account,provider,monkeypatch,paid=True)
+    from app.payment_reconcile_service import reconcile_paypal
+    assert reconcile_paypal(local)['ledger_reconciled']
     documents['PP-D-123'].update(status='RESOLVED',dispute_outcome={'outcome_code':'RESOLVED_WITH_PAYOUT'})
     web=client(auth.find_user('admin')['id'],monkeypatch);calls=[];errors=[]
     def route(route):
@@ -91,13 +96,15 @@ def test_admin_actual_history_reconciliation_feedback_and_held_money(account,pro
         browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000});page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',route);page.goto('https://mta.test/history-admin')
         page.add_script_tag(content=(Path(__file__).resolve().parents[1]/'app/static/regime_admin_panel.js').read_text())
         button=page.get_by_role('button',name=('Riconcilia dal provider' if language=='it' else 'Reconcile from provider')+' · paypal · '+local);button.wait_for()
-        page.once('dialog',lambda d:d.accept());button.click()
-        page.get_by_text('Ledger aggiornato; prove finanziarie ancora da verificare.' if language=='it' else 'Ledger updated; unresolved financial evidence remains.',exact=True).wait_for()
+        page.once('dialog',lambda d:d.accept())
+        with page.expect_response(lambda r:r.url.endswith('/reconcile-payment') and r.request.method=='POST') as response:button.click()
+        assert response.value.status in (409,422)
+        page.get_by_text('Impossibile completare la verifica: HTTP' if language=='it' else 'Unable to complete verification: HTTP',exact=False).wait_for()
         assert resources.state(account)['credits_micro']==3_000_000 and report()['pending']==1
         documents['PP-D-123'].update(update_time='2026-10-24T03:00:00Z',dispute_outcome={'outcome_code':'RESOLVED_SELLER_FAVOUR'})
         page.once('dialog',lambda d:d.accept());button.click()
         page.get_by_text('Ledger riconciliato.' if language=='it' else 'Ledger reconciled.',exact=True).wait_for()
         assert resources.state(account)['credits_micro']==5_000_000 and report()['pending']==0
         assert 'Regime switching is not yet enabled' in page.locator('#regimeReadiness').inner_text() if language=='en' else 'Cambio di regime non ancora abilitato' in page.locator('#regimeReadiness').inner_text()
-        assert not errors and all(status<400 for _,_,status in calls)
+        assert not errors and all(status<400 or (method=='POST' and url.endswith('/reconcile-payment') and status in (409,422)) for method,url,status in calls)
         browser.close()

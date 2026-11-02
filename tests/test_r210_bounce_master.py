@@ -190,11 +190,12 @@ async function fetch(value){url=value;return {ok:true,async arrayBuffer(){return
 def test_context_menu_categories_keep_all_actions_and_shortcuts():
     from test_r210_decimal_bpm_shortcuts import function
     setup="""const assert=require('assert');let html='',selectedTrackId,selectedTrackIdSet=new Set(),current={tracks:[]},playCursorMs=0;
-const trackById=()=>({id:'t',type:'click'}),pluginInfo={stem_splitter:{available:true}},window={innerWidth:1000,innerHeight:800};
-function closeTrackContextMenu(){}function isGeneratedChordsTrack(){return false}function tr(en){return en}const $$=()=>[];
+const trackById=()=>({id:'t',type:'click'}),pluginInfo={stem_splitter:{available:true}},window={innerWidth:1000,innerHeight:800},timelineTool='select';let inspectorRefreshes=0;
+function closeTrackContextMenu(){}function refreshSelectedTrackInspector(){inspectorRefreshes++}function isGeneratedChordsTrack(){return false}function tr(en){return en}const $$=()=>[];
 const document={createElement(){return {setAttribute(){},addEventListener(){},focus(){},getBoundingClientRect(){return {width:200,height:300}},style:{},set innerHTML(value){html=value}}},body:{appendChild(){}}};
 """
     check="""openTrackContextMenuAt('t',900,700);
+assert.equal(inspectorRefreshes,1);
 assert.equal((html.match(/<details/g)||[]).length,4);
 for(const action of ['duplicateTrack','renameTrack','bounceToTrack','openTrackStemWorkflow','openAiRemixPanel','openSampleEditor','recalculateBpmFromTrack','openTextAnalysisChooser','extractMarkersFromTrack','openMetronomeSettings','refreshGeneratedTrackFromContext','openTrackDelayDialog','addTimelineChordAtPlayhead','addTimelineMarkerAtPlayhead','deleteSelection','deleteTracksByIds'])assert.ok(html.includes(action),action);
 assert.ok(html.includes('aria-keyshortcuts="B"'));

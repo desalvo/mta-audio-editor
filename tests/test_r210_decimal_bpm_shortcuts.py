@@ -195,7 +195,7 @@ persistMetronomeSettings().then(()=>{assert.deepEqual(events,['wait','save','nat
 def test_context_shortcut_presentation_and_decimal_transport_contract():
     assert '<kbd class="context-shortcut">R</kbd>' in JS and 'aria-keyshortcuts="r"' in JS
     assert 'focusTrackShortcuts(selectedTrackId,event)' in JS
-    assert 'focusTrackShortcuts(trackId)' in JS
+    assert "$('#timelinePane')?.focus({preventScroll:true})" in JS
     assert 'menu.focus({preventScroll:true})' in JS
     html=(ROOT/'app/templates/index.html').read_text()
     assert 'min="30" max="300" step="0.01"' in html
