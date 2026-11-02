@@ -1,6 +1,6 @@
 {
   "schema": "mta-remote-transport-review-1",
-  "date": "2026-10-29",
+  "date": "2026-11-02",
   "scope": "Explicit app-owned Python HTTP/client/openers and socket constructors. Opaque operator commands, native libraries and dynamic code are separate trust boundaries; this inventory never grants rights or proves a remote checkpoint.",
   "sites": [
     {
@@ -215,10 +215,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5716,
+      "line": 5779,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "f00a34a7415da214d40f74c33aa8179e734e0f3f2be2a6dc5b7bea5f09345580",
+      "source_sha256": "566df1da6e42c1de6ff8aa7c6432827920ffc1cd58af03174331783844d7d59a",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -475,5 +475,11 @@
     ],
     "boundary": "Exact original owner/merchant/admitted checkout plus stable complete canonical cases/captures/refunds and bounded balance-only cash, no caller amount or payout label authority. Cash claims and original ledger commit atomically, before any gross first funding becomes visible. No new transport, interpreter, inference, process, grant or automatic monetary retry.",
     "unchanged": "All checker bytes, AST call shapes, classifications, findings, thresholds and suppressions. Provider and browser target acceptance remain separate."
+  },
+  "timeline_media_review": {
+    "date": "2026-11-02",
+    "evidence": "docs/TIMELINE_MEDIA_R210.md",
+    "explicitly_reviewed_new_or_changed": 0,
+    "scope": "Local timeline/lyrics plus inherited media/profile boundaries; no RC, payment or hardware authorization."
   }
 }

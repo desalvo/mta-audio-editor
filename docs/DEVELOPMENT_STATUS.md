@@ -181,3 +181,11 @@ Implementati matching tempo/pitch a zona costante con riferimento e valori modif
 Selezione finale 156 passati, 0 skip, zero fallimenti/errori; Ruff e gate di revisione passano. Restano **A6,B6,C6,F4,F5,F6,G5,G6**; accesso SAM gated ancora da verificare sul server. Dettagli e limitazioni nel rapporto.
 
 Commit cumulativo suggerito: `Recover payments and improve AI security, audio editing, and SAM setup`. Versioni precedenti in `development-history/before-editor-workflows-20261101/`.
+
+### Timeline e lyrics — richieste completate
+
+Tracce vuote audio/MIDI da menu contestuale; inserimento dei file del progetto nelle tracce; copia/incolla e trascinamento dei segmenti tra sorgenti diverse. I trasferimenti pubblicano una nuova sorgente PCM e conservano gli originali per undo/redo, riapertura e archivi. Le sovrapposizioni e i trasferimenti obsoleti sono rifiutati prima della pubblicazione.
+
+Divisione delle lyrics >=40 caratteri su import JSON, estrazioni Whisper e recupero remoto, con tempi affidabili conservati oppure stimati e ancoraggi degli accordi rimappati. Avvisi e azione Dividi negli editor. Dettagli e limiti: `TIMELINE_MEDIA_R210.md`.
+
+**RC generale invariata: 34/42 = 81,0%.** Le funzionalità di questo batch sono implementate e verificate localmente; nessun criterio esterno viene promosso senza la relativa evidenza. CI remota, browser grafico e prova hardware nativa restano da verificare.

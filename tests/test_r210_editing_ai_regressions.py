@@ -148,7 +148,7 @@ await exportLyricsChordsJson();assert.equal(saved.name,'Song.json');const doc=JS
 lyricsChordsEditorLyricsDraft=[];lyricsChordsEditorDraft=[];const input={files:[{size:100,text:async()=>JSON.stringify(doc)}],value:'x'};await importLyricsChordsJson(input);assert.deepEqual(lyricsChordsEditorLyricsDraft,doc.lyrics);assert.deepEqual(lyricsChordsEditorDraft,doc.chords);assert.equal(input.value,'');assert.equal(refreshes,2);
 })().catch(e=>{console.error(e);process.exitCode=1});'''
     source = setup + '\n' + '\n'.join(function(name) for name in
-        ('shiftChordsDraft', 'exportLyricsChordsJson', 'importLyricsChordsJson')) + '\n' + check
+        ('shiftChordsDraft', 'exportLyricsChordsJson', 'lyricTextGroups', 'splitImportedLyrics', 'importLyricsChordsJson')) + '\n' + check
     subprocess.run(['node', '-e', source], check=True, capture_output=True, text=True)
 
 

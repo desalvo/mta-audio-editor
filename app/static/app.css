@@ -1723,3 +1723,10 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 .track-mta-slot select{height:23px;width:43px;min-width:0;padding:1px 0;border:1px solid #385570;border-radius:4px;background:#0b1721;color:#f0f7fd;font-size:10px}
 .track-delay-row.has-mta-slot .track-delay-input{flex:1 1 28px;width:28px}
 .track-delay-row.has-mta-slot .track-delay-unit{flex:0 1 46px;min-width:34px}
+
+.lc-long-line-warning,.lyrics-long-warning{color:#ffd073;font-size:10px;font-weight:600}
+.lyrics-long-warning{display:none}.lyrics-too-long .lyrics-long-warning{display:block}.lyrics-too-long textarea{outline:1px solid #d99d2b}
+
+.lane.clip-transfer-target{outline:2px solid #59c6ef;outline-offset:-2px;background-color:rgba(48,164,213,.12)}
+
+.timeline-media-busy #editor,.timeline-media-busy #mixerDock{pointer-events:none}

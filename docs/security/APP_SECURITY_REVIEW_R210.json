@@ -4,7 +4,7 @@
   "scope": "309current app Python sources;168unsuppressed reviewed findings,0HIGH/21MEDIUM/147LOW. Pre-commercial activation and original quotes reviewed;scanner and suppression policy unchanged.",
   "source_sha256": {
     "app/__init__.py": "eb3205cb75b2a7474361060d9b8d89329c29272cd8978ba62b6290b9a29b7550",
-    "app/account_erasure.py": "cefeaa9ff969e6be3b3d118ba689b0a3bf06fc21093cabd51f7ab606f11ab35e",
+    "app/account_erasure.py": "eb074aec67b28079948aa846fe7aa1d034af2a1636e09b37ae6e31a0283ae6c8",
     "app/account_financial_context.py": "0a7749ce17ecd76126453cbdaa4d571e4cb9214d29d1c35ba2d0f5f12e526e0b",
     "app/account_lifecycle.py": "dc2a034d92b49c76f4953cfce42da64432edf54283d5b31ccc78456115a7c59c",
     "app/account_limits.py": "15d4b17175386e08b4283a764559767dff344395eeb1ecc3089d1a7ce773219e",
@@ -25,7 +25,7 @@
     "app/admin_dump_routes.py": "aecf5f7e83457dccf5db05d53d1fff5ef27458ff33dc6e6978627eee57824679",
     "app/admin_navigation.py": "1b559c7fef7a74168c4d2c169db4886213b9aaeb75f1812c813a72722df22970",
     "app/ai_access.py": "8ca028716c25ef3a677bf26f096868e65fc1793185f090acd3d26697051e9b35",
-    "app/ai_adapter_identity.py": "2556274ea29305b189e58b54c88b8d3955fa26cf258e03364f97b2eb2ab8f8ce",
+    "app/ai_adapter_identity.py": "a1e420da7d6041837262ddd9a8790a32049c5d5946ed832d752836fd2cb2a616",
     "app/ai_amd_smi_collector.py": "1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b",
     "app/ai_arranger.py": "4542cfa2668487c1ab309a5758aa593d37a8c18e60ee91b8a73e681047cabbc3",
     "app/ai_arranger_runtime.py": "c9da0bbbf3a8f795275646a5c599d9752a56b546e2ce5bbc89d37bc3019c64e6",
@@ -65,7 +65,7 @@
     "app/ai_model_attestation.py": "640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
     "app/ai_model_download.py": "ef8a2b180203eac208fe3fa7f4edc6c1cff0e025a7b2319be2abcc581812bfde",
-    "app/ai_models.py": "27fd2f626be6706cb91cd06ce7af80395cb32e10669147db367beffc50a2cc00",
+    "app/ai_models.py": "4f910d64b878d30115eb34447220fa32fc90a5637930dd06024ea40c9a1f2d07",
     "app/ai_native_remote_journal.py": "2ae103fce708e07452fbd45d5ff6da60c8afd94e184d14914e9a7ed87001df95",
     "app/ai_notification_routes.py": "c9572bd27f8dcf3210d0617853780fccd7b158d89123946e890625e854df7c66",
     "app/ai_notifications.py": "c2645a42a7aa798d733a31927e01d13d52b13bec156fa4b6de6889ae725afa63",
@@ -89,7 +89,7 @@
     "app/ai_remote_transport.py": "21f727505bfe14d97ae80d80099f85e7fd1c1aab73f00f5c1f803eed4408e141",
     "app/ai_request_dedup.py": "a31b0bca32439ba887c3d0c87178442e49307e5117b150d3038e097419fcb4b2",
     "app/ai_result_cache.py": "44b24c96a4c30f4a43ff7ca1379af9651085363b47e4f6358be5e5aed453acf1",
-    "app/ai_server_execution.py": "dcb911e336cac91ea670c5ad10fff5f5577c21c492a2edb01300ce5e77668ca1",
+    "app/ai_server_execution.py": "651ca28dc040542436fecdfc07a66aac44564dfb3f9440311f76c1c70525377c",
     "app/ai_storage_sampler.py": "03e700ce4fe6b799a75959ac4bfd4ce4185f06c0a8fc5e98718d2421a72168b6",
     "app/ai_studio_adapter.py": "62856cb1a67a669d56e9b875ef13890460db349a74c59cf36260b0c8684f9423",
     "app/ai_token_routes.py": "c437a893c2bbb76bdaf53e27b46ace1fb006a834c35469c272332fee26956177",
@@ -100,7 +100,7 @@
     "app/ai_usage_reporting.py": "6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
     "app/ai_worker_artifacts.py": "9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28",
     "app/ai_worker_protocol.py": "70255f784389b81e80edeaca1fb8d6698375284b962c11dec0cbaecac40c26fb",
-    "app/ai_worker_registry.py": "92a13311444b82298b815ef41c51cf0c60d0c612f48c0b94c882f5e1e7e95b55",
+    "app/ai_worker_registry.py": "2a99aeffdbbdddfdade782306df7721791194517219a60a7ff15d9ff943cdea0",
     "app/audio_backend.py": "4d91382bcd6eb8e6c7792c52e440df2dd50a01db1cb31eeee4ebaf1835cc064c",
     "app/audio_capture.py": "3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a",
     "app/audio_engine.py": "1b7579278628d91bc9b019e101e30ff4462fe0a8ca6ec7334b5ec5af2d77040d",
@@ -113,7 +113,7 @@
     "app/checkout_terminal_outcomes.py": "3e5790f8fc7ac22002e04ba0b5f972e147cb141b63f3a9a4a49759dd01ed2eae",
     "app/chord_ml.py": "dad908b9b8d0f43b6bff995388e84a977e27f4753acfd80e7fb44c70c1e23f58",
     "app/chordino_runtime.py": "1f68de3b0d7c4b4a50f7b509941b4e55e5b31f788727e7b2f75ed0cc745b29c4",
-    "app/codec.py": "1b8012fb814cc6ee9b07b6a4fd53ae5fe7de4ce8128b782da2d49269d564d157",
+    "app/codec.py": "0e072cd1b214446a053c2bf2ab63d2055af0c455c28b00153daa227fa60086f5",
     "app/commercial_launch.py": "7e73b44ae8f48d9a082c4a198cb1e6f25440655b3bef8571b7ae1c7e8d4e346d",
     "app/configure_ace_gpu_profiler.py": "5a5554a196c01e12d9ad1812f9b8efc157a90832d7d674a02da89ed209b44967",
     "app/cpp_audio.py": "c5493e46e1eeeb6903208ea12472ac5a19d80516a4ef488880dd965800463801",
@@ -137,8 +137,10 @@
     "app/linux_proc_view.py": "76faadb240dc3af7f2ecfbdd2c5b1016d0a6f6c100afd4bacb1bbfb0118fd022",
     "app/live_mixer.py": "c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291",
     "app/live_sources.py": "729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
-    "app/main.py": "f00a34a7415da214d40f74c33aa8179e734e0f3f2be2a6dc5b7bea5f09345580",
+    "app/lyric_layout.py": "c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
+    "app/main.py": "566df1da6e42c1de6ff8aa7c6432827920ffc1cd58af03174331783844d7d59a",
     "app/mega53_runtime.py": "14f862c31db8153972313411f38373de83d53ce2558f9e69c74a76cd88044c52",
+    "app/merish_mta16.py": "a5b114a5c3e29491890d28f92b7e5e6a76c21bde3f6989f262429d331bdec816",
     "app/metronome_grid.py": "65c3e06fd4215ac561a5cb085d0c92fada782a519331e76f861fd01124f0cf02",
     "app/midi.py": "bfc599a17318a7dfccd050ec430de588420df2f4fe6dded4fd8d7e69e82bad1c",
     "app/midi_devices.py": "dd19f0d76871b9d93d37f35a35d03c1f7b072892c851a6155497fd6ecc3d5284",
@@ -149,6 +151,7 @@
     "app/midi_smf.py": "20486d0f8fdc7afbc0859645d3616517901cdaabc9951880a865909bee6cc478",
     "app/midi_ump.py": "5bc915e5a04b841937fec3ebb7ec453fd48dc37b7eb03fcfe0c9d2c0b3825bee",
     "app/mlive_mp3.py": "d83e56a2142fed65fe0ad85053c18aa0af293186f271619b22bb3ca3b557fe31",
+    "app/mlive_profile.py": "4ebfd83f1137fcd3c88d413078170481ec41d24cb2e909ccb17a502b1b87c695",
     "app/model_asset_admin.py": "d435e1bb234cb7b95de4fcbb1aa369f527505fa151c0334799407e0428f0009f",
     "app/model_asset_admin_routes.py": "82151d07e47b67087bc7694a71eb1812bfc32b454b573f84c44330a9e39fb29d",
     "app/model_license_policy.py": "bf59c12014850db763c47d703d72b33fb9ba7a001fd0661fa9d589f67b59d12c",
@@ -156,13 +159,13 @@
     "app/model_selectors.py": "5af81aea974cc537ddb63ef5b4e2390b165e91dff789a6babca39bb95bc37b9a",
     "app/model_storage.py": "99a7c255f886ae7bf1cd6a9506455592f2efd0da9aaba8327a8940a916b1da6b",
     "app/model_updater.py": "2ceb9df25b17d70d46427bda86fc5a52a9adabe0587b6af944d469306d0ce977",
-    "app/models.py": "3887c28b3307bafa4bdebfb28a3b51b6deb9571d00e1db18e9e419e57114f04d",
+    "app/models.py": "6dbcda41f4ae4290f8ab33c827430892d58efa789037062987d2b6b088b5f4f9",
     "app/mp3g.py": "8cf260e75c2fee4ab397008d9f5aa36186791002082f723da9673d28e75c6a3a",
     "app/mrmt3_adapter.py": "9c8179fe122d3dfd000fd1c269b654ae45d55b2edd3894011d9016d7ec41bb83",
     "app/mrmt3_checkpoint.py": "1d22fa45ccdadbf2aec366f8457daf519d6de2c0362aadcae339b91486e6f305",
     "app/mrmt3_decode.py": "f23b8655b2cb7dafe947049870047e8d55eff5f8bf0a504d418a1e74aaafec26",
     "app/mta_reverse.py": "bf12e048a68b5ed8a8a92c50e7ff77a7fb270b134215ed00db0cb5b57991baab",
-    "app/mta_writer.py": "75e2202f8e7f49b867f8652a5cc89643ced8fbe8903dfaae6bfdb2de68b0b6a2",
+    "app/mta_writer.py": "dfae84bb63bd6959a67d8d3a5d5442c3c81ff97ad876fe362245c9a01b61a144",
     "app/music_channels.py": "5486f7e76d150476499ecb64ade0bc3c134512d95c6edad2a86d73971bd79d1c",
     "app/music_interchange.py": "e8b5a5d4468f88ddf6f330b2710ee2b0a14f1f503140207916579bb14a08c12b",
     "app/music_publication.py": "2ebd385691c6969e8c909e5083fe5e069fba4e56bc4ef292a1e02203675374cd",
@@ -187,7 +190,7 @@
     "app/owner_payments.py": "7cea910f4a7a98142080aa061618eec83da8c8b67d4a40344078e5158682f719",
     "app/payment_reconcile_service.py": "2f81d2af1cebfc5269c04d16d145f82aa12dd46b15a8334026b59ec61fd5204a",
     "app/payment_reconciliation.py": "e6036e125bf99dc9ec22b4f4d782118e363eef1fc1aa5a459188ddf78d133e54",
-    "app/paypal_cash_history.py": "269c99e86a6aa5a1289103406a7fcee94a7411ef7466c27f82725931ccfce73b",
+    "app/paypal_cash_history.py": "66ca5430d993c98533674ff6786ee8f0fe0263d799e2277f44a66964f49a479c",
     "app/paypal_dispute_details.py": "e81dbc26dfddafa4b35b743be3d7a1ad3c272716be3eefd16d8e1e31821ca36a",
     "app/paypal_dispute_history.py": "24f457cd9c6ef467ee2ba418f8ffb60e4bd3102a2db5ca41c5308df95742abb8",
     "app/paypal_merchant_history.py": "6a64b4cc8998a3c855cfceb42ecec8d5f235d43504a069291678285f9cd1b293",
@@ -200,6 +203,7 @@
     "app/plugins.py": "08eb7f847cbd6eb5c65976be8e04feddb1553c895f79653f573942f262c3a5f2",
     "app/preview_publish.py": "72b54e1ec35c11b6367d193188eb19621673654fa3aefb52c5b54fe5fd2a887a",
     "app/project_kinds.py": "d2043a15db7f478bf7aca0e9d6e1205e09d9886e5c56ea5d786d2ad6ba8181f1",
+    "app/project_media_conversion.py": "0ac88bdac1306baa1890c00fc5d5b9bc2e885fb12c686e04ca7a917a3eac9cc4",
     "app/project_media_usage.py": "85300cbd24bf3df6fa8b4c34b7a4b4aa94d77471b7858bd69b50ae7f0990e3f6",
     "app/qixuan_profiles.py": "0cf26f379cc704c483db8a3b902fb8f8456af8e2af955d7a395fd22b59e469c7",
     "app/rc_acceptance.py": "c7f524b417dd7748d67ba7fe53fff4980e86b6c4dabb560124bc7cb4d1739f91",
@@ -265,7 +269,7 @@
     "app/social_totp.py": "35c23d4b3b880e627bb2c10d29e8c37c5db8ae3d9ff7f7a06804f523ee7e651e",
     "app/social_ui.py": "4f90381d7eff2da0cc3cc8edb2581a58a2f28c32808b9e4b5bebec483c640a80",
     "app/sqlite_availability.py": "365fb1b80404d3441fdf9cd06570f21a7a2a7f0ecbc41f716c4a40ca8bcf79da",
-    "app/storage.py": "603f1c07e718b78d2fe3a5d91279e46cc5f2abef6ec4abcab3edc978943e4d5c",
+    "app/storage.py": "9cd06abf50bcdb687d2083bc47aecb3df962440b9a8c7bd2bee7d49533558c41",
     "app/stripe_failed_charge_proof.py": "eeb33009f2623729477d2b7d663403d6501effd6256c0e88c3a16786fc0b8c17",
     "app/stripe_paid_history.py": "a7f1d845fca563f0cc9f4db1e48bca8bacbb3d8e19f81b393c6de6d649532d08",
     "app/studio_admin.py": "ea7ce1fcad4ec2e75cc270a7fb7728b8de12773ec59c1c84c37f1b12b76e8acc",
@@ -286,6 +290,7 @@
     "app/subscription_cash_reconciliation.py": "0f8eca66bd07987f0e67b2a7ac3d6225f062705068e4f83c7db0831a021fd3ee",
     "app/subscription_receivables.py": "ebd5d1fb9c7bc89361f7dbaa81878b9a781fcb4565b61913f549bcb32109b82c",
     "app/timeline_editing.py": "5bfbe968ba505ca7f393d4e8046ad94e7c6f05d1dbf108cc3909239ec95758a1",
+    "app/timeline_media.py": "6d97741fc1c178700a21a52450a6c7d193b7bce8fb401933464414f02214e6f5",
     "app/track_match.py": "cdec4949487c0bac848dd897580174a327cd758bda559936987cb3867b1f6082",
     "app/transcription_source_contract.py": "2f87dfd312a74b1922a47e86c0882513ea581a63033b581d9cb7547cd85a49f5",
     "app/transcription_timing.py": "b70274158cf7e9d5a8fcaf09957a3858620fd1b63d1858967c8a54cf8091f50d",
@@ -319,14 +324,14 @@
   },
   "findings": [
     {
-      "id": "0440bf85aa5db5ddb63eabf94293c537de5b60c8894d6fb86f6519385cb36ea7",
+      "id": "1a167ffb13f9a537278e525c26c2e59ea7c0d7afbc9d6d8b4f171ffb8d949d0f",
       "disposition": "false_positive",
       "rationale": "Schema identifiers come from _rows_for_user quoting; account bookkeeping deletions use a literal table allowlist. Owner and rowid values are bound, under scoped authorized erasure.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "fd404ee5c1866d596061daed7c4b5a572537c60917d2b6b87cad3df6a1ca321b",
+      "id": "c22c5140403c6e5876aca14e9cef160f0fbddc5c8a859a05c7addaed1fb2e9da",
       "disposition": "false_positive",
       "rationale": "Schema identifiers come from _rows_for_user quoting; account bookkeeping deletions use a literal table allowlist. Owner and rowid values are bound, under scoped authorized erasure.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
@@ -634,6 +639,20 @@
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
+      "id": "26556aa7b26c0922c279a35eaa4d9382789f19c4a286e9777b29a724242e6164",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Validated registered chords worker interpreter, isolated -I execution of a literal importlib dependency check, ten-second timeout. This is availability inspection only, with no user Python/executable selection, model inference or financial transition.",
+      "boundary": "Validated registered chords worker interpreter, isolated -I execution of a literal importlib dependency check, ten-second timeout. This is availability inspection only, with no user Python/executable selection, model inference or financial transition.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "1825710367d8aff1cd0bc6439dc3263ed0943eac00c239568815ff41e5753293",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Validated registered chords worker interpreter, isolated -I execution of a literal importlib dependency check, ten-second timeout. This is availability inspection only, with no user Python/executable selection, model inference or financial transition.",
+      "boundary": "Validated registered chords worker interpreter, isolated -I execution of a literal importlib dependency check, ten-second timeout. This is availability inspection only, with no user Python/executable selection, model inference or financial transition.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
       "id": "eb976b5cd46675e3335e73818115b1220b32b40e7dfbb94632f97045bf60e217",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in collect is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
@@ -893,7 +912,7 @@
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "752d6964f4218dd14bb600c35e757bc5492af83c89ead60502e06d2d85706e08",
+      "id": "4546edd84f0db2dd33eeac3e6dd3851d3fc17e01e13e8e729672073c6b9ff32b",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Internal codec argv uses fixed FFmpeg/ffprobe verbs and project-resolved local media paths. Media remains untrusted parser input; this review does not certify external codec binaries.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
@@ -956,112 +975,112 @@
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced. tests/test_r210_legacy_separator_rights.py;actual PCM/CLI/token API,post-load revocation,pre-dispatch refusal and child cleanup."
     },
     {
-      "id": "2d98793fe2764c4ce0cddc23fec5d106728d689bc3e6218da9d204d14d570839",
+      "id": "fb1b277e63ec96c4064c9a053c2f9475ade60bb9f0e8bac8d99b40e110b4449e",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _lead_backing_engine_available.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "7265c0decca3f48a45be6615196397dc1a0fdbf4a488de8a6cbdc6359af29b49",
+      "id": "bc631eb4f92fa3cec91f7c2661e7a1f5f96b472148a95aef1a708723a038ced9",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in verify_email_page is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "98399c6fee3a493bad192ae3892d6d117f714315bd22beeba8537b2c7fa727a3",
+      "id": "67f8f4770ed631cbf0972d6fe7a751596127a0c7f732ccce343a9121347765e4",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in reset_password_page is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "22ed586316f621e6e1a266b166b0298f5f84f689183821f88f8cc66d717437e3",
+      "id": "06dc6fb305ff67bcb0d6b1c012117b7b66271c3809523a340e89dafc8760ccfc",
       "disposition": "false_positive",
       "rationale": "Importing subprocess does not itself execute code. Concrete process calls in this module are separately reviewed below. Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper.",
       "boundary": "Module import alone does not receive or execute an untrusted shell command.",
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "e28b8118359e8f1572ad6bfe2cafc8abd34b453b4058255a9405a48a9190608f",
+      "id": "7dfa30ec9e790739df16bf501e7f7d840d93a587c644e2eddd7afbcd90736201",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: vst3_parameters.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "14e9636496a14d9d7920f465e6cdcd53783ad305bf043f0af438e976daeb4566",
+      "id": "b7bb62348f17aa1a424948256670980833e6391c8548afe5b8958f562dc24dee",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _normalize_audio_to_project_rate. PATH lookup is an explicit deployment trust requirement, not proof that the external binary is safe.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "0b96d61e0ffdeaa1a04d4c070d3a48dc94b4eb02096049e9d5509e41cb1eed30",
+      "id": "5faa271bd12876c3fbee9142d50c043b36a1a69f36abbcaaf1e65022b7c75ab6",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _normalize_audio_to_project_rate.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "1cf89f3a47bfede368ca9144c641213e38e0bc3244769c80c1e12310b5f06f9d",
+      "id": "90b2823113fc021ad41cdcfa809aa8b51af1c3b30573083e9b0bb03cc69773f8",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _native_remote_infer. PATH lookup is an explicit deployment trust requirement, not proof that the external binary is safe.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "a1da37884618975d2f343906fb2d189e9d36b8e1bcf6595e8aea783bef56d8bf",
+      "id": "9550abc42fe21135b8b6461fe72e0de346d5bd3b0efa982c83c3b7c58af68532",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _native_remote_infer.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "e9c3c67e8224461b400333ffe1c9b17c5632f54cab50a12323594b7442aed53d",
+      "id": "f581d62001d561ad77edbc7d9feb774739181ab2b939b630f3bf485e82fec675",
       "disposition": "reviewed_trust_boundary",
-      "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _text_music_worker. PATH lookup is an explicit deployment trust requirement, not proof that the external binary is safe.",
-      "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
-      "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
+      "rationale": "Fixed FFmpeg PCM normalization of a private rendered timeline WAV before existing authorized text inference. Crop start and duration are numeric values, never shell text; actor, engine and publication conflict checks remain in place.",
+      "boundary": "Fixed FFmpeg PCM normalization of a private rendered timeline WAV before existing authorized text inference. Crop start and duration are numeric values, never shell text; actor, engine and publication conflict checks remain in place.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
     },
     {
-      "id": "ea9f576fe4ae39d4040afe80a6b927a2c53ca44fa085c9948f85cfb8d15cd855",
+      "id": "ab846176c2f7e2490a7c9519f0a6b59c9f15ff56f3f97dd38a27f87692357df2",
       "disposition": "reviewed_trust_boundary",
-      "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _text_music_worker.",
-      "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
-      "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
+      "rationale": "Fixed FFmpeg PCM normalization of a private rendered timeline WAV before existing authorized text inference. Crop start and duration are numeric values, never shell text; actor, engine and publication conflict checks remain in place.",
+      "boundary": "Fixed FFmpeg PCM normalization of a private rendered timeline WAV before existing authorized text inference. Crop start and duration are numeric values, never shell text; actor, engine and publication conflict checks remain in place.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
     },
     {
-      "id": "d1707ef39936fe0efee2d2a5395b02d48c4e0181c2314adb1b348e04913a149e",
+      "id": "ded5f53cea4d0f26659666be3b2cdfb69faaa87be48511bc9136942064db5181",
       "disposition": "false_positive",
       "rationale": "Importing subprocess does not itself execute code. Concrete process calls in this module are separately reviewed below. Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper.",
       "boundary": "Module import alone does not receive or execute an untrusted shell command.",
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "c9c389615cc55fe87105971744f5f2f1180e4fe2568656f0bcc2b91f9af62b4d",
+      "id": "de94b3a85c9e8ab54ae37208f04ac2fb2be57d1d1571a654c468a15f221b1da9",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _sam_audio_extract.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "d10e53cc79d7c36c028094262f8a754c095448880669034d86949b375fc6a4db",
+      "id": "da9319bbc68c33de69495669d6854eaf9b00d2dc142e9c6d679a9d2c90dd5844",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _drumsep_extract.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "8109a1a96229a5b99091c5b9beb964de997d74e33f5aabcc021c0ef087ca8ea4",
+      "id": "4fb3e58e4c22e0db49e9883c1cff88ce32b81f7b5e1e5c4fef88e137f98ee805",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _render_karaoke_video.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "34061bd1d58fd88fd2ac33f8accfec25865012393a5b4f57e267b679d8feb993",
+      "id": "a48e5d5878125b10a534fb49a199ced7187df63aab87a2af4147b2e483e6e8a0",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _karaoke_export_worker.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
@@ -1073,6 +1092,13 @@
       "rationale": "Importing subprocess does not itself execute code. Concrete process calls in this module are separately reviewed below. Pinned Mega 53 checkpoint and configured local runtime/interpreter are verified before argv assembly. The new shared runner drains logs to a private file and detects cancellation, timeout and output threshold.",
       "boundary": "Module import alone does not receive or execute an untrusted shell command.",
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
+    },
+    {
+      "id": "df36fec1633ce03c2bcb36fe69ddd77733013a88c5df0c67f9ddc48db6c3c96b",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Standard ElementTree constructs exported XML nodes only; incoming settings are bounded to one megabyte and parsed with defusedxml. The import warning does not identify an unsafe input parser.",
+      "boundary": "Standard ElementTree constructs exported XML nodes only; incoming settings are bounded to one megabyte and parsed with defusedxml. The import warning does not identify an unsafe input parser.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
     },
     {
       "id": "667cc92e324f321cd5858c36aee43da07ac214a50336781404b096b8499be0a7",
@@ -1206,6 +1232,55 @@
       "rationale": "Demucs command is assembled from selected installed runtime, model and device arguments; the user media path is one argv element. Its reader thread continuously drains stdout. Legacy separator review: Direct Demucs launch now rechecks current rights after progress callbacks;selector and selected cardinality are closed and local repository overrides are refused. Arguments remain a separate fixed argv without a shell.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified. tests/test_r210_legacy_separator_rights.py;actual PCM/CLI/token API,post-load revocation,pre-dispatch refusal and child cleanup."
+    },
+    {
+      "id": "47ee9ad574739c81d161842e78f63740f07cc93be8d2a013203afbc93f70ca2d",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "8836df9b4b62587f3a6fe7a1a9bfd33dae685d767cceea23a69ad9ac7f7d6882",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "daef8a685ba837819ad6ce6caf48b051034909c12079e85bdd81aa472073c0c5",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "6f7f3ba11b33f49e97510b7aed4e4839d2f4f2d5ae79dfa620374d4e2f1faf55",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "76e975e39b52b63568f32049e53f88a9c55373b130b9e23be6cffc4a6ddcc56b",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "70e57d1f38485d979a0d4c61bc335d17c5a4ba7bcd92ebcad832eedb6f9130f7",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "69afb5ee40f6fdf5415e61c2b5d5a98b4c58aa58dd312712eb3242875425a118",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
     },
     {
       "id": "d7335ea932c09f8ab10ab7f13f6126592c64bf14f8cfa2c1b595b15621bf032a",
@@ -1411,6 +1486,41 @@
       "verification": "tests/test_r210_legacy_executor_closure.py and affected lifecycle/process regressions exercise actual subprocess timeout, cancellation, policy propagation, server rejection and owned API replay."
     },
     {
+      "id": "d8c745405cbe5d68a92aaeadf26501f41471398f10fbeb0030eab1f270ead990",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "12538892a4ef5a83ca6783f825eed18e04db38db6fc8c8190728b4a8a3998cce",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "0d84d65586fbb5810226d073ef9c7b6be9dd20b6ad4534a8a202bee1bdc84fea",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "9eb2197d47eb6b60cffabcc1f1ae559d4efcf23f583404efe8ebaacbdbc10d96",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "id": "eebb25c9b017fb5d734fbd22ad633d4b7fdf00648fdea3116185e31dd1e10882",
+      "disposition": "reviewed_trust_boundary",
+      "rationale": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
       "id": "155326810ccc5279437ba564e2ff085cc0a966a3b923a10c50eb703db7d740b0",
       "disposition": "false_positive",
       "rationale": "Importing subprocess does not itself execute code. Concrete process calls in this module are separately reviewed below. Managed manifest verifies every file digest and exact component rights, and safe_file pins the interpreter. The fixed Transkun runner now loads only weights-only compatible state; no unsafe retry exists.",
@@ -1518,7 +1628,7 @@
     "review": "New owner-derived account financial context validates UID through parameterized SQL, verifies private NC/loss histories, exposes only aggregate own totals and no combined debt. Account limits begins a read snapshot after schema setup and includes verified NC closed period ranges. The authenticated limits route returns a generic 409 for unverifiable context without leaking journal identities. No new subprocess, dynamic SQL or suppression. All existing findings matched unchanged code after line-number shifts.",
     "evidence": "tests/test_r210_account_financial_context.py; tests/test_r210_account_financial_browser.py; account-financial-final.xml"
   },
-  "current_scan": "docs/validation/r210/paypal-cash-history/bandit.json",
+  "current_scan": "docs/validation/r210/timeline-media/bandit.json",
   "owner_payment_continuation": {
     "date": "2026-10-23",
     "reviewed_sources": [
@@ -1690,8 +1800,8 @@
     "evidence": "docs/validation/r210/executor-boundaries-result.json",
     "native_error_mapping": "Denied or unverifiable native compatibility-model rights now return readable HTTP409 before upload copy; no unchecked exception or model side effect."
   },
-  "current_scan_sha256": "cc61162b085ee7a3fd3b2d94cb9f5edf5c6a16c238220e09b9c67eed6e32561c",
-  "date": "2026-10-29",
+  "current_scan_sha256": "59bee676daf15609911ec7f206b019b6ced0990d41f575179e0974275bffe632",
+  "date": "2026-11-02",
   "export_exclusive_contention_review": {
     "date": "2026-10-27",
     "review": "Inspected all new source branches:BUSY/LOCKED classification by SQLite base error code and narrow legacy fallback;no missing-table/syntax/corruption masking;barrier snapshot reuses caller connection,restores integer-derived bounded busy_timeout,and rolls back only its own read transaction.Original cutover missing state stays unavailable;no dirty reads,positive auth cache,barrier bypass or forced journal/WAL change.Authentication/session revocation and original-owner checks run again after lock release.Private503 messages contain no SQL,path,cookie or user data.Mutations are explicitly nonretryable;browser replays only GET/HEAD after exact typedbusy503.Completed download retries are opt-in on the three export callbacks;general callbacks which may write are not replayed.No new HTTP clients,subprocesses,filesystem trust primitives or financial operations.",
@@ -2683,5 +2793,11 @@
     ],
     "boundary": "Exact original owner/merchant/admitted checkout plus stable complete canonical cases/captures/refunds and bounded balance-only cash, no caller amount or payout label authority. Cash claims and original ledger commit atomically, before any gross first funding becomes visible. No new transport, interpreter, inference, process, grant or automatic monetary retry.",
     "unchanged": "All checker bytes, AST call shapes, classifications, findings, thresholds and suppressions. Provider and browser target acceptance remain separate."
+  },
+  "timeline_media_review": {
+    "date": "2026-11-02",
+    "evidence": "docs/TIMELINE_MEDIA_R210.md",
+    "explicitly_reviewed_new_or_changed": 17,
+    "scope": "Local timeline/lyrics plus inherited media/profile boundaries; no RC, payment or hardware authorization."
   }
 }

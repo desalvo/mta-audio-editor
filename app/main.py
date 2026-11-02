@@ -29,6 +29,8 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, estimate_adaptive_tempo_map, generate_adaptive_metronome_wav, generate_chords_piano_wav, generate_silent_chords_wav, refresh_chords_piano_wav_region, refresh_chords_waveform_region, generate_metronome_wav, zoned_metronome_beats, stabilize_adaptive_beats, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
+from .lyric_layout import split_long_lyrics
+from .timeline_media import EmptyTrackRequest, TimelineTransferRequest
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, TrackExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .mlive_mp3 import embed_mlive_merish_metadata
 from .mp3g import build_mp3g_zip
@@ -3536,7 +3538,7 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Lyrics extraction cancelled")
             _media_job_update(job_id, progress=96, message="Sincronizzazione lyrics sulla timeline")
-            mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else events
+            mapped = split_long_lyrics(_shift_timed_events(events, int(range_start_ms)) if range_mode else events)
             # AI inference stays outside the project lock. Refuse to overwrite
             # annotations that changed while the expensive job was running.
             with project_publication_lock(pid):
@@ -4244,6 +4246,28 @@ def bounce_project_job(pid:str,request:Request):return _start_bounce(pid,request
 
 @app.post('/api/projects/{pid}/tracks/{track_id}/bounce')
 def bounce_track_job(pid:str,track_id:str,request:Request):return _start_bounce(pid,request,track_id)
+
+
+@app.post('/api/projects/{pid}/tracks/empty')
+@_serialized_project_mutation
+def add_empty_timeline_track(pid: str, req: EmptyTrackRequest, request: Request):
+    from .timeline_media import empty_track
+    project = _project_for_actor(request, pid)
+    try:
+        return empty_track(project, req, _ensure_workspace_capacity)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/timeline/transfer')
+@_serialized_project_mutation
+def transfer_timeline_segments(pid: str, req: TimelineTransferRequest, request: Request):
+    from .timeline_media import transfer
+    project = _project_for_actor(request, pid)
+    try:
+        return transfer(project, req, _ensure_workspace_capacity)
+    except (ValueError, FileNotFoundError) as exc:
+        raise HTTPException(400, str(exc)) from exc
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/duplicate")
@@ -5343,7 +5367,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                         project = load_project(project_id)
                         if project.lyrics:
                             raise RuntimeError('Lyrics changed during analysis; existing lyrics preserved')
-                        project.lyrics = extracted_lyrics
+                        project.lyrics = split_long_lyrics(extracted_lyrics)
                         project.lyrics_engine = 'OpenAI Whisper'
                         project.lyrics_model = selected_lyrics_model
                         save_project(project)
@@ -7946,7 +7970,7 @@ def native_ai_workers_import_recovered_json(request: Request, request_id: str, p
         if kind == 'whisper':
             if project.lyrics:
                 raise HTTPException(409, 'Existing lyrics must be cleared or merged manually')
-            project.lyrics = parsed
+            project.lyrics = split_long_lyrics(parsed)
             project.lyrics_engine = 'Recovered remote Whisper'
         else:
             if project.chords:

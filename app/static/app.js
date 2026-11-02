@@ -694,9 +694,9 @@ function render(){
     ${toolbarHtml()}
     ${clipBrowserHtml()}
     <div class="editor-grid ${current.inspector_visible===false?'inspector-hidden':''}" id="editorGrid" style="--track-column-width:${trackWidth}px">
-      <div class="track-column" id="trackColumn"><div class="track-column-head">TRACKS</div>${current.tracks.map((t,i)=>trackHead(t,i)).join('')}</div>
+      <div class="track-column" id="trackColumn" oncontextmenu="openProjectTimelineMenu(event)"><div class="track-column-head">TRACKS</div>${current.tracks.map((t,i)=>trackHead(t,i)).join('')}</div>
       <div class="track-resizer" id="trackResizer" title="Ridimensiona Tracks"></div>
-      <div class="timeline-pane" id="timelinePane"><div class="ruler"><canvas id="ruler" width="${W}" height="30"></canvas></div><div class="lanes" id="lanes" style="width:${W}px"><div class="timeline-chord-lane ${current.show_chords_playback?'':'hidden'}" id="timelineChordLane">${timelineChordLaneHtml(W)}</div>${current.tracks.map((t,i)=>lane(t,W,i)).join('')}${timelineMarkersHtml()}<div class="playhead" id="playhead" style="left:${playCursorMs/1000*pxPerSec}px"></div></div></div>
+      <div class="timeline-pane" id="timelinePane" oncontextmenu="openProjectTimelineMenu(event)"><div class="ruler"><canvas id="ruler" width="${W}" height="30"></canvas></div><div class="lanes" id="lanes" style="width:${W}px"><div class="timeline-chord-lane ${current.show_chords_playback?'':'hidden'}" id="timelineChordLane">${timelineChordLaneHtml(W)}</div>${current.tracks.map((t,i)=>lane(t,W,i)).join('')}${timelineMarkersHtml()}<div class="playhead" id="playhead" style="left:${playCursorMs/1000*pxPerSec}px"></div></div></div>
       ${inspectorHtml()}
     </div>`;
   $('#mixerDock').innerHTML=mixerHtml();
@@ -1209,6 +1209,7 @@ function openTrackContextMenuAt(id,clientX,clientY,fromTimeline=false){
   if(!fromTimeline){timelineSelectionOnly=false;if(!selectedTrackIdSet.has(id)){selectedTrackIdSet=new Set([id])}
   selectedTrackId=id;refreshSelectedTrackInspector();
   $$('.track-head').forEach(el=>{const tid=el.id.replace(/^head-/,'');el.classList.toggle('selected',selectedTrackIdSet.has(tid));el.classList.toggle('primary-selected',tid===id)});}
+  if(fromTimeline)timelineTargetTrackId=id;
   const stem=pluginInfo.stem_splitter||{};
   const disabled=stem.available?'':'disabled';
   const menu=document.createElement('div');
@@ -1217,6 +1218,8 @@ function openTrackContextMenuAt(id,clientX,clientY,fromTimeline=false){
   menu.setAttribute('role','menu');
   menu.tabIndex=-1;
   menu.innerHTML=`<details class="context-category" open><summary>${tr('Track','Traccia')}</summary><div role="group">
+    ${timelineCreationMenu(id)}
+    ${track.kind!=='midi'?`<button type="button" onclick="closeTrackContextMenu();openInsertProjectFileDialog('${id}')">＋ ${tr('Insert project file in this track…','Inserisci file del progetto nella traccia…')}</button><button type="button" ${timelineClipboard?.parts?.length?'':'disabled'} onclick="closeTrackContextMenu();pasteTimelineSelection('${id}')">${tr('Paste segments here','Incolla segmenti qui')}</button>`:''}
     <button type="button" aria-keyshortcuts="Control+A Meta+A" onclick="closeTrackContextMenu();${fromTimeline?'selectAllTimelineSegments()':'selectAllTracks()'}">☑ <span>${fromTimeline?tr('Select all timeline segments','Seleziona tutti i segmenti della timeline'):tr('Select all tracks','Seleziona tutte le tracce')}</span><kbd class="context-shortcut">Ctrl/⌘ A</kbd></button>
     ${timelineTool==='split'?`<button type="button" aria-keyshortcuts="S" onclick="closeTrackContextMenu();splitSelectedTracksAt(playCursorMs)">✂ <span>${tr('Split selected tracks at transport','Dividi tracce selezionate alla posizione del transport')}</span><kbd class="context-shortcut">S</kbd></button>`:''}
     ${track.kind==='midi'?`<button type="button" onclick="closeTrackContextMenu();openMidiEditor('${id}')">♬ <span>${tr('MIDI / VST instrument','MIDI / Strumento VST')}</span></button>`:''}
@@ -1344,7 +1347,7 @@ function trackContextPointerDown(event){
     if(trackContextPress!==state)return;
     trackContextSuppressClickUntil=Date.now()+800;
     if(navigator.vibrate)navigator.vibrate(12);
-    openTrackContextMenuAt(state.id,state.x,state.y);
+    openTrackContextMenuAt(state.id,state.x,state.y,!!state.target.closest?.('#timelinePane'));
     trackContextPress=null;
   },TRACK_CONTEXT_LONG_PRESS_MS);
   trackContextPress=state;
@@ -2471,7 +2474,7 @@ function showAutoMixInfo(){alert('Auto Mix is reversible. It snapshots the curre
 function bindModelInputs(){$$('.model-input').forEach(el=>el.addEventListener('change',()=>{if(el.dataset.k==='name')return;const t=current.tracks[+el.dataset.i];if(t){t[el.dataset.k]=el.value;markDirty()}}));refreshPresetSelect(false);refreshPresetSelect(true)}
 function collect(){if(!current)return;$$('.model-input').forEach(el=>{const t=current.tracks[+el.dataset.i];if(t&&el.dataset.k!=='name')t[el.dataset.k]=el.value});/* Timed lyrics/chords/markers are structured project events. Hidden legacy textareas are display mirrors only and must never overwrite word timing, manual anchors, disabled/deleted flags, snapshots or MTA overrides. */}
 function projectSnapshot(){return current?JSON.parse(JSON.stringify(current)):null}
-function resetSessionHistory(){persistedProjectSnapshot=projectSnapshot();projectDirty=false;undoStack=[];redoStack=[];historyProjectId=current?.id||null;lastHistoryState=projectSnapshot();timelineClipboard=null;updateEditActionState()}
+function resetSessionHistory(){timelineTargetTrackId=null;persistedProjectSnapshot=projectSnapshot();projectDirty=false;undoStack=[];redoStack=[];historyProjectId=current?.id||null;lastHistoryState=projectSnapshot();timelineClipboard=null;updateEditActionState()}
 function ensureSessionHistory(){if((current?.id||null)!==historyProjectId)resetSessionHistory();else if(!lastHistoryState&&current)lastHistoryState=projectSnapshot()}
 function checkpointHistory(){if(!current)return;ensureSessionHistory();if(JSON.stringify(current)!==JSON.stringify(lastHistoryState)){undoStack.push(lastHistoryState);if(undoStack.length>100)undoStack.shift();redoStack=[];lastHistoryState=projectSnapshot();updateEditActionState()}}
 async function persistCurrentProject(showToast=false){
@@ -2501,13 +2504,13 @@ async function persistCurrentProject(showToast=false){
   $('#headerProjectName').textContent=current?.title||'—';
   if(showToast)toast('Progetto salvato');
 }
-async function restoreHistorySnapshot(snapshot,label){if(!snapshot||!current)return;current=JSON.parse(JSON.stringify(snapshot));selectedTrackId=current.tracks.some(t=>t.id===selectedTrackId)?selectedTrackId:(current.tracks[0]?.id||null);projectDirty=true;render();await persistCurrentProject(false);lastHistoryState=projectSnapshot();updateEditActionState();toast(label)}
+async function restoreHistorySnapshot(snapshot,label){if(!snapshot||!current)return;const media=current.clip_library||[];current=JSON.parse(JSON.stringify(snapshot));const known=new Set((current.clip_library||[]).map(x=>x.id));current.clip_library=[...(current.clip_library||[]),...media.filter(x=>!known.has(x.id))];selectedTrackId=current.tracks.some(t=>t.id===selectedTrackId)?selectedTrackId:(current.tracks[0]?.id||null);projectDirty=true;render();await persistCurrentProject(false);lastHistoryState=projectSnapshot();updateEditActionState();toast(label)}
 async function undoEdit(){ensureSessionHistory();checkpointHistory();if(!undoStack.length)return toast('Nessuna operazione da annullare');const target=undoStack.pop();redoStack.push(projectSnapshot());await restoreHistorySnapshot(target,'Undo')}
 async function redoEdit(){ensureSessionHistory();if(!redoStack.length)return toast('Nessuna operazione da ripristinare');undoStack.push(projectSnapshot());const target=redoStack.pop();await restoreHistorySnapshot(target,'Redo')}
 function editTrackIds(){let ids=selectedTrackIds();if(!ids.length&&selectedTrackId)ids=[selectedTrackId];return ids}
 function selectionBounds(){return[Math.round(Math.min(sel.a,sel.b)),Math.round(Math.max(sel.a,sel.b))]}
 function clipId(){return'clip_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9)}
-function selectedClipFragments(){if(!current)return[];const[a,b]=selectionBounds();if(b-a<2)return[];const ids=new Set(editTrackIds()),out=[];for(const t of current.tracks){if(!ids.has(t.id))continue;const delay=trackDelayMs(t);for(const c of t.clips||[]){const cs=Number(c.timeline_start_ms||0)+delay,ce=cs+(c.source_end_ms-c.source_start_ms),is=Math.max(a,cs),ie=Math.min(b,ce);if(ie>is)out.push({track_id:t.id,offset_ms:is-a,source_start_ms:c.source_start_ms+(is-cs),source_end_ms:c.source_start_ms+(ie-cs)})}}return out}
+function selectedClipFragments(){if(!current)return[];const[a,b]=selectionBounds();if(b-a<2)return[];const ids=new Set(editTrackIds()),out=[];for(const t of current.tracks){if(!ids.has(t.id))continue;const delay=trackDelayMs(t);for(const c of t.clips||[]){const cs=Number(c.timeline_start_ms||0)+delay,ce=cs+(c.source_end_ms-c.source_start_ms),is=Math.max(a,cs),ie=Math.min(b,ce);if(ie>is)out.push({track_id:t.id,filename:t.filename,offset_ms:is-a,source_start_ms:c.source_start_ms+(is-cs),source_end_ms:c.source_start_ms+(ie-cs)})}}return out}
 function removeRangeFromTracks(a,b,trackIds,ripple=false){
   const ids=new Set(trackIds),duration=Math.max(0,b-a);
   for(const t of current.tracks){
@@ -2561,8 +2564,9 @@ async function rebuildTimelinePlayback(){
   const cursor=waProjectCursorMs(),renderFilters=waRenderFilters;stopPlayback();playCursorMs=cursor;
   try{await startWebAudioProjectPlayback(renderFilters,cursor);timelineAudioDirty=false}catch(e){toast(e.message)}
 }
-function moveSelectedSegments(wanted,anchor=null){
-  const delta=MtaTimelineRules.delta(current,selectedTimelineSegments,wanted,pxPerSec,anchor);if(!delta)return;
+function moveSelectedSegments(wanted,anchor=null,free=false){
+  const rulesProject=free?{...current,timeline_snap:'off',timeline_magnetic:false}:current;
+  const delta=MtaTimelineRules.delta(rulesProject,selectedTimelineSegments,wanted,pxPerSec,anchor);if(!delta)return;
   const items=selectedSegmentItems(),ids=new Set(items.map(x=>x.track.id));checkpointHistory();
   for(const item of items)item.clip.timeline_start_ms+=delta;
   for(const t of current.tracks||[])if(ids.has(t.id))t.clips.sort((a,b)=>a.timeline_start_ms-b.timeline_start_ms);
@@ -2575,16 +2579,17 @@ function beginTimelineClipDrag(event,trackId,clipId){
   const key=MtaTimelineRules.key(track,clip),multiple=event.shiftKey||event.ctrlKey||event.metaKey;
   if(multiple&&selectedTimelineSegments.has(key)){selectedTimelineSegments.delete(key);paintSegmentSelection();return}
   if(!multiple&&!selectedTimelineSegments.has(key))selectedTimelineSegments.clear();
-  selectedTimelineSegments.add(key);sel={a:0,b:0};updateSel();paintSegmentSelection();$('#timelinePane')?.focus({preventScroll:true});
+  timelineTargetTrackId=trackId;selectedTimelineSegments.add(key);sel={a:0,b:0};updateSel();paintSegmentSelection();$('#timelinePane')?.focus({preventScroll:true});
   const items=selectedSegmentItems().map(x=>({...x,el:document.querySelector(`.clip-block[data-track-id="${CSS.escape(x.track.id)}"][data-clip-id="${CSS.escape(x.clip.id)}"]`)}));
-  const pid=event.pointerId,startX=event.clientX,pane=$('#timelinePane'),clickMs=pane?Math.max(0,(startX-pane.getBoundingClientRect().left+pane.scrollLeft)/pxPerSec*1000):playCursorMs;let delta=0,moved=false;
+  const pid=event.pointerId,startX=event.clientX,pane=$('#timelinePane'),clickMs=pane?Math.max(0,(startX-pane.getBoundingClientRect().left+pane.scrollLeft)/pxPerSec*1000):playCursorMs;let delta=0,moved=false,destinationTrackId=trackId;
   timelineClipDrag={pointerId:pid};document.body.classList.add('moving-timeline-clip');
-  const move=ev=>{if(ev.pointerId!==pid)return;ev.preventDefault();if(Math.abs(ev.clientX-startX)<3&&!moved)return;moved=true;delta=MtaTimelineRules.delta(current,selectedTimelineSegments,(ev.clientX-startX)/pxPerSec*1000,pxPerSec,key);
+  const move=ev=>{if(ev.pointerId!==pid)return;ev.preventDefault();const over=document.elementFromPoint(ev.clientX,ev.clientY)?.closest?.('.lane[data-track]');destinationTrackId=over?.dataset.track||trackId;const cross=destinationTrackId!==trackId;if(Math.abs(ev.clientX-startX)<3&&!cross&&!moved)return;moved=true;delta=cross?crossTrackDragDelta(items,(ev.clientX-startX)/pxPerSec*1000,destinationTrackId,key):MtaTimelineRules.delta(current,selectedTimelineSegments,(ev.clientX-startX)/pxPerSec*1000,pxPerSec,key);
+    $$('.lane').forEach(el=>el.classList.toggle('clip-transfer-target',cross&&el.dataset.track===destinationTrackId));
     for(const x of items)if(x.el)x.el.style.transform=`translateX(${delta/1000*pxPerSec}px)`;
     for(const t of current.tracks||[]){const copy={...t,clips:(t.clips||[]).map(c=>selectedTimelineSegments.has(MtaTimelineRules.key(t,c))?{...c,timeline_start_ms:c.timeline_start_ms+delta}:c)};drawWave(copy)}
   };
-  const cleanup=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);timelineClipDrag=null;document.body.classList.remove('moving-timeline-clip');for(const x of items)if(x.el)x.el.style.transform='';};
-  const finish=ev=>{if(ev.pointerId!==pid)return;cleanup();if(!moved)goToTimestamp(clickMs);if(moved&&delta)moveSelectedSegments(delta,key);else for(const t of current.tracks||[])drawWave(t)};
+  const cleanup=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);timelineClipDrag=null;$$('.clip-transfer-target').forEach(el=>el.classList.remove('clip-transfer-target'));document.body.classList.remove('moving-timeline-clip');for(const x of items)if(x.el)x.el.style.transform='';};
+  const finish=ev=>{if(ev.pointerId!==pid)return;cleanup();if(!moved)goToTimestamp(clickMs);if(moved&&destinationTrackId!==trackId)void transferSelectedSegmentsToTrack(destinationTrackId,delta);else if(moved&&delta)moveSelectedSegments(delta,key);else for(const t of current.tracks||[])drawWave(t)};
   const cancel=ev=>{if(ev.pointerId!==pid)return;cleanup();for(const t of current.tracks||[])drawWave(t)};
   window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',cancel);
 }
@@ -2608,19 +2613,76 @@ function toggleRippleTool(){
   toast(rippleEnabled?'Ripple attivo sulle tracce selezionate':'Ripple disattivato');
 }
 
+let timelineTargetTrackId=null,timelineMediaBusy=false;
+function projectAllowsTrackKind(kind){return current?.target==='DAW_MIDI'||(kind==='midi'?current?.target==='MIDI':['DAW','MTA8','MTA16'].includes(current?.target))}
+function timelineCreationMenu(afterId=null){
+ const arg=afterId?`'${afterId}'`:'null';
+ return `${projectAllowsTrackKind('audio')?`<button type="button" onclick="closeTrackContextMenu();createEmptyTimelineTrack('audio',${arg})">＋ ${tr('Empty audio track','Traccia audio vuota')}</button>`:''}${projectAllowsTrackKind('midi')?`<button type="button" onclick="closeTrackContextMenu();createEmptyTimelineTrack('midi',${arg})">＋ ${tr('Empty MIDI track','Traccia MIDI vuota')}</button>`:''}`;
+}
+function openProjectTimelineMenu(event){
+ if(!current)return;event.preventDefault();event.stopPropagation();closeTrackContextMenu();
+ const menu=document.createElement('div');menu.id='trackContextMenu';menu.className='track-context-menu';menu.setAttribute('role','menu');menu.tabIndex=-1;
+ menu.innerHTML=timelineCreationMenu()+`<button type="button" onclick="closeTrackContextMenu();selectAllTimelineSegments()">${tr('Select all timeline segments','Seleziona tutti i segmenti della timeline')}</button>`;
+ document.body.appendChild(menu);menu.focus({preventScroll:true});const r=menu.getBoundingClientRect();menu.style.left=`${Math.max(8,Math.min(event.clientX,window.innerWidth-r.width-8))}px`;menu.style.top=`${Math.max(8,Math.min(event.clientY,window.innerHeight-r.height-8))}px`;
+}
+async function commitTimelineMedia(path,body){
+ if(!current||timelineMediaBusy)return null;const pid=current.id;timelineMediaBusy=true;let ownsAutosave=false;document.body.classList.add('timeline-media-busy');
+ showUtilityModal(tr('Timeline edit','Modifica timeline'),`<p role="status">${tr('Preparing audio…','Preparazione audio…')}</p>`);
+ try{
+  while(autosaveBusy){await new Promise(resolve=>setTimeout(resolve,20));if(current?.id!==pid)return null}
+  await flushAutosave();if(current?.id!==pid)return null;
+  if(projectDirty)throw Error(tr('Save the project before retrying','Salva il progetto prima di riprovare'));
+  clearTimeout(autosaveTimer);autosaveBusy=true;ownsAutosave=true;
+  const before=projectSnapshot(),result=await api(`/api/projects/${encodeURIComponent(pid)}/${path}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  if(current?.id!==pid)return null;
+  current=result.project;
+  const known=new Set((before.clip_library||[]).map(x=>x.id));before.clip_library=[...(before.clip_library||[]),...(current.clip_library||[]).filter(x=>!known.has(x.id))];
+  undoStack.push(before);if(undoStack.length>100)undoStack.shift();redoStack=[];
+  projectDirty=false;persistedProjectSnapshot=projectSnapshot();lastHistoryState=projectSnapshot();
+  timelineSelectionOnly=true;selectedTrackIdSet.clear();selectedTrackId=null;
+  timelineTargetTrackId=result.track_id;selectedTimelineSegments=new Set((result.clip_ids||[]).map(id=>`${result.track_id}:${id}`));
+  render();updateEditActionState();timingAudioChanged(new Set(result.changed_track_ids||[result.track_id]));closeUtilityModal();$('#timelinePane')?.focus({preventScroll:true});
+  await syncNativeProjectFile(pid,true);return result;
+ }catch(error){closeUtilityModal();toast(error.message);return null}
+ finally{timelineMediaBusy=false;document.body.classList.remove('timeline-media-busy');if(ownsAutosave)autosaveBusy=false;if(ownsAutosave&&autosaveQueued){autosaveQueued=false;markDirty(50)}}
+}
+async function createEmptyTimelineTrack(kind='audio',afterId=null){
+ const name=prompt(tr('New track name','Nome della nuova traccia'),kind==='midi'?tr('MIDI track','Traccia MIDI'):tr('Audio track','Traccia audio'));if(name===null||!name.trim())return;
+ await commitTimelineMedia('tracks/empty',{name:name.trim(),kind,after_track_id:afterId});
+}
+function openInsertProjectFileDialog(trackId){
+ const track=trackById(trackId);if(!track||track.kind==='midi')return toast(tr('Choose an audio track','Scegli una traccia audio'));
+ const files=(current.clip_library||[]).filter(x=>x.duration_ms>0);if(!files.length)return toast(tr('No audio files in this project','Nessun file audio nel progetto'));
+ const start=Math.max(0,Math.round(playCursorMs||0));
+ showUtilityModal(tr('Insert project audio','Inserisci audio del progetto'),`<p>${esc(track.name)} · ${fmtTime(start/1000,true)}</p><label>${tr('Project file','File del progetto')}<select id="timelineProjectFile">${files.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} · ${esc(x.filename)}</option>`).join('')}</select></label><div class="utility-actions"><button class="utility-btn primary" onclick="insertProjectFileIntoTrack('${trackId}',document.getElementById('timelineProjectFile').value,${start})">${tr('Insert at transport','Inserisci al transport')}</button><button class="utility-btn secondary" onclick="closeUtilityModal()">${tr('Cancel','Annulla')}</button></div>`);
+}
+async function insertProjectFileIntoTrack(trackId,assetId,start){
+ const asset=(current?.clip_library||[]).find(x=>x.id===assetId);if(!asset?.duration_ms)return;
+ return commitTimelineMedia('timeline/transfer',{destination_track_id:trackId,start_ms:start,action:'copy',parts:[{filename:asset.filename,source_start_ms:0,source_end_ms:asset.duration_ms,offset_ms:0}]});
+}
+async function transferSelectedSegmentsToTrack(trackId,delta=0){
+ const items=selectedSegmentItems();if(!items.length)return;
+ const origin=Math.min(...items.map(x=>MtaTimelineRules.start(x.track,x.clip)));
+ return commitTimelineMedia('timeline/transfer',{destination_track_id:trackId,start_ms:Math.max(0,Math.round(origin+delta)),action:'move',parts:items.map(({track,clip})=>({track_id:track.id,clip_id:clip.id,filename:track.filename,source_start_ms:clip.source_start_ms,source_end_ms:clip.source_end_ms,offset_ms:MtaTimelineRules.start(track,clip)-origin,expected_start_ms:MtaTimelineRules.start(track,clip)}))});
+}
+function crossTrackDragDelta(items,wanted,trackId,anchorKey){
+ const target=trackById(trackId),origin=Math.min(...items.map(x=>MtaTimelineRules.start(x.track,x.clip))),anchor=items.find(x=>MtaTimelineRules.key(x.track,x.clip)===anchorKey)||items[0];
+ let delta=Math.round(wanted),desired=MtaTimelineRules.start(anchor.track,anchor.clip)+delta;
+ if(current.timeline_snap&&current.timeline_snap!=='off'){const grid=MtaTimelineRules.gridAt(current,desired),step=MtaTimelineRules.step(current,desired);delta=Math.round(grid.origin+Math.round((desired-grid.origin)/step)*step-MtaTimelineRules.start(anchor.track,anchor.clip))}
+ return Math.max(Math.max(0,trackDelayMs(target))-origin,delta);
+}
+
 function copyTimelineSelection(){if(timelineTool==='select'&&selectedSegmentItems().length)return editSelectedSegments('copy');const[a,b]=selectionBounds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');timelineClipboard={duration_ms:b-a,parts};updateEditActionState();toast('Selezione copiata')}
 function cutTimelineSelection(){if(timelineTool==='select'&&selectedSegmentItems().length)return editSelectedSegments('cut');const[a,b]=selectionBounds(),ids=editTrackIds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length||!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');checkpointHistory();timelineClipboard={duration_ms:b-a,parts};removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();updateEditActionState();toast(rippleEnabled?'Selezione tagliata con ripple':'Selezione tagliata')}
-function pasteTimelineSelection(){
+async function pasteTimelineSelection(destinationTrackId=timelineTargetTrackId){
  if(!current||!timelineClipboard?.parts?.length)return toast('Clipboard timeline vuota');
- const dest=Math.max(0,Math.round(playCursorMs||0)),planned=[];
- for(const x of timelineClipboard.parts){const t=trackById(x.track_id);if(!t)continue;const c={id:clipId(),source_start_ms:x.source_start_ms,source_end_ms:x.source_end_ms,timeline_start_ms:dest+x.offset_ms-trackDelayMs(t)};
- const others=[...(t.clips||[]),...planned.filter(y=>y.t.id===t.id).map(y=>y.c)];
- if(c.timeline_start_ms<0||others.some(y=>c.timeline_start_ms<y.timeline_start_ms+y.source_end_ms-y.source_start_ms&&c.timeline_start_ms+c.source_end_ms-c.source_start_ms>y.timeline_start_ms))return toast(tr('Segments on the same track cannot overlap','I segmenti della stessa traccia non possono sovrapporsi'));planned.push({t,c})}
- if(!planned.length)return;checkpointHistory();for(const {t,c} of planned){t.clips.push(c);t.clips_initialized=true;t.clips.sort((a,b)=>a.timeline_start_ms-b.timeline_start_ms)}projectDirty=true;render();markDirty();timingAudioChanged(new Set(planned.map(x=>x.t.id)));
+ const target=trackById(destinationTrackId)||(selectedTrackIdSet.size===1?trackById(selectedTrackId):null);
+ if(!target)return toast(tr('Click the destination track on the timeline first','Fai prima click sulla traccia di destinazione nella timeline'));
+ return commitTimelineMedia('timeline/transfer',{destination_track_id:target.id,start_ms:Math.max(0,Math.round(playCursorMs||0)),action:'copy',parts:timelineClipboard.parts});
 }
 function editSelectedSegments(action){
  const items=selectedSegmentItems();if(!items.length)return;const origin=Math.min(...items.map(x=>MtaTimelineRules.start(x.track,x.clip)));
- if(action!=='remove'){const parts=items.map(({track,clip})=>({track_id:track.id,offset_ms:MtaTimelineRules.start(track,clip)-origin,source_start_ms:clip.source_start_ms,source_end_ms:clip.source_end_ms}));timelineClipboard={duration_ms:Math.max(...parts.map(x=>x.offset_ms+x.source_end_ms-x.source_start_ms)),parts};updateEditActionState()}
+ if(action!=='remove'){const parts=items.map(({track,clip})=>({track_id:track.id,filename:track.filename,clip_id:clip.id,offset_ms:MtaTimelineRules.start(track,clip)-origin,source_start_ms:clip.source_start_ms,source_end_ms:clip.source_end_ms}));timelineClipboard={duration_ms:Math.max(...parts.map(x=>x.offset_ms+x.source_end_ms-x.source_start_ms)),parts};updateEditActionState()}
  if(action==='copy')return;checkpointHistory();const ids=new Set(items.map(x=>x.track.id));for(const t of current.tracks||[])if(ids.has(t.id)){t.clips=t.clips.filter(c=>!selectedTimelineSegments.has(MtaTimelineRules.key(t,c)));t.clips_initialized=true}selectedTimelineSegments.clear();projectDirty=true;render();markDirty();timingAudioChanged(ids);
 }
 
@@ -2682,7 +2744,7 @@ function handleGeneratedTrackShortcut(event){
   event.preventDefault();closeTrackContextMenu();void refreshGeneratedTrackFromContext(track.id);return true;
 }
 function selectTrack(id,event=null){
-  timelineSelectionOnly=false;
+  timelineTargetTrackId=id;timelineSelectionOnly=false;
   if(!trackById(id))return;
   const multi=!!(event&&(event.ctrlKey||event.metaKey));
   if(multi){
@@ -2982,13 +3044,14 @@ function bindTimeline(){
   let downX=0,downMs=0,moved=false;
   el.onpointerdown=e=>{
     if(timelineTool!=='select'||e.button!==0||e.target.closest?.('.clip-block'))return;
-    const lane=e.target.closest?.('.lane[data-track]'),track=lane&&trackById(lane.dataset.track);if(!track)return;
+    const lane=e.target.closest?.('.lane[data-track]'),track=lane&&trackById(lane.dataset.track);if(!track)return;timelineTargetTrackId=track.id;
     const rect=pane.getBoundingClientRect(),time=(e.clientX-rect.left+pane.scrollLeft)/pxPerSec*1000;
     const clip=(track.clips||[]).find(c=>time>=effectiveClipStartMs(track,c)&&time<effectiveClipStartMs(track,c)+c.source_end_ms-c.source_start_ms);
     if(clip)beginTimelineClipDrag(e,track.id,clip.id);
   };
   el.onmousedown=e=>{
     if(e.button!==0)return;
+    const lane=e.target?.closest?.('.lane[data-track]');if(lane)timelineTargetTrackId=lane.dataset.track;
     const r=pane.getBoundingClientRect();
     downX=e.clientX; moved=false;
     downMs=Math.max(0,(e.clientX-r.left+pane.scrollLeft)/pxPerSec*1000);
@@ -4718,7 +4781,7 @@ function shiftTimedEditorRows(){
 }
 function shiftTimedLyricsAnchors(old,updated){if(!old.length||old.length!==updated.length)return;const delta=Number(updated[0].time_ms)-Number(old[0].time_ms);if(!delta||!old.every((line,i)=>Number(updated[i].time_ms)-Number(line.time_ms)===delta))return;const times=new Set(old.map(x=>Number(x.time_ms)));for(const chord of current.chords||[])if(chord.manual_anchor&&chord.anchor_line_time_ms!=null&&times.has(Number(chord.anchor_line_time_ms))){ensureEventSnapshot(chord);chord.anchor_line_time_ms+=delta}for(const marker of current.markers||[])if(marker.manual_lyric_anchor&&marker.anchor_lyric_time_ms!=null&&times.has(Number(marker.anchor_lyric_time_ms))){ensureEventSnapshot(marker);marker.anchor_lyric_time_ms+=delta}}
 function parseTimedEditorTime(value){const raw=String(value??'').trim();if(!raw)return 0;if(raw.includes(':')){const parts=raw.split(':').map(x=>x.trim());if(parts.length===2){const m=Number(parts[0]),s=Number(parts[1]);if(Number.isFinite(m)&&Number.isFinite(s)&&m>=0&&s>=0)return Math.max(0,Math.round((m*60+s)*1000))}if(parts.length===3){const h=Number(parts[0]),m=Number(parts[1]),s=Number(parts[2]);if([h,m,s].every(Number.isFinite)&&h>=0&&m>=0&&s>=0)return Math.max(0,Math.round((h*3600+m*60+s)*1000))}}const seconds=Number(raw.replace(',','.'));return Number.isFinite(seconds)&&seconds>=0?Math.round(seconds*1000):NaN}
-function timedEditorRow(kind,item={},idx=0,originalIndex=null){const cfg=timedEditorConfig(kind),start=timedEditorTime(item.time_ms||0),end=cfg.end?(item.end_ms==null?'':timedEditorTime(item.end_ms)):'';const original=originalIndex==null?'':String(originalIndex);const split=(kind==='lyrics'||kind==='chords'||kind==='markers')?`<button class="timed-row-action" type="button" onclick="splitTimedEditorRow(this,'${kind}')" title="Dividi riga">Dividi</button>`:'';return `<tr class="timed-editor-row" data-index="${idx}" data-original-index="${original}"><td class="timed-editor-index">${idx+1}</td><td><input class="timed-start" value="${esc(start)}" inputmode="decimal" aria-label="Tempo iniziale" oncontextmenu="return openTimedTimestampMenu(event,this,'start')"></td>${cfg.end?`<td><input class="timed-end" value="${esc(end)}" inputmode="decimal" placeholder="auto" aria-label="Tempo finale" oncontextmenu="return openTimedTimestampMenu(event,this,'end')"></td>`:''}<td class="timed-editor-value"><textarea class="timed-value" rows="2" aria-label="${esc(cfg.valueLabel)}">${esc(item[cfg.key]||'')}</textarea></td><td class="timed-row-actions"><button class="timed-row-action" type="button" onclick="insertTimedEditorRow(this,'${kind}','above')" title="Inserisci riga sopra">＋ sopra</button><button class="timed-row-action" type="button" onclick="insertTimedEditorRow(this,'${kind}','below')" title="Inserisci riga sotto">＋ sotto</button>${split}<button class="timed-row-delete" type="button" onclick="removeTimedEditorRow(this)" title="Elimina riga">Elimina</button></td></tr>`}
+function timedEditorRow(kind,item={},idx=0,originalIndex=null){const cfg=timedEditorConfig(kind),start=timedEditorTime(item.time_ms||0),end=cfg.end?(item.end_ms==null?'':timedEditorTime(item.end_ms)):'';const original=originalIndex==null?'':String(originalIndex);const split=(kind==='lyrics'||kind==='chords'||kind==='markers')?`<button class="timed-row-action" type="button" onclick="splitTimedEditorRow(this,'${kind}')" title="Dividi riga">Dividi</button>`:'';return `<tr class="timed-editor-row" data-index="${idx}" data-original-index="${original}"><td class="timed-editor-index">${idx+1}</td><td><input class="timed-start" value="${esc(start)}" inputmode="decimal" aria-label="Tempo iniziale" oncontextmenu="return openTimedTimestampMenu(event,this,'start')"></td>${cfg.end?`<td><input class="timed-end" value="${esc(end)}" inputmode="decimal" placeholder="auto" aria-label="Tempo finale" oncontextmenu="return openTimedTimestampMenu(event,this,'end')"></td>`:''}<td class="timed-editor-value ${kind==='lyrics'&&String(item[cfg.key]||'').length>=40?'lyrics-too-long':''}"><textarea class="timed-value" rows="2" oninput="this.parentElement.classList.toggle('lyrics-too-long',${kind==='lyrics'} &amp;&amp; this.value.length>=40)" aria-label="${esc(cfg.valueLabel)}">${esc(item[cfg.key]||'')}</textarea>${kind==='lyrics'?'<small class="lyrics-long-warning">⚠ Riga lyrics lunga: dividila</small>':''}</td><td class="timed-row-actions"><button class="timed-row-action" type="button" onclick="insertTimedEditorRow(this,'${kind}','above')" title="Inserisci riga sopra">＋ sopra</button><button class="timed-row-action" type="button" onclick="insertTimedEditorRow(this,'${kind}','below')" title="Inserisci riga sotto">＋ sotto</button>${split}<button class="timed-row-delete" type="button" onclick="removeTimedEditorRow(this)" title="Elimina riga">Elimina</button></td></tr>`}
 function renumberTimedEditorRows(){document.querySelectorAll('#timedEditorRows .timed-editor-row').forEach((row,i)=>{row.dataset.index=String(i);const cell=row.querySelector('.timed-editor-index');if(cell)cell.textContent=String(i+1)})}
 function timedRowStart(row){return parseTimedEditorTime(row?.querySelector('.timed-start')?.value)}
 function timedRowEnd(row){const raw=String(row?.querySelector('.timed-end')?.value||'').trim();return raw?parseTimedEditorTime(raw):NaN}
@@ -4753,6 +4816,10 @@ function splitTimedEditorRow(button,kind){
   if(!Number.isFinite(start))return toast('Tempo iniziale non valido');
   let end=Number.isFinite(rawEnd)?rawEnd:(Number.isFinite(nextStart)&&nextStart>start?nextStart:start+2000);
   if(end<=start)return toast('La durata della riga deve essere positiva');
+  if(kind==='lyrics'){
+    const text=row.querySelector('.timed-value')?.value||'',chunks=splitImportedLyrics([{time_ms:start,end_ms:end,text,words:[]}]);
+    if(chunks.length>1){row.querySelector('.timed-value').value=chunks[0].text;row.querySelector('.timed-start').value=timedEditorTime(chunks[0].time_ms);if(row.querySelector('.timed-end'))row.querySelector('.timed-end').value=timedEditorTime(chunks[0].end_ms);row.querySelector('.timed-editor-value')?.classList.remove('lyrics-too-long');row.insertAdjacentHTML('afterend',chunks.slice(1).map(x=>timedEditorRow(kind,x,0,null)).join(''));renumberTimedEditorRows();return}
+  }
   const middle=start+Math.floor((end-start)/2);if(middle<=start||middle>=end)return toast('Intervallo troppo breve da dividere');
   const endInput=row.querySelector('.timed-end');if(endInput)endInput.value=timedEditorTime(middle);
   row.insertAdjacentHTML('afterend',timedEditorRow(kind,{time_ms:middle,end_ms:end,[cfg.key]:''},0,null));
@@ -4771,6 +4838,7 @@ window.addEventListener('pointerdown',e=>{
   if(menu&&!menu.contains(e.target))closeTrackContextMenu();
 });
 window.addEventListener('keydown',e=>{
+  if(timelineMediaBusy){e.preventDefault();e.stopPropagation();return}
   if(handleBounceShortcut(e)||handleGeneratedTrackShortcut(e))return;
   if(e.target?.closest?.('.gain-knob')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End','0'].includes(e.key))return;
   const target=e.target;
@@ -4781,8 +4849,9 @@ window.addEventListener('keydown',e=>{
     if(editable)return;
     const key=e.key.toLowerCase();if(key==='a'&&!e.shiftKey&&current&&!target?.closest?.('[role="dialog"],dialog,.utility-modal,.utility-backdrop')){e.preventDefault();closeTrackContextMenu();if(target?.closest?.('#timelinePane'))selectAllTimelineSegments();else selectAllTracks();return}if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}
   }
-  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.shiftKey&&timelineTool==='select'&&selectedSegmentItems().length&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();moveSelectedSegments((e.key==='ArrowRight'?1:-1)*(current.timeline_snap&&current.timeline_snap!=='off'?MtaTimelineRules.step(current,Math.max(0,MtaTimelineRules.start(selectedSegmentItems()[0].track,selectedSegmentItems()[0].clip))):10));return}
-  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&(document.activeElement?.closest?.('#timelinePane')||document.activeElement?.closest?.('#timeline')||document.activeElement?.closest?.('.timeline')||document.activeElement===document.body)){e.preventDefault();const increment=Math.max(1,Math.round(4/Math.max(0.01,pxPerSec)*1000));goToTimestamp(playCursorMs+(e.key==='ArrowRight'?increment:-increment));return}
+  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&timelineTool==='select'&&selectedSegmentItems().length&&target?.closest?.('#timelinePane')&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();const first=selectedSegmentItems()[0],amount=e.shiftKey?10:(current.timeline_snap&&current.timeline_snap!=='off'?MtaTimelineRules.step(current,Math.max(0,MtaTimelineRules.start(first.track,first.clip))):100);moveSelectedSegments((e.key==='ArrowRight'?1:-1)*amount,null,e.shiftKey);return}
+  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&(document.activeElement?.closest?.('#timelinePane')||document.activeElement?.closest?.('#timeline')||document.activeElement?.closest?.('.timeline')||document.activeElement===document.body)){e.preventDefault();const increment=e.shiftKey?100:Math.max(1,Math.round(4/Math.max(0.01,pxPerSec)*1000));goToTimestamp(playCursorMs+(e.key==='ArrowRight'?increment:-increment));return}
+  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&(e.key==='Delete'||e.key==='Backspace')&&timelineTool==='select'&&selectedSegmentItems().length&&target?.closest?.('#timelinePane')){e.preventDefault();e.stopPropagation();editSelectedSegments('remove');return}
   if(e.key==='Escape'){closeTrackContextMenu();return}
   if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&e.key.toLowerCase()==='s'&&!target?.closest?.('[role="dialog"],dialog,.utility-modal,.utility-backdrop')&&!document.querySelector('.utility-backdrop:not(.hidden)')){e.preventDefault();e.stopPropagation();splitSelectedTracksAt(playCursorMs);return}
   if(!editable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.repeat&&(e.key==='Backspace'||e.key==='Delete')&&timelineChordSelectedIndices.size){e.preventDefault();e.stopPropagation();deleteSelectedTimelineChords();return}
@@ -5444,6 +5513,33 @@ async function exportLyricsChordsJson(){
   const filename=((current?.title||'lyrics-chords').replace(/[^A-Za-z0-9._ -]+/g,'_').trim()||'lyrics-chords')+'.json';
   await saveGeneratedBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),filename,'application/json');
 }
+// Break long imported lyrics at word boundaries, preferring punctuation and conjunctions.
+function lyricTextGroups(tokens,limit=40){
+ const text=tokens.join(' ');if(text.length<limit||tokens.length<2)return [tokens];let split=1,best=Infinity;
+ for(let i=1;i<tokens.length;i++){const left=tokens.slice(0,i).join(' '),right=tokens.slice(i).join(' ');const score=Math.abs(left.length-text.length/2)-(/[,.!?;:]$/.test(left)?5:0)-(/^(e|ma|o|però|perché|quando|mentre|che|and|but|or|because|when|et|mais|ou)$/i.test(tokens[i])?3:0)+(Math.min(left.length,right.length)<4?10:0);if(score<best){best=score;split=i}}
+ return [...lyricTextGroups(tokens.slice(0,split),limit),...lyricTextGroups(tokens.slice(split),limit)];
+}
+function splitImportedLyrics(lines,chords=[]){
+ const result=[];
+ for(let index=0;index<lines.length;index++){
+  const line=lines[index],tokens=String(line.text||'').trim().split(/\s+/).filter(Boolean),groups=lyricTextGroups(tokens);
+  if(groups.length<2){result.push(line);continue}
+  const start=Number(line.time_ms||0),next=Number(lines[index+1]?.time_ms),rawEnd=Number(line.end_ms),end=Number.isFinite(rawEnd)&&rawEnd>start?rawEnd:(Number.isFinite(next)&&next>start?next:start+Math.max(2000,tokens.length*300)),originalWords=Array.isArray(line.words)?line.words:[];
+  const reliable=originalWords.length===tokens.length&&originalWords.every((w,i)=>String(w.text||'').trim()===tokens[i]&&Number.isFinite(Number(w.start_ms))&&Number.isFinite(Number(w.end_ms))&&w.end_ms>=w.start_ms&&w.start_ms>=start&&(!i||originalWords[i-1].end_ms<=w.start_ms));
+  const words=reliable?originalWords:tokens.map((text,i)=>({text,start_ms:Math.round(start+(end-start)*i/tokens.length),end_ms:Math.round(start+(end-start)*(i+1)/tokens.length),syllables:[]}));let offset=0;
+  for(let g=0;g<groups.length;g++){const from=offset;offset+=groups[g].length;const chunk=words.slice(from,offset),begin=g===0?start:Number(chunk[0].start_ms),finish=g===groups.length-1?Math.max(Number(chunk.at(-1).end_ms),end):Number(chunk.at(-1).end_ms);result.push({...line,text:groups[g].join(' '),time_ms:begin,end_ms:finish,words:JSON.parse(JSON.stringify(chunk))});
+   for(const ch of chords)if(ch.manual_anchor&&Number(ch.anchor_line_time_ms)===start){const wi=Number(ch.anchor_word_index||0),kind=ch.anchor_kind||'word';if((kind==='start'&&g===0)||(kind==='end'&&g===groups.length-1)||(kind==='word'&&wi>=from&&wi<offset)){ch.anchor_line_time_ms=begin;ch.anchor_word_index=kind==='end'?chunk.length-1:Math.max(0,wi-from);if(!reliable){ch.anchor_syllable_index=null;ch.anchor_char_offset=null}ch.__lyricSplitHandled=true}}
+  }
+  for(const ch of chords)if(ch.__lyricSplitHandled)delete ch.__lyricSplitHandled;
+ }
+ return result;
+}
+function splitLongLyricsEditorLine(index){
+ const line=lyricsChordsEditorLyricsDraft?.[Number(index)];if(!line)return;ensureEventSnapshot(line);
+ const next=lyricsChordsEditorLyricsDraft[Number(index)+1],source={...line,end_ms:line.end_ms??next?.time_ms??null};const chunks=splitImportedLyrics([source],lyricsChordsEditorDraft||[]);if(chunks.length<2)return toast(tr('This line has no word boundary to split','Questa riga non ha spazi in cui dividerla'));
+ for(const [i,chunk] of chunks.entries()){chunk.manual_override=true;if(i)chunk.source_snapshot={__new__:true}}
+ lyricsChordsEditorLyricsDraft.splice(Number(index),1,...chunks);refreshLyricsChordsEditor();
+}
 async function importLyricsChordsJson(input){
   const file=input?.files?.[0];if(!file)return;
   try{
@@ -5452,7 +5548,7 @@ async function importLyricsChordsJson(input){
     if(!doc||typeof doc!=='object'||Array.isArray(doc)||(!Array.isArray(doc.lyrics)&&!Array.isArray(doc.chords))||(doc.lyrics!==undefined&&!Array.isArray(doc.lyrics))||(doc.chords!==undefined&&!Array.isArray(doc.chords)))throw Error('JSON lyrics/chords non valido');
     for(const kind of ['lyrics','chords'])if(doc[kind]){if(doc[kind].length>100000||doc[kind].some(x=>!x||typeof x!=='object'||!Number.isSafeInteger(x.time_ms)||x.time_ms<0||typeof x[kind==='lyrics'?'text':'chord']!=='string'))throw Error('Evento '+kind+' non valido')}
     if(!confirm(tr('Replace the annotations present in the file?','Sostituire le annotazioni presenti nel file?')))return;
-    if(doc.lyrics)lyricsChordsEditorLyricsDraft=doc.lyrics;if(doc.chords)lyricsChordsEditorDraft=doc.chords;
+    if(doc.chords)lyricsChordsEditorDraft=doc.chords;if(doc.lyrics)lyricsChordsEditorLyricsDraft=splitImportedLyrics(doc.lyrics,lyricsChordsEditorDraft||[]);
     lyricsChordsEditorSelected=-1;lyricsChordsEditorFocus=null;refreshLyricsChordsEditor();
   }catch(e){toast('Import JSON: '+e.message)}finally{input.value=''}
 }
@@ -5551,7 +5647,7 @@ function lyricsChordsEditorHtml(){
       return target===li;
     }).sort((a,b)=>Number(a.m.time_ms||0)-Number(b.m.time_ms||0)||a.mi-b.mi);
   };
-  const rows=lyrics.map((line,li)=>{const words=editorLineWords(line,li),lineCtx=`oncontextmenu="return openLyricsChordsContextMenu(event,'lyrics',${li})"`;const startCh=(byAnchor.get(`${li}:start:0:x`)||[]).map(chip).join(''),endKey=`${li}:end:${Math.max(0,words.length-1)}:x`,endCh=(byAnchor.get(endKey)||[]).map(chip).join('');const markers=markersFor(li).map(({m,mi})=>`<span class="lc-marker-chip ${m.disabled?'disabled':''} ${m.deleted?'deleted':''}" draggable="true" ondragstart="dragLyricsMarker(event,${mi})" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('markers',${mi})" oncontextmenu="return openLyricsChordsContextMenu(event,'markers',${mi})" title="Trascina su una riga lyrics per associare · Doppio click: modifica · Click destro: menu marker">⚑ ${esc(m.label)}${m.manual_lyric_anchor?' · Manual':''}</span>`).join('');const wordHtml=words.map((w,wi)=>{const units=editorWordUnits(w),wordLevel=(byAnchor.get(`${li}:word:${wi}:x`)||[]).map(chip).join(''),unitHtml=units.map((u,si)=>{const syll=u.syllable==null?null:si,key=`${li}:word:${wi}:${syll==null?'x':syll}`,syllableChips=(byAnchor.get(key)||[]).map(chip).join(''),chips=(si===0?wordLevel:'')+syllableChips;return `<span class="lc-syllable-anchor" ondragover="event.preventDefault()" ondrop="if(draggingLyricsMarkerIndex<0)dropLyricsChord(event,${li},${wi},${syll==null?'null':syll},'word')" onclick="assignSelectedLyricsChordPart(event,${li},${wi},${syll==null?'null':syll})"><span class="lc-chord-slot">${chips}</span><span class="lc-syllable lc-lyrics-inline" contenteditable="true" spellcheck="false" data-original-text="${esc(u.text)}" onclick="if(lyricsChordsEditorSelected>=0){assignSelectedLyricsChordPart(event,${li},${wi},${syll==null?'null':syll})}else event.stopPropagation()" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" onkeydown="return lyricsInlineKey(event)" onblur="commitLyricsInlineUnit(${li},${wi},${syll==null?'null':syll},this.textContent)">${esc(u.text)}</span></span>`}).join('');return `<span class="lc-word" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" oncontextmenu="return openLyricsWordContextMenu(event,${li},${wi})">${unitHtml}</span>`}).join('');return `<div class="lc-line ${line.disabled?'lc-disabled':''} ${line.deleted?'lc-deleted':''}" ${lineCtx} ondragover="allowLyricsMarkerDrop(event)" ondrop="dropLyricsMarker(event,${li})"><div class="lc-marker-row">${markers}</div><button type="button" class="lc-time lc-time-edit" onclick="event.stopPropagation();lcRememberScroll();editLyricsLineTime(${li})">${esc(lyricsChordsEditorPosition(line.time_ms||0))}</button><div class="lc-content"><div class="lc-edge-anchor lc-edge-start" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},0,null,'start')" onclick="assignSelectedLyricsChord(${li},0,null,'start')"><span class="lc-chord-slot">${startCh}</span><span>◂</span></div><div class="lc-words">${wordHtml||`<span class="lc-token">${esc(line.text||'.')}</span>`}</div><div class="lc-edge-anchor lc-edge-end" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},${Math.max(0,words.length-1)},null,'end')" onclick="assignSelectedLyricsChord(${li},${Math.max(0,words.length-1)},null,'end')"><span class="lc-chord-slot">${endCh}</span><span>▸</span></div></div></div>`}).join('');
+  const rows=lyrics.map((line,li)=>{const words=editorLineWords(line,li),lineCtx=`oncontextmenu="return openLyricsChordsContextMenu(event,'lyrics',${li})"`;const startCh=(byAnchor.get(`${li}:start:0:x`)||[]).map(chip).join(''),endKey=`${li}:end:${Math.max(0,words.length-1)}:x`,endCh=(byAnchor.get(endKey)||[]).map(chip).join('');const markers=markersFor(li).map(({m,mi})=>`<span class="lc-marker-chip ${m.disabled?'disabled':''} ${m.deleted?'deleted':''}" draggable="true" ondragstart="dragLyricsMarker(event,${mi})" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('markers',${mi})" oncontextmenu="return openLyricsChordsContextMenu(event,'markers',${mi})" title="Trascina su una riga lyrics per associare · Doppio click: modifica · Click destro: menu marker">⚑ ${esc(m.label)}${m.manual_lyric_anchor?' · Manual':''}</span>`).join('');const wordHtml=words.map((w,wi)=>{const units=editorWordUnits(w),wordLevel=(byAnchor.get(`${li}:word:${wi}:x`)||[]).map(chip).join(''),unitHtml=units.map((u,si)=>{const syll=u.syllable==null?null:si,key=`${li}:word:${wi}:${syll==null?'x':syll}`,syllableChips=(byAnchor.get(key)||[]).map(chip).join(''),chips=(si===0?wordLevel:'')+syllableChips;return `<span class="lc-syllable-anchor" ondragover="event.preventDefault()" ondrop="if(draggingLyricsMarkerIndex<0)dropLyricsChord(event,${li},${wi},${syll==null?'null':syll},'word')" onclick="assignSelectedLyricsChordPart(event,${li},${wi},${syll==null?'null':syll})"><span class="lc-chord-slot">${chips}</span><span class="lc-syllable lc-lyrics-inline" contenteditable="true" spellcheck="false" data-original-text="${esc(u.text)}" onclick="if(lyricsChordsEditorSelected>=0){assignSelectedLyricsChordPart(event,${li},${wi},${syll==null?'null':syll})}else event.stopPropagation()" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" onkeydown="return lyricsInlineKey(event)" onblur="commitLyricsInlineUnit(${li},${wi},${syll==null?'null':syll},this.textContent)">${esc(u.text)}</span></span>`}).join('');return `<span class="lc-word" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" oncontextmenu="return openLyricsWordContextMenu(event,${li},${wi})">${unitHtml}</span>`}).join('');return `<div class="lc-line ${line.disabled?'lc-disabled':''} ${line.deleted?'lc-deleted':''}" ${lineCtx} ondragover="allowLyricsMarkerDrop(event)" ondrop="dropLyricsMarker(event,${li})"><div class="lc-marker-row">${markers}${String(line.text||'').length>=40?`<span class="lc-long-line-warning" role="status">⚠ ${tr('Long lyric: split this line','Riga lyrics lunga: dividila')} <button type="button" onclick="event.stopPropagation();splitLongLyricsEditorLine(${li})">${tr('Split','Dividi')}</button></span>`:''}</div><button type="button" class="lc-time lc-time-edit" onclick="event.stopPropagation();lcRememberScroll();editLyricsLineTime(${li})">${esc(lyricsChordsEditorPosition(line.time_ms||0))}</button><div class="lc-content"><div class="lc-edge-anchor lc-edge-start" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},0,null,'start')" onclick="assignSelectedLyricsChord(${li},0,null,'start')"><span class="lc-chord-slot">${startCh}</span><span>◂</span></div><div class="lc-words">${wordHtml||`<span class="lc-token">${esc(line.text||'.')}</span>`}</div><div class="lc-edge-anchor lc-edge-end" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},${Math.max(0,words.length-1)},null,'end')" onclick="assignSelectedLyricsChord(${li},${Math.max(0,words.length-1)},null,'end')"><span class="lc-chord-slot">${endCh}</span><span>▸</span></div></div></div>`}).join('');
   const selected=lyricsChordsEditorSelected>=0?chords[lyricsChordsEditorSelected]:null;
   return `<div class="lyrics-chords-editor"><div class="lc-editor-fixed-toolbar"><div class="workflow-note"><b>Editor Lyrics + Chords + Markers</b> · questa vista contiene solo l'editor combinato Lyrics + Chords + Markers. Formato tempo: <code>m:ss.mmm</code>/<code>mm:ss.mmm</code>. Gli anchor ◂/▸ rappresentano inizio/fine riga. Trascina/clicca un chord su una sillaba o su una posizione interna della parola, oppure su un anchor o un altro chord. Click destro su una parola: <b>Dividi qui</b>.</div><div class="lc-toolbar"><button class="utility-btn" onclick="undoLyricsChordsEditor()" ${lyricsChordsEditorUndoStack.length?'':'disabled'}>Undo</button><button class="utility-btn" onclick="redoLyricsChordsEditor()" ${lyricsChordsEditorRedoStack.length?'':'disabled'}>Redo</button><button class="utility-btn" onclick="cutLyricsChordsItem()">Taglia</button><button class="utility-btn" onclick="copyLyricsChordsItem()">Copia</button><button class="utility-btn" onclick="pasteLyricsChordsItem()">Incolla</button><button class="utility-btn primary lc-save-btn" onclick="saveLyricsChordsEditor()">Salva</button><button class="utility-btn secondary" onclick="addLyricsEditorLine()">+ Lyrics</button><button class="utility-btn secondary" onclick="promptLyricsShift()">Delay lyrics (ms)</button><button class="utility-btn secondary" onclick="promptChordsShift()">Delay chords (ms)</button><button class="utility-btn secondary" onclick="exportLyricsChordsJson()">Esporta JSON</button><label class="utility-btn secondary">Importa JSON<input type="file" accept=".json,application/json" hidden onchange="importLyricsChordsJson(this)"></label><button class="utility-btn secondary" onclick="addChordEditorEvent()">+ Chord</button><button class="utility-btn secondary" onclick="addInstrumentalSection()">+ Instrumental</button><button class="utility-btn secondary" onclick="resetLyricsChordAnchors()">Reset anchor</button><button class="utility-btn secondary" onclick="openLyricsPdfStylePanel()">Stile PDF</button></div></div><div class="lc-editor-scroll" oncontextmenu="if(event.target===this)return openLyricsChordsContextMenu(event,'editor',-1)"><div class="lc-grid">${rows||'<div class="workflow-note">Nessuna lyric.</div>'}</div>${selected?`<div class="workflow-note">Chord selezionato: <b>${esc(selected.chord)}</b></div>`:''}</div><div class="utility-actions lc-editor-footer"><button class="utility-btn primary" onclick="saveLyricsChordsEditor()">Salva</button><button class="utility-btn secondary" onclick="closeLyricsChordsEditor()">Chiudi</button></div></div>`
 }

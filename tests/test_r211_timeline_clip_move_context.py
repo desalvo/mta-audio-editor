@@ -9,7 +9,7 @@ def test_clip_blocks_are_draggable_in_select_mode():
     assert "function beginTimelineClipDrag(event,trackId,clipId)" in JS
     assert "if(timelineTool!=='select'||event.button!==0)return" in JS
     assert 'onpointerdown="beginTimelineClipDrag(event' in JS
-    assert "MtaTimelineRules.delta(current,selectedTimelineSegments" in JS
+    assert "MtaTimelineRules.delta(rulesProject,selectedTimelineSegments" in JS
     assert ".clip-block{pointer-events:auto}" in CSS
 
 

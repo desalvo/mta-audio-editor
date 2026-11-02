@@ -1,10 +1,10 @@
 {
   "schema": "mta-service-admission-review-1",
-  "date": "2026-10-29",
+  "date": "2026-11-02",
   "checker_sha256": "7146777e44094f727c8d6fe787da212879a601ca58577825f412b82e736b6dc3",
   "source_sha256": {
     "app/__init__.py": "sha256:eb3205cb75b2a7474361060d9b8d89329c29272cd8978ba62b6290b9a29b7550",
-    "app/account_erasure.py": "sha256:cefeaa9ff969e6be3b3d118ba689b0a3bf06fc21093cabd51f7ab606f11ab35e",
+    "app/account_erasure.py": "sha256:eb074aec67b28079948aa846fe7aa1d034af2a1636e09b37ae6e31a0283ae6c8",
     "app/account_financial_context.py": "sha256:0a7749ce17ecd76126453cbdaa4d571e4cb9214d29d1c35ba2d0f5f12e526e0b",
     "app/account_lifecycle.py": "sha256:dc2a034d92b49c76f4953cfce42da64432edf54283d5b31ccc78456115a7c59c",
     "app/account_limits.py": "sha256:15d4b17175386e08b4283a764559767dff344395eeb1ecc3089d1a7ce773219e",
@@ -25,7 +25,7 @@
     "app/admin_dump_routes.py": "sha256:aecf5f7e83457dccf5db05d53d1fff5ef27458ff33dc6e6978627eee57824679",
     "app/admin_navigation.py": "sha256:1b559c7fef7a74168c4d2c169db4886213b9aaeb75f1812c813a72722df22970",
     "app/ai_access.py": "sha256:8ca028716c25ef3a677bf26f096868e65fc1793185f090acd3d26697051e9b35",
-    "app/ai_adapter_identity.py": "sha256:2556274ea29305b189e58b54c88b8d3955fa26cf258e03364f97b2eb2ab8f8ce",
+    "app/ai_adapter_identity.py": "sha256:a1e420da7d6041837262ddd9a8790a32049c5d5946ed832d752836fd2cb2a616",
     "app/ai_amd_smi_collector.py": "sha256:1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b",
     "app/ai_arranger.py": "sha256:4542cfa2668487c1ab309a5758aa593d37a8c18e60ee91b8a73e681047cabbc3",
     "app/ai_arranger_runtime.py": "sha256:c9da0bbbf3a8f795275646a5c599d9752a56b546e2ce5bbc89d37bc3019c64e6",
@@ -65,7 +65,7 @@
     "app/ai_model_attestation.py": "sha256:640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "sha256:fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
     "app/ai_model_download.py": "sha256:ef8a2b180203eac208fe3fa7f4edc6c1cff0e025a7b2319be2abcc581812bfde",
-    "app/ai_models.py": "sha256:27fd2f626be6706cb91cd06ce7af80395cb32e10669147db367beffc50a2cc00",
+    "app/ai_models.py": "sha256:4f910d64b878d30115eb34447220fa32fc90a5637930dd06024ea40c9a1f2d07",
     "app/ai_native_remote_journal.py": "sha256:2ae103fce708e07452fbd45d5ff6da60c8afd94e184d14914e9a7ed87001df95",
     "app/ai_notification_routes.py": "sha256:c9572bd27f8dcf3210d0617853780fccd7b158d89123946e890625e854df7c66",
     "app/ai_notifications.py": "sha256:c2645a42a7aa798d733a31927e01d13d52b13bec156fa4b6de6889ae725afa63",
@@ -89,7 +89,7 @@
     "app/ai_remote_transport.py": "sha256:21f727505bfe14d97ae80d80099f85e7fd1c1aab73f00f5c1f803eed4408e141",
     "app/ai_request_dedup.py": "sha256:a31b0bca32439ba887c3d0c87178442e49307e5117b150d3038e097419fcb4b2",
     "app/ai_result_cache.py": "sha256:44b24c96a4c30f4a43ff7ca1379af9651085363b47e4f6358be5e5aed453acf1",
-    "app/ai_server_execution.py": "sha256:dcb911e336cac91ea670c5ad10fff5f5577c21c492a2edb01300ce5e77668ca1",
+    "app/ai_server_execution.py": "sha256:651ca28dc040542436fecdfc07a66aac44564dfb3f9440311f76c1c70525377c",
     "app/ai_storage_sampler.py": "sha256:03e700ce4fe6b799a75959ac4bfd4ce4185f06c0a8fc5e98718d2421a72168b6",
     "app/ai_studio_adapter.py": "sha256:62856cb1a67a669d56e9b875ef13890460db349a74c59cf36260b0c8684f9423",
     "app/ai_token_routes.py": "sha256:c437a893c2bbb76bdaf53e27b46ace1fb006a834c35469c272332fee26956177",
@@ -100,7 +100,7 @@
     "app/ai_usage_reporting.py": "sha256:6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
     "app/ai_worker_artifacts.py": "sha256:9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28",
     "app/ai_worker_protocol.py": "sha256:70255f784389b81e80edeaca1fb8d6698375284b962c11dec0cbaecac40c26fb",
-    "app/ai_worker_registry.py": "sha256:92a13311444b82298b815ef41c51cf0c60d0c612f48c0b94c882f5e1e7e95b55",
+    "app/ai_worker_registry.py": "sha256:2a99aeffdbbdddfdade782306df7721791194517219a60a7ff15d9ff943cdea0",
     "app/audio_backend.py": "sha256:4d91382bcd6eb8e6c7792c52e440df2dd50a01db1cb31eeee4ebaf1835cc064c",
     "app/audio_capture.py": "sha256:3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a",
     "app/audio_engine.py": "sha256:1b7579278628d91bc9b019e101e30ff4462fe0a8ca6ec7334b5ec5af2d77040d",
@@ -113,7 +113,7 @@
     "app/checkout_terminal_outcomes.py": "sha256:3e5790f8fc7ac22002e04ba0b5f972e147cb141b63f3a9a4a49759dd01ed2eae",
     "app/chord_ml.py": "sha256:dad908b9b8d0f43b6bff995388e84a977e27f4753acfd80e7fb44c70c1e23f58",
     "app/chordino_runtime.py": "sha256:1f68de3b0d7c4b4a50f7b509941b4e55e5b31f788727e7b2f75ed0cc745b29c4",
-    "app/codec.py": "sha256:1b8012fb814cc6ee9b07b6a4fd53ae5fe7de4ce8128b782da2d49269d564d157",
+    "app/codec.py": "sha256:0e072cd1b214446a053c2bf2ab63d2055af0c455c28b00153daa227fa60086f5",
     "app/commercial_launch.py": "sha256:7e73b44ae8f48d9a082c4a198cb1e6f25440655b3bef8571b7ae1c7e8d4e346d",
     "app/configure_ace_gpu_profiler.py": "sha256:5a5554a196c01e12d9ad1812f9b8efc157a90832d7d674a02da89ed209b44967",
     "app/cpp_audio.py": "sha256:c5493e46e1eeeb6903208ea12472ac5a19d80516a4ef488880dd965800463801",
@@ -137,8 +137,10 @@
     "app/linux_proc_view.py": "sha256:76faadb240dc3af7f2ecfbdd2c5b1016d0a6f6c100afd4bacb1bbfb0118fd022",
     "app/live_mixer.py": "sha256:c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291",
     "app/live_sources.py": "sha256:729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
-    "app/main.py": "sha256:f00a34a7415da214d40f74c33aa8179e734e0f3f2be2a6dc5b7bea5f09345580",
+    "app/lyric_layout.py": "sha256:c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
+    "app/main.py": "sha256:566df1da6e42c1de6ff8aa7c6432827920ffc1cd58af03174331783844d7d59a",
     "app/mega53_runtime.py": "sha256:14f862c31db8153972313411f38373de83d53ce2558f9e69c74a76cd88044c52",
+    "app/merish_mta16.py": "sha256:a5b114a5c3e29491890d28f92b7e5e6a76c21bde3f6989f262429d331bdec816",
     "app/metronome_grid.py": "sha256:65c3e06fd4215ac561a5cb085d0c92fada782a519331e76f861fd01124f0cf02",
     "app/midi.py": "sha256:bfc599a17318a7dfccd050ec430de588420df2f4fe6dded4fd8d7e69e82bad1c",
     "app/midi_devices.py": "sha256:dd19f0d76871b9d93d37f35a35d03c1f7b072892c851a6155497fd6ecc3d5284",
@@ -149,6 +151,7 @@
     "app/midi_smf.py": "sha256:20486d0f8fdc7afbc0859645d3616517901cdaabc9951880a865909bee6cc478",
     "app/midi_ump.py": "sha256:5bc915e5a04b841937fec3ebb7ec453fd48dc37b7eb03fcfe0c9d2c0b3825bee",
     "app/mlive_mp3.py": "sha256:d83e56a2142fed65fe0ad85053c18aa0af293186f271619b22bb3ca3b557fe31",
+    "app/mlive_profile.py": "sha256:4ebfd83f1137fcd3c88d413078170481ec41d24cb2e909ccb17a502b1b87c695",
     "app/model_asset_admin.py": "sha256:d435e1bb234cb7b95de4fcbb1aa369f527505fa151c0334799407e0428f0009f",
     "app/model_asset_admin_routes.py": "sha256:82151d07e47b67087bc7694a71eb1812bfc32b454b573f84c44330a9e39fb29d",
     "app/model_license_policy.py": "sha256:bf59c12014850db763c47d703d72b33fb9ba7a001fd0661fa9d589f67b59d12c",
@@ -156,13 +159,13 @@
     "app/model_selectors.py": "sha256:5af81aea974cc537ddb63ef5b4e2390b165e91dff789a6babca39bb95bc37b9a",
     "app/model_storage.py": "sha256:99a7c255f886ae7bf1cd6a9506455592f2efd0da9aaba8327a8940a916b1da6b",
     "app/model_updater.py": "sha256:2ceb9df25b17d70d46427bda86fc5a52a9adabe0587b6af944d469306d0ce977",
-    "app/models.py": "sha256:3887c28b3307bafa4bdebfb28a3b51b6deb9571d00e1db18e9e419e57114f04d",
+    "app/models.py": "sha256:6dbcda41f4ae4290f8ab33c827430892d58efa789037062987d2b6b088b5f4f9",
     "app/mp3g.py": "sha256:8cf260e75c2fee4ab397008d9f5aa36186791002082f723da9673d28e75c6a3a",
     "app/mrmt3_adapter.py": "sha256:9c8179fe122d3dfd000fd1c269b654ae45d55b2edd3894011d9016d7ec41bb83",
     "app/mrmt3_checkpoint.py": "sha256:1d22fa45ccdadbf2aec366f8457daf519d6de2c0362aadcae339b91486e6f305",
     "app/mrmt3_decode.py": "sha256:f23b8655b2cb7dafe947049870047e8d55eff5f8bf0a504d418a1e74aaafec26",
     "app/mta_reverse.py": "sha256:bf12e048a68b5ed8a8a92c50e7ff77a7fb270b134215ed00db0cb5b57991baab",
-    "app/mta_writer.py": "sha256:75e2202f8e7f49b867f8652a5cc89643ced8fbe8903dfaae6bfdb2de68b0b6a2",
+    "app/mta_writer.py": "sha256:dfae84bb63bd6959a67d8d3a5d5442c3c81ff97ad876fe362245c9a01b61a144",
     "app/music_channels.py": "sha256:5486f7e76d150476499ecb64ade0bc3c134512d95c6edad2a86d73971bd79d1c",
     "app/music_interchange.py": "sha256:e8b5a5d4468f88ddf6f330b2710ee2b0a14f1f503140207916579bb14a08c12b",
     "app/music_publication.py": "sha256:2ebd385691c6969e8c909e5083fe5e069fba4e56bc4ef292a1e02203675374cd",
@@ -187,7 +190,7 @@
     "app/owner_payments.py": "sha256:7cea910f4a7a98142080aa061618eec83da8c8b67d4a40344078e5158682f719",
     "app/payment_reconcile_service.py": "sha256:2f81d2af1cebfc5269c04d16d145f82aa12dd46b15a8334026b59ec61fd5204a",
     "app/payment_reconciliation.py": "sha256:e6036e125bf99dc9ec22b4f4d782118e363eef1fc1aa5a459188ddf78d133e54",
-    "app/paypal_cash_history.py": "sha256:269c99e86a6aa5a1289103406a7fcee94a7411ef7466c27f82725931ccfce73b",
+    "app/paypal_cash_history.py": "sha256:66ca5430d993c98533674ff6786ee8f0fe0263d799e2277f44a66964f49a479c",
     "app/paypal_dispute_details.py": "sha256:e81dbc26dfddafa4b35b743be3d7a1ad3c272716be3eefd16d8e1e31821ca36a",
     "app/paypal_dispute_history.py": "sha256:24f457cd9c6ef467ee2ba418f8ffb60e4bd3102a2db5ca41c5308df95742abb8",
     "app/paypal_merchant_history.py": "sha256:6a64b4cc8998a3c855cfceb42ecec8d5f235d43504a069291678285f9cd1b293",
@@ -200,6 +203,7 @@
     "app/plugins.py": "sha256:08eb7f847cbd6eb5c65976be8e04feddb1553c895f79653f573942f262c3a5f2",
     "app/preview_publish.py": "sha256:72b54e1ec35c11b6367d193188eb19621673654fa3aefb52c5b54fe5fd2a887a",
     "app/project_kinds.py": "sha256:d2043a15db7f478bf7aca0e9d6e1205e09d9886e5c56ea5d786d2ad6ba8181f1",
+    "app/project_media_conversion.py": "sha256:0ac88bdac1306baa1890c00fc5d5b9bc2e885fb12c686e04ca7a917a3eac9cc4",
     "app/project_media_usage.py": "sha256:85300cbd24bf3df6fa8b4c34b7a4b4aa94d77471b7858bd69b50ae7f0990e3f6",
     "app/qixuan_profiles.py": "sha256:0cf26f379cc704c483db8a3b902fb8f8456af8e2af955d7a395fd22b59e469c7",
     "app/rc_acceptance.py": "sha256:c7f524b417dd7748d67ba7fe53fff4980e86b6c4dabb560124bc7cb4d1739f91",
@@ -265,7 +269,7 @@
     "app/social_totp.py": "sha256:35c23d4b3b880e627bb2c10d29e8c37c5db8ae3d9ff7f7a06804f523ee7e651e",
     "app/social_ui.py": "sha256:4f90381d7eff2da0cc3cc8edb2581a58a2f28c32808b9e4b5bebec483c640a80",
     "app/sqlite_availability.py": "sha256:365fb1b80404d3441fdf9cd06570f21a7a2a7f0ecbc41f716c4a40ca8bcf79da",
-    "app/storage.py": "sha256:603f1c07e718b78d2fe3a5d91279e46cc5f2abef6ec4abcab3edc978943e4d5c",
+    "app/storage.py": "sha256:9cd06abf50bcdb687d2083bc47aecb3df962440b9a8c7bd2bee7d49533558c41",
     "app/stripe_failed_charge_proof.py": "sha256:eeb33009f2623729477d2b7d663403d6501effd6256c0e88c3a16786fc0b8c17",
     "app/stripe_paid_history.py": "sha256:a7f1d845fca563f0cc9f4db1e48bca8bacbb3d8e19f81b393c6de6d649532d08",
     "app/studio_admin.py": "sha256:ea7ce1fcad4ec2e75cc270a7fb7728b8de12773ec59c1c84c37f1b12b76e8acc",
@@ -286,6 +290,7 @@
     "app/subscription_cash_reconciliation.py": "sha256:0f8eca66bd07987f0e67b2a7ac3d6225f062705068e4f83c7db0831a021fd3ee",
     "app/subscription_receivables.py": "sha256:ebd5d1fb9c7bc89361f7dbaa81878b9a781fcb4565b61913f549bcb32109b82c",
     "app/timeline_editing.py": "sha256:5bfbe968ba505ca7f393d4e8046ad94e7c6f05d1dbf108cc3909239ec95758a1",
+    "app/timeline_media.py": "sha256:6d97741fc1c178700a21a52450a6c7d193b7bce8fb401933464414f02214e6f5",
     "app/track_match.py": "sha256:cdec4949487c0bac848dd897580174a327cd758bda559936987cb3867b1f6082",
     "app/transcription_source_contract.py": "sha256:2f87dfd312a74b1922a47e86c0882513ea581a63033b581d9cb7547cd85a49f5",
     "app/transcription_timing.py": "sha256:b70274158cf7e9d5a8fcaf09957a3858620fd1b63d1858967c8a54cf8091f50d",
@@ -781,6 +786,17 @@
       "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred."
     },
     {
+      "path": "app/ai_models.py",
+      "function": "chord_engine_available",
+      "line": 192,
+      "kind": "process_boundary",
+      "call": "subprocess.run",
+      "ast_sha256": "e51ba9bf248db7f6791d8c44bd45bb5c506774874aa6e9d53db56ea836bde724",
+      "disposition": "request_lifetime",
+      "boundary": "Validated registered chords worker interpreter, isolated -I execution of a literal importlib dependency check, ten-second timeout. This is availability inspection only, with no user Python/executable selection, model inference or financial transition.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
       "path": "app/ai_notifications.py",
       "function": "start_service",
       "line": 280,
@@ -1058,7 +1074,7 @@
     {
       "path": "app/codec.py",
       "function": "run",
-      "line": 100,
+      "line": 106,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -1168,7 +1184,7 @@
     {
       "path": "app/main.py",
       "function": "_mta_application_lifespan",
-      "line": 120,
+      "line": 122,
       "kind": "asynchronous_lifetime",
       "call": "threading.Thread",
       "ast_sha256": "ed0506da846494e6e3f42fce50724c85d4318633cefae5b87412d969ca653ef2",
@@ -1179,7 +1195,7 @@
     {
       "path": "app/main.py",
       "function": "<module>",
-      "line": 134,
+      "line": 136,
       "kind": "service_entry",
       "call": "fastapi.FastAPI",
       "ast_sha256": "3700fcf3063b49c5e82a1f88e486381c87c9b07ff59a995036c26b4e20bca90f",
@@ -1190,7 +1206,7 @@
     {
       "path": "app/main.py",
       "function": "_start_diagnostic_cleanup",
-      "line": 193,
+      "line": 195,
       "kind": "asynchronous_lifetime",
       "call": "threading.Thread",
       "ast_sha256": "beaef14413a62ea17b58c98f04519b731f51000890132545ca2ee3b28fee6fc5",
@@ -1201,7 +1217,7 @@
     {
       "path": "app/main.py",
       "function": "_start_background_services",
-      "line": 239,
+      "line": 241,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "89393e3de6a2c6081e555f7eca31135d9e524553cd6b6f7efd6122be49106209",
@@ -1212,7 +1228,7 @@
     {
       "path": "app/main.py",
       "function": "_lead_backing_engine_available",
-      "line": 275,
+      "line": 277,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "61b5e8d52377fa9b874c7054fa6d0709388fb3b6d3d24dd4b0ef09a2909aeaad",
@@ -1223,7 +1239,7 @@
     {
       "path": "app/main.py",
       "function": "_start_kara_checkpoint_repair",
-      "line": 321,
+      "line": 323,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "8345e76927c7039790c2af7814b1f778ae59c9fad3c57c382f89e5a31664d783",
@@ -1234,7 +1250,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_projects_dump",
-      "line": 1439,
+      "line": 1446,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1245,7 +1261,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_parameters",
-      "line": 1589,
+      "line": 1596,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "ed80931ac27dbcefb0d8e3590f252599fe79c87557e31b086bd4af990c524610",
@@ -1256,7 +1272,7 @@
     {
       "path": "app/main.py",
       "function": "project_archive_export",
-      "line": 2742,
+      "line": 2773,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1267,7 +1283,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_audio",
-      "line": 2845,
+      "line": 2876,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "25125771ed742253ce8b8474ad02ee2ac9742a724508dc20a0a14109373f9f57",
@@ -1278,7 +1294,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_effect_preview",
-      "line": 2893,
+      "line": 2924,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "950199ef2b6e3d4bdb93c0c381d27a888e1ebc45bb7285a435de56399ec1d730",
@@ -1289,7 +1305,7 @@
     {
       "path": "app/main.py",
       "function": "_normalize_audio_to_project_rate",
-      "line": 2970,
+      "line": 3001,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "1ef3cbaf0a3abeca889313cd85b3eb87211f557a3dba84291ffe6d0e541d70ba",
@@ -1300,7 +1316,7 @@
     {
       "path": "app/main.py",
       "function": "start_waveform_job",
-      "line": 3215,
+      "line": 3246,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "2ab21f2385d2ba58890dff3c78c3937067830df10bc1e138d4f1ab57f4aa82f0",
@@ -1311,7 +1327,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_import_job",
-      "line": 3402,
+      "line": 3433,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "152141a7b66765bd0c1230d92572fd473dd4af68f0fd2541d6bbb4467a843f2e",
@@ -1322,7 +1338,7 @@
     {
       "path": "app/main.py",
       "function": "_native_remote_infer",
-      "line": 3451,
+      "line": 3482,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "63354d4a762c50c82a3ee076466ad3186afcfe33afcf9ec6be8fdd300359c035",
@@ -1333,7 +1349,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3473,
+      "line": 3509,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "f55f9882602b8af337cfa6c132dad2e18f7c325b3e04c915ef169492cd65983d",
@@ -1344,7 +1360,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics_pdf",
-      "line": 3786,
+      "line": 3827,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1355,7 +1371,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics_pdf",
-      "line": 3790,
+      "line": 3831,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1366,7 +1382,7 @@
     {
       "path": "app/main.py",
       "function": "start_youtube_import_job",
-      "line": 4083,
+      "line": 4124,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "5d7cc8a2fbe59f62084513a399f3654bfe2fb295e42460f6ea59acc3852c7c95",
@@ -1377,7 +1393,7 @@
     {
       "path": "app/main.py",
       "function": "_start_bounce",
-      "line": 4198,
+      "line": 4239,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "cda43824f22c314bfbd46533b87b036f37be97ce089977c37a595b4f9d3f64da",
@@ -1388,7 +1404,7 @@
     {
       "path": "app/main.py",
       "function": "start_mta_import_job",
-      "line": 4715,
+      "line": 4778,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "c1af4132570b409eec7d50a30a364b6553142628ee88568c514de50ea7fdd234",
@@ -1399,7 +1415,7 @@
     {
       "path": "app/main.py",
       "function": "_sam_audio_extract",
-      "line": 4926,
+      "line": 4989,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "16ed5cdd033b2e3fc4bf7190188bdfceca04b04671cde85b4f1b66c449fc7c91",
@@ -1410,7 +1426,7 @@
     {
       "path": "app/main.py",
       "function": "_drumsep_extract",
-      "line": 5756,
+      "line": 5819,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "16ed5cdd033b2e3fc4bf7190188bdfceca04b04671cde85b4f1b66c449fc7c91",
@@ -1421,7 +1437,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_export_job",
-      "line": 7083,
+      "line": 7195,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "a1a2c97c174a33143f284b9fb40206cfbe2ca013793a4b2847c164bd786bbc73",
@@ -1432,7 +1448,7 @@
     {
       "path": "app/main.py",
       "function": "_render_karaoke_video",
-      "line": 7227,
+      "line": 7339,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -1443,18 +1459,18 @@
     {
       "path": "app/main.py",
       "function": "start_configured_project_export_job",
-      "line": 7403,
+      "line": 7522,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
-      "ast_sha256": "abbe34be572b744fe54e96b252bad363db7fba0d7c4b764b43a30e5116f9cbd0",
+      "ast_sha256": "485b20b4843d6cbd50e172f3f072f2cd7776d2f9013299c31e903e073cab09ce",
       "disposition": "tracked_work",
-      "boundary": "Independent original child ticket is reserved before Thread.start,with parent context inherited;normal completion closes it. Start failure closes only unstarted work;uncaught/lost work remains held. Duplicate start cannot replace an original ticket.",
-      "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred."
+      "boundary": "Export still uses service_admission.worker_thread, inheriting and reserving the owned continuation before start. The added per-user M-Live settings are copied bounded data, never executable/model selection.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
     },
     {
       "path": "app/main.py",
       "function": "_karaoke_export_worker",
-      "line": 7439,
+      "line": 7558,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -1465,7 +1481,7 @@
     {
       "path": "app/main.py",
       "function": "start_karaoke_export_job",
-      "line": 7473,
+      "line": 7592,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "25bd2b0dec8b83af17ce49cdac963d6f913b538d5faca1d0f56d9e5ad1066368",
@@ -1476,7 +1492,7 @@
     {
       "path": "app/main.py",
       "function": "<module>",
-      "line": 7518,
+      "line": 7638,
       "kind": "command_entry",
       "call": "__main__",
       "ast_sha256": "607d58081f661301abd859308265389ab10fcd588f64dc15d59eb4e3a0eba9c3",
@@ -1487,7 +1503,7 @@
     {
       "path": "app/main.py",
       "function": "<module>",
-      "line": 7526,
+      "line": 7646,
       "kind": "service_entry",
       "call": "uvicorn.run",
       "ast_sha256": "eb5df95bcf270409640c491bb593d14e8a6934e813f51e685518c34878489580",
@@ -1498,7 +1514,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_test",
-      "line": 8069,
+      "line": 8189,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "340066854303f6f9d9de09ff9bd8b0a1a29f95e2f161b9e0544122ede37da00d",
@@ -1692,6 +1708,39 @@
       "disposition": "tracked_work",
       "boundary": "Independent original child ticket is reserved before Thread.start,with parent context inherited;normal completion closes it. Start failure closes only unstarted work;uncaught/lost work remains held. Duplicate start cannot replace an original ticket.",
       "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred."
+    },
+    {
+      "path": "app/project_media_conversion.py",
+      "function": "_probe",
+      "line": 18,
+      "kind": "process_boundary",
+      "call": "subprocess.run",
+      "ast_sha256": "3d592040e51679a98d25b3134060ec319d288e2be51d859fd383e1e9376ec825",
+      "disposition": "request_lifetime",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "path": "app/project_media_conversion.py",
+      "function": "_pcm_hash",
+      "line": 28,
+      "kind": "process_boundary",
+      "call": "subprocess.run",
+      "ast_sha256": "d44b2cd2ff24e04bde5027463d6fde15eb61ed31e11129687dbf3a14f717ed7f",
+      "disposition": "request_lifetime",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "path": "app/project_media_conversion.py",
+      "function": "convert",
+      "line": 106,
+      "kind": "process_boundary",
+      "call": "subprocess.run",
+      "ast_sha256": "968c42e1eb90c144254a022d36f7a65d3c3f20bbaf9112ae33f0b835443d4a7b",
+      "disposition": "request_lifetime",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
     },
     {
       "path": "app/rc_acceptance.py",
@@ -2112,6 +2161,28 @@
       "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred."
     },
     {
+      "path": "app/timeline_media.py",
+      "function": "_decode_span",
+      "line": 129,
+      "kind": "process_boundary",
+      "call": "subprocess.run",
+      "ast_sha256": "f75469ebb0adfe01b12f8ee13f619d7e4e505c9ee179c0837052f783aa780280",
+      "disposition": "request_lifetime",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
+      "path": "app/timeline_media.py",
+      "function": "_decode_span",
+      "line": 133,
+      "kind": "process_boundary",
+      "call": "subprocess.run",
+      "ast_sha256": "c86c9cbbb30811f4cfcfdc0f35c8e3c31b84e6564e2fdccae6123179af12e49e",
+      "disposition": "request_lifetime",
+      "boundary": "Local non-inference media preparation in the admitted request lifetime. Project ACL and publication lock precede edits. Fixed administrator-installed FFmpeg/ffprobe argv, shell=False, owned regular source files, numeric typed bounds, private outputs and immutable original media. No executable selection from API input.",
+      "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
+    },
+    {
       "path": "app/transkun_adapter.py",
       "function": "transcribe",
       "line": 25,
@@ -2424,5 +2495,11 @@
     ],
     "boundary": "Exact original owner/merchant/admitted checkout plus stable complete canonical cases/captures/refunds and bounded balance-only cash, no caller amount or payout label authority. Cash claims and original ledger commit atomically, before any gross first funding becomes visible. No new transport, interpreter, inference, process, grant or automatic monetary retry.",
     "unchanged": "All checker bytes, AST call shapes, classifications, findings, thresholds and suppressions. Provider and browser target acceptance remain separate."
+  },
+  "timeline_media_review": {
+    "date": "2026-11-02",
+    "evidence": "docs/TIMELINE_MEDIA_R210.md",
+    "explicitly_reviewed_new_or_changed": 7,
+    "scope": "Local timeline/lyrics plus inherited media/profile boundaries; no RC, payment or hardware authorization."
   }
 }
