@@ -150,6 +150,7 @@ _AUTH_SCHEMA_READS = (
     ('SELECT * FROM social_identities LIMIT 0', frozenset('id user_id provider subject created_at'.split())),
     ('SELECT * FROM sessions LIMIT 0', frozenset('id user_id token_hash created_at expires_at user_agent_hash'.split())),
     ('SELECT * FROM model_access_tokens LIMIT 0', frozenset('id user_id token_hash scopes label created_at expires_at revoked_at'.split())),
+    ('SELECT * FROM direct_messages LIMIT 0', frozenset('id sender recipient text mime media size created_at read_at'.split())),
     ('SELECT * FROM smtp_config LIMIT 0', frozenset('id host port security username password_enc from_email from_name'.split())),
 )
 
@@ -263,6 +264,22 @@ def init_auth_db() -> None:
           from_name TEXT NOT NULL DEFAULT 'MTA Audio Editor'
         );
         INSERT OR IGNORE INTO smtp_config(id) VALUES(1);
+        CREATE TABLE IF NOT EXISTS direct_messages(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          sender INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          recipient INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          text TEXT NOT NULL DEFAULT '',
+          mime TEXT,
+          media BLOB,
+          size INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL,
+          read_at INTEGER,
+          CHECK(sender != recipient)
+        );
+        CREATE INDEX IF NOT EXISTS idx_direct_messages_sender ON direct_messages(sender,recipient,id);
+        CREATE INDEX IF NOT EXISTS idx_direct_messages_rate ON direct_messages(sender,created_at);
+        CREATE INDEX IF NOT EXISTS idx_direct_messages_recipient ON direct_messages(recipient,read_at,id);
+
         """)
         # Migration safety for early development DBs.
         for definition in (

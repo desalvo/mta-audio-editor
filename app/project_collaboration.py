@@ -391,8 +391,9 @@ def upload_media(pid: str, request: Request, file: UploadFile):
             raise
 
 
-def _validate_media(path):
-    head = path.read_bytes()[:32]
+def _validate_media(path, *, allow_video=False):
+    with path.open("rb") as stream:
+        head = stream.read(32)
     if head.startswith((b'\x89PNG\r\n\x1a\n', b'\xff\xd8\xff', b'GIF87a', b'GIF89a')) or (head.startswith(b'RIFF') and head[8:12] == b'WEBP'):
         from PIL import Image
         try:
@@ -417,19 +418,32 @@ def _validate_media(path):
                                 capture_output=True, text=True, timeout=15, check=True)
         info = json.loads(result.stdout)
         streams = info.get('streams', [])
-        if not streams or any(stream.get('codec_type') != 'audio' for stream in streams):
-            raise ValueError('Only audio streams are accepted')
+        kinds = {stream.get('codec_type') for stream in streams}
+        allowed = {'audio', 'video'} if allow_video else {'audio'}
+        if not kinds or not kinds <= allowed:
+            raise ValueError('Unsupported streams')
         duration = float(info.get('format', {}).get('duration', 0))
         if not 0 < duration <= 1800:
             raise ValueError('Audio must be between zero and 30 minutes')
         format_name = info.get('format', {}).get('format_name', '')
+        if 'video' in kinds:
+            # Limit the preview to browser video containers and bounded geometry.
+            videos = [item for item in streams if item.get('codec_type') == 'video']
+            if len(videos) != 1 or not 0 < videos[0].get('width', 0) * videos[0].get('height', 0) <= 8_847_360:
+                raise ValueError('Unsupported video dimensions')
+            codec = videos[0].get('codec_name')
+            if head[4:8] == b'ftyp' and 'mp4' in format_name and codec in {'h264', 'av1', 'hevc'}:
+                return 'video/mp4'
+            if head.startswith(b'\x1aE\xdf\xa3') and 'webm' in format_name and codec in {'vp8', 'vp9', 'av1'}:
+                return 'video/webm'
+            raise ValueError('Unsupported video container or codec')
         choices = [('wav', 'audio/wav'), ('mp3', 'audio/mpeg'), ('ogg', 'audio/ogg'), ('webm', 'audio/webm'), ('matroska', 'audio/webm'), ('flac', 'audio/flac'), ('mp4', 'audio/mp4')]
         mime = next((mime for kind, mime in choices if kind in format_name), None)
         if not mime:
             raise ValueError('Unsupported audio container')
         return mime
     except Exception as exc:
-        raise HTTPException(400, 'Invalid or unsupported dashboard audio') from exc
+        raise HTTPException(400, 'Invalid or unsupported media' if allow_video else 'Invalid or unsupported dashboard audio') from exc
 
 
 @router.get('/api/projects/{pid}/collaboration/media/{media_id}')

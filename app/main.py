@@ -257,6 +257,9 @@ LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
 MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024")) * 1024 * 1024
 NATIVE_SINGLE_USER = os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1", "true", "yes", "on"}
+from .direct_messaging import router as direct_messaging_router
+if not NATIVE_SINGLE_USER:
+    app.include_router(direct_messaging_router)
 
 
 from .ai_backend_models import LEAD_BACKING_MODELS

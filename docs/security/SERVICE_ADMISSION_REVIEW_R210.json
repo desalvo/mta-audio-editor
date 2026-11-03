@@ -6,7 +6,7 @@
     "app/__init__.py": "sha256:eb3205cb75b2a7474361060d9b8d89329c29272cd8978ba62b6290b9a29b7550",
     "app/account_erasure.py": "sha256:eb074aec67b28079948aa846fe7aa1d034af2a1636e09b37ae6e31a0283ae6c8",
     "app/account_financial_context.py": "sha256:0a7749ce17ecd76126453cbdaa4d571e4cb9214d29d1c35ba2d0f5f12e526e0b",
-    "app/account_lifecycle.py": "sha256:dc2a034d92b49c76f4953cfce42da64432edf54283d5b31ccc78456115a7c59c",
+    "app/account_lifecycle.py": "sha256:10f1f4734ed72decc28751d0c2afa3380d4ac59624b9822d5900127866c5da66",
     "app/account_limits.py": "sha256:15d4b17175386e08b4283a764559767dff344395eeb1ecc3089d1a7ce773219e",
     "app/account_mfa.py": "sha256:327ffaf732eeda25fad86e5521514f9430f65b6eaf26dea17277451e5a6e44b0",
     "app/account_routes.py": "sha256:25049dea0a992f351d757831b1730648a34ef991c40301ee3fba72d4fbbfcce2",
@@ -23,7 +23,7 @@
     "app/ace_task_progress.py": "sha256:dc94627cc3a1aba22cf86cc40d9f2c265607bed18660fd95a2cb0d2fb1337b69",
     "app/admin_dump.py": "sha256:c9600065219c35ec1a20bfe5626187ecaeeb3ba0cfd9f96b0be189d231614c2e",
     "app/admin_dump_routes.py": "sha256:aecf5f7e83457dccf5db05d53d1fff5ef27458ff33dc6e6978627eee57824679",
-    "app/admin_navigation.py": "sha256:1b559c7fef7a74168c4d2c169db4886213b9aaeb75f1812c813a72722df22970",
+    "app/admin_navigation.py": "sha256:a5b91f451786afdec45a087a0db840c0242aa7fc079c819614d231274354e56b",
     "app/ai_access.py": "sha256:8ca028716c25ef3a677bf26f096868e65fc1793185f090acd3d26697051e9b35",
     "app/ai_adapter_identity.py": "sha256:44102cff9b57d788e23f84f3e1b8e6656cb6ef3254c0bcb71bca2aeb405b1cbc",
     "app/ai_amd_smi_collector.py": "sha256:1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b",
@@ -104,7 +104,7 @@
     "app/audio_backend.py": "sha256:4d91382bcd6eb8e6c7792c52e440df2dd50a01db1cb31eeee4ebaf1835cc064c",
     "app/audio_capture.py": "sha256:3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a",
     "app/audio_engine.py": "sha256:1b7579278628d91bc9b019e101e30ff4462fe0a8ca6ec7334b5ec5af2d77040d",
-    "app/auth.py": "sha256:7197a25d08ec5924510a2a4fd02809b5f894b7f908ce73ac13be47b3277a537c",
+    "app/auth.py": "sha256:7862136dc5d18c92c1a692e5311161127c24ed40e0c31078d4edce0901278111",
     "app/auto_mix.py": "sha256:3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "sha256:ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa",
     "app/beat_sync.py": "sha256:48e427e70dedf19ffe26306c3d88ce5d40546fc76c8f7679d389a29d524b7b87",
@@ -124,6 +124,7 @@
     "app/diagnostic_bundle.py": "sha256:4dec1e08e02793482b8d46cbdedbe2bf7cf2afadeacabe6d920c9a6e59485189",
     "app/diffsinger_bridge.py": "sha256:27055c93551c2abee3b1925cf406d1a3c6ffb6a3a07d3cee73dea2bd9cb195ef",
     "app/diffsinger_onnx.py": "sha256:8dac6440e42a18978ea46326079c81394e73d51599799b8d9c6e9ee5f4c49b12",
+    "app/direct_messaging.py": "sha256:55e8e015120d7221be6e27bbe3b9f6141262f3b3ce53703eb82f20fc42dbd69d",
     "app/drumsep_onnx_worker.py": "sha256:0858dd1b003942654ae0da859fa36e26a3d646e8bf0afffc4a4b595e90e07412",
     "app/editor_layout.py": "sha256:ebab4f9c61dfde7f105c8ba9a30025029a4ef96af772137b0a32ca4d1ff1e5a6",
     "app/fs_durability.py": "sha256:2d8f75d663a856c15c278e41ad0eb08ce26a0fef9dea43dbbabc16670928aa62",
@@ -138,7 +139,7 @@
     "app/live_mixer.py": "sha256:c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291",
     "app/live_sources.py": "sha256:729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
     "app/lyric_layout.py": "sha256:c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
-    "app/main.py": "sha256:b2b1cc761af709395bc91ac1fec487db47e54326fef95058679ec7f8c0dcc561",
+    "app/main.py": "sha256:9dfccd9dd3a2af524fadac05c402831ca0b629642ede46d3ce3fb6c60efd5f76",
     "app/mega53_install.py": "sha256:39680a52cd307de733aadf1a6ce8ff199cb9fd0c5fe5c8585e1dab8bf16aef05",
     "app/mega53_runtime.py": "sha256:a7e696e29a82a3875c28ec95c29c6bf52d70b219ac600f637b24457c58ce91ce",
     "app/merish_mta16.py": "sha256:a5b114a5c3e29491890d28f92b7e5e6a76c21bde3f6989f262429d331bdec816",
@@ -210,7 +211,7 @@
     "app/platform_file_lock.py": "sha256:f465c089ff94a35fe80708e26b8ed69bcc8cf1dbfd8004f12a2051065ffb2a74",
     "app/plugins.py": "sha256:08eb7f847cbd6eb5c65976be8e04feddb1553c895f79653f573942f262c3a5f2",
     "app/preview_publish.py": "sha256:72b54e1ec35c11b6367d193188eb19621673654fa3aefb52c5b54fe5fd2a887a",
-    "app/project_collaboration.py": "sha256:68972d5aa3458319fdd7a7c176d5186e9b4224436037031216ae8be1c48e3d5c",
+    "app/project_collaboration.py": "sha256:0ed558812dfc81e98ccbd80628ae79461e5cd3725ca4f3c4c4892654853a10da",
     "app/project_kinds.py": "sha256:d2043a15db7f478bf7aca0e9d6e1205e09d9886e5c56ea5d786d2ad6ba8181f1",
     "app/project_media_conversion.py": "sha256:0ac88bdac1306baa1890c00fc5d5b9bc2e885fb12c686e04ca7a917a3eac9cc4",
     "app/project_media_usage.py": "sha256:85300cbd24bf3df6fa8b4c34b7a4b4aa94d77471b7858bd69b50ae7f0990e3f6",
@@ -333,7 +334,7 @@
     {
       "path": "app/account_lifecycle.py",
       "function": "start_service",
-      "line": 559,
+      "line": 567,
       "kind": "asynchronous_lifetime",
       "call": "threading.Thread",
       "ast_sha256": "1a86843be333fd4d72825cfbdf11ad3ca1c1dde64e9b6e5250d5f29bc861f9f9",
@@ -663,7 +664,7 @@
     {
       "path": "app/admin_navigation.py",
       "function": "public_base",
-      "line": 37,
+      "line": 38,
       "kind": "database_connection",
       "call": "sqlite3.connect",
       "ast_sha256": "730b0418fe051b7fdef792d6b56b4adba45728d41edac0734d30b6c9d593d29d",
@@ -1213,7 +1214,7 @@
     {
       "path": "app/main.py",
       "function": "_lead_backing_engine_available",
-      "line": 283,
+      "line": 286,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "61b5e8d52377fa9b874c7054fa6d0709388fb3b6d3d24dd4b0ef09a2909aeaad",
@@ -1224,7 +1225,7 @@
     {
       "path": "app/main.py",
       "function": "_start_kara_checkpoint_repair",
-      "line": 329,
+      "line": 332,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "8345e76927c7039790c2af7814b1f778ae59c9fad3c57c382f89e5a31664d783",
@@ -1235,7 +1236,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_projects_dump",
-      "line": 1448,
+      "line": 1451,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1246,7 +1247,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_parameters",
-      "line": 1598,
+      "line": 1601,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "ed80931ac27dbcefb0d8e3590f252599fe79c87557e31b086bd4af990c524610",
@@ -1257,7 +1258,7 @@
     {
       "path": "app/main.py",
       "function": "project_archive_export",
-      "line": 2777,
+      "line": 2780,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1268,7 +1269,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_audio",
-      "line": 2880,
+      "line": 2883,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "25125771ed742253ce8b8474ad02ee2ac9742a724508dc20a0a14109373f9f57",
@@ -1279,7 +1280,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_effect_preview",
-      "line": 2928,
+      "line": 2931,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "950199ef2b6e3d4bdb93c0c381d27a888e1ebc45bb7285a435de56399ec1d730",
@@ -1290,7 +1291,7 @@
     {
       "path": "app/main.py",
       "function": "_normalize_audio_to_project_rate",
-      "line": 3005,
+      "line": 3008,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "1ef3cbaf0a3abeca889313cd85b3eb87211f557a3dba84291ffe6d0e541d70ba",
@@ -1301,7 +1302,7 @@
     {
       "path": "app/main.py",
       "function": "start_waveform_job",
-      "line": 3250,
+      "line": 3253,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "2ab21f2385d2ba58890dff3c78c3937067830df10bc1e138d4f1ab57f4aa82f0",
@@ -1312,7 +1313,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_import_job",
-      "line": 3437,
+      "line": 3440,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "152141a7b66765bd0c1230d92572fd473dd4af68f0fd2541d6bbb4467a843f2e",
@@ -1323,7 +1324,7 @@
     {
       "path": "app/main.py",
       "function": "_native_remote_infer",
-      "line": 3490,
+      "line": 3493,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "63354d4a762c50c82a3ee076466ad3186afcfe33afcf9ec6be8fdd300359c035",
@@ -1334,7 +1335,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3517,
+      "line": 3520,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "f55f9882602b8af337cfa6c132dad2e18f7c325b3e04c915ef169492cd65983d",
@@ -1345,7 +1346,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics_pdf",
-      "line": 3835,
+      "line": 3838,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1356,7 +1357,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics_pdf",
-      "line": 3839,
+      "line": 3842,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1367,7 +1368,7 @@
     {
       "path": "app/main.py",
       "function": "start_youtube_import_job",
-      "line": 4132,
+      "line": 4135,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "5d7cc8a2fbe59f62084513a399f3654bfe2fb295e42460f6ea59acc3852c7c95",
@@ -1378,7 +1379,7 @@
     {
       "path": "app/main.py",
       "function": "_start_bounce",
-      "line": 4247,
+      "line": 4250,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "cda43824f22c314bfbd46533b87b036f37be97ce089977c37a595b4f9d3f64da",
@@ -1389,7 +1390,7 @@
     {
       "path": "app/main.py",
       "function": "start_mta_import_job",
-      "line": 4797,
+      "line": 4800,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "c1af4132570b409eec7d50a30a364b6553142628ee88568c514de50ea7fdd234",
@@ -1400,7 +1401,7 @@
     {
       "path": "app/main.py",
       "function": "_drumsep_extract",
-      "line": 5712,
+      "line": 5715,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "16ed5cdd033b2e3fc4bf7190188bdfceca04b04671cde85b4f1b66c449fc7c91",
@@ -1411,7 +1412,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_export_job",
-      "line": 7064,
+      "line": 7067,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "a1a2c97c174a33143f284b9fb40206cfbe2ca013793a4b2847c164bd786bbc73",
@@ -1422,7 +1423,7 @@
     {
       "path": "app/main.py",
       "function": "_render_karaoke_video",
-      "line": 7208,
+      "line": 7211,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -1433,7 +1434,7 @@
     {
       "path": "app/main.py",
       "function": "start_configured_project_export_job",
-      "line": 7391,
+      "line": 7394,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "485b20b4843d6cbd50e172f3f072f2cd7776d2f9013299c31e903e073cab09ce",
@@ -1444,7 +1445,7 @@
     {
       "path": "app/main.py",
       "function": "_karaoke_export_worker",
-      "line": 7427,
+      "line": 7430,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -1455,7 +1456,7 @@
     {
       "path": "app/main.py",
       "function": "start_karaoke_export_job",
-      "line": 7461,
+      "line": 7464,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "25bd2b0dec8b83af17ce49cdac963d6f913b538d5faca1d0f56d9e5ad1066368",
@@ -1466,7 +1467,7 @@
     {
       "path": "app/main.py",
       "function": "<module>",
-      "line": 7507,
+      "line": 7510,
       "kind": "command_entry",
       "call": "__main__",
       "ast_sha256": "607d58081f661301abd859308265389ab10fcd588f64dc15d59eb4e3a0eba9c3",
@@ -1477,7 +1478,7 @@
     {
       "path": "app/main.py",
       "function": "<module>",
-      "line": 7515,
+      "line": 7518,
       "kind": "service_entry",
       "call": "uvicorn.run",
       "ast_sha256": "eb5df95bcf270409640c491bb593d14e8a6934e813f51e685518c34878489580",
@@ -1488,7 +1489,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_test",
-      "line": 8058,
+      "line": 8061,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "340066854303f6f9d9de09ff9bd8b0a1a29f95e2f161b9e0544122ede37da00d",
@@ -1741,7 +1742,7 @@
     {
       "path": "app/project_collaboration.py",
       "function": "_validate_media",
-      "line": 414,
+      "line": 415,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "cfd8c0d14790f7ce7ca7f474c14ad17e570a1b7b4ffe0e57b469aad2b3622d10",
@@ -1752,7 +1753,7 @@
     {
       "path": "app/project_collaboration.py",
       "function": "start_maintenance",
-      "line": 539,
+      "line": 553,
       "kind": "asynchronous_lifetime",
       "call": "threading.Thread",
       "ast_sha256": "2cc989f83e0f95e38b3f052eb3756e60337bea131e7f16456d367580d70ecfea",

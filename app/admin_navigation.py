@@ -19,6 +19,7 @@ def safe_next(value):
         pairs=parse_qsl(u.query,keep_blank_values=True)
         p=dict(pairs)
         if len(p)!=len(pairs):return '/'
+        if u.path=='/account' and p=={'messages':'1'}:return '/account?messages=1'
         if u.path=='/ai-device' and set(p)=={'code'} and re.fullmatch(r'[A-Za-z0-9_-]{1,100}',p['code']):return value
         if u.path in ('/admin/ai-billing','/admin/ai-tokens','/account') and not p:return u.path
         if u.path!='/settings' or set(p)-{'tab','section','user','job'}:return '/'
@@ -67,6 +68,7 @@ def action(plain,path,label):
 
 
 def outbox_action(event_id,uid):
+    if event_id.startswith('direct-message:'):return '/account?messages=1','Messaggi / Messages'
     if event_id.startswith('pending:') and ':admin:' in event_id:return settings_target('pending',uid),'Apri richiesta di approvazione'
     if event_id.startswith('reactivation-admin:'):return settings_target('pending',uid),'Apri richiesta di riattivazione'
     if event_id.startswith('privacy-request:'):return settings_target('archives',uid),'Apri richiesta di cancellazione privacy'

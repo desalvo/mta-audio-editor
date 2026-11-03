@@ -4170,7 +4170,7 @@ function openTrackMp3ExportDialog(id){
   const artist=current.artist||'';
   const composer=(current.authors||[]).join(', ');
   showUtilityModal('Export traccia MP3',`
-    <div class="stem-workflow track-mp3-export-config">
+    <div class="stem-workflow track-mp3-export-config export-settings">
       <div class="workflow-grid">
         <label class="workflow-field"><span>Bitrate</span><select id="trackMp3Bitrate"><option value="128">128 kbps</option><option value="192">192 kbps</option><option value="256">256 kbps</option><option value="320" selected>320 kbps</option></select></label>
         <label class="workflow-field"><span>Sample rate</span><select id="trackMp3SampleRate"><option value="44100" selected>44.1 kHz</option><option value="48000">48 kHz</option></select></label>
@@ -4251,7 +4251,7 @@ async function doExport(format=exportFormat){
         :`<div class="workflow-note">Formato progetto: <b>${esc(current.target)}</b>. L'export MTA userà l'estensione <b>.${ext}</b>.</div>`;
   const normalizeParams=['mta','wav','mp3','mlive_mp3','mp3g','flac'].includes(format)?`<div class="export-normalize-panel"><label class="workflow-check"><input id="exportNormalize" type="checkbox" onchange="toggleExportNormalizeTarget()"><span>Normalizza prima dell’export</span></label><label id="exportNormalizeTargetRow" class="workflow-field export-normalize-target" hidden><span>Picco target (dBFS)</span><input id="exportNormalizeDb" type="number" min="-30" max="0" step="0.1" value="-1.0"><small>${format==='mta'?'Il picco è misurato sulla somma degli slot prima della codifica MP3; tutti gli slot ricevono lo stesso fattore. Il dispositivo e la codifica possono variare il picco.':'0 dBFS è il massimo digitale; -1 dBFS è un valore tipico per evitare clipping.'}</small></label></div>`:'';
   showUtilityModal('Esporta progetto',`
-    <div class="stem-workflow">
+    <div class="stem-workflow export-settings">
       <label class="workflow-field"><span>Formato</span><input value="${format==='mta'?current.target:(format==='mlive_mp3'?'MP3 M-Live / Merish':(format==='mp3g'?'MP3+G (ZIP MP3 + CDG)':format.toUpperCase()))}" disabled></label>
       <label class="workflow-field"><span>Nome file</span><div class="export-name-row"><input id="exportFileName" maxlength="180" value="${esc(safe)}"><span>.${ext}</span></div></label>
       ${mtaTargetField}
@@ -4726,7 +4726,7 @@ async function saveRightsSelection(){
 function openKaraokeExport(){
   if(!current)return;
   if(!(current.lyrics||[]).length)return toast('L’export MP4 richiede lyrics sincronizzate');
-  showUtilityModal('Esporta MP4 Karaoke',`<div class="stem-workflow">
+  showUtilityModal('Esporta MP4 Karaoke',`<div class="stem-workflow export-settings">
     <div class="workflow-note">Il video usa l’audio completo del progetto e le lyrics sincronizzate. Quando sono disponibili timestamp parola-per-parola, il testo viene evidenziato in stile karaoke.</div>
     <label class="workflow-check"><input id="karaokeIncludeChords" type="checkbox" ${(current.chords||[]).length?'checked':''} ${(current.chords||[]).length?'':'disabled'}> Mostra anche i chords sincronizzati sopra alle lyrics</label>
     <label class="workflow-field"><span>Background opzionale</span><input id="exportKaraokeBackground" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"></label>

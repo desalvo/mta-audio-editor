@@ -224,3 +224,10 @@ Il commit da01cdd ha perso i bit eseguibili su tre file che nel commit precedent
 ## CI 41688455408 — collocazione del rapporto
 
 La CI conferma il ripristino dei permessi. Il solo test fallito riguarda il rapporto Markdown nella radice, riservata ai README. Il rapporto è stato spostato in docs/.
+
+## Messaggistica tra account e pulsanti di export
+
+- La campanella con contatore dei non letti è disponibile nelle pagine dell’editor e dell’account, incluse le sezioni amministrative. Apre una dashboard flottante e richiudibile per conversazioni tra due account attivi e confermati, indipendenti dai progetti. Gli aggiornamenti arrivano entro circa sei secondi a pagina attiva.
+- La dashboard gestisce testo, immagini, audio e video. Gli allegati sono verificati lato server, con limite di 20 MiB per file e quota di 512 MiB per mittente. Le conversazioni restano disponibili ai partecipanti finché gli account e i relativi dati sono conservati. Le email sono accodate sul server e contengono un avviso generico e, con URL pubblico configurato, il link alla dashboard. La consegna richiede SMTP configurato.
+- Reso esplicito il contrasto e il rendering delle etichette nei pulsanti della scelta formato, dei parametri di export e della mappatura MTA.
+- **RC invariata al 73%**. Questo batch aggiunge una funzionalità al perimetro e non chiude un gate esterno. CI remota, verifica visiva nel browser e consegna SMTP su server reale da confermare.

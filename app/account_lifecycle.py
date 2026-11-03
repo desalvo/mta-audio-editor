@@ -518,7 +518,15 @@ def send_pending():
             init(con);con.execute('BEGIN IMMEDIATE')
             row=con.execute("SELECT * FROM account_mail_outbox WHERE state!='sent' AND (lease IS NULL OR lease<?) ORDER BY rowid LIMIT 1",(now-120,)).fetchone()
             if not row:return
-            row=dict(row);con.execute("UPDATE account_mail_outbox SET state='sending',lease=? WHERE id=?",(now,row['id']))
+            row=dict(row)
+            if row['id'].startswith('direct-message:'):
+                target=con.execute('SELECT email FROM users WHERE id=? AND active=1 AND email_confirmed=1',
+                                   (row['user_id'],)).fetchone()
+                if not target:
+                    con.execute("DELETE FROM account_mail_outbox WHERE id=?", (row['id'],))
+                    continue
+                row['recipient']=target['email']
+            con.execute("UPDATE account_mail_outbox SET state='sending',lease=? WHERE id=?",(now,row['id']))
         try:
             from .version import APP_RELEASE
             from .admin_navigation import action, outbox_action
