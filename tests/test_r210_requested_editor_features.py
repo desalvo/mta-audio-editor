@@ -109,12 +109,12 @@ const a=src.indexOf('function projectSnapshot()'),b=src.indexOf('\nfunction edit
 const x=src.indexOf('async function seCommit('),y=src.indexOf('\nfunction seEnvelope(',x);
 assert.ok(a>=0&&b>a&&x>=0&&y>x);
 const before={id:'p',tracks:[{id:'t',filename:'old.wav',waveform_peaks:[.1]}],clip_library:[]};
-let rendered=[],opened=0,sync=0;
+let rendered=[],opened=0,sync=0,invalidated=[];
 const c={current:structuredClone(before),sampleEditor:{trackId:'t'},sampleEditorBusy:false,
  undoStack:[],redoStack:[],historyProjectId:'p',lastHistoryState:structuredClone(before),persistedProjectSnapshot:structuredClone(before),
  projectDirty:false,autosaveTimer:null,autosaveBusy:false,autosaveQueued:false,selectedTrackId:'t',
  setTimeout,clearTimeout,JSON,Set,Number,structuredClone,confirm:()=>true,toast:()=>{},updateEditActionState:()=>{},
- render:()=>rendered.push(c.current.tracks[0].waveform_peaks[0]),
+ render:()=>rendered.push(c.current.tracks[0].waveform_peaks[0]),timingAudioChanged:ids=>invalidated.push([...ids]),
  api:async()=>({project:{id:'p',tracks:[{id:'t',filename:'new.wav',waveform_peaks:[.2]}],clip_library:[{id:'old',filename:'old.wav'},{id:'new',filename:'new.wav'}]}}),
  openSampleEditor:async()=>opened++,syncNativeProjectFile:async()=>sync++,trackById:()=>true,closeUtilityModal:()=>{},markDirty:()=>{},
  collect:()=>{},$:()=>({textContent:''})};
@@ -122,7 +122,7 @@ vm.createContext(c);vm.runInContext(src.slice(a,b),c);vm.runInContext(src.slice(
 c.persistCurrentProject=async()=>{c.projectDirty=false;c.lastHistoryState=c.projectSnapshot()};
 (async()=>{await c.seCommit('effect-apply',{effect:'gain'});assert.equal(c.current.tracks[0].filename,'new.wav');assert.deepEqual(rendered,[.2]);assert.equal(c.undoStack.length,1);assert.equal(c.undoStack[0].clip_library.length,2);
 await c.seHistory('undo');assert.equal(c.current.tracks[0].filename,'old.wav');assert.equal(c.current.clip_library.length,2);
-await c.seHistory('redo');assert.equal(c.current.tracks[0].filename,'new.wav');assert.equal(opened,3);assert.equal(sync,3);assert.deepEqual(rendered,[.2,.1,.2]);})().catch(e=>{console.error(e);process.exitCode=1});'''
+await c.seHistory('redo');assert.equal(c.current.tracks[0].filename,'new.wav');assert.equal(opened,3);assert.equal(sync,3);assert.deepEqual(rendered,[.2,.1,.2]);assert.deepEqual(invalidated,[['t'],['t']]);})().catch(e=>{console.error(e);process.exitCode=1});'''
     subprocess.run(['node','-e',js],check=True)
 
 

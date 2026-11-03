@@ -45,3 +45,10 @@ e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-sour
 e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:341
 e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:81
 e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:91
+# Run 41562792488: reviewed documentation prose and public source SHA-256
+# values only; see docs/security/GITLEAKS_REVIEW_R210.json for the evidence.
+852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/PROJECT_COLLABORATION_R210_IT_EN.md:generic-api-key:23
+852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/validation/r210/shared-benchmark/source-snapshot.json:generic-api-key:24
+852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/validation/r210/shared-benchmark/source-snapshot.json:generic-api-key:40
+852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/validation/r210/shared-benchmark/source-snapshot.json:generic-api-key:92
+852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/validation/r210/shared-benchmark/source-snapshot.json:generic-api-key:248

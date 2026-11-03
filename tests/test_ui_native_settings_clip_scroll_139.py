@@ -21,7 +21,10 @@ def test_web_settings_are_available_to_admin_from_sidebar():
     assert "currentUser=await api('/api/session')" in APP_JS
     assert "if(currentUser?.native_single_user)return showNativeSettings();" in APP_JS
     assert 'return showWebSettings();' in APP_JS
-    assert "currentUser?.role==='admin'?`<button type=\"button\" onclick=\"navigateAway('/settings')\">Server administration</button>`:''" in APP_JS
+    settings = APP_JS.split('function showWebSettings(){', 1)[1].split('\nasync function rescanSharedMedia', 1)[0]
+    admin_actions = settings.split("currentUser?.role==='admin'?`", 1)[1].split("`:''", 1)[0]
+    assert "onclick=\"navigateAway('/settings')\">Server administration</button>" in admin_actions
+    assert 'MtaBenchmark.open()' in admin_actions
     assert 'Settings non disponibile' not in APP_JS
 
 

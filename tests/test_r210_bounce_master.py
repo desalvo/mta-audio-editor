@@ -191,6 +191,7 @@ def test_context_menu_categories_keep_all_actions_and_shortcuts():
     from test_r210_decimal_bpm_shortcuts import function
     setup="""const assert=require('assert');let html='',selectedTrackId,selectedTrackIdSet=new Set(),current={target:'DAW',tracks:[]},playCursorMs=0,timelineClipboard=null,timelineSelectionOnly=false,timelineTargetTrackId=null;
 const trackById=()=>({id:'t',type:'click'}),pluginInfo={stem_splitter:{available:true}},window={innerWidth:1000,innerHeight:800},timelineTool='select';let inspectorRefreshes=0;
+let joinPair=null;function timelineJoinPair(){return joinPair}
 function closeTrackContextMenu(){}function refreshSelectedTrackInspector(){inspectorRefreshes++}function isGeneratedChordsTrack(){return false}function tr(en){return en}const $$=()=>[];
 const document={createElement(){return {setAttribute(){},addEventListener(){},focus(){},getBoundingClientRect(){return {width:200,height:300}},style:{},set innerHTML(value){html=value}}},body:{appendChild(){}}};
 """
@@ -203,5 +204,8 @@ assert.ok(html.includes('createEmptyTimelineTrack'));assert.ok(html.includes('op
 assert.ok(html.includes('selectAllTracks()'));assert.ok(!html.includes('selectAllTimelineSegments()'));
 openTrackContextMenuAt('t',900,700,true);assert.equal(inspectorRefreshes,1);
 assert.ok(html.includes('selectAllTimelineSegments()'));assert.ok(!html.includes('selectAllTracks()'));
+assert.match(html,/disabled[^>]*joinSelectedTimelineSegments/);
+joinPair=['a','b'];openTrackContextMenuAt('t',900,700,true);
+assert.doesNotMatch(html,/disabled[^>]*joinSelectedTimelineSegments/);
 """
     subprocess.run(['node','-e',setup+'\n'.join(function(name) for name in ('projectAllowsTrackKind','timelineCreationMenu','openTrackContextMenuAt'))+check],check=True)

@@ -1,0 +1,19 @@
+{
+  "commit_base": "852259d56ead9e50cc886dd6ee287ba13cd404e6",
+  "previous_package_sha256": "04ffbfd51f6a988f24dccc74432cc60fec2a94c8b2a6294c4bc4d184fe54b502",
+  "changed": [
+    ".gitleaksignore",
+    "docs/security/GITLEAKS_REVIEW_R210.json",
+    "tests/test_r210_stem_codec_diagnostics.py",
+    "tests/test_ui_native_settings_clip_scroll_139.py",
+    "tests/test_r210_requested_editor_features.py",
+    "tests/test_r210_bounce_master.py",
+    "docs/WORK_STATUS_R210_20261103_IT.md"
+  ],
+  "added": [
+    "docs/CI_41562792488_REVIEW_R210_IT.md",
+    "tests/test_r210_ci_41562792488_secrets_review.py",
+    "validation/r210-ci-41562792488-hotfix.xml"
+  ],
+  "deleted": []
+}

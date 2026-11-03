@@ -16,19 +16,24 @@ def installer():
     m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
 
 
-@pytest.mark.parametrize('group',['audio','sam'])
 @pytest.mark.parametrize('device,codec',[('rocm','0.11.1+cpu'),('cpu','0.17.0+cpu')])
-def test_all_cpu_rocm_groups_pin_codec_before_model_dependencies(tmp_path,monkeypatch,group,device,codec):
+def test_audio_cpu_rocm_pin_codec_before_model_dependencies(tmp_path,monkeypatch,device,codec):
     m=installer();calls=[]
     def run(args,**kw):
         calls.append(list(map(str,args)))
         if 'ls-remote' in args:return SimpleNamespace(stdout='a'*40+'\tHEAD')
         return SimpleNamespace(stdout='torch==2.11.0+rocm7.2\ntorchaudio==2.11.0+rocm7.2\ntorchvision==0.26.0+rocm7.2\n')
     monkeypatch.setattr(m,'run',run);monkeypatch.setattr(m,'verify',lambda *a:None)
-    m.install_group('/python',tmp_path,device,group)
+    m.install_group('/python',tmp_path,device,'audio')
     codec_call=next(c for c in calls if 'torchcodec=='+codec in c)
     assert '--no-deps' in codec_call and 'https://download.pytorch.org/whl/cpu' in codec_call
     assert 'torchcodec=='+codec in (tmp_path/'torch-constraints.txt').read_text()
+
+
+@pytest.mark.parametrize('device',['cpu','rocm'])
+def test_retired_sam_runtime_group_is_rejected_before_install(tmp_path,device):
+    with pytest.raises(ValueError,match='Unsupported AI runtime group'):
+        installer().install_group('/python',tmp_path,device,'sam')
 
 
 def test_audio_verify_rejects_torchaudio_encoder_failure(monkeypatch):

@@ -611,5 +611,46 @@
       "exit_code": 2
     },
     "historical_snapshot_note": "A no-git scan retains35 old commit-scoped historical findings;0new versus the original44. These are not new exceptions and are not represented as a clean history scan."
+  },
+  "shared_benchmark_false_positives_20261103": {
+    "run_id": 41562792488,
+    "job_id": 125677071633,
+    "commit": "852259d56ead9e50cc886dd6ee287ba13cd404e6",
+    "engine": "gitleaks 8.24.3",
+    "rule": "generic-api-key",
+    "finding_count": 5,
+    "disposition": "false_positive",
+    "reviewed_occurrences": [
+      {
+        "path": "docs/PROJECT_COLLABORATION_R210_IT_EN.md",
+        "line": 23,
+        "reason": "Documentation prose listing integration tests and participation actions; not a credential."
+      },
+      {
+        "path": "docs/validation/r210/shared-benchmark/source-snapshot.json",
+        "line": 24,
+        "source": "app/ai_access.py",
+        "reason": "Public SHA-256 source integrity digest independently recalculated against the corresponding checked-in file; not an API key."
+      },
+      {
+        "path": "docs/validation/r210/shared-benchmark/source-snapshot.json",
+        "line": 40,
+        "source": "app/ai_device_auth.py",
+        "reason": "Public SHA-256 source integrity digest independently recalculated against the corresponding checked-in file; not an API key."
+      },
+      {
+        "path": "docs/validation/r210/shared-benchmark/source-snapshot.json",
+        "line": 92,
+        "source": "app/ai_token_routes.py",
+        "reason": "Public SHA-256 source integrity digest independently recalculated against the corresponding checked-in file; not an API key."
+      },
+      {
+        "path": "docs/validation/r210/shared-benchmark/source-snapshot.json",
+        "line": 248,
+        "source": "app/resource_access.py",
+        "reason": "Public SHA-256 source integrity digest independently recalculated against the corresponding checked-in file; not an API key."
+      }
+    ],
+    "scope": "Five exact commit/path/rule/line fingerprints; no global rule, path or commit exclusions. New findings remain blocking."
   }
 }
