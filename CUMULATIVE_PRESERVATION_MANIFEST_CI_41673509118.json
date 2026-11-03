@@ -1,0 +1,13 @@
+{
+  "baseline_commit": "da01cdd756355c0c23237df1548b0b5563736615",
+  "baseline_sha256": "7b7df9d3239846ac638e62c61510b3a1b3509238e08edaeec4b5b504d63e202e",
+  "git_mode_fix": {
+    "app/ai_unified_adapter.py": "100644 -> 100755",
+    "scripts/install_ace_step.sh": "100644 -> 100755",
+    "scripts/install_mta.sh": "100644 -> 100755"
+  },
+  "other_tracked_content_changed": [
+    "docs/DEVELOPMENT_STATUS.md"
+  ],
+  "seven_regressions": "passed locally; full CI pending"
+}

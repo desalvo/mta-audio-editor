@@ -216,3 +216,7 @@ Verifica finale hotfix 41491614671: **550 test passati, zero skip/fallimenti/err
 - Normalizzazione MTA: misura e guadagno escludono click, accordi generati e tracce contrassegnate nell’Inspector; slot misti separati fino al ricalcolo, clipping rilevato, tracce mute effettivamente silenziose. Test locali PCM/MP3 per MTA8/MTA16; verifica fisica su Merish ancora necessaria.
 - Amministrazione: installazione locale esplicita Mega 53 con commit Git fissato, YAML/checkpoint ufficiali verificati, ambiente separato, caricamento stretto del modello e pubblicazione solo a verifica superata. Job annullabile, esecuzione effettiva e GPU ancora da validare. I test automatici simulano download e installazione.
 - Ancora aperto: installazione remota dei worker e installazione web completa di tutti i runtime accessori non già coperti dalle ricette esistenti; non dichiarare chiusa l’area fino a test reali. Nessun server reale è stato modificato.
+
+## CI 41673509118 — correzione permessi eseguibili
+
+Il commit da01cdd ha perso i bit eseguibili su tre file che nel commit precedente erano 100755. Questo ha causato sette test falliti, compreso il controllo dell'adapter Demucs. L'archivio cumulativo conserva ora questi tre file come 100755 e include una patch Git per ripristinare i bit nell'indice anche sui filesystem che non conservano il permesso Unix. I sette test interessati sono stati ripetuti localmente con esito positivo. La full CI deve essere rieseguita dopo il commit; restano aperte le prove reali su hardware e l'installazione AI remota.
