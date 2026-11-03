@@ -220,3 +220,7 @@ Verifica finale hotfix 41491614671: **550 test passati, zero skip/fallimenti/err
 ## CI 41673509118 — correzione permessi eseguibili
 
 Il commit da01cdd ha perso i bit eseguibili su tre file che nel commit precedente erano 100755. Questo ha causato sette test falliti, compreso il controllo dell'adapter Demucs. L'archivio cumulativo conserva ora questi tre file come 100755 e include una patch Git per ripristinare i bit nell'indice anche sui filesystem che non conservano il permesso Unix. I sette test interessati sono stati ripetuti localmente con esito positivo. La full CI deve essere rieseguita dopo il commit; restano aperte le prove reali su hardware e l'installazione AI remota.
+
+## CI 41688455408 — collocazione del rapporto
+
+La CI conferma il ripristino dei permessi. Il solo test fallito riguarda il rapporto Markdown nella radice, riservata ai README. Il rapporto è stato spostato in docs/.
