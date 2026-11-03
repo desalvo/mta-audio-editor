@@ -16,8 +16,8 @@ web oppure dal token server, mai dal piano del client. Le native mantengono un
 solo token per istanza/server e utente, condiviso fra tutti i motori.
 
 Sono coperti i protocolli per ACE-Step, Whisper/lyrics, chords, markers, Demucs,
-SAM Audio, separazione cantanti, backing vocals e DrumSep. La scelta di modello,
-le ancore SAM, le opzioni chords, il BPM e l'origine dei beat attraversano il
+backing vocals e DrumSep. La scelta di modello,
+le opzioni chords, il BPM e l'origine dei beat attraversano il
 confine del worker. I runtime scelgono GPU quando il backend la espone; un backend
 CPU non diventa un backend GPU tramite una semplice opzione. DrumSep seleziona,
 fra i provider ONNX realmente installati, MIGraphX, ROCm, CUDA e CPU in quest'ordine.
@@ -60,12 +60,10 @@ python3 /usr/lib/mta-audio-editor-server/native-installers/configure_ai_workers.
 
 Non selezionare un motore prima di averne installato le dipendenze: il preflight
 fallisce senza cambiare la configurazione. Ripetere l'helper con un altro Python
-per SAM/singer-separation, backing-vocals o drumsep. Non occorre usare un unico
+per backing-vocals o drumsep. Non occorre usare un unico
 venv. Configurare MTA_AI_DRUMSEP_MODEL con il percorso del modello ONNX autorizzato.
 I tre modelli karaoke già previsti dall'app mantengono gli stessi identificatori;
-MTA_AI_VOCAL_MODELS_DIR seleziona la cache. I checkpoint SAM selezionabili hanno
-identificatori facebook/sam-audio-{small,base,large}; l'accesso deve essere già
-stato autorizzato dall'operatore. Riavviare mta-server a coda inattiva dopo aver
+MTA_AI_VOCAL_MODELS_DIR seleziona la cache. Riavviare mta-server a coda inattiva dopo aver
 cambiato ambiente. ACE deve usare il wrapper ace_profile_server.py già previsto
 dal ciclo precedente, con ACESTEP_QUEUE_WORKERS=1.
 
@@ -94,7 +92,7 @@ del profiler dopo inferenza riuscita non ripete l'inferenza: consegna il risulta
 senza inventare secondi GPU. Gli errori della vera inferenza restano errori.
 
 **Limite attuale:** il provider integrato è ammesso per ACE-Step, Whisper Python,
-Demucs, SAM, singer-separation e markers. Chords può invocare processi/modelli
+Demucs e markers. Chords può invocare processi/modelli
 esterni; DrumSep e audio-separator possono usare ONNX. Per questi runtime la GPU
 può lavorare ma non si promuove una traccia Torch parziale o vuota a consumo
 fatturabile. Restano accounting CPU verificabile e diagnostica; il loro sensore GPU
@@ -176,3 +174,5 @@ provider specifico; non basta firmare una stima o la durata dello slot.
 La precedente conferma dell'utente resta valida per generazione ACE completa,
 chiusura finestra, aggiunta, riproduzione e persistenza della traccia. Non viene
 estesa automaticamente alla nuova misura o a tutti gli altri modelli.
+
+SAM Audio e la separazione dei singoli cantanti sono stati rimossi. Non configurare nuovi worker o credenziali per questi nomi; i record storici di accounting restano leggibili.

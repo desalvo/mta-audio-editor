@@ -36,7 +36,6 @@ def installed(tmp_path, monkeypatch):
 @pytest.mark.parametrize(('kind', 'group'), [
     ('whisper', 'audio'), ('chords-ml', 'audio'), ('demucs', 'audio'),
     ('drumsep', 'audio'), ('markers', 'audio'), ('backing-vocals', 'audio'),
-    ('sam-audio', 'sam'), ('singer-separation', 'sam'),
 ])
 def test_installer_runtime_resolves_real_adapter(installed, monkeypatch, kind, group):
     monkeypatch.setenv('MTA_AI_WORKER_' + kind.upper().replace('-', '_') + '_PYTHON', str(installed[group]))

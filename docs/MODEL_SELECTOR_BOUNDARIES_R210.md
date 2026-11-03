@@ -15,7 +15,6 @@ Ora il controllo avviene nel dominio `evaluate`,prima dell’ammissione nella co
 | Motore | Selezione corrente |
 | --- | --- |
 | Whisper |14 nomi della dipendenza di produzione20250625,inclusi i nomi `.en`,gli alias `large` e `large-v3-turbo` e tutti i7 nomi della UI attuale. Percorsi locali,URL e nomi estranei rifiutati. |
-| SAM Audio |I3 checkpoint `sam-audio-small`,`sam-audio-base`,`sam-audio-large`,nelle forme brevi o `facebook/…`;il caricatore riceve la forma canonica. Anche `MTA_AI_SAM_MODEL` segue lo stesso controllo. |
 | Demucs |Gli11 profili già dichiarati in `OFFICIAL_DEMUCS_MODELS`;valori e metadati originali invariati. Il model updater importa lo stesso registro,senza seconda copia divergente. |
 
 La lista Whisper è verificata sul sorgente primario della release già fissata in `requirements-lyrics.txt`: [Whisper v20250625](https://github.com/openai/whisper/blob/v20250625/whisper/__init__.py). URL,hash SHA256 del sorgente e14 nomi sono in `validation/r210/selector-whisper-source.json`. Nessun sorgente upstream viene eseguito o aggiunto come runtime. Dipendenze e versioni di produzione non cambiano.
@@ -57,3 +56,5 @@ MTA-0.3.0-r210-pre-RC-model-selectors-cumulative.zip contiene tutti i4724 file d
 Commit inglese cumulativo suggerito,non eseguito:
 
 `Complete execution safeguards, administration, settlement recovery and checkpoint admission`
+
+SAM Audio e singer-separation sono rifiutati anche nei vecchi selettori DrumSep, prima di inferenza, cache o output. Nessun fallback automatico.

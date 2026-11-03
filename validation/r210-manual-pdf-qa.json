@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-03",
+  "operation": "edit",
+  "expected_pdf_outputs": 4,
+  "marker_successful_once_before_original_authoring": true,
+  "recovery_replayed_without_duplicate_marker": true,
+  "workspace_reset_recovery": true,
+  "generator": "scripts/build_docs.py --manuals-only",
+  "weasyprint_version": "70.0 (repository-pinned)",
+  "html_manuals_updated": [
+    "app/docs/user.html",
+    "app/docs/user-en.html",
+    "app/docs/admin.html",
+    "app/docs/admin-en.html"
+  ],
+  "pdf_manuals": {
+    "MTA-Audio-Editor-User-Manual-IT.pdf": {
+      "pages": 33,
+      "inspected_pages": [
+        31,
+        32,
+        33
+      ],
+      "corpus_and_adapter_facts_present": true,
+      "required_human_validation_present": true,
+      "sha256": "d662fb7b0510adc67888531cdb114e89025bc2c3b595321f9e6eb2514323b630",
+      "size_bytes": 2901287,
+      "visual_review": "passed: final 3 pages inspected, including new timeline/shared/benchmark content; no clipping, overlap, black glyphs or orphan benchmark warning",
+      "text_bounds": "passed on inspected pages"
+    },
+    "MTA-Audio-Editor-User-Manual-EN.pdf": {
+      "pages": 31,
+      "inspected_pages": [
+        29,
+        30,
+        31
+      ],
+      "corpus_and_adapter_facts_present": true,
+      "required_human_validation_present": true,
+      "sha256": "c565824cb958d8432b1b6522c909d280aa28afac14f773c14811cefb6a836bc6",
+      "size_bytes": 2889039,
+      "visual_review": "passed: final 3 pages inspected, including new timeline/shared/benchmark content; no clipping, overlap, black glyphs or orphan benchmark warning",
+      "text_bounds": "passed on inspected pages"
+    },
+    "MTA-Audio-Editor-Administrator-Manual-IT.pdf": {
+      "pages": 19,
+      "inspected_pages": [
+        17,
+        18,
+        19
+      ],
+      "corpus_and_adapter_facts_present": true,
+      "required_human_validation_present": true,
+      "sha256": "6dc786b2ee68c1682ea36e8e8e4fcbaa4e3d49185ec156c20eca9ef37f3f3584",
+      "size_bytes": 2538565,
+      "visual_review": "passed: final 3 pages inspected, including new timeline/shared/benchmark content; no clipping, overlap, black glyphs or orphan benchmark warning",
+      "text_bounds": "passed on inspected pages"
+    },
+    "MTA-Audio-Editor-Administrator-Manual-EN.pdf": {
+      "pages": 19,
+      "inspected_pages": [
+        17,
+        18,
+        19
+      ],
+      "corpus_and_adapter_facts_present": true,
+      "required_human_validation_present": true,
+      "sha256": "91060d9331d3d7623571dd1115eeba89fe238aa30b70d4aaa8da0e57af68315d",
+      "size_bytes": 2536546,
+      "visual_review": "passed: final 3 pages inspected, including new timeline/shared/benchmark content; no clipping, overlap, black glyphs or orphan benchmark warning",
+      "text_bounds": "passed on inspected pages"
+    }
+  },
+  "other_pdfs_unchanged": 8,
+  "content_truth": {
+    "sam_retirement_preserved": true,
+    "synthetic_cases": 12,
+    "negative_difficult_cases": 6,
+    "real_cases_not_available": 6,
+    "candidates": 11,
+    "executable_adapter_candidates": 1,
+    "adapter": "Mega 53",
+    "real_neural_inference_claimed": false,
+    "professional_approval_claimed": false,
+    "human_validation": "pending",
+    "real_smtp_or_microphone_acceptance_claimed": false
+  },
+  "screenshots_in_package": false,
+  "runtime_or_build_script_edits_for_manuals": false
+}

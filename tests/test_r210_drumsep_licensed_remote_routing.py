@@ -8,7 +8,7 @@ def test_remote_drum_models_select_correct_license():
     assert selected('drumsep', {'model':'mvsep-mega53'}) == 'mvsep-mega53'
     assert selected('drumsep', {'model':'dsp'}) == 'mta-analysis'
     assert selected('drumsep', {'model':'drumsep-onnx'}) == 'drumsep-weights'
-    assert selected('drumsep', {'model':'sam-audio-base'}) == 'sam-audio'
+    with pytest.raises(ValueError,match='removed'):selected('drumsep', {'model':'sam-audio-base'})
 
 
 def test_default_neural_weights_remain_blocked():

@@ -93,7 +93,7 @@ def list_pending() -> list[dict]:
             if not isinstance(data, dict) or not re.fullmatch(r'[0-9a-f]{32}', data.get('request_id', '')):
                 raise ValueError('Invalid entry')
             kind = data.get('kind')
-            if not isinstance(kind, str) or kind not in ('whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'):
+            if not isinstance(kind, str) or kind not in ('whisper','chords-ml','demucs','drumsep','backing-vocals'):
                 kind = None
             result.append({'request_id': data['request_id'], 'kind': kind,
                            'created_at': data.get('created_at') if isinstance(data.get('created_at'), int) else None,

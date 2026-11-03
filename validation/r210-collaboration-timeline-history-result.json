@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-03",
+  "scope": "Independent audit of shared timeline history and remote audio refresh",
+  "reproduced_before_fix": [
+    "Owner shared-project undo returned200 but retained the moved250ms position",
+    "Guest shared-project undo returned409",
+    "Old history did not carry independent remote edits",
+    "Clean remote project replaced current during pointer clip drag",
+    "Pending remote SSE snapshot did not settle after direct save until another event",
+    "base_bpm-only remote change did not invalidate playback audio"
+  ],
+  "fixes": [
+    "Preserve current sharing authority/revision when restoring undo/redo; retain existing AI-publication token guard",
+    "Rebase undo/redo on received clean snapshots, preserving independent remote changes and preferring remote values for conflicts",
+    "Treat pointer clip drag as busy in callback and application guard",
+    "Notify collaboration after direct save becomes clean",
+    "Include base_bpm in project audio identity"
+  ],
+  "pytest": {
+    "passed_distinct": 130,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "new_cases": 7,
+    "full_batch_passed": 129,
+    "final_affected_group_passed": 24,
+    "cleaned_new_harness_passed": 7,
+    "junit": "validation/r210-collaboration-timeline-history-final.xml",
+    "aggregation": "Latest executed testcase retained per classname/name across actual passing batches"
+  },
+  "checks": {
+    "ruff": "passed",
+    "app_javascript_syntax": "passed",
+    "real_main_put_owner_and_guest_undo_redo": "passed",
+    "independent_remote_track_edit_retained": "passed",
+    "same_track_remote_conflict_not_undone": "passed"
+  },
+  "runtime_source_sha256": {
+    "app/static/app.js": "dc31d0c55f4b70b710ac9de71fbe5262f5fb8afb08e3b4aa8f74936cddbaa56f",
+    "app/main.py": "ba2146256de24c5c1aec303c94b4c81e62554158fc0b9998c95155f112fa742c",
+    "app/timeline_media.py": "61c1fbc25230f3fa9f81d7f93e4d7e53acfa37b25e082a7e56efa9a59aec67e8",
+    "app/lyric_layout.py": "c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
+    "app/static/project_collaboration.js": "51431b8831db8b26ce240c7a6172b5d5a04af947841c47c58fed91d3b095bab9"
+  },
+  "runtime_changed": [
+    "app/static/app.js"
+  ],
+  "backend_changed": false,
+  "limits": [
+    "Browser rendering, real simultaneous browser interactions and physical audio playback still need target acceptance",
+    "No new original RC criterion promoted"
+  ],
+  "validation_sequence": "Broad129case group ran after history/drag/save fixes; the subsequent one-field base_bpm detector change is covered by the final24affected cases and7new harness cases."
+}

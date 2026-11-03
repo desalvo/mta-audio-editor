@@ -32,11 +32,11 @@ def test_install_dry_run_is_complete_and_never_runs_subprocess(device, tmp_path,
     module = installer()
     monkeypatch.setattr(module, 'run', lambda *a, **k: pytest.fail('dry run mutated the host'))
     plan = module.install(SimpleNamespace(device=device, dry_run=True))
-    assert {'whisper', 'chords-ml', 'markers', 'demucs', 'backing-vocals', 'drumsep', 'sam-audio', 'singer-separation', 'ace-step'} <= plan['engines'].keys()
+    assert {'whisper', 'chords-ml', 'markers', 'demucs', 'backing-vocals', 'drumsep', 'ace-step'} <= plan['engines'].keys()
     assert plan['device'] == device and plan['gpu_billing_activated'] is False
 
 
-def test_installer_commits_bindings_only_after_both_environments_pass(tmp_path, monkeypatch):
+def test_installer_commits_bindings_only_after_audio_environment_passes(tmp_path, monkeypatch):
     module = installer()
     config = tmp_path / 'mta.env'
     original = 'SMTP_PASSWORD=keep\nMTA_ACE_STEP_URL=http://127.0.0.1:8001\n'
@@ -55,7 +55,7 @@ def test_installer_commits_bindings_only_after_both_environments_pass(tmp_path, 
     args = SimpleNamespace(device='cpu', dry_run=False, env_file=str(config), base=str(tmp_path / 'runtimes'), python='python3')
     module.install(args)
     result = config.read_text()
-    assert calls == ['audio', 'sam']
+    assert calls == ['audio']
     assert original.strip() in result
     for kind, group in module.ENGINE_GROUPS.items():
         if group != 'ace':
@@ -65,7 +65,7 @@ def test_installer_commits_bindings_only_after_both_environments_pass(tmp_path, 
     calls.clear()
     monkeypatch.setattr(module, 'verify', lambda binary, group, device: calls.append('verify:' + group))
     module.install(args)
-    assert calls == ['verify:audio', 'verify:sam']
+    assert calls == ['verify:audio']
 
 
 def test_failed_ai_install_preserves_live_configuration(tmp_path, monkeypatch):

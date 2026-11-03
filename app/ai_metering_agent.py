@@ -332,9 +332,8 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
     # child can finish between /proc samples; absence from samples cannot turn
     # direct-child wait4 into complete tree accounting, including cancellation.
     tree_metering_required = worker == Path(__file__).with_name('ai_unified_adapter.py').resolve() and (
-        kind in {'demucs', 'sam-audio', 'singer-separation'}
-        or (kind == 'backing-vocals' and license_decision.model_id == 'mta-analysis')
-        or (kind == 'drumsep' and license_decision.model_id == 'sam-audio'))
+        kind == 'demucs'
+        or (kind == 'backing-vocals' and license_decision.model_id == 'mta-analysis'))
     job_id=job_id or ai_billing.create_job(user_id,kind,token_id,billing_exemption_reason=('license:'+license_decision.model_id) if not license_decision.billable else '')
     record_job(job_id,license_decision)
     from .ai_execution_policy import admitted_env
@@ -486,7 +485,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             if verified_enabled:
                 try:
                     from .ai_gpu_verified import consume_report
-                    segments=(len(plan.get('singers',[])) if plan.get('selected','all')=='all' else 1) if kind=='singer-separation' else (None if kind=='ace-step' else 1)
+                    segments=None if kind=='ace-step' else 1
                     usage['gpu_seconds']=consume_report(job_id,directory,ace=kind=='ace-step',expected_segments=segments)
                     metered_source='gpu-kernel-verified'
                 except (OSError,ValueError,TypeError,KeyError):

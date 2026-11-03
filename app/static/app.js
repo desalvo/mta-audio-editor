@@ -1,6 +1,24 @@
 async function downloadDrumSepModel(){try{toast(tr('Downloading DrumSep ONNX (335 MB)…','Download DrumSep ONNX (335 MB)…'));const res=await api('/api/drumsep/models/download',{method:'POST'});toast(tr('DrumSep model installed at: ','Modello DrumSep installato in: ')+res.path)}catch(err){toast(err.message)}}
-function rememberStemTarget(value){try{MtaPreferences.setItem('mta.stem.target',value)}catch(e){}}
-function restoreStemTarget(id){const element=document.getElementById(id);if(!element)return;try{const saved=MtaPreferences.getItem('mta.stem.target');if(saved&&Array.from(element.options).some(o=>o.value===saved))element.value=saved}catch(e){}}
+function isPercussionStemTarget(value){return ['percussions','drums_without_percussions','kick','snare','toms','cymbals'].includes(value)}
+function stemTargetControl(prefix){return $(prefix==='track'?'#trackStemTargets':'#stemWorkflowTargets')}
+function syncStemPercussionSelection(prefix,source){
+  const checkbox=$(`#${prefix}SplitPercussions`),target=stemTargetControl(prefix);
+  if(!checkbox||!target)return;
+  // A saved extraction target must never opt a new job into extra processing.
+  if(source==='reset'){checkbox.checked=false;target.value='all'}
+  else if(source==='target')checkbox.checked=isPercussionStemTarget(target.value);
+  if(!checkbox.checked&&isPercussionStemTarget(target.value))target.value='all';
+  $(`#${prefix}PercussionMethodRow`)?.classList.toggle('hidden',!checkbox.checked);
+  const method=$(`#${prefix}PercussionMethod`);if(method)method.disabled=!checkbox.checked;
+}
+function stemSeparationSelection(prefix){
+  // Also normalize at submission, so an unchecked checkbox cannot hide a
+  // selective percussion request in the target field.
+  syncStemPercussionSelection(prefix,'checkbox');
+  const splitPercussions=!!$(`#${prefix}SplitPercussions`)?.checked;
+  return {stemTargets:stemTargetControl(prefix)?.value||'all',splitPercussions,
+    percussionMethod:splitPercussions?($(`#${prefix}PercussionMethod`)?.value||'dsp'):'dsp'};
+}
 function rememberPercussionMethod(value){try{MtaPreferences.setItem('mta.percussion.method',value)}catch(e){}}
 function restorePercussionMethod(id){const element=document.getElementById(id);if(!element)return;try{const choice=MtaPreferences.getItem('mta.percussion.method');if(choice&&Array.from(element.options).some(o=>o.value===choice))element.value=choice}catch(e){}}
 
@@ -469,7 +487,7 @@ function showProjectOpenProgress(pct,message){
 }
 function finishProjectOpenProgress(){setMobileBusy(false);if(document.querySelector('.utility-modal .project-open-progress'))$('#utilityBackdrop')?.classList.add('hidden')}
 function projectPickerRows(projects,emptyMessage){
-  return projects.length?`<div class="project-picker-list">${projects.map(p=>{const shared=currentUser&&p.owner_user_id&&p.owner_user_id!==currentUser.id;return `<button class="project-picker-row" onclick="openProjectFromPicker('${esc(p.id)}')"><span><b>${shared?'⌘ ':''}${esc(p.title)}</b><small>${shared?'Shared · ':''}${esc(p.target||'DAW')}</small></span><strong>Apri ›</strong></button>`}).join('')}</div>`:`<p class="hint">${esc(emptyMessage)}</p>`;
+  return projects.length?`<div class="project-picker-list">${projects.map(p=>{const shared=(p.shared_with_user_ids||[]).length>0||(currentUser&&p.owner_user_id&&p.owner_user_id!==currentUser.id);return `<button class="project-picker-row" onclick="openProjectFromPicker('${esc(p.id)}')"><span><b>${shared?'⌘ ':''}${esc(p.title)}</b><small>${shared?'Shared · ':''}${esc(p.target||'DAW')}</small></span><strong>Apri ›</strong></button>`}).join('')}</div>`:`<p class="hint">${esc(emptyMessage)}</p>`;
 }
 async function openProjectFromPicker(id){closeUtilityModal();await openP(id)}
 async function openProjectSelector(){
@@ -665,6 +683,7 @@ function restoreUiState(){
 let lastMetronomeZoneProjectId=null;
 let previousRenderedTrackState={projectId:null,count:0};
 function render(){
+  globalThis.MtaCollaboration?.sync(current,currentUser,{isDirty:()=>projectDirty,isBusy:()=>autosaveBusy||timelineMediaBusy||!!timelineClipDrag,applyRemote:applySharedRemoteProject,toast,revoked:sharedAccessEnded,left:sharedAccessEnded});
   if(segmentSelectionProject!==current?.id){selectedTimelineSegments.clear();segmentSelectionProject=current?.id}
   const validSegments=new Set((current?.tracks||[]).flatMap(t=>(t.clips||[]).map(c=>MtaTimelineRules.key(t,c))));
   for(const key of selectedTimelineSegments)if(!validSegments.has(key))selectedTimelineSegments.delete(key);
@@ -883,7 +902,7 @@ function toolbarHtml(){
   const refs=current.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
   const stem=pluginInfo.stem_splitter||{};
   return `<div class="editor-toolbar">
-    <button id="toolSelect" class="tool ${timelineTool==='select'?'active':''}" onclick="setTimelineTool('select')"><strong>➤</strong>Select</button><button id="toolSplit" class="tool ${timelineTool==='split'?'active':''}" onclick="setTimelineTool('split')"><strong>✂</strong>Split</button><button id="toolRange" class="tool ${timelineTool==='range'?'active':''}" onclick="setTimelineTool('range')"><strong>▭</strong>Range</button><button id="toolRipple" class="tool ${rippleEnabled?'active':''}" onclick="toggleRippleTool()" aria-pressed="${rippleEnabled?'true':'false'}"><strong>↔</strong>Ripple</button>
+    <button id="toolSelect" class="tool ${timelineTool==='select'?'active':''}" onclick="setTimelineTool('select')"><strong>➤</strong>Select</button><button id="toolSplit" class="tool ${timelineTool==='split'?'active':''}" onclick="setTimelineTool('split')"><strong>✂</strong>Split</button><button id="toolJoin" class="tool" onclick="joinSelectedTimelineSegments()" ${timelineJoinPair()?'':'disabled'} title="${tr('Join two adjacent selected audio segments','Unisci due segmenti audio selezionati adiacenti')}"><strong>⋈</strong>${tr('Join','Unisci')}</button><button id="toolRange" class="tool ${timelineTool==='range'?'active':''}" onclick="setTimelineTool('range')"><strong>▭</strong>Range</button><button id="toolRipple" class="tool ${rippleEnabled?'active':''}" onclick="toggleRippleTool()" aria-pressed="${rippleEnabled?'true':'false'}"><strong>↔</strong>Ripple</button>
     <div class="toolbar-sep destructive-sep"></div><div class="toolbar-destructive-group"><button class="toolbar-action danger compact-delete" onclick="deleteSelection(false)">Delete tracks</button><button class="toolbar-action danger compact-delete" onclick="deleteSelection(true)">Delete selected range</button></div>
     <div class="toolbar-sep"></div><div class="toolbar-group"><label>Snap</label><select id="timelineSnap" onchange="current.timeline_snap=this.value;markDirty()">${['bars','beats','off'].map(x=>`<option value="${x}" ${(current.timeline_snap||'off')===x?'selected':''}>${x==='bars'?tr('Bars','Battute'):x==='beats'?tr('Beats','Battiti'):'Off'}</option>`).join('')}</select></div>
     <button class="toolbar-action ${current.timeline_magnetic?'active':''}" aria-pressed="${!!current.timeline_magnetic}" onclick="current.timeline_magnetic=!current.timeline_magnetic;markDirty();render()" title="${tr('Magnetic segment edges','Bordi magnetici dei segmenti')}">🧲 ${tr('Magnet','Magnete')}</button>
@@ -1221,7 +1240,8 @@ function openTrackContextMenuAt(id,clientX,clientY,fromTimeline=false){
     ${timelineCreationMenu(id)}
     ${track.kind!=='midi'?`<button type="button" onclick="closeTrackContextMenu();openInsertProjectFileDialog('${id}')">＋ ${tr('Insert project file in this track…','Inserisci file del progetto nella traccia…')}</button><button type="button" ${timelineClipboard?.parts?.length?'':'disabled'} onclick="closeTrackContextMenu();pasteTimelineSelection('${id}')">${tr('Paste segments here','Incolla segmenti qui')}</button>`:''}
     <button type="button" aria-keyshortcuts="Control+A Meta+A" onclick="closeTrackContextMenu();${fromTimeline?'selectAllTimelineSegments()':'selectAllTracks()'}">☑ <span>${fromTimeline?tr('Select all timeline segments','Seleziona tutti i segmenti della timeline'):tr('Select all tracks','Seleziona tutte le tracce')}</span><kbd class="context-shortcut">Ctrl/⌘ A</kbd></button>
-    ${timelineTool==='split'?`<button type="button" aria-keyshortcuts="S" onclick="closeTrackContextMenu();splitSelectedTracksAt(playCursorMs)">✂ <span>${tr('Split selected tracks at transport','Dividi tracce selezionate alla posizione del transport')}</span><kbd class="context-shortcut">S</kbd></button>`:''}
+    ${timelineTool==='split'?`<button type="button" aria-keyshortcuts="S" onclick="closeTrackContextMenu();splitSelectedTracksAt(playCursorMs)">✂ <span>${tr('Split selected segments at transport','Dividi segmenti selezionati alla posizione del transport')}</span><kbd class="context-shortcut">S</kbd></button>`:''}
+    ${fromTimeline?`<button type="button" ${timelineJoinPair()?'':'disabled'} onclick="closeTrackContextMenu();joinSelectedTimelineSegments()">⋈ ${tr('Join adjacent segments','Unisci segmenti adiacenti')}</button>`:''}
     ${track.kind==='midi'?`<button type="button" onclick="closeTrackContextMenu();openMidiEditor('${id}')">♬ <span>${tr('MIDI / VST instrument','MIDI / Strumento VST')}</span></button>`:''}
     <button type="button" onclick="closeTrackContextMenu();duplicateTrack('${id}')">⧉ <span>Duplica traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
@@ -1427,49 +1447,6 @@ async function startTrackTextAnalysis(id,kind,choice=''){
 }
 
 
-// Optional SAM Audio multi-singer separation; anchors are source-relative seconds.
-function rememberSingerModel(value){try{MtaPreferences.setItem('mta.singer.model',value)}catch(_){}}
-function rememberSingerTarget(value){try{MtaPreferences.setItem('mta.singer.target',value)}catch(_){}}
-function toggleSingerPanel(prefix){const el=$(`#${prefix}SingerPanel`);if(el)el.classList.toggle('hidden',!$(`#${prefix}SingerEnabled`)?.checked)}
-function singerTimeToSeconds(value){
-  const parts=String(value||'').trim().split(':');
-  if(!parts.length||parts.length>3||parts.some(p=>!/^\d+(?:\.\d+)?$/.test(p)))throw Error('Tempo cantante non valido: usa mm:ss o secondi');
-  const seconds=parts.reduce((acc,part)=>acc*60+Number(part),0);
-  if(!Number.isFinite(seconds))throw Error('Tempo cantante non valido');
-  return seconds;
-}
-function singerLines(prefix){return String($(`#${prefix}SingerRefs`)?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean)}
-function syncSingerTargets(prefix){
-  const select=$(`#${prefix}SingerTarget`);if(!select)return;
-  const old=select.value||'all',lines=singerLines(prefix);
-  select.innerHTML='<option value="all">'+tr('All singers','Tutti i cantanti')+'</option>'+lines.slice(0,8).map((line,i)=>`<option value="singer_${i+1}">${esc(line.split('|')[0].trim()||`Voce ${i+1}`)}</option>`).join('');
-  select.value=[...select.options].some(o=>o.value===old)?old:'all';
-  try{MtaPreferences.setItem('mta.singer.count',String(lines.length))}catch(_){}
-}
-function addSingerReference(prefix){
-  const box=$(`#${prefix}SingerRefs`);if(!box)return;
-  const lines=singerLines(prefix);if(lines.length>=8)return toast(tr('Maximum 8 singers','Massimo 8 cantanti'));
-  box.value=(lines.length?lines.join('\n')+'\n':'')+`Voce ${lines.length+1} | |`;
-  syncSingerTargets(prefix);box.focus();
-}
-function restoreSingerUi(prefix){
-  const model=$(`#${prefix}SingerModel`),refs=$(`#${prefix}SingerRefs`);if(!model||!refs)return;
-  try{const stored=MtaPreferences.getItem('mta.singer.model');if(stored&&[...model.options].some(o=>o.value===stored))model.value=stored;}catch(_){}
-  if(!refs.value){let count=2;try{count=Number(MtaPreferences.getItem('mta.singer.count'))||2}catch(_){};count=Math.max(2,Math.min(8,count));refs.value=Array.from({length:count},(_,i)=>`Voce ${i+1} | |`).join('\n')}
-  syncSingerTargets(prefix);try{const selected=MtaPreferences.getItem('mta.singer.target');const target=$(`#${prefix}SingerTarget`);if(target&&[...target.options].some(o=>o.value===selected))target.value=selected;}catch(_){}
-}
-function collectSingerSelection(prefix){
-  if(!$(`#${prefix}SingerEnabled`)?.checked)return null;
-  const rows=singerLines(prefix);
-  if(rows.length<2||rows.length>8)throw Error('Specifica da 2 a 8 cantanti');
-  const specs=rows.map(line=>{const fields=line.split('|').map(x=>x.trim());if(fields.length!==3||!fields[0])throw Error('Ogni riga deve contenere nome | inizio | fine');return {name:fields[0],start:singerTimeToSeconds(fields[1]),end:singerTimeToSeconds(fields[2])}});
-  for(const x of specs)if(x.end-x.start<0.5||x.end-x.start>60)throw Error('Ogni intervallo solista deve durare da 0,5 a 60 secondi');
-  for(let i=0;i<specs.length;i++)for(let j=i+1;j<specs.length;j++)if(specs[i].start<specs[j].end&&specs[j].start<specs[i].end)throw Error('Gli intervalli solisti di cantanti diversi non possono sovrapporsi');
-  const model=$(`#${prefix}SingerModel`)?.value||'sam-audio-small',target=$(`#${prefix}SingerTarget`)?.value||'all';
-  rememberSingerModel(model);rememberSingerTarget(target);
-  return {singers_json:JSON.stringify(specs),singer_model:model,singer_target:target};
-}
-
 function openTrackStemWorkflow(id){
   const track=trackById(id);if(!track)return toast('Traccia non trovata');
   const stem=pluginInfo.stem_splitter||{};if(!stem.available)return toast('Demucs non è disponibile in questo runtime');
@@ -1480,10 +1457,9 @@ function openTrackStemWorkflow(id){
   const recommendedCount=Number(profileMap[recommended]?.stem_count)||counts[0]||4;
   const countOptions=counts.map(n=>{const p=profiles.find(x=>Number(x.stem_count)===n),labels=p?.stem_labels||[];const detail=labels.length&&labels.length<=8?' · '+labels.join(' / '):(p?.display_name?' · '+p.display_name:'');return `<option value="${n}" ${n===recommendedCount?'selected':''}>${n} stem${esc(detail)}</option>`}).join('');
   const leadBacking=stem.lead_backing||{},backingModels=(leadBacking.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===leadBacking.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(leadBacking.storage==='local'?'download locale':'download server')}</option>`).join('');
-  showUtilityModal('Separa traccia',`<div class="stem-workflow"><p class="hint">Sorgente: <b>${esc(track.name)}</b>. La separazione partirà solo dopo la conferma dei parametri.</p><div class="workflow-grid"><label class="workflow-field"><span>Modello AI</span><select id="trackStemModel" onchange="syncTrackStemModelCount('model')">${models}</select></label><label class="workflow-field"><span>Numero stem</span><select id="trackStemCount" onchange="syncTrackStemModelCount('count')">${countOptions}</select></label></div><label class="workflow-check"><input id="trackSplitBackingVocals" type="checkbox" onchange="$('#trackBackingModelRow').classList.toggle('hidden',!this.checked)"> Separa anche voce principale e backing vocals</label><label class="workflow-field hidden" id="trackBackingModelRow"><span>Modello Lead / Backing Vocals</span><select id="trackBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button class="backing-model-download utility-btn primary" type="button" onclick="downloadTrackBackingModel()">Scarica modello</button></label><label class="workflow-check"><input id="trackSplitPercussions" type="checkbox"> ${tr('Separate drums and percussions','Separa drums e percussioni')}</label><label class="workflow-field"><span>${tr('Percussion separation method','Metodo separazione percussioni')}</span><select id="trackPercussionMethod" onchange="rememberPercussionMethod(this.value)"><option value="dsp">DSP (fallback)</option><option value="mvsep-mega53">MVSep Mega 53 AI (Kick / Snare / Toms / Hi-hat / Percussion)</option><option value="drumsep-onnx">DrumSep ONNX (Kick / Snare / Toms / Cymbals)</option><option value="sam-audio-small">SAM Audio Small (optional)</option><option value="sam-audio-base">SAM Audio Base (optional)</option><option value="sam-audio-large">SAM Audio Large (optional)</option></select><button class="utility-btn" type="button" onclick="downloadDrumSepModel()">${tr('Download DrumSep model','Scarica modello DrumSep')}</button><small>${tr('SAM Audio requires an authorized checkpoint and isolated Python environment (MTA_SAM_AUDIO_PYTHON).','SAM Audio richiede un checkpoint autorizzato e un ambiente Python separato (MTA_SAM_AUDIO_PYTHON).')}</small></label><label class="workflow-field"><span>${tr('Stems to extract','Stem da estrarre')}</span><select id="trackStemTargets" onchange="rememberStemTarget(this.value)"><option value="all">${tr('All stems','Tutti gli stem')}</option><option value="lead_vocals">${tr('Lead vocals only (no backing vocals)','Solo voce principale (senza backing vocals)')}</option><option value="percussions">${tr('Percussions only','Solo percussioni')}</option><option value="drums_without_percussions">${tr('Drums without percussions','Drums senza percussioni')}</option><option value="other">${tr('Everything else (Other)','Tutto il resto (Other)')}</option><option value="kick">Kick</option><option value="snare">Snare</option><option value="toms">Toms</option><option value="cymbals">Cymbals</option></select></label><label class="workflow-check"><input id="trackSingerEnabled" type="checkbox" onchange="toggleSingerPanel('track')"> ${tr('Separate multiple singers (experimental SAM Audio)','Separa più cantanti (SAM Audio sperimentale)')}</label><div id="trackSingerPanel" class="hidden"><label class="workflow-field"><span>${tr('Singer model','Modello separazione cantanti')}</span><select id="trackSingerModel" onchange="rememberSingerModel(this.value)"><option value="sam-audio-small">SAM Audio Small</option><option value="sam-audio-base">SAM Audio Base</option><option value="sam-audio-large">SAM Audio Large</option></select></label><label class="workflow-field"><span>${tr('Singer · solo reference start · end (one per line)','Cantante · inizio · fine del riferimento solista (una riga per voce)')}</span><textarea id="trackSingerRefs" rows="4" placeholder="Voce A | 00:12 | 00:18&#10;Voce B | 00:28 | 00:35" oninput="syncSingerTargets('track')"></textarea></label><button type="button" class="utility-btn" onclick="addSingerReference('track')">+ ${tr('Add singer','Aggiungi cantante')}</button><label class="workflow-field"><span>${tr('Singers to extract','Cantanti da estrarre')}</span><select id="trackSingerTarget" onchange="rememberSingerTarget(this.value)"></select></label><small>${tr('Choose a passage in which only that singer is audible, measured from the beginning of the source audio. Each additional voice requires SAM Audio access.','Indica per ogni voce un intervallo in cui canta da sola, misurato dall’inizio dell’audio sorgente. SAM Audio richiede checkpoint autorizzati.')}</small></div><div id="trackStemDisclosure" class="workflow-note"></div><div class="utility-actions"><button class="utility-btn primary" type="button" onclick="startTrackStemSplit('${esc(id)}')">Avvia separazione</button><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button></div></div>`);
+  showUtilityModal('Separa traccia',`<div class="stem-workflow"><p class="hint">Sorgente: <b>${esc(track.name)}</b>. La separazione partirà solo dopo la conferma dei parametri.</p><div class="workflow-grid"><label class="workflow-field"><span>Modello AI</span><select id="trackStemModel" onchange="syncTrackStemModelCount('model')">${models}</select></label><label class="workflow-field"><span>Numero stem</span><select id="trackStemCount" onchange="syncTrackStemModelCount('count')">${countOptions}</select></label></div><label class="workflow-check"><input id="trackSplitBackingVocals" type="checkbox" onchange="$('#trackBackingModelRow').classList.toggle('hidden',!this.checked)"> Separa anche voce principale e backing vocals</label><label class="workflow-field hidden" id="trackBackingModelRow"><span>Modello Lead / Backing Vocals</span><select id="trackBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button class="backing-model-download utility-btn primary" type="button" onclick="downloadTrackBackingModel()">Scarica modello</button></label><label class="workflow-check"><input id="trackSplitPercussions" type="checkbox" onchange="syncStemPercussionSelection('track','checkbox')"> ${tr('Separate drums and percussions','Separa drums e percussioni')}</label><label class="workflow-field hidden" id="trackPercussionMethodRow"><span>${tr('Percussion separation method','Metodo separazione percussioni')}</span><select id="trackPercussionMethod" disabled onchange="rememberPercussionMethod(this.value)"><option value="dsp">DSP (fallback)</option><option value="mvsep-mega53">MVSep Mega 53 AI (Kick / Snare / Toms / Hi-hat / Percussion)</option><option value="drumsep-onnx">DrumSep ONNX (Kick / Snare / Toms / Cymbals)</option></select><button class="utility-btn" type="button" onclick="downloadDrumSepModel()">${tr('Download DrumSep model','Scarica modello DrumSep')}</button></label><label class="workflow-field"><span>${tr('Stems to extract','Stem da estrarre')}</span><select id="trackStemTargets" onchange="syncStemPercussionSelection('track','target')"><option value="all">${tr('All standard stems (Demucs)','Tutti gli stem standard (Demucs)')}</option><option value="lead_vocals">${tr('Lead vocals only (no backing vocals)','Solo voce principale (senza backing vocals)')}</option><option value="percussions">${tr('Percussions only','Solo percussioni')}</option><option value="drums_without_percussions">${tr('Drums without percussions','Drums senza percussioni')}</option><option value="other">${tr('Everything else (Other)','Tutto il resto (Other)')}</option><option value="kick">Kick</option><option value="snare">Snare</option><option value="toms">Toms</option><option value="cymbals">Cymbals</option></select></label><div id="trackStemDisclosure" class="workflow-note"></div><div class="utility-actions"><button class="utility-btn primary" type="button" onclick="startTrackStemSplit('${esc(id)}')">Avvia separazione</button><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button></div></div>`);
   restorePercussionMethod('trackPercussionMethod');
-  restoreStemTarget('trackStemTargets');
-  restoreSingerUi('track');
+  syncStemPercussionSelection('track','reset');
   syncTrackStemModelCount('model');
 }
 function syncTrackStemModelCount(source){
@@ -1498,10 +1474,8 @@ async function startTrackStemSplit(id){
   const model=$('#trackStemModel')?.value,stemCount=Number($('#trackStemCount')?.value||0),splitBackingVocals=!!$('#trackSplitBackingVocals')?.checked,backingVocalModel=$('#trackBackingVocalModel')?.value||'uvr_mdxnet_kara_2';
   if(!model||!stemCount)return toast('Seleziona modello AI e numero di stem prima di procedere');
   await flushAutosave();
-  try{const stemTargets=$('#trackStemTargets')?.value||'all',splitPercussions=!!$('#trackSplitPercussions')?.checked;
-  const singers=collectSingerSelection('track');
-  if(singers&&(splitBackingVocals||splitPercussions||stemTargets!=='all'))throw Error('La separazione cantanti è alternativa alla separazione Lead/Backing e a quella selettiva strumenti');
-  const q=new URLSearchParams({model,stem_count:String(stemCount),split_backing_vocals:String(splitBackingVocals),backing_vocal_model:backingVocalModel,split_percussions:String(splitPercussions),percussion_method:($('#trackPercussionMethod')?.value||'dsp'),stem_targets:stemTargets,...(singers||{})});const job=await api(`/api/projects/${current.id}/tracks/${id}/stem-jobs?${q}`,{method:'POST'});closeUtilityModal();activeStemJob=job.id;activeStemProjectId=job.project_id;showStemProgress(job);pollStemJob(job.id)}catch(e){toast(e.message)}
+  try{const {stemTargets,splitPercussions,percussionMethod}=stemSeparationSelection('track');
+  const q=new URLSearchParams({model,stem_count:String(stemCount),split_backing_vocals:String(splitBackingVocals),backing_vocal_model:backingVocalModel,split_percussions:String(splitPercussions),percussion_method:percussionMethod,stem_targets:stemTargets});const job=await api(`/api/projects/${current.id}/tracks/${id}/stem-jobs?${q}`,{method:'POST'});closeUtilityModal();activeStemJob=job.id;activeStemProjectId=job.project_id;showStemProgress(job);pollStemJob(job.id)}catch(e){toast(e.message)}
 }
 // Track renaming must never force a full DAW render: that destroys mixer editors,
 // timeline canvases and can defer the visible label until unrelated UI work.
@@ -2479,12 +2453,15 @@ function ensureSessionHistory(){if((current?.id||null)!==historyProjectId)resetS
 function checkpointHistory(){if(!current)return;ensureSessionHistory();if(JSON.stringify(current)!==JSON.stringify(lastHistoryState)){undoStack.push(lastHistoryState);if(undoStack.length>100)undoStack.shift();redoStack=[];lastHistoryState=projectSnapshot();updateEditActionState()}}
 async function persistCurrentProject(showToast=false){
   if(!current)return;
+  if(current.collaboration_access_revoked)throw new Error('Condivisione terminata: conserva le modifiche locali e apri un progetto accessibile.');
   collect();
+  globalThis.MtaCollaboration?.beforeSave(current);
   const projectId=current.id,mutationAtStart=projectMutationSerial;
   const payload=JSON.stringify(current);
   let saved;
   try{saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:payload});}
   catch(error){
+    if(error.message==='PROJECT_COLLABORATION_CONFLICT')globalThis.MtaCollaboration?.conflict();
     if(error.message!=='PROJECT_AI_RESULTS_CHANGED')throw error;
     await reconcileAiProject(projectId);
     // Recollect after merging; a newer edit must never be replaced by the old payload.
@@ -2492,6 +2469,9 @@ async function persistCurrentProject(showToast=false){
   }
   if(!current||current.id!==projectId)return;
   if(projectMutationSerial!==mutationAtStart){
+    globalThis.MtaCollaboration?.saved(saved);
+    if(globalThis.MtaCollaboration?.mergeSaved)current=globalThis.MtaCollaboration.mergeSaved(JSON.parse(payload),current,saved);
+    globalThis.MtaCollaboration?.saved(current);
     // A newer user edit happened in flight: never overwrite it with old server data.
     projectDirty=true;
     autosaveQueued=true;
@@ -2501,10 +2481,12 @@ async function persistCurrentProject(showToast=false){
   projectDirty=false;
   persistedProjectSnapshot=JSON.parse(JSON.stringify(saved));
   lastHistoryState=projectSnapshot();
+  // A pending live update can settle only after the direct save is clean.
+  globalThis.MtaCollaboration?.saved(current);
   $('#headerProjectName').textContent=current?.title||'—';
   if(showToast)toast('Progetto salvato');
 }
-async function restoreHistorySnapshot(snapshot,label){if(!snapshot||!current)return;const media=current.clip_library||[];current=JSON.parse(JSON.stringify(snapshot));const known=new Set((current.clip_library||[]).map(x=>x.id));current.clip_library=[...(current.clip_library||[]),...media.filter(x=>!known.has(x.id))];selectedTrackId=current.tracks.some(t=>t.id===selectedTrackId)?selectedTrackId:(current.tracks[0]?.id||null);projectDirty=true;render();await persistCurrentProject(false);lastHistoryState=projectSnapshot();updateEditActionState();toast(label)}
+async function restoreHistorySnapshot(snapshot,label){if(!snapshot||!current)return;const live=current,media=live.clip_library||[];current=JSON.parse(JSON.stringify(snapshot));for(const field of ['collaboration_revision','owner_user_id','shared_with_user_ids','collaboration_access_revoked']){if(Object.prototype.hasOwnProperty.call(live,field))current[field]=JSON.parse(JSON.stringify(live[field]));else delete current[field]}const known=new Set((current.clip_library||[]).map(x=>x.id));current.clip_library=[...(current.clip_library||[]),...media.filter(x=>!known.has(x.id))];selectedTrackId=current.tracks.some(t=>t.id===selectedTrackId)?selectedTrackId:(current.tracks[0]?.id||null);projectDirty=true;render();timingAudioChanged(new Set((current.tracks||[]).map(t=>t.id)));await persistCurrentProject(false);lastHistoryState=projectSnapshot();updateEditActionState();toast(label)}
 async function undoEdit(){ensureSessionHistory();checkpointHistory();if(!undoStack.length)return toast('Nessuna operazione da annullare');const target=undoStack.pop();redoStack.push(projectSnapshot());await restoreHistorySnapshot(target,'Undo')}
 async function redoEdit(){ensureSessionHistory();if(!redoStack.length)return toast('Nessuna operazione da ripristinare');undoStack.push(projectSnapshot());const target=redoStack.pop();await restoreHistorySnapshot(target,'Redo')}
 function editTrackIds(){let ids=selectedTrackIds();if(!ids.length&&selectedTrackId)ids=[selectedTrackId];return ids}
@@ -2532,27 +2514,41 @@ function removeRangeFromTracks(a,b,trackIds,ripple=false){
 }
 function splitSelectedTracksAt(ms){
   if(!current)return;
-  const ids=selectedTrackIds();if(!ids.length)return toast('Seleziona almeno una traccia');
-  const at=Math.max(0,Math.round(ms));let count=0;checkpointHistory();
+  const selected=selectedSegmentItems(),keys=new Set(selected.map(({track,clip})=>MtaTimelineRules.key(track,clip)));
+  const ids=keys.size?new Set(selected.map(x=>x.track.id)):new Set(selectedTrackIds());
+  if(!ids.size)return toast(tr('Select at least one timeline segment or track','Seleziona almeno un segmento della timeline o una traccia'));
+  const at=Number(ms);if(!Number.isFinite(at))return;
+  const point=Math.max(0,Math.round(at)),plans=[],nextSelection=new Set(selectedTimelineSegments);let count=0;
   for(const t of current.tracks){
-    if(!ids.includes(t.id))continue;
+    if(!ids.has(t.id)||t.kind==='midi')continue;
     const delay=trackDelayMs(t),out=[];
     for(const c of t.clips||[]){
-      const raw=Number(c.timeline_start_ms||0),cs=raw+delay,ce=cs+(c.source_end_ms-c.source_start_ms);
-      if(at<=cs||at>=ce){out.push(c);continue}
-      const sourceCut=c.source_start_ms+(at-cs);
-      out.push({...c,id:clipId(),source_end_ms:sourceCut});
-      out.push({...c,id:clipId(),source_start_ms:sourceCut,timeline_start_ms:at-delay});
-      count++;
+      const key=MtaTimelineRules.key(t,c),raw=Number(c.timeline_start_ms||0),cs=raw+delay,ce=cs+(c.source_end_ms-c.source_start_ms);
+      if((keys.size&&!keys.has(key))||point<=cs||point>=ce){out.push(c);continue}
+      const sourceCut=c.source_start_ms+(point-cs),left={...c,id:clipId(),source_end_ms:sourceCut},right={...c,id:clipId(),source_start_ms:sourceCut,timeline_start_ms:point-delay};
+      out.push(left,right);if(keys.has(key)){nextSelection.delete(key);nextSelection.add(MtaTimelineRules.key(t,left));nextSelection.add(MtaTimelineRules.key(t,right))}count++;
     }
-    t.clips=out.sort((x,y)=>x.timeline_start_ms-y.timeline_start_ms);
+    plans.push({track:t,clips:out.sort((x,y)=>x.timeline_start_ms-y.timeline_start_ms)});
   }
-  if(!count)return toast('Nessun clip attraversa il punto di split nelle tracce selezionate');
-  projectDirty=true;render();markDirty();toast(`Split applicato a ${count} clip nelle tracce selezionate`);
+  if(!count)return toast(tr('No selected segment crosses the transport position','Nessun segmento selezionato attraversa la posizione del transport'));
+  checkpointHistory();for(const plan of plans){plan.track.clips=plan.clips;plan.track.clips_initialized=true}
+  selectedTimelineSegments=nextSelection;projectDirty=true;render();markDirty();timingAudioChanged(ids);toast(tr('Segments split: ','Segmenti divisi: ')+count);
 }
+function timelineJoinPair(){
+  const items=selectedSegmentItems();if(items.length!==2||items[0].track.id!==items[1].track.id||items[0].track.kind==='midi')return null;
+  items.sort((a,b)=>Number(a.clip.timeline_start_ms)-Number(b.clip.timeline_start_ms));
+  const [left,right]=items;if(left.clip.source_end_ms<=left.clip.source_start_ms||right.clip.source_end_ms<=right.clip.source_start_ms||Number(left.clip.timeline_start_ms)+left.clip.source_end_ms-left.clip.source_start_ms!==Number(right.clip.timeline_start_ms))return null;
+  return items;
+}
+async function joinSelectedTimelineSegments(){
+  const pair=timelineJoinPair();if(!pair)return toast(tr('Select exactly two adjacent audio segments on the same track','Seleziona esattamente due segmenti audio adiacenti della stessa traccia'));
+  return commitTimelineMedia('timeline/join',{track_id:pair[0].track.id,parts:pair.map(({track,clip})=>({track_id:track.id,clip_id:clip.id,filename:track.filename,source_start_ms:clip.source_start_ms,source_end_ms:clip.source_end_ms,expected_start_ms:MtaTimelineRules.start(track,clip)}))});
+}
+
 
 function paintSegmentSelection(){
   for(const el of document.querySelectorAll('.clip-block'))el.classList.toggle('segment-selected',selectedTimelineSegments.has(`${el.dataset.trackId}:${el.dataset.clipId}`));
+  const joinButton=$('#toolJoin');if(joinButton)joinButton.disabled=!timelineJoinPair();
 }
 function selectedSegmentItems(){return (current?.tracks||[]).flatMap(t=>(t.clips||[]).filter(c=>selectedTimelineSegments.has(MtaTimelineRules.key(t,c))).map(c=>({track:t,clip:c})))}
 function timingAudioChanged(ids){
@@ -2622,7 +2618,7 @@ function timelineCreationMenu(afterId=null){
 function openProjectTimelineMenu(event){
  if(!current)return;event.preventDefault();event.stopPropagation();closeTrackContextMenu();
  const menu=document.createElement('div');menu.id='trackContextMenu';menu.className='track-context-menu';menu.setAttribute('role','menu');menu.tabIndex=-1;
- menu.innerHTML=timelineCreationMenu()+`<button type="button" onclick="closeTrackContextMenu();selectAllTimelineSegments()">${tr('Select all timeline segments','Seleziona tutti i segmenti della timeline')}</button>`;
+ menu.innerHTML=timelineCreationMenu()+`<button type="button" onclick="closeTrackContextMenu();selectAllTimelineSegments()">${tr('Select all timeline segments','Seleziona tutti i segmenti della timeline')}</button>${timelineTool==='split'?`<button type="button" aria-keyshortcuts="S" onclick="closeTrackContextMenu();splitSelectedTracksAt(playCursorMs)">✂ ${tr('Split selected segments at transport','Dividi segmenti selezionati alla posizione del transport')}<kbd>S</kbd></button>`:''}<button type="button" ${timelineJoinPair()?'':'disabled'} onclick="closeTrackContextMenu();joinSelectedTimelineSegments()">⋈ ${tr('Join adjacent segments','Unisci segmenti adiacenti')}</button>`;
  document.body.appendChild(menu);menu.focus({preventScroll:true});const r=menu.getBoundingClientRect();menu.style.left=`${Math.max(8,Math.min(event.clientX,window.innerWidth-r.width-8))}px`;menu.style.top=`${Math.max(8,Math.min(event.clientY,window.innerHeight-r.height-8))}px`;
 }
 async function commitTimelineMedia(path,body){
@@ -2672,8 +2668,8 @@ function crossTrackDragDelta(items,wanted,trackId,anchorKey){
  return Math.max(Math.max(0,trackDelayMs(target))-origin,delta);
 }
 
-function copyTimelineSelection(){if(timelineTool==='select'&&selectedSegmentItems().length)return editSelectedSegments('copy');const[a,b]=selectionBounds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');timelineClipboard={duration_ms:b-a,parts};updateEditActionState();toast('Selezione copiata')}
-function cutTimelineSelection(){if(timelineTool==='select'&&selectedSegmentItems().length)return editSelectedSegments('cut');const[a,b]=selectionBounds(),ids=editTrackIds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length||!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');checkpointHistory();timelineClipboard={duration_ms:b-a,parts};removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();updateEditActionState();toast(rippleEnabled?'Selezione tagliata con ripple':'Selezione tagliata')}
+function copyTimelineSelection(){if(selectedSegmentItems().length)return editSelectedSegments('copy');const[a,b]=selectionBounds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');timelineClipboard={duration_ms:b-a,parts};updateEditActionState();toast('Selezione copiata')}
+function cutTimelineSelection(){if(selectedSegmentItems().length)return editSelectedSegments('cut');const[a,b]=selectionBounds(),ids=editTrackIds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length||!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');checkpointHistory();timelineClipboard={duration_ms:b-a,parts};removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();updateEditActionState();toast(rippleEnabled?'Selezione tagliata con ripple':'Selezione tagliata')}
 async function pasteTimelineSelection(destinationTrackId=timelineTargetTrackId){
  if(!current||!timelineClipboard?.parts?.length)return toast('Clipboard timeline vuota');
  const target=trackById(destinationTrackId)||(selectedTrackIdSet.size===1?trackById(selectedTrackId):null);
@@ -2687,7 +2683,7 @@ function editSelectedSegments(action){
 }
 
 function removeTimelineSelection(){if(!current)return;if(timelineTool==='select'&&selectedSegmentItems().length)return editSelectedSegments('remove');const[a,b]=selectionBounds(),ids=editTrackIds();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length)return toast('Seleziona almeno una traccia');checkpointHistory();removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();toast(rippleEnabled?'Parte rimossa con ripple':'Parte di traccia rimossa')}
-function updateEditActionState(){const set=(id,v)=>{const e=$(id);if(e)e.disabled=!!v};set('#undoBtn',!undoStack.length);set('#redoBtn',!redoStack.length);set('#pasteBtn',!timelineClipboard?.parts?.length)}
+function updateEditActionState(){const set=(id,v)=>{const e=$(id);if(e)e.disabled=!!v};set('#undoBtn',!undoStack.length);set('#redoBtn',!redoStack.length);set('#pasteBtn',!timelineClipboard?.parts?.length);set('#toolJoin',!timelineJoinPair())}
 function markDirty(delay=650){
   if(!current)return;projectMutationSerial++;ensureSessionHistory();checkpointHistory();projectDirty=true;clearTimeout(autosaveTimer);if(!autosaveEnabled){updateEditActionState();return}autosaveTimer=setTimeout(()=>flushAutosave(false),delay);
 }
@@ -3111,7 +3107,7 @@ async function deleteTracksByIds(ids){
 
 async function deleteSelection(wholeSong){
   if(!current)return;
-  if(wholeSong&&timelineTool==='select'&&selectedSegmentItems().length){editSelectedSegments('remove');return}
+  if(wholeSong&&selectedSegmentItems().length){editSelectedSegments('remove');return}
   if(!wholeSong){
     let ids=selectedTrackIds();
     if(!ids.length&&selectedTrackId)ids=[selectedTrackId];
@@ -3291,9 +3287,9 @@ function openStemWorkflow(){
       <label class="workflow-check"><input id="stemExtractChords" type="checkbox" onchange="$('#stemChordsEngineRow').classList.toggle('hidden',!this.checked);updateStemChordEngineDisclosure()"> Estrai anche i chords</label>
       <label class="workflow-field hidden" id="stemChordsEngineRow"><span>Motore chords</span><select id="stemChordsEngine" onchange="updateStemChordEngineDisclosure()">${chordEngineOptions}</select><small id="stemChordEngineDisclosure"></small><button type="button" onclick="downloadStemTextModel('chords')">Scarica modello</button></label>
       <div class="workflow-note warning"><b>Nota sui tempi di elaborazione:</b> separazione stem, estrazione lyrics e analisi chords possono richiedere parecchio tempo in base alla durata del brano, ai modelli scelti e all’hardware disponibile.</div><label class="workflow-check"><input id="stemSplitBackingVocals" type="checkbox" onchange="updateBackingModelRow()"> Separa anche voce principale e backing vocals (secondo passaggio AI)</label><label class="workflow-field hidden" id="backingModelRow"><span>Modello Lead / Backing Vocals</span><select id="stemBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button class="backing-model-download utility-btn primary" type="button" onclick="downloadSelectedBackingModel()">Scarica modello</button></label>
-      <label class="workflow-check"><input id="stemSplitPercussions" type="checkbox"> ${tr('Separate drums and percussions','Separa drums e percussioni')}</label>
-      <label class="workflow-field"><span>${tr('Percussion separation method','Metodo separazione percussioni')}</span><select id="stemPercussionMethod" onchange="rememberPercussionMethod(this.value)"><option value="dsp">DSP (fallback)</option><option value="mvsep-mega53">MVSep Mega 53 AI (Kick / Snare / Toms / Hi-hat / Percussion)</option><option value="drumsep-onnx">DrumSep ONNX (Kick / Snare / Toms / Cymbals)</option><option value="sam-audio-small">SAM Audio Small (optional)</option><option value="sam-audio-base">SAM Audio Base (optional)</option><option value="sam-audio-large">SAM Audio Large (optional)</option></select><button class="utility-btn" type="button" onclick="downloadDrumSepModel()">${tr('Download DrumSep model','Scarica modello DrumSep')}</button><small>${tr('SAM Audio requires an authorized checkpoint and isolated Python environment (MTA_SAM_AUDIO_PYTHON).','SAM Audio richiede un checkpoint autorizzato e un ambiente Python separato (MTA_SAM_AUDIO_PYTHON).')}</small></label><label class="workflow-field"><span>${tr('Stems to extract','Stem da estrarre')}</span><select id="stemWorkflowTargets" onchange="rememberStemTarget(this.value)"><option value="all">${tr('All stems','Tutti gli stem')}</option><option value="lead_vocals">${tr('Lead vocals only (no backing vocals)','Solo voce principale (senza backing vocals)')}</option><option value="percussions">${tr('Percussions only','Solo percussioni')}</option><option value="drums_without_percussions">${tr('Drums without percussions','Drums senza percussioni')}</option><option value="other">${tr('Everything else (Other)','Tutto il resto (Other)')}</option><option value="kick">Kick</option><option value="snare">Snare</option><option value="toms">Toms</option><option value="cymbals">Cymbals</option></select></label>
-      <label class="workflow-check"><input id="stemSingerEnabled" type="checkbox" onchange="toggleSingerPanel('stem')"> ${tr('Separate multiple singers (experimental SAM Audio)','Separa più cantanti (SAM Audio sperimentale)')}</label><div id="stemSingerPanel" class="hidden"><label class="workflow-field"><span>${tr('Singer model','Modello separazione cantanti')}</span><select id="stemSingerModel" onchange="rememberSingerModel(this.value)"><option value="sam-audio-small">SAM Audio Small</option><option value="sam-audio-base">SAM Audio Base</option><option value="sam-audio-large">SAM Audio Large</option></select></label><label class="workflow-field"><span>${tr('Singer · solo reference start · end (one per line)','Cantante · inizio · fine del riferimento solista (una riga per voce)')}</span><textarea id="stemSingerRefs" rows="4" placeholder="Voce A | 00:12 | 00:18&#10;Voce B | 00:28 | 00:35" oninput="syncSingerTargets('stem')"></textarea></label><button type="button" class="utility-btn" onclick="addSingerReference('stem')">+ ${tr('Add singer','Aggiungi cantante')}</button><label class="workflow-field"><span>${tr('Singers to extract','Cantanti da estrarre')}</span><select id="stemSingerTarget" onchange="rememberSingerTarget(this.value)"></select></label><small>${tr('Choose a passage in which only that singer is audible, measured from the beginning of the source audio. Each additional voice requires SAM Audio access.','Indica per ogni voce un intervallo in cui canta da sola, misurato dall’inizio dell’audio sorgente. SAM Audio richiede checkpoint autorizzati.')}</small></div>
+      <label class="workflow-check"><input id="stemSplitPercussions" type="checkbox" onchange="syncStemPercussionSelection('stem','checkbox')"> ${tr('Separate drums and percussions','Separa drums e percussioni')}</label>
+      <label class="workflow-field hidden" id="stemPercussionMethodRow"><span>${tr('Percussion separation method','Metodo separazione percussioni')}</span><select id="stemPercussionMethod" disabled onchange="rememberPercussionMethod(this.value)"><option value="dsp">DSP (fallback)</option><option value="mvsep-mega53">MVSep Mega 53 AI (Kick / Snare / Toms / Hi-hat / Percussion)</option><option value="drumsep-onnx">DrumSep ONNX (Kick / Snare / Toms / Cymbals)</option></select><button class="utility-btn" type="button" onclick="downloadDrumSepModel()">${tr('Download DrumSep model','Scarica modello DrumSep')}</button></label><label class="workflow-field"><span>${tr('Stems to extract','Stem da estrarre')}</span><select id="stemWorkflowTargets" onchange="syncStemPercussionSelection('stem','target')"><option value="all">${tr('All standard stems (Demucs)','Tutti gli stem standard (Demucs)')}</option><option value="lead_vocals">${tr('Lead vocals only (no backing vocals)','Solo voce principale (senza backing vocals)')}</option><option value="percussions">${tr('Percussions only','Solo percussioni')}</option><option value="drums_without_percussions">${tr('Drums without percussions','Drums senza percussioni')}</option><option value="other">${tr('Everything else (Other)','Tutto il resto (Other)')}</option><option value="kick">Kick</option><option value="snare">Snare</option><option value="toms">Toms</option><option value="cymbals">Cymbals</option></select></label>
+      
       <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto. Su iPhone/iPad, <b>Auto</b> usa Core ML sul dispositivo quando il modello richiesto è disponibile e ricade automaticamente sul server negli altri casi. I modelli locali vengono scaricati una sola volta e restano disponibili offline. 8 stem richiede un modello compatibile.</div>
       <div class="utility-actions">
         <button class="utility-btn primary" type="button" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
@@ -3301,8 +3297,7 @@ function openStemWorkflow(){
       </div>
     </div>`);
   restorePercussionMethod('stemPercussionMethod');
-  restoreStemTarget('stemWorkflowTargets');
-  restoreSingerUi('stem');
+  syncStemPercussionSelection('stem','reset');
   updateStemWorkflowMode();
 }
 function updateBackingModelRow(){const row=$('#backingModelRow'),on=$('#stemSplitBackingVocals')?.checked;if(row)row.classList.toggle('hidden',!on)}
@@ -3378,13 +3373,11 @@ async function startStemWorkflow(){
   const extractLyrics=!!$('#stemExtractLyrics')?.checked,extractChords=!!$('#stemExtractChords')?.checked;
   const lyricsModel=$('#stemLyricsModel')?.value||textModelCatalog().lyrics?.default_model||'turbo';
   const chordsEngine=$('#stemChordsEngine')?.value||textModelCatalog().chords?.default_engine||'madmom-deep-chroma';
-  const splitPercussions=!!$('#stemSplitPercussions')?.checked,stemTargets=$('#stemWorkflowTargets')?.value||'all';
+  const {stemTargets,splitPercussions,percussionMethod}=stemSeparationSelection('stem');
   const splitBackingVocals=!!$('#stemSplitBackingVocals')?.checked;
   const backingVocalModel=$('#stemBackingVocalModel')?.value||'uvr_mdxnet_kara_2';
-  let singers=null;try{singers=collectSingerSelection('stem');}catch(e){return toast(e.message)}
-  if(singers&&(splitBackingVocals||splitPercussions||stemTargets!=='all'))return toast('La separazione cantanti è alternativa alla separazione Lead/Backing e a quella selettiva strumenti');
   let execution=$('#stemExecutionMode')?.value||preferredStemExecution||'server';
-  if((splitBackingVocals||splitPercussions||stemTargets!=='all'||singers)&&execution!=='server'){execution='server';toast('La separazione Lead/Backing Vocals richiede il secondo passaggio sul server.');}
+  if((splitBackingVocals||splitPercussions||stemTargets!=='all')&&execution!=='server'){execution='server';toast('La separazione Lead/Backing Vocals richiede il secondo passaggio sul server.');}
   if(supportsLocalIosStems()&&execution!=='server'){
     let localProjectId=projectId;
     if(!localProjectId){
@@ -3419,7 +3412,7 @@ async function startStemWorkflow(){
     if(mobilePlatform()==='android'&&window.MtaMobile?.ensureLocalStemModel){
       try{const raw=window.MtaMobile.ensureLocalStemModel(model,stemCount||0);const state=typeof raw==='string'?JSON.parse(raw):raw;if(state&&!state.ok)console.warn('Android local model prefetch:',state.error)}catch(e){console.warn('Android local model prefetch failed',e)}
     }
-    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}&extract_lyrics=${extractLyrics}&extract_chords=${extractChords}&lyrics_model=${encodeURIComponent(lyricsModel)}&chords_engine=${encodeURIComponent(chordsEngine)}&split_backing_vocals=${splitBackingVocals}&backing_vocal_model=${encodeURIComponent(backingVocalModel)}&split_percussions=${splitPercussions}&percussion_method=${encodeURIComponent($('#stemPercussionMethod')?.value||'dsp')}&stem_targets=${encodeURIComponent(stemTargets)}&singers_json=${encodeURIComponent(singers?.singers_json||'')}&singer_model=${encodeURIComponent(singers?.singer_model||'sam-audio-small')}&singer_target=${encodeURIComponent(singers?.singer_target||'all')}`,{method:'POST',body:fd});
+    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}&extract_lyrics=${extractLyrics}&extract_chords=${extractChords}&lyrics_model=${encodeURIComponent(lyricsModel)}&chords_engine=${encodeURIComponent(chordsEngine)}&split_backing_vocals=${splitBackingVocals}&backing_vocal_model=${encodeURIComponent(backingVocalModel)}&split_percussions=${splitPercussions}&percussion_method=${encodeURIComponent(percussionMethod)}&stem_targets=${encodeURIComponent(stemTargets)}`,{method:'POST',body:fd});
     if(nativeProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(r.project.id,nativeProjectPath);
     }
@@ -3439,7 +3432,6 @@ function showStemProgress(job){
       <div class="stem-progress-head"><b>${esc(job.filename)}</b><span>${pct}%</span></div>
       <div class="stem-progress"><div class="stem-progress-fill" style="width:${pct}%"></div></div>
       <div class="stem-progress-message">${esc(job.message||job.status)}</div>
-      ${job.singer_mode?`<div class="workflow-note">${tr('Singer separation','Separazione cantanti')}: ${esc((job.singers||[]).map(s=>s.name).join(', '))} · ${esc(job.singer_model||'SAM Audio')}</div>`:''}
       ${job.split_backing_vocals?`<div class="workflow-note">Backing vocals: ${esc(job.vocal_split_method || (job.backing_vocal_model==='ffmpeg-center-side'?'DSP FFmpeg center/side':'AI audio-separator · '+String(job.backing_vocal_model||'modello predefinito')))}</div>`:''}
       ${job.error?`<pre class="stem-error">${esc(job.error)}</pre>`:''}
       ${job.analysis&&Object.keys(job.analysis).length?`<div class="workflow-note">${Object.entries(job.analysis).map(([k,v])=>`${k==='lyrics'?'Lyrics':'Chords'}: ${v.ok?`OK · ${v.count||0} eventi`:`errore · ${esc(v.error||'analisi non riuscita')}`}`).join('<br>')}</div>`:''}
@@ -4851,7 +4843,7 @@ window.addEventListener('keydown',e=>{
   }
   if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&timelineTool==='select'&&selectedSegmentItems().length&&target?.closest?.('#timelinePane')&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();const first=selectedSegmentItems()[0],amount=e.shiftKey?10:(current.timeline_snap&&current.timeline_snap!=='off'?MtaTimelineRules.step(current,Math.max(0,MtaTimelineRules.start(first.track,first.clip))):100);moveSelectedSegments((e.key==='ArrowRight'?1:-1)*amount,null,e.shiftKey);return}
   if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&(document.activeElement?.closest?.('#timelinePane')||document.activeElement?.closest?.('#timeline')||document.activeElement?.closest?.('.timeline')||document.activeElement===document.body)){e.preventDefault();const increment=e.shiftKey?100:Math.max(1,Math.round(4/Math.max(0.01,pxPerSec)*1000));goToTimestamp(playCursorMs+(e.key==='ArrowRight'?increment:-increment));return}
-  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&(e.key==='Delete'||e.key==='Backspace')&&timelineTool==='select'&&selectedSegmentItems().length&&target?.closest?.('#timelinePane')){e.preventDefault();e.stopPropagation();editSelectedSegments('remove');return}
+  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&(e.key==='Delete'||e.key==='Backspace')&&selectedSegmentItems().length&&target?.closest?.('#timelinePane')){e.preventDefault();e.stopPropagation();editSelectedSegments('remove');return}
   if(e.key==='Escape'){closeTrackContextMenu();return}
   if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&e.key.toLowerCase()==='s'&&!target?.closest?.('[role="dialog"],dialog,.utility-modal,.utility-backdrop')&&!document.querySelector('.utility-backdrop:not(.hidden)')){e.preventDefault();e.stopPropagation();splitSelectedTracksAt(playCursorMs);return}
   if(!editable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.repeat&&(e.key==='Backspace'||e.key==='Delete')&&timelineChordSelectedIndices.size){e.preventDefault();e.stopPropagation();deleteSelectedTimelineChords();return}
@@ -5112,6 +5104,46 @@ async function cleanupUnusedProjectMedia(){
  if(!current||!confirm(tr('Remove unused library clips, orphan audio and stale temporary files? Timeline and pending-job media, originals and attachments are kept.','Rimuovere clip di libreria inutilizzate, audio orfani e temporanei obsoleti? Media della timeline e dei job, originali e allegati vengono conservati.')))return;
  try{await save();const r=await api(`/api/projects/${current.id}/files/cleanup`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({remove_unused_library:true})});current=await api(`/api/projects/${current.id}`);if(r.library_removed||r.deleted)resetSessionHistory();render();await syncNativeProjectFile(current.id);await manageProjectFiles();toast(tr('Cleanup complete: ','Pulizia completata: ')+r.deleted+' audio · '+r.library_removed+' clip · '+r.temporary_deleted+' temp');}catch(e){toast(e.message)}
 }
+function rebaseSharedProjectHistory(previous,remote){
+  const merge=globalThis.MtaCollaboration?.mergeSaved;if(!merge)return;
+  const rebase=snapshot=>{
+    // History changes are replayed onto the received snapshot. Remote changes
+    // win conflicts, so Undo cannot erase another participant's newer edit.
+    const result=merge(previous,remote,snapshot);
+    for(const field of ['collaboration_revision','owner_user_id','shared_with_user_ids','collaboration_access_revoked']){
+      if(Object.prototype.hasOwnProperty.call(remote,field))result[field]=JSON.parse(JSON.stringify(remote[field]));else delete result[field];
+    }
+    return result;
+  };
+  undoStack=undoStack.map(rebase);redoStack=redoStack.map(rebase);
+}
+function applySharedRemoteProject(project,force=false){
+  if(!current||current.id!==project?.id||autosaveBusy||timelineMediaBusy||timelineClipDrag||(projectDirty&&!force))return false;
+  const previous=current,ids=new Set();
+  for(const track of [...(previous.tracks||[]),...(project.tracks||[])]){
+    const before=(previous.tracks||[]).find(t=>t.id===track.id),after=(project.tracks||[]).find(t=>t.id===track.id);
+    const sound=t=>t?JSON.stringify(Object.fromEntries(Object.entries(t).filter(([k])=>!['name','color','waveform_peaks','height_px','mta_slot'].includes(k)))):'';
+    if(sound(before)!==sound(after))ids.add(track.id);
+  }
+  const projectSound=p=>JSON.stringify(Object.fromEntries(Object.entries(p||{}).filter(([key])=>key.startsWith('master_')||['pitch_semitones','sample_rate','bpm','base_bpm','tempo_known'].includes(key))));
+  if(projectSound(previous)!==projectSound(project))for(const track of project.tracks||[])ids.add(track.id);
+  current=project;projectDirty=false;clearTimeout(autosaveTimer);autosaveTimer=null;
+  persistedProjectSnapshot=JSON.parse(JSON.stringify(project));lastHistoryState=projectSnapshot();
+  if(force)resetSessionHistory();else if(globalThis.MtaCollaboration?.mergeSaved)rebaseSharedProjectHistory(previous,project);if(ids.size)timingAudioChanged(ids);render();return true;
+}
+function sharedAccessEnded(){
+  if(!current)return;current.shared_with_user_ids=[];
+  const owner=Number(current.owner_user_id)===Number(currentUser?.id);
+  if(owner)delete current.collaboration_access_revoked;
+  else{current.collaboration_access_revoked=true;clearTimeout(autosaveTimer);autosaveTimer=null;autosaveQueued=false;}
+  toast(tr('Sharing ended. Unsaved local changes are retained.','Condivisione terminata. Le modifiche locali non salvate sono conservate.'));
+}
+async function refreshProjectShareState(){
+  if(!current)return;const pid=current.id,remote=await api('/api/projects/'+pid);if(current?.id!==pid)return;
+  if(projectDirty){current.owner_user_id=remote.owner_user_id;current.shared_with_user_ids=remote.shared_with_user_ids;}
+  else current=remote;
+  render();
+}
 async function manageProjectSharing(){
   if(!current){toast('Apri prima un progetto');return}
   try{
@@ -5119,8 +5151,8 @@ async function manageProjectSharing(){
     showUtilityModal('Condivisione progetto',`<div class="share-form"><input id="shareIdentifier" placeholder="Username o email"><button onclick="addProjectShare()">Condividi</button></div><div class="share-list">${shares.map(u=>`<div><span><b>${esc(u.display_name||u.username)}</b><small>${esc(u.username)} · ${esc(u.email)}</small></span><button onclick="removeProjectShare(${u.id})">Rimuovi</button></div>`).join('')||'<p class="hint">Il progetto non è condiviso con altri utenti.</p>'}</div><p class="hint">Gli utenti condivisi possono aprire e modificare il progetto; solo il proprietario o un amministratore possono cambiarne le condivisioni o eliminarlo.</p>`);
   }catch(e){toast(e.message)}
 }
-async function addProjectShare(){const identifier=$('#shareIdentifier').value.trim();if(!identifier)return;try{await api(`/api/projects/${current.id}/shares`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({identifier})});await manageProjectSharing();toast('Progetto condiviso')}catch(e){toast(e.message)}}
-async function removeProjectShare(userId){try{await api(`/api/projects/${current.id}/shares/${userId}`,{method:'DELETE'});await manageProjectSharing()}catch(e){toast(e.message)}}
+async function addProjectShare(){const identifier=$('#shareIdentifier').value.trim();if(!identifier)return;try{await api(`/api/projects/${current.id}/shares`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({identifier})});await refreshProjectShareState();await manageProjectSharing();toast('Progetto condiviso')}catch(e){toast(e.message)}}
+async function removeProjectShare(userId){try{await api(`/api/projects/${current.id}/shares/${userId}`,{method:'DELETE'});await refreshProjectShareState();await manageProjectSharing()}catch(e){toast(e.message)}}
 
 async function showSettings(){
   if(!currentUser){try{currentUser=await api('/api/session')}catch(e){return toast('Impossibile caricare la sessione: '+e.message)}}
@@ -5130,7 +5162,7 @@ async function showSettings(){
 function showWebSettings(){
   const enabled=MtaPreferences.getItem('mtaWebAutosaveEnabled')!=='false';
   const showChordNeighbors=appDisplayPreference('showPreviousNextChords',false),showLyricNeighbors=appDisplayPreference('showPreviousNextLyrics',false);
-  showUtilityModal('Settings',`<div class="form-grid web-settings"><button type="button" onclick="MtaEditorLayout.configure()">${tr('Toolbar layout','Organizza barra strumenti')}</button><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><p class="hint">Quando abilitate, le viste Lyrics/Chords sopra la timeline mostrano precedente, corrente e successivo; l'evento corrente resta evidenziato. Le preferenze dell'editor sono salvate in questa app/browser.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button type="button" onclick="navigateAway('/account')">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="navigateAway('/settings')">Server administration</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
+  showUtilityModal('Settings',`<div class="form-grid web-settings"><button type="button" onclick="MtaEditorLayout.configure()">${tr('Toolbar layout','Organizza barra strumenti')}</button><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><p class="hint">Quando abilitate, le viste Lyrics/Chords sopra la timeline mostrano precedente, corrente e successivo; l'evento corrente resta evidenziato. Le preferenze dell'editor sono salvate in questa app/browser.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button type="button" onclick="navigateAway('/account')">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="navigateAway('/settings')">Server administration</button><button type="button" onclick="MtaBenchmark.open()">${tr('AI benchmark and validation','Benchmark e validazione AI')}</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
 }
 async function rescanSharedMedia(){try{const r=await api('/api/storage/shared/rescan?delete_unreferenced=true',{method:'POST'});toast(`Shared media: ${r.assets||0} asset, ${r.deleted||0} eliminati, ${r.references||0} riferimenti`)}catch(e){toast('Rescan shared media fallito: '+e.message)}}
 function saveWebSettings(){setAppDisplayPreference('useFlacStorage',$('#useFlacStorage')?.checked===true);const enabled=$('#webAutosaveEnabled')?.checked!==false;MtaPreferences.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);closeUtilityModal();if(playbackActuallyRunning()||playbackPaused)updateTimedPlaybackOverlay(playCursorMs);toast('Settings salvati')}
@@ -6300,7 +6332,7 @@ async function openNativeRemoteWorkers(){
  try{
   const data=await api('/api/native/ai-workers/settings');
   const policyNote=data.remote_policy?.state==='model_review_required'?tr('Each new remote request requires model rights review. A configured connection does not authorize inference.','Ogni nuova richiesta remota richiede la verifica dei diritti del modello. Una connessione configurata non autorizza l’inferenza.'):tr('New remote inference is blocked: model identity and rights cannot be verified. Existing request recovery and cancellation remain subject to owner authorization.','Nuove inferenze remote bloccate: identità e diritti del modello non verificabili. Recupero e cancellazione delle richieste esistenti richiedono l’autorizzazione del proprietario.');
-  const labels={'whisper':'Whisper / Lyrics','chords-ml':'Chord analysis','demucs':'Demucs / stems','drumsep':'DrumSep','sam-audio':'SAM Audio','singer-separation':'Singer separation','backing-vocals':'Backing vocals','markers':'Structural markers'};
+  const labels={'whisper':'Whisper / Lyrics','chords-ml':'Chord analysis','demucs':'Demucs / stems','drumsep':'DrumSep','backing-vocals':'Backing vocals','markers':'Structural markers'};
   Object.keys(data.workers||{}).forEach(key=>{if(!labels[key]&&/^[a-z][a-z0-9-]{0,63}$/.test(key))labels[key]=key;});
   const rows=Object.entries(labels).map(([key,label])=>{const cfg=data.workers?.[key]||{};return `<div class="form-grid" style="border-bottom:1px solid var(--border,#8884);padding:8px"><strong>${label}</strong><label>Processing<select id="nativeRemoteMode-${key}"><option value="local" ${cfg.mode!=='remote'?'selected':''}>Local / Locale</option><option value="remote" ${cfg.mode==='remote'?'selected':''}>Remote / Remoto</option></select></label><input id="nativeRemoteUrl-${key}" type="hidden" value="${esc(cfg.url||'')}"><input id="nativeRemoteToken-${key}" type="hidden" value=""><button type="button" onclick="saveNativeRemoteWorker('${key}')">Save / Salva</button></div>`}).join('');
   showUtilityModal(tr('Native AI processing','Elaborazioni AI native'),`<p role="status" data-remote-rights>${esc(policyNote)}</p><div class="settings-form"><label>${tr('MTA server for all remote AI engines','Server MTA per tutti i motori AI remoti')}<input id="nativeSharedServer" type="url" placeholder="https://mta.example.org"></label><button onclick="aiAccountConnect(document.getElementById('nativeSharedServer').value.trim()).catch(e=>toast(e.message))">${tr('Connect account','Collega account')}</button><div id="nativeSharedAccountStatus"></div></div><p>Select the execution location for each model. In remote mode an unavailable server causes an error; models do not run locally as fallback.</p>${rows}<hr><h3>Pending remote AI requests / Richieste remote pendenti</h3><div id="nativeRemotePending">Loading...</div><button type="button" onclick="refreshNativePending()">Refresh pending / Aggiorna</button><hr><h3>Server request history / Storico richieste sul server</h3><div id="nativeRemoteHistory">Select a worker / Seleziona un worker</div><button type="button" onclick="refreshNativeRemoteHistory()">Discover on server / Cerca sul server</button><hr><h3>Recovered stem orphans / Stem orfani recuperati</h3><p>Review preserved files and quarantine or restore them without deleting data / Esamina i file conservati e gestisci la quarantena senza cancellazioni.</p><button type="button" onclick="refreshNativeStemOrphans()">Review orphan files / Esamina file orfani</button><div id="nativeStemOrphanInventory" role="status" aria-live="polite"></div>`);
@@ -6402,7 +6434,7 @@ async function appendNativeRemoteHistory(kind,offset,section,generation){
      add.textContent='Import WAV into open project / Importa WAV nel progetto aperto';
      add.addEventListener('click',()=>importNativeDiscoveredWav(kind,item.request_key,add));
      line.appendChild(document.createTextNode(' '));line.appendChild(add);
-     const format=['whisper','chords-ml'].includes(kind)?'json':(['demucs','drumsep','sam-audio','singer-separation','backing-vocals'].includes(kind)?'stems':null);
+     const format=['whisper','chords-ml'].includes(kind)?'json':(['demucs','drumsep','backing-vocals'].includes(kind)?'stems':null);
      if(format){
       const apply=document.createElement('button');apply.type='button';
       apply.textContent=format==='json'?'Apply JSON / Applica JSON':'Import stems / Importa stem';
@@ -6425,7 +6457,7 @@ async function appendNativeRemoteHistory(kind,offset,section,generation){
 async function refreshNativeRemoteHistory(){
  const target=document.getElementById('nativeRemoteHistory');if(!target)return;
  const generation=++nativeRemoteHistoryGeneration;
- const kinds=['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals','markers'];
+ const kinds=['whisper','chords-ml','demucs','drumsep','backing-vocals','markers'];
  target.textContent='Discovering / Ricerca in corso...';
  const active=kinds.filter(kind=>document.getElementById(`nativeRemoteMode-${kind}`)?.value==='remote');
  if(!active.length){target.textContent='No remote workers selected / Nessun worker remoto selezionato';return;}
@@ -6466,7 +6498,7 @@ async function refreshNativePending(){
    if(item.damaged)return '<p>Damaged request journal / Registro danneggiato: automatic retry disabled</p>';
    const id=esc(item.request_id||'');
    const label=esc(item.kind||'Legacy');
-   return `<div class="form-grid"><code>${id}</code><span>${label}</span>${item.recoverable?`<button type="button" onclick="checkNativePendingStatus('${id}')">Check status / Verifica</button><button type="button" onclick="downloadNativePendingArtifact('${id}')">Recover result / Recupera risultato</button><button type="button" onclick="importNativePendingAudio('${id}')">Import recovered WAV / Importa WAV</button>${['demucs','drumsep','sam-audio','singer-separation','backing-vocals'].includes(item.kind)?`<button type="button" onclick="importNativePendingStems('${id}')">Import recovered stems / Importa stem</button>`:''}${['whisper','chords-ml'].includes(item.kind)?`<button type="button" onclick="importNativePendingJson('${id}')">Apply recovered JSON / Applica JSON</button>`:''}`:'<span>Manual recovery required</span>'}<span id="nativePendingStatus-${id}"></span></div>`;
+   return `<div class="form-grid"><code>${id}</code><span>${label}</span>${item.recoverable?`<button type="button" onclick="checkNativePendingStatus('${id}')">Check status / Verifica</button><button type="button" onclick="downloadNativePendingArtifact('${id}')">Recover result / Recupera risultato</button><button type="button" onclick="importNativePendingAudio('${id}')">Import recovered WAV / Importa WAV</button>${['demucs','drumsep','backing-vocals'].includes(item.kind)?`<button type="button" onclick="importNativePendingStems('${id}')">Import recovered stems / Importa stem</button>`:''}${['whisper','chords-ml'].includes(item.kind)?`<button type="button" onclick="importNativePendingJson('${id}')">Apply recovered JSON / Applica JSON</button>`:''}`:'<span>Manual recovery required</span>'}<span id="nativePendingStatus-${id}"></span></div>`;
   }).join(''):'<p>No pending requests / Nessuna richiesta pendente</p>';
  }catch(e){target.textContent=e.message;}
 }

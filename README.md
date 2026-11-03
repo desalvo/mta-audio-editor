@@ -357,7 +357,7 @@ Native `.maeproj` files are lightweight JSON manifests backed by the modular wor
 
 Projects support 44.1/48/96 kHz sample rates (44.1 kHz default), with automatic resampling of imported sources to the project rate. Export includes 24/32-bit WAV at 44.1/48/96 kHz, standard MP3, M-Live/Merish MP3 and MP3+G (ZIP containing an MP3+CDG pair).
 
-Multi-singer SAM Audio setup (experimental): see [SINGER_SEPARATION_SETUP.md](docs/SINGER_SEPARATION_SETUP.md).
+SAM Audio and individual-singer separation have been retired; see [SAM_REMOVAL_R210_IT_EN.md](docs/SAM_REMOVAL_R210_IT_EN.md) and the direct percussion benchmark workflow.
 
 ### VST3 user manuals / Manuali VST3
 
@@ -431,12 +431,12 @@ See `docs/MVSEP_MEGA53_LEAD_BACKING_R210_IT_EN.md` for the external checkpoint i
 
 UVR KARA 2 rights and guarded enablement: `docs/UVR_KARA2_RIGHTS_R210_EN.md`.
 
-**AI model rights registry (r210):** Studio model-license administration now displays curated upstream evidence and outstanding rights gaps for UVR, DrumSep, ChordFormer, Madmom, SAM Audio and selected DiffSinger banks. Evidence does not grant rights or automatically unblock unknown checkpoints. See `docs/MODEL_RIGHTS_DOSSIERS_R210_IT_EN.md`.
+**AI model rights registry (r210):** Studio model-license administration now displays curated upstream evidence and outstanding rights gaps for UVR, DrumSep, ChordFormer, Madmom and selected DiffSinger banks. Evidence does not grant rights or automatically unblock unknown checkpoints. See `docs/MODEL_RIGHTS_DOSSIERS_R210_IT_EN.md`.
 
 ### Licensed fallback selection (r210)
 If KARA 2 is not admitted, new lead/backing jobs with no explicitly selected engine use Mega 53 when permitted by its own policy. DrumSep offers an explicit `dsp` mode producing broad drums/percussion stems, not individual kit pieces. Restricted original weights remain blocked. Mega 53 still requires an installed runtime and checkpoint.
 
-Mega 53 can also provide separately extracted kick, snare, toms, hi-hat and percussion via the percussion method selector. This is not equivalent to full cymbals separation or guaranteed kit reconstruction; SAM Audio and DSP remain available. Model checkpoint and MSST installation are required.
+Mega 53 can also provide separately extracted kick, snare, toms, hi-hat and percussion via the percussion method selector. This is not equivalent to full cymbals separation or guaranteed kit reconstruction; DSP remains available. Model checkpoint and MSST installation are required.
 
 DrumSep checkpoint-rights deep review and licensed remote Mega 53 drum-parts routing: see `docs/DRUMSEP_RIGHTS_REVIEW_20261020.md`. Original DrumSep weights remain disabled where license evidence is insufficient.
 

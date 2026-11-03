@@ -62,7 +62,7 @@ def test_remote_rejects_unsafe_zip_and_does_not_fallback(tmp_path,monkeypatch):
     # A genuinely different request may still be submitted.
     with pytest.raises(ai_remote_client.RemoteAIError,match='offline'):route.infer('demucs',source,{'separation':'new'})
 
-@pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+@pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','backing-vocals'])
 def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
     monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))

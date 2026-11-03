@@ -1,0 +1,23 @@
+{
+  "recovered_from": "Agent tool-history source patches after workspace reset",
+  "runtime_sha256": {
+    "app/project_collaboration.py": "68972d5aa3458319fdd7a7c176d5186e9b4224436037031216ae8be1c48e3d5c",
+    "app/static/project_collaboration.js": "51431b8831db8b26ce240c7a6172b5d5a04af947841c47c58fed91d3b095bab9",
+    "app/static/project_collaboration.css": "b11c7a9bbebdbfb4cbb9421e7da74f9e223ef5ddc750e69e4d451f123aa5c1c7",
+    "app/models.py": "a08ecc563cc51b6e97d4901129446c46b61b447ffaa0f868f953b912439c61d6",
+    "app/storage.py": "9d6fbf270a5521d14085a74b008f647e0921bcb337f7e1aa8d6430c9218fd21f"
+  },
+  "javascript_exact_original_final_sha256": true,
+  "current_tests": {
+    "passed": 61,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "new_distinct_cases": 47,
+    "unchanged_storage_regressions": 14,
+    "junit": "validation/r210-project-collaboration.xml"
+  },
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "remote_email_or_server_actions": false
+}

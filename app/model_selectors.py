@@ -11,7 +11,6 @@ WHISPER_MODELS=frozenset({
     'tiny.en','tiny','base.en','base','small.en','small','medium.en','medium',
     'large-v1','large-v2','large-v3','large','large-v3-turbo','turbo',
 })
-SAM_MODELS=frozenset({'sam-audio-small','sam-audio-base','sam-audio-large'})
 
 OFFICIAL_DEMUCS_MODELS={
  "htdemucs":{"stem_count":4,"stem_labels":["drums","bass","other","vocals"]},
@@ -36,14 +35,6 @@ def whisper_model(value=None):
     return value
 
 
-def sam_model(value=None):
-    if value is None or value=='':value=os.getenv('MTA_AI_SAM_MODEL','')
-    if not isinstance(value,str):raise ValueError('SAM requires a published model identifier')
-    if value in SAM_MODELS:return 'facebook/'+value
-    if value.startswith('facebook/') and value.removeprefix('facebook/') in SAM_MODELS:return value
-    raise ValueError('Select a supported SAM checkpoint; arbitrary repositories and local paths are not authorized')
-
-
 def demucs_model(value=None):
     if value is None or value=='':value='htdemucs'
     if not isinstance(value,str) or value not in OFFICIAL_DEMUCS_MODELS:
@@ -54,8 +45,8 @@ def demucs_model(value=None):
 def validate_selection(kind,plan):
     if kind=='whisper':whisper_model(plan.get('model'))
     elif kind=='demucs':demucs_model(plan.get('model'))
-    elif kind=='sam-audio' and (plan.get('model') not in (None,'') or os.getenv('MTA_AI_SAM_MODEL')):
-        sam_model(plan.get('model'))
+    elif kind in ('sam-audio','singer-separation') or (kind=='drumsep' and str(plan.get('model','')).lower().rsplit('/',1)[-1].startswith('sam-')):
+        raise ValueError('Requested separator has been removed')
 
 
 def demucs_arguments(arguments):

@@ -16,9 +16,9 @@ Il test fallito non era soltanto una fixture obsoleta. Il worker DSP registrato 
 
 `app/ai_metering_agent.py` ora riconosce la topologia dei percorsi del **worker interno esatto** `ai_unified_adapter.py`:
 
-- Demucs, SAM Audio e singer-separation;
+- Demucs;
 - backing-vocals con DSP FFmpeg, compreso il default effettivo selezionato dalla policy;
-- DrumSep quando usa il percorso SAM Audio.
+- I vecchi record di worker ritirati restano consultabili come storico.
 
 Per questi percorsi, una misura di sola fonte `worker`/`wait4` non consente pubblicazione o finalizzazione fatturabile, anche quando il campionamento dichiara `isolated:true`. La condizione viene verificata sia al completamento sia nel trattamento di `WorkerInterrupted`: una cancellazione non trasforma la misura incompleta in un addebito parziale. Restano l’errore `WorkerUncertain`, l’identità del job originale, il ledger `running/unmetered`, l’uso non addebitato e il claim originale `running`.
 

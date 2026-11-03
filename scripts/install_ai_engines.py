@@ -2,7 +2,7 @@
 """Default complete server AI installation, isolated from the web and ACE runtimes.
 
 Invoked by install_mta.sh's signed-package wizard. Model checkpoints are cached
-on demand, as in native builds; SAM access remains subject to upstream approval.
+on demand, as in native builds; checkpoint rights remain independently reviewed.
 """
 import argparse
 import hashlib
@@ -22,7 +22,6 @@ from app.ai_install_catalog import ENGINE_GROUPS, IMPORTS, validate_coverage
 
 
 REQS = ('requirements.txt', 'requirements-stems.txt', 'requirements-lyrics.txt', 'requirements-chords.txt')
-SAM_REPO = 'https://github.com/facebookresearch/sam-audio.git'
 
 
 def selected_device(value):
@@ -80,6 +79,8 @@ def system_dependencies():
 
 
 def install_group(python, folder, device, group):
+    if group != 'audio':
+        raise ValueError('Unsupported AI runtime group')
     # Use final, versioned venv path: moving a venv breaks its absolute shebangs.
     # Existing active environments are untouched until the complete preflight passes.
     run([python, '-m', 'venv', folder])
@@ -120,31 +121,17 @@ def install_group(python, folder, device, group):
         run(pip + ['--no-deps', '-r', SOURCE / 'requirements-roformer-compat.txt'])
         # Match native CI's explicit dependencies absent from separator wheel metadata.
         run(pip + ['-c', constraints, 'audioread>=3,<4', 'onnxruntime>=1.17', 'six>=1.16,<2'])
-    else:
-        # Resolve an immutable official upstream commit and retain it with the
-        # installed runtime. This is a read-only query, not a repository mutation.
-        revision = run(['git', 'ls-remote', SAM_REPO, 'HEAD'], capture_output=True, text=True).stdout.split()[0]
-        import re
-        if not re.fullmatch('[a-f0-9]{40}', revision):
-            raise ValueError('Invalid SAM upstream revision')
-        (folder / 'sam-source-revision').write_text(revision + '\n')
-        run(pip + ['-c', constraints, '-r', SOURCE / 'requirements.txt'])
-        run(pip + ['-c', constraints, 'sam_audio @ git+' + SAM_REPO + '@' + revision])
     verify(binary, group, device)
     return binary
 
 
 def verify(binary, group, device=None):
+    if group != 'audio':
+        raise ValueError('Unsupported AI runtime group')
     run([binary, '-c',
          'import importlib,json,sys;[importlib.import_module(n) for n in json.loads(sys.argv[1])]',
          json.dumps(IMPORTS[group])])
-    if group == 'sam':
-        # Imports alone miss the Hub 1.x / legacy SAM loader TypeError.
-        run([binary, '-c',
-             'import sys;sys.path.insert(0,sys.argv[1]);'
-             'from sam_audio_compat import verify_sam_hub_compatibility;'
-             'verify_sam_hub_compatibility()', str(SOURCE / 'app')])
-    if group in ('sam', 'audio'):
+    if group == 'audio':
         # Import alone does not exercise FFmpeg's shared libraries. Decode a
         # short PCM fixture before publishing this environment as ready.
         run([binary, '-c',
@@ -172,7 +159,9 @@ def verify(binary, group, device=None):
 def update_environment(path, values, original):
     if path.is_symlink() or (path.read_text() if path.exists() else '') != original:
         raise ValueError('Server configuration changed; rerun AI setup')
-    lines = [line for line in original.splitlines() if line.split('=', 1)[0] not in values]
+    retired = ('MTA_SAM_', 'MTA_AI_SAM_', 'MTA_AI_WORKER_SAM_AUDIO_', 'MTA_AI_WORKER_SINGER_SEPARATION_')
+    lines = [line for line in original.splitlines()
+             if line.split('=', 1)[0] not in values and not line.split('=', 1)[0].startswith(retired)]
     for key, value in values.items():
         if any(c in value for c in '\r\n\x00'):
             raise ValueError('Unsafe AI setting')
@@ -197,7 +186,7 @@ def install(args):
     validate_coverage()
     device = selected_device(args.device)
     plan = {'engines': ENGINE_GROUPS, 'device': device, 'weights': 'on-demand',
-            'isolated_runtimes': ['audio', 'sam'], 'gpu_billing_activated': False}
+            'isolated_runtimes': ['audio'], 'gpu_billing_activated': False}
     if args.dry_run:
         print(json.dumps(plan, indent=2))
         return plan
@@ -210,17 +199,14 @@ def install(args):
         ''.join((SOURCE / name).read_text() for name in (*REQS, 'requirements-roformer-compat.txt'))).encode()).hexdigest()[:16]
     root = Path(args.base) / ('ai-' + fingerprint)
     root.mkdir(parents=True, exist_ok=True, mode=0o755)
-    values = {'MTA_AI_WORKER_ENABLED': 'true', 'MTA_AI_UNIFIED_WORKERS_ENABLED': 'true',
-              'MTA_AI_SAM_MODEL': 'facebook/sam-audio-small'}
-    defaults = {'MTA_AI_SAM_MODEL': 'facebook/sam-audio-small',
-                'MTA_AI_VOCAL_MODEL': 'UVR_MDXNET_KARA_2.onnx',
+    values = {'MTA_AI_WORKER_ENABLED': 'true', 'MTA_AI_UNIFIED_WORKERS_ENABLED': 'true'}
+    defaults = {'MTA_AI_VOCAL_MODEL': 'UVR_MDXNET_KARA_2.onnx',
                 'MTA_AI_VOCAL_MODELS_DIR': '/var/lib/mta/models/audio-separator',
                 'MTA_DRUMSEP_MODEL_DIR': '/var/lib/mta/models/drumsep',
                 'HF_HOME': '/var/lib/mta/models/huggingface'}
     existing = {line.split('=', 1)[0] for line in original.splitlines()}
-    values.pop('MTA_AI_SAM_MODEL')
     values.update({key: value for key, value in defaults.items() if key not in existing})
-    for group in ('audio', 'sam'):
+    for group in ('audio',):
         folder = root / group
         marker = folder / '.mta-ai-ready.json'
         binary = folder / 'bin/python'
@@ -236,8 +222,6 @@ def install(args):
             values['MTA_DEMUCS_PYTHON'] = str(binary)
             if 'MTA_AI_DEFAULT_PYTHON' not in existing:
                 values['MTA_AI_DEFAULT_PYTHON'] = str(binary)
-        else:
-            values['MTA_SAM_AUDIO_PYTHON'] = str(binary)
     # ACE is installed/started by the existing wizard; leave its runtime and URL intact.
     update_environment(config, values, original)
     print(json.dumps({**plan, 'runtime': str(root), 'imports_verified': True}), flush=True)

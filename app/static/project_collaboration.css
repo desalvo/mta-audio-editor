@@ -1,0 +1,18 @@
+.collaboration-nav{margin:9px 0;border:1px solid #3285a8!important;border-radius:7px;background:#3285a81a!important;gap:8px}
+.collaboration-unread{display:inline-flex;min-width:24px;justify-content:center;align-items:center;border-radius:15px;background:#dc3545;color:#fff;padding:2px 6px;margin-left:auto;font-size:14px;box-shadow:0 0 0 2px #fff2}
+.collaboration-unread[hidden]{display:none}
+.collaboration-window{position:fixed;right:24px;top:110px;width:min(550px,calc(100vw - 24px));height:min(650px,calc(100vh - 140px));z-index:6500;display:flex;flex-direction:column;resize:both;overflow:hidden;min-width:290px;min-height:220px;background:var(--panel,#142431);color:var(--text,#e6edf4);border:1px solid var(--border,#466879);border-radius:12px;box-shadow:0 16px 60px #0008}
+.collaboration-window[hidden]{display:none}
+.collaboration-title{display:flex;align-items:center;justify-content:space-between;cursor:move;touch-action:none;padding:9px 12px;background:#277da033;border-bottom:1px solid var(--border,#466879)}
+.collaboration-title strong{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 90px)}
+.collaboration-title button{min-width:32px;padding:3px 8px;margin-left:5px}
+.collaboration-body{display:flex;flex-direction:column;gap:8px;min-height:0;flex:1;padding:10px;overflow:auto}
+.collaboration-messages{flex:1;min-height:100px;overflow:auto;overscroll-behavior:contain;border:1px solid var(--border,#466879);border-radius:7px;padding:8px}
+.collaboration-message{margin:0 0 12px;padding:7px;background:#8899aa0e;border-radius:6px;overflow-wrap:anywhere}
+.collaboration-message b{font-weight:800}.collaboration-message time{font-size:11px;opacity:.68}.collaboration-message-text{white-space:pre-wrap;margin:4px 0}
+.collaboration-message img{max-width:100%;max-height:240px;border-radius:5px}.collaboration-message audio{max-width:100%;width:100%}
+.collaboration-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.collaboration-actions button,.collaboration-attachment{font-size:12px}
+.collaboration-attachment{max-width:180px}.collaboration-attachment input{max-width:170px}#mtaCollaborationText{width:100%;box-sizing:border-box}
+.collaboration-conflict{border:1px solid #e5a52d;background:#e5a52d1a;padding:10px;border-radius:7px}.collaboration-conflict[hidden]{display:none}
+.collaboration-window.minimized{height:43px!important;min-height:0;resize:none}.collaboration-window.minimized .collaboration-body{display:none}
+@media(max-width:600px){.collaboration-window{right:12px;top:80px;height:calc(100vh - 100px)}.collaboration-actions button{min-height:36px}}

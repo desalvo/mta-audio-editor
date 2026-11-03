@@ -140,10 +140,10 @@ def test_diagnostic_storage_does_not_update_billing(tmp_path, monkeypatch):
         assert con.execute("SELECT 1 FROM sqlite_master WHERE name='ai_compute_jobs'").fetchone() is None
 
 
-def test_demucs_and_sam_commands_profile_actual_child(monkeypatch, tmp_path):
+def test_demucs_commands_profile_actual_child(monkeypatch, tmp_path):
     from app.ai_unified_adapter import _backend_command
     monkeypatch.setenv('MTA_AI_TORCH_PROFILER', 'true')
-    for backend in ('demucs', 'sam-audio'):
+    for backend in ('demucs',):
         command = _backend_command({'gpu_profile_task_id': 'task'}, tmp_path, backend, ['--model', 'm'])
         assert command[1]=='-I' and command[2].endswith('ai_profiled_backend.py')
         assert backend in command and 'task' in command

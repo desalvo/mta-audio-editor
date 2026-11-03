@@ -27,7 +27,6 @@ CATALOG={
     'ace-step':('Apache-2.0','cost_recovery','https://github.com/ace-step/ACE-Step/blob/main/LICENSE'),
     'whisper':('MIT','cost_recovery','https://github.com/openai/whisper/blob/main/LICENSE'),
     'demucs':('MIT','cost_recovery','https://github.com/facebookresearch/demucs/blob/main/LICENSE'),
-    'sam-audio':('SAM License (conditions apply)','cost_recovery','https://github.com/facebookresearch/sam-audio/blob/main/LICENSE'),
     'mta-analysis':('EUPL-1.2 / dependency licenses','cost_recovery','https://github.com/desalvo/mta-audio-editor'),
     'madmom':('CC-BY-NC-SA-4.0 weights; separate code license','disabled','https://github.com/CPJKU/madmom/blob/main/LICENSE'),
     'chordformer':('Checkpoint rights require review','disabled','https://github.com/mwaseemrandhawa/ChordFormer'),
@@ -187,7 +186,8 @@ def selected(kind,plan):
         return 'oddvoices'
     if kind=='vocal-harmony':return 'mta-analysis'
     if kind in ('arranger','remix','ace-step'):return 'ace-step'
-    if kind=='singer-separation':return 'sam-audio'
+    if kind in ('sam-audio','singer-separation'):
+        raise LicenseDenied('Requested separator has been removed')
     if kind=='backing-vocals':
         import os
         if os.getenv('MTA_LEAD_BACKING_COMMAND','').strip():
@@ -198,7 +198,8 @@ def selected(kind,plan):
         model=plan.get('model')
         if model=='dsp':return 'mta-analysis'
         if model=='mvsep-mega53':return 'mvsep-mega53'
-        if model in ('sam-audio-small','sam-audio-base','sam-audio-large'):return 'sam-audio'
+        if str(model or '').lower().rsplit('/',1)[-1].startswith('sam-'):
+            raise LicenseDenied('Requested separator has been removed')
         return 'drumsep-weights'
     if kind=='markers':return 'madmom' if 'madmom' in str(plan.get('engine','')) else 'mta-analysis'
     if kind=='chords-ml':
@@ -208,7 +209,7 @@ def selected(kind,plan):
         if engine=='chordformer':return 'chordformer'
         if engine=='btc-hcqt':return 'btc-hcqt'
         return 'mta-analysis'
-    return 'sam-audio' if kind=='sam-audio' else kind
+    return kind
 
 
 def authorize_remote_execution(kind, plan):

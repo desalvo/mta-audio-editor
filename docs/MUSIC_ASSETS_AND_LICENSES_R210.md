@@ -74,7 +74,7 @@ La tabella distingue un divieto noto da un diritto o backend non ancora verifica
 | Google MT3, MR-MT3, Transkun, MT3-Infer | Candidati non abilitati | Adapter/pesi/dipendenze e collaudo non completati | Integrazione e verifica prima dell'uso produttivo |
 | Nuovo motore aggiunto al registro | Disabilitato finché non verificato | Diritti non presumibili per componenti futuri | Revisione manuale esplicita e fonte dei diritti |
 
-Basic Pitch e YourMT3 fissati hanno dichiarazioni Apache-2.0; ACE-Step Apache-2.0; Whisper e Demucs MIT. BTC-HCQT dichiara esplicitamente [MIT per codice e pesi](https://github.com/marcusfkelley/btc-hcqt), fermo restando il collaudo del suo runtime. SAM Audio usa la [SAM License](https://github.com/facebookresearch/sam-audio/blob/main/LICENSE), con condizioni proprie: non è classificato erroneamente come NC. Questi componenti **non sono esclusi dal billing per la sola licenza indicata**; installazione, dipendenze, condizioni aggiuntive e compatibilità effettiva restano controlli distinti.
+Basic Pitch e YourMT3 fissati hanno dichiarazioni Apache-2.0; ACE-Step Apache-2.0; Whisper e Demucs MIT. BTC-HCQT dichiara esplicitamente [MIT per codice e pesi](https://github.com/marcusfkelley/btc-hcqt), fermo restando il collaudo del suo runtime. Il workflow SAM Audio è stato rimosso. Questi componenti **non sono esclusi dal billing per la sola licenza indicata**; installazione, dipendenze, condizioni aggiuntive e compatibilità effettiva restano controlli distinti.
 
 ## Policy manuale e contabilizzazione
 

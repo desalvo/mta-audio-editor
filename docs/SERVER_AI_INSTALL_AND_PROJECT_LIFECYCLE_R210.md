@@ -17,11 +17,10 @@ setup with `install_mta.sh` installs the AI runtimes automatically.
 - New installations retain local ACE-Step as the default. Its existing installer
   installs and starts it. Explicit existing local/remote/disabled ACE preferences
   are retained; disabling ACE does not disable the other installed AI engines.
-- Demucs, Whisper, chord/marker dependencies, ONNX DrumSep, audio-separator and SAM
-  Audio/singer separation are provisioned by default. Common audio and SAM runtimes
-  are separate, and neither replaces the web runtime nor ACE's installed torch.
+- Demucs, Whisper, chord/marker dependencies, ONNX DrumSep and audio-separator
+  are provisioned in the audio runtime, separate from the web runtime and ACE's torch.
 - On Linux the built-in registry accepts the installer's `/opt/mta/ai-<fingerprint>/audio/bin/python`
-  or `sam/bin/python` only for engines in the matching group, with the ready marker,
+  only for engines in the matching group, with the ready marker,
   an isolated venv and root-owned non-group-writable runtime directories and files.
   These checks trust the administrator-managed installation; they are not an
   integrity attestation of the dependencies or model weights. Other interpreter
@@ -46,9 +45,9 @@ setup with `install_mta.sh` installs the AI runtimes automatically.
   files even when Whisper is absent from the web interpreter.
 - Checkpoints are cached/downloaded on demand, as in the native application. This
   does not download all model sizes or claim their licenses/access are satisfied.
-  SAM checkpoints require Hugging Face authorization and upstream access approval:
-  https://github.com/facebookresearch/sam-audio . The upstream code revision used
-  for SAM installation is resolved to a full commit and retained in the runtime.
+  SAM Audio and singer-separation are retired. Successful setup removes their
+  obsolete environment bindings while retaining SMTP, secrets and other engines.
+  Runtime cleanup still preserves configured and running environments.
 - Default DrumSep fetches through the existing native downloader and its fixed
   SHA-256 verification before inference. An explicit missing model override fails.
   Existing queue, token authorization and verified-accounting gates are preserved.

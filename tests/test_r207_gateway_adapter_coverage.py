@@ -155,15 +155,16 @@ def test_unified_subprocess_models(tmp_path, monkeypatch):
         else:
             Path(cmd[cmd.index('--output') + 1]).write_bytes(b'a')
     monkeypatch.setattr(subprocess, 'run', fake_run)
-    with pytest.raises(ValueError, match='supported SAM checkpoint'):
+    with pytest.raises(ValueError, match='Unsupported'):
         unified.infer({'kind': 'sam-audio', 'source_audio': source}, output)
     monkeypatch.setenv('MTA_AI_SAM_MODEL', 'sam-audio-small')
-    unified.infer({'kind': 'sam-audio', 'source_audio': source}, output)
+    with pytest.raises(ValueError,match='Unsupported'):
+        unified.infer({'kind': 'sam-audio', 'source_audio': source}, output)
     with pytest.raises(ValueError, match='declared Demucs checkpoint'):
         unified.infer({'kind': 'demucs', 'source_audio': source, 'model': '../bad'}, output)
     unified.infer({'kind': 'demucs', 'source_audio': source}, output)
     assert (tmp_path/'stem_vocals.wav').exists()
-    assert len(calls) == 2
+    assert len(calls) == 1
 
 
 @pytest.mark.parametrize('bad', [
@@ -179,19 +180,14 @@ def test_singer_separation_invalid_options(tmp_path, bad):
         unified.infer({'kind': 'singer-separation', 'source_audio': source, **bad}, output)
 
 
-def test_singer_separation_selected_and_all(tmp_path, monkeypatch):
-    source, output = _staged(tmp_path)
+@pytest.mark.parametrize('selected',['all','singer_2'])
+def test_singer_separation_is_refused_without_subprocess(tmp_path,monkeypatch,selected):
+    source,output=_staged(tmp_path)
     import subprocess
-    calls = []
-    def fake_run(args, **kwargs):
-        calls.append(args)
-        Path(args[args.index('--output') + 1]).write_bytes(b'a')
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    singers = [{'id': f'singer_{i}', 'start': i, 'end': i + 1} for i in (1, 2)]
-    unified.infer({'kind': 'singer-separation', 'source_audio': source, 'singers': singers, 'selected': 'singer_2'}, output)
-    assert (tmp_path/'singer_2.wav').exists() and len(calls) == 1
-    unified.infer({'kind': 'singer-separation', 'source_audio': source, 'singers': singers, 'selected': 'all'}, output)
-    assert len(calls) == 3
+    monkeypatch.setattr(subprocess,'run',lambda *a,**k:pytest.fail('Retired separator executed'))
+    with pytest.raises(ValueError,match='Unsupported'):
+        unified.infer({'kind':'singer-separation','source_audio':source,'selected':selected},output)
+    assert not output.exists()
 
 
 def test_backing_vocals_artifact_security(tmp_path, monkeypatch):

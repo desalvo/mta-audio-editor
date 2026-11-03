@@ -12,10 +12,13 @@ def test_ctrl_cmd_multiselect_replaces_track_checkboxes():
     assert "selectedTrackIds(){ensureTrackSelection()" in JS
 
 
-def test_split_tool_operates_selected_tracks_only():
+def test_split_tool_prefers_selected_segments_then_selected_tracks():
     assert "function splitSelectedTracksAt(ms)" in JS
-    assert "const ids=selectedTrackIds()" in JS
-    assert "if(!ids.includes(t.id))continue" in JS
+    split = JS[JS.index('function splitSelectedTracksAt(ms)'):JS.index('function timelineJoinPair()')]
+    assert "const selected=selectedSegmentItems()" in split
+    assert "keys.size?new Set(selected.map(x=>x.track.id)):new Set(selectedTrackIds())" in split
+    assert "keys.size&&!keys.has(key)" in split
+    assert "if(!ids.has(t.id)||t.kind==='midi')continue" in split
     assert "timelineTool==='split'" in JS
 
 

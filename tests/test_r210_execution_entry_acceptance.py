@@ -15,8 +15,8 @@ from app import ai_arranger_runtime as queue, ai_metering_agent as agent, auth
 from test_r210_queue_identity_stem_metering import env as env  # noqa: F401
 
 KINDS = sorted({
-    'ace-step', 'arranger', 'remix', 'whisper', 'demucs', 'singer-separation',
-    'backing-vocals', 'drumsep', 'sam-audio', 'chords-ml', 'markers',
+    'ace-step', 'arranger', 'remix', 'whisper', 'demucs', 
+    'backing-vocals', 'drumsep', 'chords-ml', 'markers',
     'audio-to-midi', 'audio-to-midi-basic-pitch', 'audio-to-midi-yourmt3',
     'audio-to-midi-mr-mt3', 'audio-to-midi-transkun', 'vocal-harmony', 'vocal-synthesis',
 })

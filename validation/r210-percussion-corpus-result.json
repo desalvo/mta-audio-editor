@@ -1,0 +1,23 @@
+{
+  "dataset_id": "mta-synthetic-v1",
+  "generator_command": "python -m scripts.generate_percussion_corpus --output /new/corpus --seed 42 --duration 12 --controls-report /new/controls.json",
+  "counts": {
+    "declared": 24,
+    "negative": 6,
+    "prepared": 18,
+    "real": 0,
+    "real_unavailable": 6,
+    "synthetic": 12
+  },
+  "audio_files": 153,
+  "total_audio_bytes": 435313932,
+  "manifest_sha256": "0ccc8fcdc03337cae9bb5f5bee8d1d6485d3b8479967492713dcd5a9fd2e4840",
+  "exact_reference_controls": {
+    "run": 36,
+    "passed": 36
+  },
+  "neural_inference_performed": false,
+  "real_recordings_prepared": 0,
+  "human_approval": false,
+  "audio_packaging": "Generated original procedural audio is reproducible from source; full WAVs are deliberately excluded from source distribution."
+}

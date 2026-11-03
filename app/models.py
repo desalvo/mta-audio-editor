@@ -485,6 +485,7 @@ class Project(BaseModel):
     id: str
     owner_user_id: int | None = Field(default=None, ge=1)
     shared_with_user_ids: list[int] = Field(default_factory=list)
+    collaboration_revision: int = Field(default=0, ge=0)
     title: str = Field(max_length=200)
     artist: str = Field(default="", max_length=200)
     original_title: str = Field(default="", max_length=300)

@@ -47,6 +47,12 @@ class TimelineTransferRequest(BaseModel):
     parts: list[TimelinePart] = Field(min_length=1, max_length=512)
 
 
+
+class TimelineJoinRequest(BaseModel):
+    track_id: str
+    parts: list[TimelinePart] = Field(min_length=2, max_length=2)
+
+
 def _source(project, name):
     # Check the directory entry before audio_path resolves it.
     entry = storage.pdir(project.id) / 'audio' / name
@@ -134,6 +140,115 @@ def _decode_span(source, begin, end, rate, channels, destination):
         '-map', '0:a:0', '-af', f'atrim=start={begin / 1000:.6f}:end={end / 1000:.6f},asetpts=PTS-STARTPTS{normalize}',
         '-ar', str(rate), '-ac', str(channels), '-c:a', 'pcm_f32le', '-f', 'f32le', str(destination)],
         check=True, capture_output=True, timeout=1800)
+
+
+
+def _pack_join_source(project, track, clips):
+    """Pack unchanged clip PCM so discontinuous source spans become contiguous.
+
+    Mixer, track delay, pitch and tempo remain track parameters and are never
+    baked twice. Timeline positions and clips outside the joined pair survive.
+    """
+    channels = max(1, track.channels or 2)
+    if channels > 2:
+        raise ValueError('Per unire segmenti usa sorgenti mono o stereo')
+    source = _source(project, track.filename)
+    name, path, handle = _create_output(project)
+    offset_ms = offset_frames = 0
+    with handle, tempfile.TemporaryDirectory(prefix='mta-timeline-join-') as tmp:
+        with sf.SoundFile(handle, 'w', samplerate=project.sample_rate, channels=channels,
+                          format='WAV', subtype='FLOAT', closefd=False) as output:
+            for index, clip in enumerate(clips):
+                raw = Path(tmp) / f'{index}.f32'
+                duration_ms = clip.duration_ms
+                _decode_span(source, clip.source_start_ms, clip.source_end_ms,
+                             project.sample_rate, channels, raw)
+                wanted = round((offset_ms + duration_ms) * project.sample_rate / 1000) - offset_frames
+                actual = raw.stat().st_size // (4 * channels)
+                if abs(actual - wanted) > max(2, round(project.sample_rate / 1000)):
+                    raise ValueError('Intervallo oltre la fine della sorgente audio')
+                remaining = wanted
+                with raw.open('rb') as data:
+                    while remaining > 0:
+                        chunk = data.read(min(remaining, 65536) * 4 * channels)
+                        if not chunk:
+                            break
+                        frames = np.frombuffer(chunk, dtype='<f4').reshape(-1, channels)
+                        if not np.isfinite(frames).all():
+                            raise ValueError('La sorgente contiene campioni non validi')
+                        output.write(frames)
+                        remaining -= len(frames)
+                if remaining > 0:
+                    output.write(np.zeros((remaining, channels), dtype='float32'))
+                clip.source_start_ms = offset_ms
+                offset_ms += duration_ms
+                offset_frames += wanted
+                clip.source_end_ms = offset_ms
+                raw.unlink()
+            output.flush()
+        _sync(handle, path)
+    track.filename = name
+    track.source_clip_id = None
+    track.duration_ms = round(offset_frames * 1000 / project.sample_rate)
+    track.channels = channels
+    track.channel_layout = 'stereo' if channels == 2 else 'mono'
+    track.sample_rate = project.sample_rate
+    track.waveform_peaks = waveform_peaks(path, 4096)
+    track.waveform_revision = ''
+    _retain(project, track)
+
+
+def join(project, req, capacity_check=None):
+    """Join exactly two adjacent audio clips without changing audible timing."""
+    require_kind(project, 'audio')
+    track = next((t for t in project.tracks if t.id == req.track_id), None)
+    if track is None or track.kind != 'audio':
+        raise ValueError('Seleziona due segmenti audio della stessa traccia')
+    ensure_clips(track)
+    selected = []
+    for part in req.parts:
+        clip = next((c for c in track.clips if c.id == part.clip_id), None)
+        if (clip is None or part.track_id != track.id
+                or (part.filename is not None and part.filename != track.filename)
+                or (clip.source_start_ms, clip.source_end_ms) != (part.source_start_ms, part.source_end_ms)
+                or (part.expected_start_ms is not None
+                    and clip.timeline_start_ms + track.delay_ms != part.expected_start_ms)):
+            raise ValueError('Il segmento è cambiato; ripeti la selezione')
+        selected.append(clip)
+    selected.sort(key=lambda c: c.timeline_start_ms)
+    left, right = selected
+    if left.id == right.id or min(left.duration_ms, right.duration_ms) <= 0:
+        raise ValueError('Seleziona due segmenti distinti e non vuoti')
+    if left.timeline_start_ms + left.duration_ms != right.timeline_start_ms:
+        raise ValueError('I due segmenti devono essere adiacenti nella timeline')
+    _check_no_overlap(track.clips)
+    clips = sorted((c.model_copy(deep=True) for c in track.clips), key=lambda c: c.timeline_start_ms)
+    selected_ids = {left.id, right.id}
+    from .audio_engine import media_duration_ms
+    duration = media_duration_ms(_source(project, track.filename))
+    if any(c.source_end_ms > duration + 1 for c in clips):
+        raise ValueError('Intervallo oltre la fine della sorgente audio')
+    needs_source = left.source_end_ms != right.source_start_ms
+    packed = sum(c.duration_ms for c in clips)
+    if len(clips) > 10000 or (needs_source and packed > LIMIT_MS):
+        raise ValueError('Sorgente risultante troppo lunga')
+    if capacity_check and needs_source:
+        capacity_check(project.owner_user_id, int(packed * project.sample_rate / 1000) * max(1, track.channels or 2) * 8 + 65536)
+    ai_upload_transaction.begin(project.id)
+    try:
+        _retain(project, track)
+        if needs_source:
+            _pack_join_source(project, track, clips)
+        left, right = [c for c in clips if c.id in selected_ids]
+        merged = left.model_copy(update={'id': uuid.uuid4().hex[:12], 'source_end_ms': right.source_end_ms})
+        track.clips = sorted([c for c in clips if c.id not in selected_ids] + [merged], key=lambda c: c.timeline_start_ms)
+        track.clips_initialized = True
+        storage.save_project(project)
+    except BaseException:
+        ai_upload_transaction.reconcile(project.id)
+        raise
+    ai_upload_transaction.finish(project.id)
+    return {'project': project, 'track_id': track.id, 'clip_ids': [merged.id], 'changed_track_ids': [track.id]}
 
 
 def transfer(project, req, capacity_check=None):

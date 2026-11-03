@@ -1,3 +1,7 @@
+# Default separazione Demucs — 2 novembre 2026
+
+Corretto il ripristino involontario di “Solo percussioni” dalle preferenze: entrambe le finestre partono da tutti gli stem standard Demucs, senza secondo passaggio drums/percussioni. Metodo avanzato inattivo finché non richiesto esplicitamente; checkbox e target vengono sincronizzati anche all'invio. Dettagli, prove e limiti: `STANDARD_STEM_DEFAULT_R210_IT_EN.md` e `validation/r210-standard-stem-default-result.json`. Verifiche: 179 test passati, inclusi 36 nuovi casi; Ruff, sintassi JS e gate correlati superati. Nessuna nuova prova neurale/browser/nativa o CI remota. Baseline utente `f235f4c3ca67af72006bfc6262474ccb0ff0a705`; RC invariata **34/42 = 81,0% PRE-RC**.
+
 # File progetto: tracce, conversione e backup — 2 novembre 2026
 
 La finestra File del progetto mostra le tracce attive e inattive associate alle sorgenti. I file WAV PCM interi a 8/16/24 bit e FLAC possono essere convertiti fra WAV e FLAC: prima della sostituzione vengono verificati canali, frequenza e campioni decodificati, aggiornando tutte le tracce e le clip che condividono il file. Una copia originale rimane nell'area originali; è ripristinabile e manualmente eliminabile, mentre la pulizia automatica la conserva. Il ripristino conserva una copia della versione corrente. Le conversioni sono bloccate in presenza di job di progetto attivi e non coprono PCM floating-point o formati compressi con perdita. Passando a WAV viene disattivata la conversione automatica FLAC del progetto. Dettagli: `docs/PROJECT_MEDIA_CONVERSION_R210_IT.md`.

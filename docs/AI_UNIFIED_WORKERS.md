@@ -1,6 +1,6 @@
 # Central AI worker adapters (r207)
 
-The authenticated execution endpoint now supports a **strictly server-configured registry** of model families: `ace-step`, `arranger`, `remix`, `whisper`, `demucs`, `singer-separation`, `backing-vocals`, `drumsep`, `sam-audio`, and `chords-ml`.
+The authenticated execution endpoint now supports a **strictly server-configured registry** of model families: `ace-step`, `arranger`, `remix`, `whisper`, `demucs`, `backing-vocals`, `drumsep`, and `chords-ml`.
 
 This is a unified execution **contract**, not a claim that the individual inference engines have been migrated. To activate a family, an administrator must install an adapter executable that supports the existing JSON request and WAV result protocol. Most models (for example Whisper transcription and chord detection) naturally return JSON or text and will need dedicated output adapters before their native features can use this endpoint. Existing local UI/API routes do **not** automatically move to the unified registry.
 
@@ -9,7 +9,6 @@ Set `MTA_AI_WORKER_ENABLED=true` and, for each family, `MTA_AI_WORKER_<KIND>_EXE
 ```
 MTA_AI_WORKER_WHISPER_EXECUTABLE=/opt/mta/workers/whisper_adapter.py
 MTA_AI_WORKER_DEMUCS_EXECUTABLE=/opt/mta/workers/demucs_adapter.py
-MTA_AI_WORKER_SAM_AUDIO_EXECUTABLE=/opt/mta/workers/sam_adapter.py
 ```
 
 ACE-Step retains backward compatibility with `MTA_AI_WORKER_EXECUTABLE`. All configured paths must be absolute, regular, executable and not symlinks. The HTTP client cannot specify an executable, command line, output path or host file path.
@@ -69,15 +68,13 @@ GPU or native-client execution validation has been performed in this package.
 
 On the **server** set `MTA_AI_WORKER_ENABLED=true` and
 `MTA_AI_UNIFIED_WORKERS_ENABLED=true` to use `app/ai_unified_adapter.py` as the
-operator-approved adapter for `whisper`, `demucs`, `drumsep`, `sam-audio`,
-`chords-ml`, `singer-separation` and `backing-vocals`. Each backend requires its
+operator-approved adapter for `whisper`, `demucs`, `drumsep`, `chords-ml` and `backing-vocals`. Each backend requires its
 own optional model/dependencies on the **server**; unavailable dependencies fail
 explicitly. ACE-Step/Arranger/Remix continue to use their separate existing
 configured adapters. Users may not supply arbitrary commands or server paths.
 
 Models that need configuration:
 - DrumSep: `MTA_AI_DRUMSEP_MODEL=/absolute/path/model.onnx`
-- SAM Audio: `MTA_AI_SAM_MODEL=<trusted installed model identifier>`
 - Vocal separator: `MTA_AI_VOCAL_MODEL=<installed filename>` and optionally
   `MTA_AI_VOCAL_MODELS_DIR=/absolute/path/to/models`
 - Whisper and Demucs rely on installed optional Python dependencies.
@@ -151,8 +148,7 @@ end-to-end tests require Windows, macOS and Linux builds.
 ## r207 native opt-in per model (Windows/macOS/Linux)
 
 From native **Settings → AI local / remote workers**, choose Local or Remote
-independently for Whisper/lyrics, chord analysis, Demucs, DrumSep, SAM Audio,
-singer separation, and backing vocals. In Remote mode, set the MTA HTTPS
+independently for Whisper/lyrics, chord analysis, Demucs, DrumSep, and backing vocals. In Remote mode, set the MTA HTTPS
 server URL and a personal AI token. A saved token is never returned by the
 settings API. The native runtime persists the settings in a private JSON file
 (mode 0600) and the backend reads them before each job.
@@ -161,7 +157,7 @@ Legacy project routes for lyrics/chords, stem separation, and optional
 post-stem lyrics/chords now invoke the remote transport when that model's
 remote mode is enabled. JSON results are validated into LyricLine/Chord
 objects, and WAV stems are staged into private temporary job folders. The
-SAM Audio, DrumSep and lead/backing helpers also inspect per-model mode.
+DrumSep and lead/backing helpers also inspect per-model mode.
 Remote failure does **not** trigger a local model fallback. All these
 routes still require runtime evaluation with real inference dependencies and
 native build artifacts.
@@ -179,8 +175,10 @@ AMD/NVIDIA GPU accounting is not yet certified without the hardware benchmark.
 
 ## Native opt-in routing audit (r207 cumulative, October 2026)
 
-Native single-user mode provides **independent** local/remote settings for `whisper`, `chords-ml`, `demucs`, `drumsep`, `sam-audio`, `singer-separation` and `backing-vocals` through the application Settings panel (Native AI processing) and `/api/native/ai-workers/settings`. The secret bearer token is saved locally with restricted permissions and is never included in `GET` responses. A remote setting is used **only when the corresponding inference operation is requested**; it does not cause eager model startup or downloads.
+Native single-user mode provides **independent** local/remote settings for `whisper`, `chords-ml`, `demucs`, `drumsep`, `backing-vocals` through the application Settings panel (Native AI processing) and `/api/native/ai-workers/settings`. The secret bearer token is saved locally with restricted permissions and is never included in `GET` responses. A remote setting is used **only when the corresponding inference operation is requested**; it does not cause eager model startup or downloads.
 
-Remote lyrics and chords decode `transcript.json` and `chords.json`; Demucs imports returned WAV stems into the project; DrumSep selects the requested instruments; SAM Audio imports a WAV; backing-vocal separation consumes two vocal stems; singer separation requests the selected singers together and matches the `singer_N.wav` outputs, rejecting missing singers. Each operation fails explicitly if remote inference fails and **does not fall back to local inference**. Compound workflows retain separate local/remote decisions for their constituent workers (e.g., Demucs followed by DrumSep).
+Remote lyrics and chords decode `transcript.json` and `chords.json`; Demucs imports returned WAV stems into the project; DrumSep selects the requested instruments; backing-vocal separation consumes two vocal stems. Each operation fails explicitly if remote inference fails and **does not fall back to local inference**. Compound workflows retain separate local/remote decisions for their constituent workers (e.g., Demucs followed by DrumSep).
 
 This audit is based on source-level routes and mocked transport tests, not on an end-to-end Windows/macOS/Linux package or model-loaded GPU system. Confirm installed models/worker options and the remote accounting job IDs in an environment with MTA Server. Limits: 32 MiB audio request and result payload per operation; large recordings need a streamed upload API in a follow-up revision.
+
+SAM Audio and individual-singer routes are retired, including saved native settings and registry extensions. Legacy requests fail before execution without an automatic fallback. See SAM_REMOVAL_R210_IT_EN.md and PERCUSSION_BENCHMARK_PROTOCOL.md.

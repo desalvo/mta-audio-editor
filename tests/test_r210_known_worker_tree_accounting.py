@@ -8,10 +8,8 @@ import pytest
 from app import ai_metering_agent as agent, ai_billing
 from test_r208_unified_adapter_billing_e2e import operator as operator, source_audio  # noqa: F401
 
-ROUTES=[('demucs',{'model':'htdemucs'}),('sam-audio',{'model':'sam-audio-small'}),
-        ('singer-separation',{'model':'sam-audio-small'}),
-        ('backing-vocals',{'model':'ffmpeg-center-side'}),
-        ('backing-vocals',{}),('drumsep',{'model':'sam-audio-small'})]
+ROUTES=[('demucs',{'model':'htdemucs'}),
+        ('backing-vocals',{'model':'ffmpeg-center-side'}),('backing-vocals',{})]
 
 
 @pytest.fixture(autouse=True)

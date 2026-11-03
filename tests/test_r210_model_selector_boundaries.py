@@ -28,20 +28,13 @@ def test_whisper_unknown_checkpoint_never_probes_runtime_or_creates_cache(local,
     probe.assert_not_called();assert not (local/'no-cache').exists()
 
 
-@pytest.mark.parametrize('model',['/untrusted/checkpoint','other/sam-audio-small','facebook/sam-audio-small@unreviewed',
-                                 'facebook/sam-audio-small/../other','https://example.test/sam','--model=x'])
-def test_actual_sam_entry_rejects_unknown_identity_before_heavy_import(local,monkeypatch,model):
-    from app import sam_audio_worker
-    import builtins
-    original=builtins.__import__
-    def guarded(name,*args,**kwargs):
-        if name in {'torch','torchaudio','sam_audio'}:pytest.fail('Unknown checkpoint reached optional runtime')
-        return original(name,*args,**kwargs)
-    monkeypatch.setattr(builtins,'__import__',guarded)
-    monkeypatch.setattr(sys,'argv',['sam','--source','missing','--output',str(local/'out'),
-                                  '--model='+model,'--prompt','voice'])
-    with pytest.raises(ValueError):sam_audio_worker.main()
-    assert not (local/'out').exists()
+@pytest.mark.parametrize('model',['sam-audio-small','facebook/sam-audio-large','foreign/repo'])
+def test_retired_sam_identity_is_refused_before_any_runtime(local,model):
+    from app import ai_unified_adapter
+    output=local/'missing'/'out.wav'
+    with pytest.raises(ValueError,match='Unsupported'):
+        ai_unified_adapter.infer({'kind':'sam-audio','model':model},output)
+    assert not output.parent.exists()
 
 
 @pytest.mark.parametrize('kind,model',[('whisper','/untrusted/unknown.pt'),('sam-audio','foreign/repo'),('demucs','foreign_model')])
@@ -53,7 +46,7 @@ def test_invalid_selector_is_refused_before_actual_queue_ledger_admission(operat
     with ai_billing.db() as c:assert c.execute('SELECT count(*) FROM ai_compute_jobs').fetchone()[0]==before
 
 
-@pytest.mark.parametrize('kind,model',[('whisper','tiny.en'),('sam-audio','sam-audio-small'),('demucs','htdemucs_6s')])
+@pytest.mark.parametrize('kind,model',[('whisper','tiny.en'),('demucs','htdemucs_6s')])
 def test_published_selectors_retain_actual_accounted_worker_contract(operator,kind,model):
     from app import ai_metering_agent,ai_billing
     data,metadata=ai_metering_agent.execute_registered_worker(operator,kind,{'model':model},source_wav=source_audio())
@@ -108,7 +101,7 @@ def test_whisper_aliases_and_shared_demucs_registry_preserve_declared_variants(l
         assert selectors.whisper_model(name)==name
     monkeypatch.setenv('MTA_LYRICS_WHISPER_MODEL','base.en')
     assert selectors.whisper_model(None)=='base.en'
-    assert selectors.sam_model('sam-audio-small')==selectors.sam_model('facebook/sam-audio-small')
+    assert not hasattr(selectors,'sam_model')
 
 
 def test_unified_whisper_uses_same_validated_default_as_direct_path(local,monkeypatch):

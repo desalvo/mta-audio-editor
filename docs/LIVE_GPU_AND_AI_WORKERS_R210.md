@@ -92,7 +92,6 @@ Il virtualenv che esegue ciascun worker deve avere il relativo runtime ROCm.
 |---|---|
 | Whisper Python | Nel processo che esegue il modello; il fallback CLI esterno non è coperto |
 | Demucs | Wrapper del vero sottoprocesso `demucs.separate`, non del padre in attesa |
-| SAM Audio | Wrapper del sottoprocesso SAM |
 | Separazione cantanti SAM | Somma delle invocazioni sequenziali; dispositivo coerente richiesto |
 | Chords ML | Eventuali operazioni PyTorch nel worker; altri runtime non coperti |
 | Backing vocals | Eventuali operazioni PyTorch; non certifica componenti ONNX/altre librerie |

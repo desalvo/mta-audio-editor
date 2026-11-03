@@ -2,12 +2,10 @@
 from __future__ import annotations
 import sys
 import types
-from pathlib import Path
 import numpy as np
 import pytest
 import soundfile as sf
 from app import drumsep_onnx_worker as dw
-from app import main
 
 
 def _small_window(monkeypatch):
@@ -82,68 +80,3 @@ def test_drumsep_worker_resample_and_validation(monkeypatch, tmp_path):
         dw.infer(src, tmp_path / "mock.onnx", tmp_path / "out")
 
 
-def test_sam_audio_adapter_validation_and_subprocess(monkeypatch, tmp_path,local_native_ai):
-    with pytest.raises(ValueError, match="Unsupported"):
-        main._sam_audio_extract(tmp_path / "input.wav", tmp_path / "out", "bogus", "kick")
-    monkeypatch.delenv("MTA_SAM_AUDIO_PYTHON", raising=False)
-    with pytest.raises(RuntimeError, match="MTA_SAM_AUDIO_PYTHON"):
-        main._sam_audio_extract(tmp_path / "input.wav", tmp_path / "out", "sam-audio-small", "kick")
-    monkeypatch.setenv("MTA_SAM_AUDIO_PYTHON", sys.executable)
-    def good_run(argv, **kwargs):
-        assert "--prompt" in argv
-        destination = Path(argv[argv.index("--output") + 1]); destination.write_bytes(b"RIFF" + b"0" * 90)
-        return types.SimpleNamespace(returncode=0, stderr="", stdout="")
-    monkeypatch.setattr(main.subprocess, "run", good_run)
-    output = main._sam_audio_extract(tmp_path / "input.wav", tmp_path / "out", "sam-audio-small", "kick")
-    assert output.name == "kick.wav"
-    monkeypatch.setattr(main.subprocess, "run", lambda *a, **k: types.SimpleNamespace(returncode=2, stderr="inference error", stdout=""))
-    with pytest.raises(RuntimeError, match="inference error"):
-        main._sam_audio_extract(tmp_path / "input.wav", tmp_path / "out2", "sam-audio-small", "snare")
-
-
-def test_sam_audio_worker_temporal_anchor_cli(monkeypatch, tmp_path):
-    """Use mocked checkpoint APIs but execute the actual SAM command-line adapter."""
-    from app import sam_audio_worker as sw, sam_audio_compat
-    monkeypatch.setattr(sam_audio_compat, "sam_hub_compat", lambda: nullcontext())
-    from contextlib import nullcontext
-    saved = []
-    processed = []
-    class FakeTensor:
-        ndim = 3
-        shape = (1, 2, 8)
-        def detach(self): return self
-        def cpu(self): return self
-        def __getitem__(self, item): return self
-    class FakeModel:
-        @classmethod
-        def from_pretrained(cls, model):
-            assert model == "facebook/sam-audio-small"
-            return cls()
-        def eval(self): return self
-        def to(self, device): return self
-        def separate(self, batch, **kwargs):
-            assert kwargs["predict_spans"] is False
-            return types.SimpleNamespace(target=FakeTensor())
-    class FakeProcessor:
-        audio_sampling_rate = 48000
-        @classmethod
-        def from_pretrained(cls, model): return cls()
-        def __call__(self, **kwargs):
-            processed.append(kwargs)
-            return self
-        def to(self, device): return self
-    monkeypatch.setitem(sys.modules, "torch", types.SimpleNamespace(cuda=types.SimpleNamespace(is_available=lambda:False), inference_mode=nullcontext))
-    monkeypatch.setitem(sys.modules, "torchaudio", types.SimpleNamespace(save=lambda *args:saved.append(args)))
-    monkeypatch.setitem(sys.modules, "sam_audio", types.SimpleNamespace(SAMAudio=FakeModel,SAMAudioProcessor=FakeProcessor))
-    path = tmp_path / "singer.wav"
-    monkeypatch.setattr(sys, "argv", ["worker", "--source", "in.wav", "--output", str(path),
-             "--model", "facebook/sam-audio-small", "--prompt", "singing voice",
-             "--anchors-json", '[["+",1.0,3.0],["-",4.0,6.0]]'])
-    sw.main()
-    assert processed[0]["anchors"] == [[['+',1.0,3.0],['-',4.0,6.0]]]
-    assert saved[0][0] == str(path) and saved[0][2] == 48000
-    monkeypatch.setattr(sys, "argv", ["worker", "--source", "in.wav", "--output", str(path),
-             "--model", "facebook/sam-audio-small", "--prompt", "singing voice",
-             "--anchors-json", '[["*",1.0,3.0]]'])
-    with pytest.raises(ValueError, match="temporal anchors"):
-        sw.main()

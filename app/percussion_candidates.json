@@ -1,0 +1,444 @@
+{
+  "metadata_schema": "mta-percussion-candidates-1",
+  "reviewed_at": "2026-11-03",
+  "no_automatic_downloads": true,
+  "models": [
+    {
+      "id": "mvsep-mega53",
+      "name": "MVSep Mega 53 Stems",
+      "group": "direct",
+      "adapter_version": "mta-mega53-percussion-1",
+      "checkpoint_revision": "v1.0.21",
+      "checkpoint_file": "operator-provided exact v1.0.21 checkpoint (identity is SHA-256, not filename)",
+      "checkpoint_sha256": "c62820893bbf86d4e734f966bd142d9157cfc8bb8e79e9d8f9ea553f3ff3519f",
+      "code_license": "MIT",
+      "weights_license": "MIT",
+      "weights_permission_verified": true,
+      "commercial_use": true,
+      "noncommercial_use": true,
+      "redistribution": true,
+      "license_sources": [
+        "https://github.com/ZFTurbo/Music-Source-Separation-Training/issues/245",
+        "https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/tag/v1.0.21"
+      ],
+      "dependencies": [
+        "operator-installed Music-Source-Separation-Training runtime",
+        "PyTorch",
+        "matching upstream YAML"
+      ],
+      "hardware": {
+        "cpu": true,
+        "cuda": true,
+        "rocm": "PyTorch-dependent; not validated",
+        "ram_gb": null,
+        "vram_gb": 16,
+        "measurement": "Upstream recommends at least 16 GB VRAM; no local performance measurement."
+      },
+      "outputs": [
+        "percussion",
+        "kick"
+      ],
+      "adapter_implemented": true,
+      "enabled_by_default": true,
+      "benchmark_results": [],
+      "status_reason": "Author permits MIT weight reuse; training-data rights are not warranted. Estimates may overlap. Exact local checkpoint and configured YAML must be verified before inference."
+    },
+    {
+      "id": "bs-roformer-percussion-xlance-v2",
+      "name": "BS-RoFormer Percussion v2 — Xlance",
+      "group": "direct",
+      "adapter_version": null,
+      "checkpoint_revision": "v2",
+      "checkpoint_file": "bs_perc2_xlancer.ckpt",
+      "checkpoint_sha256": null,
+      "code_license": "MSST MIT; selected upstream implementation requires pinning",
+      "weights_license": "not verified",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://huggingface.co/noblebarkrr/mvsepless_resources/blob/main/models.json"
+      ],
+      "dependencies": [],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "percussion",
+        "other"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "A third-party mirror lists these files. No first-party grant for the exact weights was verified; no download, activation or inference is allowed."
+    },
+    {
+      "id": "bs-roformer-percussion-xlance-v1",
+      "name": "BS-RoFormer Percussion v1 — Xlance",
+      "group": "direct",
+      "adapter_version": null,
+      "checkpoint_revision": "v1",
+      "checkpoint_file": "bs_perc_xlancer.ckpt",
+      "checkpoint_sha256": null,
+      "code_license": "MSST MIT; selected upstream implementation requires pinning",
+      "weights_license": "not verified",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://huggingface.co/noblebarkrr/mvsepless_resources/blob/main/models.json"
+      ],
+      "dependencies": [],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "percussion",
+        "other"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "A third-party mirror lists these files. No first-party grant for the exact weights was verified; no download, activation or inference is allowed."
+    },
+    {
+      "id": "mel-roformer-percussion-yolkispalkis",
+      "name": "Mel-Band RoFormer Percussion — yolkispalkis",
+      "group": "direct",
+      "adapter_version": null,
+      "checkpoint_revision": "experimental",
+      "checkpoint_file": "mbr_percussion_yolkispaliks.ckpt",
+      "checkpoint_sha256": null,
+      "code_license": "MSST MIT; selected upstream implementation requires pinning",
+      "weights_license": "not verified",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://huggingface.co/noblebarkrr/mvsepless_resources/blob/main/models.json"
+      ],
+      "dependencies": [],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "percussion",
+        "other"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "A third-party mirror lists these files. No first-party grant for the exact weights was verified; no download, activation or inference is allowed."
+    },
+    {
+      "id": "audiosep-hive",
+      "name": "AudioSep-Hive",
+      "group": "query",
+      "adapter_version": null,
+      "checkpoint_revision": "14f91a1",
+      "checkpoint_file": "audiosep_hive.ckpt",
+      "checkpoint_sha256": "a13fff5fa4ece1a8bc13e42e1c7b8d90e21603075302ca89e4339c9471973300",
+      "code_license": "Apache-2.0 project; component licenses require separate review",
+      "weights_license": "Apache-2.0 declared by publisher",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://huggingface.co/AlayaLab/AudioSep-hive",
+        "https://huggingface.co/AlayaLab/AudioSep-hive/blob/main/audiosep_hive.ckpt",
+        "https://github.com/AlayaLab/Hive"
+      ],
+      "dependencies": [
+        "PyTorch",
+        "torchaudio",
+        "librosa",
+        "pytorch-lightning",
+        "Hugging Face assets",
+        "CLAP auxiliary checkpoint"
+      ],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "queried source"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "Publisher declares Apache-2.0 for principal weights. Auxiliary CLAP/VAE, pinned runtime, source fidelity, stereo behavior and complete operator rights review are not validated. Adapter is not implemented or enabled.",
+      "auxiliary_assets": [
+        {
+          "file": "music_speech_audioset_epoch_15_esc_89.98.pt",
+          "revision": "438413b",
+          "sha256": "51c68f12f9d7ea25fdaaccf741ec7f81e93ee594455410f3bca4f47f88d8e006",
+          "source": "https://huggingface.co/AlayaLab/AudioSep-hive/blob/main/music_speech_audioset_epoch_15_esc_89.98.pt",
+          "rights_review": "pending"
+        }
+      ]
+    },
+    {
+      "id": "flowsep-hive",
+      "name": "FlowSep-Hive",
+      "group": "query",
+      "adapter_version": null,
+      "checkpoint_revision": "f02e798",
+      "checkpoint_file": "flowsep_hive.ckpt",
+      "checkpoint_sha256": "3b7b5379592251dc655757a7dbac109346cbc6c8763dd73efd19326fe6c39fdd",
+      "code_license": "Apache-2.0 project; component licenses require separate review",
+      "weights_license": "Apache-2.0 declared by publisher",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://huggingface.co/AlayaLab/FlowSep-hive",
+        "https://huggingface.co/AlayaLab/FlowSep-hive/blob/main/flowsep_hive.ckpt",
+        "https://github.com/AlayaLab/Hive"
+      ],
+      "dependencies": [
+        "PyTorch",
+        "torchaudio",
+        "librosa",
+        "pytorch-lightning",
+        "Hugging Face assets",
+        "VAE auxiliary checkpoint"
+      ],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "queried source"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "Publisher declares Apache-2.0 for principal weights. Auxiliary CLAP/VAE, pinned runtime, source fidelity, stereo behavior and complete operator rights review are not validated. Adapter is not implemented or enabled."
+    },
+    {
+      "id": "clapsep",
+      "name": "CLAPSep",
+      "group": "query",
+      "adapter_version": null,
+      "checkpoint_revision": "fbe31d2",
+      "checkpoint_file": "model/best_model.ckpt",
+      "checkpoint_sha256": "6fcc8dbcd7174af86266cf16b4105eced0802352762f81dbfefdce29af3dba04",
+      "code_license": "MIT (with third-party notices)",
+      "weights_license": "exact weight grant not separately verified",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://github.com/Aisaka0v0/CLAPSep",
+        "https://huggingface.co/spaces/AisakaMikoto/CLAPSep/blob/main/model/best_model.ckpt"
+      ],
+      "dependencies": [
+        "PyTorch",
+        "LAION-CLAP",
+        "TorchLibrosa",
+        "CLAP encoder checkpoint"
+      ],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "queried source"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "Exact checkpoint/dependency rights and runtime integration require review."
+    },
+    {
+      "id": "banquet",
+      "name": "Banquet (query-bandit)",
+      "group": "query",
+      "adapter_version": null,
+      "checkpoint_revision": "Zenodo 13694558 v1",
+      "checkpoint_file": "ev-pre-aug.ckpt",
+      "checkpoint_sha256": null,
+      "code_license": "MIT",
+      "weights_license": "Zenodo weight grant not resolved",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://github.com/kwatcharasupat/query-bandit",
+        "https://zenodo.org/records/13694558"
+      ],
+      "dependencies": [
+        "PyTorch",
+        "PaSST encoder",
+        "query reference audio"
+      ],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "audio-query source"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "Author repository links the weight record and supports audio-query inference. The retrieved Zenodo record exposes MD5 only and no readable license value; exact SHA-256 and all weight permissions remain unverified.",
+      "upstream_checksum": {
+        "algorithm": "md5",
+        "value": "4dfb91d6d27c2dfd4992a15070915541"
+      }
+    },
+    {
+      "id": "separate-and-detect",
+      "name": "Separate-and-Detect",
+      "group": "kit-support",
+      "adapter_version": null,
+      "checkpoint_revision": "not pinned",
+      "checkpoint_file": null,
+      "checkpoint_sha256": null,
+      "code_license": "MIT",
+      "weights_license": "not verified",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://github.com/ddman1101/Separate-and-detect"
+      ],
+      "dependencies": [
+        "MusicLDM",
+        "latent diffusion VAE",
+        "PyTorch"
+      ],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "kick",
+        "snare",
+        "toms",
+        "hi-hat",
+        "cymbals"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "Generative latent-diffusion drum reconstruction is not admitted as faithful accessory-percussion extraction. Potential kit-support research only; weights and event fidelity remain unverified.",
+      "incompatible_with_fidelity_requirement": true
+    },
+    {
+      "id": "drumsep",
+      "name": "DrumSep / MDX23C derivative",
+      "group": "kit-support",
+      "adapter_version": null,
+      "checkpoint_revision": null,
+      "checkpoint_file": null,
+      "checkpoint_sha256": null,
+      "code_license": "upstream-specific",
+      "weights_license": "not verified upstream; Intel conversion CC-BY-NC-SA-4.0",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://github.com/inagoy/drumsep",
+        "https://huggingface.co/Intel/drumsep_mdx23c_jarredou_openvino",
+        "https://github.com/jarredou/models/releases/tag/DrumSep"
+      ],
+      "dependencies": [],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [
+        "kick",
+        "snare",
+        "toms",
+        "cymbals"
+      ],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "Kit separation alone is not accessory-percussion extraction. Conversion license does not establish an adequate upstream weight grant; existing rights block is preserved."
+    },
+    {
+      "id": "mta-percussion-separator",
+      "name": "MTA Percussion Separator",
+      "group": "research",
+      "adapter_version": null,
+      "checkpoint_revision": null,
+      "checkpoint_file": null,
+      "checkpoint_sha256": null,
+      "code_license": "not developed",
+      "weights_license": "no trained checkpoint",
+      "weights_permission_verified": false,
+      "commercial_use": null,
+      "noncommercial_use": null,
+      "redistribution": null,
+      "license_sources": [
+        "https://github.com/desalvo/mta-audio-editor"
+      ],
+      "dependencies": [],
+      "hardware": {
+        "cpu": null,
+        "cuda": null,
+        "rocm": null,
+        "ram_gb": null,
+        "vram_gb": null,
+        "measurement": "not measured"
+      },
+      "outputs": [],
+      "adapter_implemented": false,
+      "enabled_by_default": false,
+      "benchmark_results": [],
+      "status_reason": "Roadmap only. No training is started before comparable existing-model benchmarks and a properly licensed corpus exist."
+    }
+  ]
+}

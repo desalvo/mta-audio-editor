@@ -23,6 +23,6 @@ def test_drumsep_does_not_copy_demucs_drums_as_kit():
     assert 'shutil.copyfile(drums_stem, kit_path)' not in region
 
 
-def test_separate_nonkit_percussion_requires_sam():
+def test_separate_nonkit_percussion_requires_supported_direct_model():
     source = Path(main.__file__).read_text()
-    assert 'For non-kit percussions select SAM Audio' in source
+    assert 'For non-kit percussions select a supported direct percussion model' in source

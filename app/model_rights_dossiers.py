@@ -25,7 +25,7 @@ DOSSIERS = {
             'https://github.com/openmirlab/mdxnet-infer/releases/tag/weights-drumsep-v1',
             'https://github.com/openmirlab/mdxnet-infer/blob/master/README.md',
         ],
-        'note': '2026-10-20 evidence review: inagoy repository LICENSE is MIT for software, while the weight checkpoint was distributed separately; issue #9 specifically requests commercial weight rights without a definitive upstream grant. Splitzo model card labels its 335 MB ONNX MIT, but the converter cannot grant rights absent in source weights. Distinct aufr33/jarredou MDX23C 6-stem weights have SHA-256 verified independent mirrors but no original weight license; conflicting mirror tags are not author grants. Preserve disabled default; use licensed Mega 53/DSP/SAM functional alternatives. An operator attestation is not a substitute for the rights grant.',
+        'note': '2026-10-20 evidence review: inagoy repository LICENSE is MIT for software, while the weight checkpoint was distributed separately; issue #9 specifically requests commercial weight rights without a definitive upstream grant. Splitzo model card labels its 335 MB ONNX MIT, but the converter cannot grant rights absent in source weights. Distinct aufr33/jarredou MDX23C 6-stem weights have SHA-256 verified independent mirrors but no original weight license; conflicting mirror tags are not author grants. Preserve disabled default; use licensed Mega 53/DSP functional alternatives. An operator attestation is not a substitute for the rights grant.',
     },
     'chordformer': {
         'status': 'five_checkpoints_unconfirmed',
@@ -39,11 +39,6 @@ DOSSIERS = {
             'https://creativecommons.org/licenses/by-nc-sa/4.0/',
         ],
         'note': 'Original pretrained weights are CC BY-NC-SA 4.0; free_only inside a commercial hosted deployment is insufficient.',
-    },
-    'sam-audio': {
-        'status': 'published_model_license',
-        'references': ['https://github.com/facebookresearch/sam-audio/blob/main/LICENSE'],
-        'note': 'SAM License expressly covers distributed code and weights, subject to all SAM License obligations; not MIT.',
     },
     'diffsinger-qixuan': {
         'status': 'restricted_free_service',

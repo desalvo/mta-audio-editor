@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-03",
+  "area": "Timeline e lyrics",
+  "workspace_reset_recovery": true,
+  "implemented_requirements": 11,
+  "requirements_total": 11,
+  "implementation_percent": 100,
+  "tests": {
+    "passed": 76,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "new_cases": 13,
+    "junit": "validation/r210-timeline-completion.xml",
+    "execution": "Complete current integrated timeline/lyrics group after main hooks, authorized join endpoint and SAM retirement integration"
+  },
+  "checks": {
+    "ruff": "passed",
+    "javascript_syntax": "passed",
+    "real_stereo_pcm_before_after_join": "passed",
+    "project_archive_reopen": "passed",
+    "ctrl_a_then_s_without_sidebar_tracks": "passed",
+    "join_endpoint_authorization_and_persistence": "passed"
+  },
+  "runtime_source_sha256": {
+    "app/static/app.js": "dc31d0c55f4b70b710ac9de71fbe5262f5fb8afb08e3b4aa8f74936cddbaa56f",
+    "app/main.py": "ba2146256de24c5c1aec303c94b4c81e62554158fc0b9998c95155f112fa742c",
+    "app/timeline_media.py": "61c1fbc25230f3fa9f81d7f93e4d7e53acfa37b25e082a7e56efa9a59aec67e8",
+    "app/lyric_layout.py": "c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000"
+  },
+  "limits": [
+    "No browser visual acceptance",
+    "No native application runtime acceptance",
+    "No original RC criterion promoted from these tests alone"
+  ],
+  "backend_integration": "TimelineJoinRequest and serialized authorized timeline/join endpoint in current main.py",
+  "validation_sequence": "Broad129case group ran after history/drag/save fixes; the subsequent one-field base_bpm detector change is covered by the final24affected cases and7new harness cases.",
+  "collaboration_history_audit": "validation/r210-collaboration-timeline-history-result.json"
+}

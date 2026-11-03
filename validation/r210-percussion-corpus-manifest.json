@@ -1,0 +1,1023 @@
+{
+  "cases": [
+    {
+      "category": "conga_snare",
+      "channels": 2,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "conga-snare",
+      "frames": 529200,
+      "group": "synthetic",
+      "id": "conga-snare",
+      "input_drums": "cases/conga-snare/input_drums.wav",
+      "input_mix": "cases/conga-snare/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/conga-snare/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/conga-snare/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/conga-snare/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/conga-snare/reference_exclude_kick.wav",
+        "include_kick": "cases/conga-snare/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 42,
+      "sha256": {
+        "cases/conga-snare/input_drums.wav": "b0e5e6bc54cf646288af253d5d0bdacb613a49c862a96bcbe04dc0d23807076a",
+        "cases/conga-snare/input_mix.wav": "b0e5e6bc54cf646288af253d5d0bdacb613a49c862a96bcbe04dc0d23807076a",
+        "cases/conga-snare/percussion.wav": "81e2b3b0ff0565a6537cf9d4c5cad5714fc308eb438567726be8cff8ef61182e",
+        "cases/conga-snare/reference_exclude_kick.wav": "81e2b3b0ff0565a6537cf9d4c5cad5714fc308eb438567726be8cff8ef61182e",
+        "cases/conga-snare/reference_include_kick.wav": "81e2b3b0ff0565a6537cf9d4c5cad5714fc308eb438567726be8cff8ef61182e",
+        "cases/conga-snare/reference_mix_exclude_kick.wav": "81e2b3b0ff0565a6537cf9d4c5cad5714fc308eb438567726be8cff8ef61182e",
+        "cases/conga-snare/reference_mix_include_kick.wav": "81e2b3b0ff0565a6537cf9d4c5cad5714fc308eb438567726be8cff8ef61182e",
+        "cases/conga-snare/snare.wav": "52b8ca27d769457871c44c3e36888c26085726acbc0ed0f068808198a58f96c6"
+      },
+      "sources": {
+        "percussion": "cases/conga-snare/percussion.wav",
+        "snare": "cases/conga-snare/snare.wav"
+      },
+      "split": "test",
+      "title": "Congas surrogate with simultaneous snare"
+    },
+    {
+      "category": "bongo_tom",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "bongo-tom",
+      "frames": 576000,
+      "group": "synthetic",
+      "id": "bongo-tom",
+      "input_drums": "cases/bongo-tom/input_drums.wav",
+      "input_mix": "cases/bongo-tom/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/bongo-tom/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/bongo-tom/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/bongo-tom/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/bongo-tom/reference_exclude_kick.wav",
+        "include_kick": "cases/bongo-tom/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 1051,
+      "sha256": {
+        "cases/bongo-tom/input_drums.wav": "2cbda0b1998eb43bb9689f35541d1c7b0ad42ad23475b5fce136e0e7ebe221f4",
+        "cases/bongo-tom/input_mix.wav": "2cbda0b1998eb43bb9689f35541d1c7b0ad42ad23475b5fce136e0e7ebe221f4",
+        "cases/bongo-tom/percussion.wav": "29f63ede61c28d1d37b48a178ca7a4ac8aaaa22d2ea871ac6b178ad53e03dd86",
+        "cases/bongo-tom/reference_exclude_kick.wav": "29f63ede61c28d1d37b48a178ca7a4ac8aaaa22d2ea871ac6b178ad53e03dd86",
+        "cases/bongo-tom/reference_include_kick.wav": "29f63ede61c28d1d37b48a178ca7a4ac8aaaa22d2ea871ac6b178ad53e03dd86",
+        "cases/bongo-tom/reference_mix_exclude_kick.wav": "29f63ede61c28d1d37b48a178ca7a4ac8aaaa22d2ea871ac6b178ad53e03dd86",
+        "cases/bongo-tom/reference_mix_include_kick.wav": "29f63ede61c28d1d37b48a178ca7a4ac8aaaa22d2ea871ac6b178ad53e03dd86",
+        "cases/bongo-tom/tom.wav": "46106350534fbb4138f1a262ba1607437f58212ffa68f03eb97be330473d1b94"
+      },
+      "sources": {
+        "percussion": "cases/bongo-tom/percussion.wav",
+        "tom": "cases/bongo-tom/tom.wav"
+      },
+      "split": "test",
+      "title": "Bongos surrogate with tom"
+    },
+    {
+      "category": "shaker_hihat",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "shaker-hihat",
+      "frames": 529200,
+      "group": "synthetic",
+      "id": "shaker-hihat",
+      "input_drums": "cases/shaker-hihat/input_drums.wav",
+      "input_mix": "cases/shaker-hihat/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/shaker-hihat/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/shaker-hihat/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/shaker-hihat/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/shaker-hihat/reference_exclude_kick.wav",
+        "include_kick": "cases/shaker-hihat/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 2060,
+      "sha256": {
+        "cases/shaker-hihat/hi_hat.wav": "d02a72c8c6aa53ad8947d02905eaf6838a83e721605bf23a23ebeb2f8145fe08",
+        "cases/shaker-hihat/input_drums.wav": "4eed8654ed3379f7568a18eadbcbef46eaf8618ede922bd05721041d07ed2436",
+        "cases/shaker-hihat/input_mix.wav": "4eed8654ed3379f7568a18eadbcbef46eaf8618ede922bd05721041d07ed2436",
+        "cases/shaker-hihat/percussion.wav": "3f024a74e27826fd04f614ec3bd210de6ed45d41012e3625a9b88e1f7a9a73ae",
+        "cases/shaker-hihat/reference_exclude_kick.wav": "3f024a74e27826fd04f614ec3bd210de6ed45d41012e3625a9b88e1f7a9a73ae",
+        "cases/shaker-hihat/reference_include_kick.wav": "3f024a74e27826fd04f614ec3bd210de6ed45d41012e3625a9b88e1f7a9a73ae",
+        "cases/shaker-hihat/reference_mix_exclude_kick.wav": "3f024a74e27826fd04f614ec3bd210de6ed45d41012e3625a9b88e1f7a9a73ae",
+        "cases/shaker-hihat/reference_mix_include_kick.wav": "3f024a74e27826fd04f614ec3bd210de6ed45d41012e3625a9b88e1f7a9a73ae"
+      },
+      "sources": {
+        "hi_hat": "cases/shaker-hihat/hi_hat.wav",
+        "percussion": "cases/shaker-hihat/percussion.wav"
+      },
+      "split": "test",
+      "title": "Shaker surrogate with hi-hat"
+    },
+    {
+      "category": "tambourine_crash",
+      "channels": 2,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "tambourine-crash",
+      "frames": 576000,
+      "group": "synthetic",
+      "id": "tambourine-crash",
+      "input_drums": "cases/tambourine-crash/input_drums.wav",
+      "input_mix": "cases/tambourine-crash/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/tambourine-crash/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/tambourine-crash/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/tambourine-crash/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/tambourine-crash/reference_exclude_kick.wav",
+        "include_kick": "cases/tambourine-crash/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 3069,
+      "sha256": {
+        "cases/tambourine-crash/cymbals.wav": "c479e532ab793591e15e3316334e9d26b20226a1f6b6e80afd508046e364c7d3",
+        "cases/tambourine-crash/input_drums.wav": "8d1af186980c9a1e235a190525efc3c6e8f79d2ee750db29dbaa99c3751dc8b2",
+        "cases/tambourine-crash/input_mix.wav": "8d1af186980c9a1e235a190525efc3c6e8f79d2ee750db29dbaa99c3751dc8b2",
+        "cases/tambourine-crash/percussion.wav": "4b89bac1c7548288d57bb375495c0a9f95411d81486428604fb20b4714c50bdc",
+        "cases/tambourine-crash/reference_exclude_kick.wav": "4b89bac1c7548288d57bb375495c0a9f95411d81486428604fb20b4714c50bdc",
+        "cases/tambourine-crash/reference_include_kick.wav": "4b89bac1c7548288d57bb375495c0a9f95411d81486428604fb20b4714c50bdc",
+        "cases/tambourine-crash/reference_mix_exclude_kick.wav": "4b89bac1c7548288d57bb375495c0a9f95411d81486428604fb20b4714c50bdc",
+        "cases/tambourine-crash/reference_mix_include_kick.wav": "4b89bac1c7548288d57bb375495c0a9f95411d81486428604fb20b4714c50bdc"
+      },
+      "sources": {
+        "cymbals": "cases/tambourine-crash/cymbals.wav",
+        "percussion": "cases/tambourine-crash/percussion.wav"
+      },
+      "split": "test",
+      "title": "Tambourine surrogate with crash"
+    },
+    {
+      "category": "cowbell_ride",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "cowbell-ride",
+      "frames": 529200,
+      "group": "synthetic",
+      "id": "cowbell-ride",
+      "input_drums": "cases/cowbell-ride/input_drums.wav",
+      "input_mix": "cases/cowbell-ride/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/cowbell-ride/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/cowbell-ride/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/cowbell-ride/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/cowbell-ride/reference_exclude_kick.wav",
+        "include_kick": "cases/cowbell-ride/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 4078,
+      "sha256": {
+        "cases/cowbell-ride/cymbals.wav": "37f8e816143a04402005e9944a8b48b0a6129830aaa17f48a92a7888590d6fe8",
+        "cases/cowbell-ride/input_drums.wav": "d50adb5332199fbd62f1ea1555d2db7a8ca1286a70314ef23d2680ce6e44c447",
+        "cases/cowbell-ride/input_mix.wav": "d50adb5332199fbd62f1ea1555d2db7a8ca1286a70314ef23d2680ce6e44c447",
+        "cases/cowbell-ride/percussion.wav": "642e2f4d6e90c27ab22611268c1fc77324eb3c1346f2fb5311b19431256eb79d",
+        "cases/cowbell-ride/reference_exclude_kick.wav": "642e2f4d6e90c27ab22611268c1fc77324eb3c1346f2fb5311b19431256eb79d",
+        "cases/cowbell-ride/reference_include_kick.wav": "642e2f4d6e90c27ab22611268c1fc77324eb3c1346f2fb5311b19431256eb79d",
+        "cases/cowbell-ride/reference_mix_exclude_kick.wav": "642e2f4d6e90c27ab22611268c1fc77324eb3c1346f2fb5311b19431256eb79d",
+        "cases/cowbell-ride/reference_mix_include_kick.wav": "642e2f4d6e90c27ab22611268c1fc77324eb3c1346f2fb5311b19431256eb79d"
+      },
+      "sources": {
+        "cymbals": "cases/cowbell-ride/cymbals.wav",
+        "percussion": "cases/cowbell-ride/percussion.wav"
+      },
+      "split": "test",
+      "title": "Cowbell surrogate with ride"
+    },
+    {
+      "category": "maracas_cymbals",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "maracas-cymbals",
+      "frames": 576000,
+      "group": "synthetic",
+      "id": "maracas-cymbals",
+      "input_drums": "cases/maracas-cymbals/input_drums.wav",
+      "input_mix": "cases/maracas-cymbals/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/maracas-cymbals/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/maracas-cymbals/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/maracas-cymbals/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/maracas-cymbals/reference_exclude_kick.wav",
+        "include_kick": "cases/maracas-cymbals/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 5087,
+      "sha256": {
+        "cases/maracas-cymbals/cymbals.wav": "b9c5b7fe1cdd9b904a6ad31488bcbcbfcbb849af9aa51aab451662e00b4adaec",
+        "cases/maracas-cymbals/input_drums.wav": "166f5790e580505db7553f8474108c7e44d5212d9d4d35be5b50815238304dd4",
+        "cases/maracas-cymbals/input_mix.wav": "166f5790e580505db7553f8474108c7e44d5212d9d4d35be5b50815238304dd4",
+        "cases/maracas-cymbals/percussion.wav": "5063cf0970c534579be45039afbb4895c48090b259f9bab7bc598f9ebcfc197c",
+        "cases/maracas-cymbals/reference_exclude_kick.wav": "5063cf0970c534579be45039afbb4895c48090b259f9bab7bc598f9ebcfc197c",
+        "cases/maracas-cymbals/reference_include_kick.wav": "5063cf0970c534579be45039afbb4895c48090b259f9bab7bc598f9ebcfc197c",
+        "cases/maracas-cymbals/reference_mix_exclude_kick.wav": "5063cf0970c534579be45039afbb4895c48090b259f9bab7bc598f9ebcfc197c",
+        "cases/maracas-cymbals/reference_mix_include_kick.wav": "5063cf0970c534579be45039afbb4895c48090b259f9bab7bc598f9ebcfc197c"
+      },
+      "sources": {
+        "cymbals": "cases/maracas-cymbals/cymbals.wav",
+        "percussion": "cases/maracas-cymbals/percussion.wav"
+      },
+      "split": "test",
+      "title": "Maracas surrogate with cymbals"
+    },
+    {
+      "category": "timbales_tom",
+      "channels": 2,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "timbales-tom",
+      "frames": 529200,
+      "group": "synthetic",
+      "id": "timbales-tom",
+      "input_drums": "cases/timbales-tom/input_drums.wav",
+      "input_mix": "cases/timbales-tom/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/timbales-tom/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/timbales-tom/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/timbales-tom/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/timbales-tom/reference_exclude_kick.wav",
+        "include_kick": "cases/timbales-tom/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 6096,
+      "sha256": {
+        "cases/timbales-tom/input_drums.wav": "f52ea94c2ac23d2ebe73155ad075084b999aa23585c67c2af050210187618d76",
+        "cases/timbales-tom/input_mix.wav": "f52ea94c2ac23d2ebe73155ad075084b999aa23585c67c2af050210187618d76",
+        "cases/timbales-tom/percussion.wav": "c46fd33fe51bc578e01cce55ec7bbd9077380b544164707e64a82de7819200fe",
+        "cases/timbales-tom/reference_exclude_kick.wav": "c46fd33fe51bc578e01cce55ec7bbd9077380b544164707e64a82de7819200fe",
+        "cases/timbales-tom/reference_include_kick.wav": "c46fd33fe51bc578e01cce55ec7bbd9077380b544164707e64a82de7819200fe",
+        "cases/timbales-tom/reference_mix_exclude_kick.wav": "c46fd33fe51bc578e01cce55ec7bbd9077380b544164707e64a82de7819200fe",
+        "cases/timbales-tom/reference_mix_include_kick.wav": "c46fd33fe51bc578e01cce55ec7bbd9077380b544164707e64a82de7819200fe",
+        "cases/timbales-tom/tom.wav": "b5589fa348adfa87341ced90a4618cb609febd230fee5ca8be9f276d06893c7a"
+      },
+      "sources": {
+        "percussion": "cases/timbales-tom/percussion.wav",
+        "tom": "cases/timbales-tom/tom.wav"
+      },
+      "split": "test",
+      "title": "Timbales surrogate with floor tom"
+    },
+    {
+      "category": "multiple_percussions",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "multiple-overlap",
+      "frames": 576000,
+      "group": "synthetic",
+      "id": "multiple-overlap",
+      "input_drums": "cases/multiple-overlap/input_drums.wav",
+      "input_mix": "cases/multiple-overlap/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/multiple-overlap/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/multiple-overlap/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/multiple-overlap/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/multiple-overlap/reference_exclude_kick.wav",
+        "include_kick": "cases/multiple-overlap/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 7105,
+      "sha256": {
+        "cases/multiple-overlap/hi_hat.wav": "a31c13e011b6e91d0dcf1b8bdcee1d7fdc69a15a3a345c58828aed35ab890d08",
+        "cases/multiple-overlap/input_drums.wav": "157e53c45ce80aac074b06c9f8fd70133e8814091dcc922ada2e91fa3f086b92",
+        "cases/multiple-overlap/input_mix.wav": "5b6224a98fb8297e3f21faed3f70c4139eebfbbf5baf773ee0ae1955a70fe5af",
+        "cases/multiple-overlap/percussion.wav": "763272e747e3f978908eb68273f9ac209b17733ff0233a66753fbd3132b7d0cd",
+        "cases/multiple-overlap/reference_exclude_kick.wav": "763272e747e3f978908eb68273f9ac209b17733ff0233a66753fbd3132b7d0cd",
+        "cases/multiple-overlap/reference_include_kick.wav": "763272e747e3f978908eb68273f9ac209b17733ff0233a66753fbd3132b7d0cd",
+        "cases/multiple-overlap/reference_mix_exclude_kick.wav": "acfc747ad7bd6ac2c7b4491835ad17c2dbcb9094583c314299ff22dee72c63cf",
+        "cases/multiple-overlap/reference_mix_include_kick.wav": "acfc747ad7bd6ac2c7b4491835ad17c2dbcb9094583c314299ff22dee72c63cf",
+        "cases/multiple-overlap/snare.wav": "ea1a355b1fb63c7ab4928f25c0d804c725c77db3fc3913f9c25f20c17f9964fa",
+        "cases/multiple-overlap/tom.wav": "2f49abf855870d5afd8bf824449a6861d240f3828d80fb76a45e5d1f6a4693ea"
+      },
+      "sources": {
+        "hi_hat": "cases/multiple-overlap/hi_hat.wav",
+        "percussion": "cases/multiple-overlap/percussion.wav",
+        "snare": "cases/multiple-overlap/snare.wav",
+        "tom": "cases/multiple-overlap/tom.wav"
+      },
+      "split": "test",
+      "title": "Overlapping accessory surrogates, original mix recovery"
+    },
+    {
+      "category": "kick_percussion",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "kick-accessory",
+      "frames": 529200,
+      "group": "synthetic",
+      "id": "kick-accessory",
+      "input_drums": "cases/kick-accessory/input_drums.wav",
+      "input_mix": "cases/kick-accessory/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/kick-accessory/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/kick-accessory/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/kick-accessory/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/kick-accessory/reference_exclude_kick.wav",
+        "include_kick": "cases/kick-accessory/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 8114,
+      "sha256": {
+        "cases/kick-accessory/input_drums.wav": "e64ec771251da4cf965348b378deb890a6b8043f0d97d12ab9969fd957ca1aec",
+        "cases/kick-accessory/input_mix.wav": "e64ec771251da4cf965348b378deb890a6b8043f0d97d12ab9969fd957ca1aec",
+        "cases/kick-accessory/kick.wav": "53b896593a8475273bfac2f862948f571c170082c5617aeca57e5d44dbf6e1f0",
+        "cases/kick-accessory/percussion.wav": "1673c8faa20fa76c31e329cbd03aa9437525a1d675a769868d8cf5a173ebc021",
+        "cases/kick-accessory/reference_exclude_kick.wav": "1673c8faa20fa76c31e329cbd03aa9437525a1d675a769868d8cf5a173ebc021",
+        "cases/kick-accessory/reference_include_kick.wav": "dbc085aaeef9a690834e1894f550c5ed72b5ba0a0329d75306e620e283a6552e",
+        "cases/kick-accessory/reference_mix_exclude_kick.wav": "1673c8faa20fa76c31e329cbd03aa9437525a1d675a769868d8cf5a173ebc021",
+        "cases/kick-accessory/reference_mix_include_kick.wav": "dbc085aaeef9a690834e1894f550c5ed72b5ba0a0329d75306e620e283a6552e",
+        "cases/kick-accessory/snare.wav": "ea9444e8117c5280d35bb2e20ba0a4b962d56f01a96b7a6ca085a6fed3ce43de"
+      },
+      "sources": {
+        "kick": "cases/kick-accessory/kick.wav",
+        "percussion": "cases/kick-accessory/percussion.wav",
+        "snare": "cases/kick-accessory/snare.wav"
+      },
+      "split": "test",
+      "title": "Kick concurrent with accessory percussion"
+    },
+    {
+      "category": "stereo",
+      "channels": 2,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "stereo-distribution",
+      "frames": 576000,
+      "group": "synthetic",
+      "id": "stereo-distribution",
+      "input_drums": "cases/stereo-distribution/input_drums.wav",
+      "input_mix": "cases/stereo-distribution/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/stereo-distribution/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/stereo-distribution/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/stereo-distribution/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/stereo-distribution/reference_exclude_kick.wav",
+        "include_kick": "cases/stereo-distribution/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 9123,
+      "sha256": {
+        "cases/stereo-distribution/hi_hat.wav": "bd7fa51e8cb975ff978b8180252a3382cd06992b6063ba5d22a1c6cbf3f0b1d2",
+        "cases/stereo-distribution/input_drums.wav": "6af68a24ea15fb475e514dfcf27cc072c777f66db457f3a6a028940c3f3ae960",
+        "cases/stereo-distribution/input_mix.wav": "6af68a24ea15fb475e514dfcf27cc072c777f66db457f3a6a028940c3f3ae960",
+        "cases/stereo-distribution/percussion.wav": "d3ea61f19c6a8e8aa52a8ded49b88364f6ab96a413202c63baaba59657a0efbe",
+        "cases/stereo-distribution/reference_exclude_kick.wav": "d3ea61f19c6a8e8aa52a8ded49b88364f6ab96a413202c63baaba59657a0efbe",
+        "cases/stereo-distribution/reference_include_kick.wav": "d3ea61f19c6a8e8aa52a8ded49b88364f6ab96a413202c63baaba59657a0efbe",
+        "cases/stereo-distribution/reference_mix_exclude_kick.wav": "d3ea61f19c6a8e8aa52a8ded49b88364f6ab96a413202c63baaba59657a0efbe",
+        "cases/stereo-distribution/reference_mix_include_kick.wav": "d3ea61f19c6a8e8aa52a8ded49b88364f6ab96a413202c63baaba59657a0efbe",
+        "cases/stereo-distribution/snare.wav": "ba21d8c8dae871fe56ace2240043c611a7d243e757f1bac67a2df92235f7971b"
+      },
+      "sources": {
+        "hi_hat": "cases/stereo-distribution/hi_hat.wav",
+        "percussion": "cases/stereo-distribution/percussion.wav",
+        "snare": "cases/stereo-distribution/snare.wav"
+      },
+      "split": "test",
+      "title": "Stereo source distribution"
+    },
+    {
+      "category": "dynamics",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "dynamic-range",
+      "frames": 529200,
+      "group": "synthetic",
+      "id": "dynamic-range",
+      "input_drums": "cases/dynamic-range/input_drums.wav",
+      "input_mix": "cases/dynamic-range/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/dynamic-range/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/dynamic-range/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/dynamic-range/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/dynamic-range/reference_exclude_kick.wav",
+        "include_kick": "cases/dynamic-range/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 10132,
+      "sha256": {
+        "cases/dynamic-range/input_drums.wav": "546654901cbb194beed03eb526ac6daf7f1776271c0463976e51a03dc956b39d",
+        "cases/dynamic-range/input_mix.wav": "546654901cbb194beed03eb526ac6daf7f1776271c0463976e51a03dc956b39d",
+        "cases/dynamic-range/percussion.wav": "ff85f5326db43ace06a782d19e25e7a33669b03828733015d43bcb6a0f43cdc3",
+        "cases/dynamic-range/reference_exclude_kick.wav": "ff85f5326db43ace06a782d19e25e7a33669b03828733015d43bcb6a0f43cdc3",
+        "cases/dynamic-range/reference_include_kick.wav": "ff85f5326db43ace06a782d19e25e7a33669b03828733015d43bcb6a0f43cdc3",
+        "cases/dynamic-range/reference_mix_exclude_kick.wav": "ff85f5326db43ace06a782d19e25e7a33669b03828733015d43bcb6a0f43cdc3",
+        "cases/dynamic-range/reference_mix_include_kick.wav": "ff85f5326db43ace06a782d19e25e7a33669b03828733015d43bcb6a0f43cdc3",
+        "cases/dynamic-range/snare.wav": "739c76333afe70d65e302df3266b7bbb100e1380fcd92cd36f236f837d6aff1f",
+        "cases/dynamic-range/tom.wav": "ee62e7454e7d1dcf77fd71846a2f0a2186e5e1d40c70414bddf7d695d6eea516"
+      },
+      "sources": {
+        "percussion": "cases/dynamic-range/percussion.wav",
+        "snare": "cases/dynamic-range/snare.wav",
+        "tom": "cases/dynamic-range/tom.wav"
+      },
+      "split": "test",
+      "title": "Weak accessory and strong kit"
+    },
+    {
+      "category": "reverb",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "reverb-tail",
+      "frames": 576000,
+      "group": "synthetic",
+      "id": "reverb-tail",
+      "input_drums": "cases/reverb-tail/input_drums.wav",
+      "input_mix": "cases/reverb-tail/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/reverb-tail/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/reverb-tail/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/reverb-tail/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/reverb-tail/reference_exclude_kick.wav",
+        "include_kick": "cases/reverb-tail/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 11141,
+      "sha256": {
+        "cases/reverb-tail/cymbals.wav": "7e8e453b3792439e2dbb9eeed46a6358daef317fd16cd8d1e356a32e97c3f67e",
+        "cases/reverb-tail/input_drums.wav": "8c87b22304fc2572071ef2c9eb9111de29a24f2a237b5f4ec1ab8d7f83902ef5",
+        "cases/reverb-tail/input_mix.wav": "8c87b22304fc2572071ef2c9eb9111de29a24f2a237b5f4ec1ab8d7f83902ef5",
+        "cases/reverb-tail/percussion.wav": "47838d62b0e47ad100d0bf407ec0dadf7dee7d8db38678e0875941d655b0faf1",
+        "cases/reverb-tail/reference_exclude_kick.wav": "47838d62b0e47ad100d0bf407ec0dadf7dee7d8db38678e0875941d655b0faf1",
+        "cases/reverb-tail/reference_include_kick.wav": "47838d62b0e47ad100d0bf407ec0dadf7dee7d8db38678e0875941d655b0faf1",
+        "cases/reverb-tail/reference_mix_exclude_kick.wav": "47838d62b0e47ad100d0bf407ec0dadf7dee7d8db38678e0875941d655b0faf1",
+        "cases/reverb-tail/reference_mix_include_kick.wav": "47838d62b0e47ad100d0bf407ec0dadf7dee7d8db38678e0875941d655b0faf1",
+        "cases/reverb-tail/snare.wav": "c82db3e12023e0e10410f2179e6c87556038a2a7e65f2fca89ee4a42bbc2af71"
+      },
+      "sources": {
+        "cymbals": "cases/reverb-tail/cymbals.wav",
+        "percussion": "cases/reverb-tail/percussion.wav",
+        "snare": "cases/reverb-tail/snare.wav"
+      },
+      "split": "test",
+      "title": "Long decay and reverberant surrogates"
+    },
+    {
+      "category": "negative_no_percussion",
+      "channels": 2,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "no-accessory",
+      "frames": 529200,
+      "group": "negative",
+      "id": "no-accessory",
+      "input_drums": "cases/no-accessory/input_drums.wav",
+      "input_mix": "cases/no-accessory/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/no-accessory/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/no-accessory/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/no-accessory/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/no-accessory/reference_exclude_kick.wav",
+        "include_kick": "cases/no-accessory/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 12150,
+      "sha256": {
+        "cases/no-accessory/cymbals.wav": "9997506b95c3f10718c5f7ecef51769fd246eab3688df4b8cee56e70e9f2afb6",
+        "cases/no-accessory/hi_hat.wav": "d2e1cab8e616f18f855756ff00c92bc924ebd7112616f1d40421ee061c5c3e7a",
+        "cases/no-accessory/input_drums.wav": "27a44299e9789673ef1b8d30a77e41001dfa6800a03f8aea577f5add43acd155",
+        "cases/no-accessory/input_mix.wav": "27a44299e9789673ef1b8d30a77e41001dfa6800a03f8aea577f5add43acd155",
+        "cases/no-accessory/percussion.wav": "25ee761b6a504f12f8f9d6d8c0feecfde132bf5e363e883aac81ec39c02905cb",
+        "cases/no-accessory/reference_exclude_kick.wav": "25ee761b6a504f12f8f9d6d8c0feecfde132bf5e363e883aac81ec39c02905cb",
+        "cases/no-accessory/reference_include_kick.wav": "25ee761b6a504f12f8f9d6d8c0feecfde132bf5e363e883aac81ec39c02905cb",
+        "cases/no-accessory/reference_mix_exclude_kick.wav": "25ee761b6a504f12f8f9d6d8c0feecfde132bf5e363e883aac81ec39c02905cb",
+        "cases/no-accessory/reference_mix_include_kick.wav": "25ee761b6a504f12f8f9d6d8c0feecfde132bf5e363e883aac81ec39c02905cb",
+        "cases/no-accessory/snare.wav": "37cc71d7d69d469f3ce16f1e326a35bf7a853da8f35879dc0bb60820f7b6bd7e",
+        "cases/no-accessory/tom.wav": "c332f11fcff71d71c3cc3481db4946dfe8e0e2de7bbaa3bcce3b7cd02f524efc"
+      },
+      "sources": {
+        "cymbals": "cases/no-accessory/cymbals.wav",
+        "hi_hat": "cases/no-accessory/hi_hat.wav",
+        "percussion": "cases/no-accessory/percussion.wav",
+        "snare": "cases/no-accessory/snare.wav",
+        "tom": "cases/no-accessory/tom.wav"
+      },
+      "split": "test",
+      "title": "Kit without accessory percussion or kick"
+    },
+    {
+      "category": "accessory_only",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "accessory-only",
+      "frames": 576000,
+      "group": "negative",
+      "id": "accessory-only",
+      "input_drums": "cases/accessory-only/input_drums.wav",
+      "input_mix": "cases/accessory-only/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/accessory-only/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/accessory-only/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/accessory-only/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/accessory-only/reference_exclude_kick.wav",
+        "include_kick": "cases/accessory-only/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 13159,
+      "sha256": {
+        "cases/accessory-only/input_drums.wav": "39cf73ce0809f1960ed54049cfb65710cbebe4c7332c2a35028dfae1db307244",
+        "cases/accessory-only/input_mix.wav": "39cf73ce0809f1960ed54049cfb65710cbebe4c7332c2a35028dfae1db307244",
+        "cases/accessory-only/percussion.wav": "39cf73ce0809f1960ed54049cfb65710cbebe4c7332c2a35028dfae1db307244",
+        "cases/accessory-only/reference_exclude_kick.wav": "39cf73ce0809f1960ed54049cfb65710cbebe4c7332c2a35028dfae1db307244",
+        "cases/accessory-only/reference_include_kick.wav": "39cf73ce0809f1960ed54049cfb65710cbebe4c7332c2a35028dfae1db307244",
+        "cases/accessory-only/reference_mix_exclude_kick.wav": "39cf73ce0809f1960ed54049cfb65710cbebe4c7332c2a35028dfae1db307244",
+        "cases/accessory-only/reference_mix_include_kick.wav": "39cf73ce0809f1960ed54049cfb65710cbebe4c7332c2a35028dfae1db307244"
+      },
+      "sources": {
+        "percussion": "cases/accessory-only/percussion.wav"
+      },
+      "split": "test",
+      "title": "Accessory-only surrogate"
+    },
+    {
+      "category": "negative_silence",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "digital-silence",
+      "frames": 529200,
+      "group": "negative",
+      "id": "digital-silence",
+      "input_drums": "cases/digital-silence/input_drums.wav",
+      "input_mix": "cases/digital-silence/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/digital-silence/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/digital-silence/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/digital-silence/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/digital-silence/reference_exclude_kick.wav",
+        "include_kick": "cases/digital-silence/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 14168,
+      "sha256": {
+        "cases/digital-silence/input_drums.wav": "adaadf845dccfd661bd64107678e40517f56961c22adb241f57062e458b04f7b",
+        "cases/digital-silence/input_mix.wav": "adaadf845dccfd661bd64107678e40517f56961c22adb241f57062e458b04f7b",
+        "cases/digital-silence/percussion.wav": "adaadf845dccfd661bd64107678e40517f56961c22adb241f57062e458b04f7b",
+        "cases/digital-silence/reference_exclude_kick.wav": "adaadf845dccfd661bd64107678e40517f56961c22adb241f57062e458b04f7b",
+        "cases/digital-silence/reference_include_kick.wav": "adaadf845dccfd661bd64107678e40517f56961c22adb241f57062e458b04f7b",
+        "cases/digital-silence/reference_mix_exclude_kick.wav": "adaadf845dccfd661bd64107678e40517f56961c22adb241f57062e458b04f7b",
+        "cases/digital-silence/reference_mix_include_kick.wav": "adaadf845dccfd661bd64107678e40517f56961c22adb241f57062e458b04f7b"
+      },
+      "sources": {
+        "percussion": "cases/digital-silence/percussion.wav"
+      },
+      "split": "test",
+      "title": "Digital silence"
+    },
+    {
+      "category": "short_audio",
+      "channels": 2,
+      "critical_excerpt": {
+        "end": 0.35,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 0.35,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "very-short",
+      "frames": 16800,
+      "group": "negative",
+      "id": "very-short",
+      "input_drums": "cases/very-short/input_drums.wav",
+      "input_mix": "cases/very-short/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/very-short/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/very-short/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/very-short/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/very-short/reference_exclude_kick.wav",
+        "include_kick": "cases/very-short/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 15177,
+      "sha256": {
+        "cases/very-short/input_drums.wav": "3851e13f3ec4b8a0bbe62f938e5d71b66804d8840bea36febde7bf807901c6ba",
+        "cases/very-short/input_mix.wav": "3851e13f3ec4b8a0bbe62f938e5d71b66804d8840bea36febde7bf807901c6ba",
+        "cases/very-short/percussion.wav": "4452e647e3bbc68c4df4b729eb6d8bbc66ca5f25f2a46f1aea6b2ccb2bab5626",
+        "cases/very-short/reference_exclude_kick.wav": "4452e647e3bbc68c4df4b729eb6d8bbc66ca5f25f2a46f1aea6b2ccb2bab5626",
+        "cases/very-short/reference_include_kick.wav": "4452e647e3bbc68c4df4b729eb6d8bbc66ca5f25f2a46f1aea6b2ccb2bab5626",
+        "cases/very-short/reference_mix_exclude_kick.wav": "4452e647e3bbc68c4df4b729eb6d8bbc66ca5f25f2a46f1aea6b2ccb2bab5626",
+        "cases/very-short/reference_mix_include_kick.wav": "4452e647e3bbc68c4df4b729eb6d8bbc66ca5f25f2a46f1aea6b2ccb2bab5626",
+        "cases/very-short/snare.wav": "feab4774d9938f4d67c5eb634da6349f854c30fe0a6135a5b017aa49239c5dad"
+      },
+      "sources": {
+        "percussion": "cases/very-short/percussion.wav",
+        "snare": "cases/very-short/snare.wav"
+      },
+      "split": "test",
+      "title": "Short source excerpt"
+    },
+    {
+      "category": "electronic",
+      "channels": 1,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "electronic-fast",
+      "frames": 529200,
+      "group": "negative",
+      "id": "electronic-fast",
+      "input_drums": "cases/electronic-fast/input_drums.wav",
+      "input_mix": "cases/electronic-fast/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/electronic-fast/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/electronic-fast/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/electronic-fast/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/electronic-fast/reference_exclude_kick.wav",
+        "include_kick": "cases/electronic-fast/reference_include_kick.wav"
+      },
+      "sample_rate": 44100,
+      "seed": 16186,
+      "sha256": {
+        "cases/electronic-fast/hi_hat.wav": "48764548559cba427ed3620156be5fa6fc8478b2232ea760e3cf778032944447",
+        "cases/electronic-fast/input_drums.wav": "8bec7b77e64d95790f6be4e7a4ff6c60b79f37f1c655eb978be05fc451d295b0",
+        "cases/electronic-fast/input_mix.wav": "8bec7b77e64d95790f6be4e7a4ff6c60b79f37f1c655eb978be05fc451d295b0",
+        "cases/electronic-fast/kick.wav": "b5c72299d82718a410db82bea1508740296309e0a20e55fc5121e4313ce5aaab",
+        "cases/electronic-fast/percussion.wav": "5abc9f2ca1198b276b829ee7afc0c5b397124a1143412ab141709439430e4076",
+        "cases/electronic-fast/reference_exclude_kick.wav": "5abc9f2ca1198b276b829ee7afc0c5b397124a1143412ab141709439430e4076",
+        "cases/electronic-fast/reference_include_kick.wav": "cd14447d39f0f8aa51fc749fd6ec934b72059c6d2ef290d83b6a2241e7ac3069",
+        "cases/electronic-fast/reference_mix_exclude_kick.wav": "5abc9f2ca1198b276b829ee7afc0c5b397124a1143412ab141709439430e4076",
+        "cases/electronic-fast/reference_mix_include_kick.wav": "cd14447d39f0f8aa51fc749fd6ec934b72059c6d2ef290d83b6a2241e7ac3069",
+        "cases/electronic-fast/snare.wav": "c0ce0aeeeaee8c832d7d64c57d06386bb8ce4bbd3eff45495cdf1b7031af4708"
+      },
+      "sources": {
+        "hi_hat": "cases/electronic-fast/hi_hat.wav",
+        "kick": "cases/electronic-fast/kick.wav",
+        "percussion": "cases/electronic-fast/percussion.wav",
+        "snare": "cases/electronic-fast/snare.wav"
+      },
+      "split": "test",
+      "title": "Dense electronic surrogate"
+    },
+    {
+      "category": "phase",
+      "channels": 2,
+      "critical_excerpt": {
+        "end": 12.0,
+        "start": 0
+      },
+      "data_origin": "original_procedural_surrogate",
+      "derivations_must_remain_in_split": true,
+      "duration_seconds": 12.0,
+      "event_description": "Procedural onsets coincide on alternating beats; compare exact registered component signals.",
+      "exact_ground_truth": true,
+      "family_id": "stereo-antiphase",
+      "frames": 576000,
+      "group": "negative",
+      "id": "stereo-antiphase",
+      "input_drums": "cases/stereo-antiphase/input_drums.wav",
+      "input_mix": "cases/stereo-antiphase/input_mix.wav",
+      "mix_references": {
+        "exclude_kick": "cases/stereo-antiphase/reference_mix_exclude_kick.wav",
+        "include_kick": "cases/stereo-antiphase/reference_mix_include_kick.wav"
+      },
+      "prepared": true,
+      "reference": "cases/stereo-antiphase/reference_include_kick.wav",
+      "references": {
+        "exclude_kick": "cases/stereo-antiphase/reference_exclude_kick.wav",
+        "include_kick": "cases/stereo-antiphase/reference_include_kick.wav"
+      },
+      "sample_rate": 48000,
+      "seed": 17195,
+      "sha256": {
+        "cases/stereo-antiphase/input_drums.wav": "9c9e10af0047874ea7e60f8c9f06986834b68910098c0069716d21db9cf011f1",
+        "cases/stereo-antiphase/input_mix.wav": "9c9e10af0047874ea7e60f8c9f06986834b68910098c0069716d21db9cf011f1",
+        "cases/stereo-antiphase/percussion.wav": "64d39252d508e862d100d56d65ab5ffaeeef10a6fe3c41efc19b54e554993f6a",
+        "cases/stereo-antiphase/reference_exclude_kick.wav": "64d39252d508e862d100d56d65ab5ffaeeef10a6fe3c41efc19b54e554993f6a",
+        "cases/stereo-antiphase/reference_include_kick.wav": "c05763d5f7aa5268e79bb0807d3b1429b2fbb75b0e18becb3f6d3c62f5ae0658",
+        "cases/stereo-antiphase/reference_mix_exclude_kick.wav": "64d39252d508e862d100d56d65ab5ffaeeef10a6fe3c41efc19b54e554993f6a",
+        "cases/stereo-antiphase/reference_mix_include_kick.wav": "c05763d5f7aa5268e79bb0807d3b1429b2fbb75b0e18becb3f6d3c62f5ae0658",
+        "cases/stereo-antiphase/tom.wav": "a17fc8319735089430a85cebb393e3d7f4fb3e18356d825253757a5f5bd65e48"
+      },
+      "sources": {
+        "percussion": "cases/stereo-antiphase/percussion.wav",
+        "tom": "cases/stereo-antiphase/tom.wav"
+      },
+      "split": "test",
+      "title": "Opposing stereo polarity stress case"
+    },
+    {
+      "category": "acoustic",
+      "data_origin": null,
+      "exact_ground_truth": false,
+      "family_id": "real-acoustic",
+      "group": "real",
+      "id": "real-acoustic",
+      "input_drums": null,
+      "input_mix": null,
+      "mix_references": {},
+      "prepared": false,
+      "reference": null,
+      "references": {},
+      "sha256": {},
+      "sources": {},
+      "split": "test",
+      "title": "Acoustic multitrack",
+      "unavailable_reason": "Real recording and isolated sources with reviewed rights not supplied"
+    },
+    {
+      "category": "electronic",
+      "data_origin": null,
+      "exact_ground_truth": false,
+      "family_id": "real-electronic",
+      "group": "real",
+      "id": "real-electronic",
+      "input_drums": null,
+      "input_mix": null,
+      "mix_references": {},
+      "prepared": false,
+      "reference": null,
+      "references": {},
+      "sha256": {},
+      "sources": {},
+      "split": "test",
+      "title": "Electronic multitrack",
+      "unavailable_reason": "Real recording and isolated sources with reviewed rights not supplied"
+    },
+    {
+      "category": "long_audio",
+      "data_origin": null,
+      "exact_ground_truth": false,
+      "family_id": "real-long-song",
+      "group": "real",
+      "id": "real-long-song",
+      "input_drums": null,
+      "input_mix": null,
+      "mix_references": {},
+      "prepared": false,
+      "reference": null,
+      "references": {},
+      "sha256": {},
+      "sources": {},
+      "split": "test",
+      "title": "Long recording",
+      "unavailable_reason": "Real recording and isolated sources with reviewed rights not supplied"
+    },
+    {
+      "category": "reverb",
+      "data_origin": null,
+      "exact_ground_truth": false,
+      "family_id": "real-reverb",
+      "group": "real",
+      "id": "real-reverb",
+      "input_drums": null,
+      "input_mix": null,
+      "mix_references": {},
+      "prepared": false,
+      "reference": null,
+      "references": {},
+      "sha256": {},
+      "sources": {},
+      "split": "test",
+      "title": "Real room tails",
+      "unavailable_reason": "Real recording and isolated sources with reviewed rights not supplied"
+    },
+    {
+      "category": "ambiguous_categories",
+      "data_origin": null,
+      "exact_ground_truth": false,
+      "family_id": "real-kick-clap",
+      "group": "real",
+      "id": "real-kick-clap",
+      "input_drums": null,
+      "input_mix": null,
+      "mix_references": {},
+      "prepared": false,
+      "reference": null,
+      "references": {},
+      "sha256": {},
+      "sources": {},
+      "split": "test",
+      "title": "Kick, clap and ambiguous percussion",
+      "unavailable_reason": "Real recording and isolated sources with reviewed rights not supplied"
+    },
+    {
+      "category": "original_mix",
+      "data_origin": null,
+      "exact_ground_truth": false,
+      "family_id": "real-heldout-mix",
+      "group": "real",
+      "id": "real-heldout-mix",
+      "input_drums": null,
+      "input_mix": null,
+      "mix_references": {},
+      "prepared": false,
+      "reference": null,
+      "references": {},
+      "sha256": {},
+      "sources": {},
+      "split": "test",
+      "title": "Held-out complete song and DRUMS",
+      "unavailable_reason": "Real recording and isolated sources with reviewed rights not supplied"
+    }
+  ],
+  "counts": {
+    "declared": 24,
+    "negative": 6,
+    "prepared": 18,
+    "real": 0,
+    "real_unavailable": 6,
+    "synthetic": 12
+  },
+  "duration_seconds": 12,
+  "external_dataset_candidates": [
+    {
+      "name": "FreePats World Percussion",
+      "status": "not_imported_rights_and_isolated_sources_review_required"
+    },
+    {
+      "name": "WaivOps WRLD-LP",
+      "status": "not_imported_rights_and_isolated_sources_review_required"
+    },
+    {
+      "name": "Expanded Groove MIDI Dataset",
+      "status": "not_imported_MIDI_is_not_isolated_audio_ground_truth"
+    }
+  ],
+  "generator": "NumPy PCG64 + procedural damped/noise signals",
+  "id": "mta-synthetic-v1",
+  "license": {
+    "id": "EUPL-1.2",
+    "redistribution_allowed": true,
+    "source": "Original procedural audio generated by the MTA project",
+    "third_party_audio": false
+  },
+  "limits": [
+    "Instrument names identify controlled surrogate tests, not acoustic recordings.",
+    "Six realistic slots are unavailable and cannot count toward release coverage.",
+    "No external dataset rights or training-data isolation is inferred."
+  ],
+  "name": "MTA original diagnostic corpus v1",
+  "numpy_version": "2.5.3",
+  "schema": "mta-percussion-corpus-1",
+  "seed": 42,
+  "soundfile_version": "0.14.0"
+}

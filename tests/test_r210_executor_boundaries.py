@@ -13,7 +13,7 @@ def test_auth_diagnostics_never_switch_server_to_unowned_local_inference(monkeyp
     from app import main
     monkeypatch.setenv('MTA_ALLOW_INSECURE_NO_AUTH',flag)
     monkeypatch.setattr(main,'NATIVE_SINGLE_USER',False)
-    for kind in ['whisper','chords-ml','markers','demucs','singer-separation','backing-vocals','drumsep']:
+    for kind in ['whisper','chords-ml','markers','demucs','backing-vocals','drumsep']:
         assert main._ai_external_engine(kind)
     assert server.enabled(False) and not server.enabled(True)
 

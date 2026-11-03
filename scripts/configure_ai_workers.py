@@ -9,7 +9,6 @@ import tempfile
 
 IMPORTS={'whisper':['whisper'],'chords-ml':['madmom_infer','librosa'],
  'markers':['numpy','scipy','librosa'],'demucs':['demucs.separate'],
- 'sam-audio':['sam_audio'],'singer-separation':['sam_audio'],
  'backing-vocals':['audio_separator.separator'],'drumsep':['onnxruntime']}
 
 
@@ -26,7 +25,9 @@ def configure(python,env_file,kinds):
     values.update({'MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON':str(python) for kind in kinds})
     if 'demucs' in kinds:values['MTA_DEMUCS_PYTHON']=str(python)
     if env_file.is_symlink() or (env_file.read_text() if env_file.exists() else '')!=original:raise ValueError('Configuration changed during preflight')
-    lines=[line for line in original.splitlines() if line.split('=',1)[0] not in values]
+    retired=('MTA_SAM_', 'MTA_AI_SAM_', 'MTA_AI_WORKER_SAM_AUDIO_', 'MTA_AI_WORKER_SINGER_SEPARATION_')
+    lines=[line for line in original.splitlines() if line.split('=',1)[0] not in values
+           and not line.split('=',1)[0].startswith(retired)]
     for key,value in values.items():
         if any(c in value for c in '\r\n\x00'):raise ValueError('Unsafe configuration value')
         lines.append(key+'="'+value.replace('\\','\\\\').replace('"','\\"')+'"')

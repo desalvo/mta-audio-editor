@@ -99,24 +99,10 @@ _EXCEPTION_TYPES = frozenset({'ImportError', 'ModuleNotFoundError', 'RuntimeErro
     'TypeError', 'AttributeError', 'OSError', 'PermissionError', 'FileNotFoundError',
     'CalledProcessError', 'OutOfMemoryError', 'NotImplementedError', 'AssertionError'})
 _DEPENDENCIES = frozenset({'torch', 'torchaudio', 'torchcodec', 'demucs', 'soundfile', 'whisper',
-    'audio_separator', 'numpy', 'sam_audio'})
+    'audio_separator', 'numpy'})
 _FAILURE_MARKERS = (
     ('MTA_BACKING_FAILURE:rocm_conversion_failed', 'backing_rocm_conversion_failed'),
     ('MTA_BACKING_FAILURE:unsupported_mdx_runtime', 'backing_runtime_incompatible'),
-    ("BaseModel._from_pretrained() missing 2 required keyword-only arguments: 'proxies' and 'resume_download'", 'sam_hub_incompatible'),
-    ('MTA_SAM_REASON:checkpoint_access_denied', 'sam_checkpoint_access_denied'),
-    ('MTA_SAM_REASON:checkpoint_not_found_or_inaccessible', 'sam_checkpoint_not_found_or_inaccessible'),
-    ('MTA_SAM_REASON:hub_rate_limited', 'sam_hub_rate_limited'),
-    ('MTA_SAM_REASON:hub_unavailable_or_cache_missing', 'sam_hub_unavailable_or_cache_missing'),
-    ('MTA_SAM_REASON:checkpoint_format_invalid', 'sam_checkpoint_format_invalid'),
-    ('MTA_SAM_REASON:insufficient_memory', 'sam_insufficient_memory'),
-    ('MTA_SAM_FAILURE:imports', 'sam_dependency_failed'),
-    ('MTA_SAM_FAILURE:model_load', 'sam_model_load_failed'),
-    ('MTA_SAM_FAILURE:device_transfer', 'sam_device_transfer_failed'),
-    ('MTA_SAM_FAILURE:processor_load', 'sam_processor_load_failed'),
-    ('MTA_SAM_FAILURE:audio_processing', 'sam_audio_processing_failed'),
-    ('MTA_SAM_FAILURE:inference', 'sam_inference_failed'),
-    ('MTA_SAM_FAILURE:audio_save', 'sam_audio_save_failed'),
 
     ('Worker outputs exceed artifact size limit', 'worker_output_size_limit'),
     ('TorchCodec is required', 'worker_audio_codec_missing'),

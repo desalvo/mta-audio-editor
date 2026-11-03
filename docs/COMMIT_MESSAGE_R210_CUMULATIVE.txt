@@ -1,1 +1,1 @@
-Complete canonical payment recovery and cash-proven payout reconciliation
+Restore standard Demucs stems by default and require explicit percussion selection [full-ci]

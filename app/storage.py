@@ -674,6 +674,12 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
 
 
 def save_project(project: Project, *, _skip_flac_conversion: bool = False):
+    from .ai_project_lock import project_publication_lock
+    with project_publication_lock(project.id):
+        return _save_project_locked(project, _skip_flac_conversion=_skip_flac_conversion)
+
+
+def _save_project_locked(project: Project, *, _skip_flac_conversion: bool = False):
     from .project_kinds import migrate_legacy, validate
     migrate_legacy(project)
     validate(project)
@@ -693,6 +699,9 @@ def save_project(project: Project, *, _skip_flac_conversion: bool = False):
     (d / "originals").mkdir(exist_ok=True)
     target = d / "project.json"
     tmp = d / f".project.json.{uuid.uuid4().hex}.tmp"
+    from . import project_collaboration
+    previous_shared = bool(json.loads(target.read_text()).get('shared_with_user_ids')) if target.exists() else False
+    project_collaboration.before_persist(project, target)
     # A queued AI result is a server-side mutation unknown to an older editor.
     # Persist the token in the same atomic JSON write as tracks/annotations.
     from .ai_global_execution import current_job
@@ -708,6 +717,7 @@ def save_project(project: Project, *, _skip_flac_conversion: bool = False):
         Project.model_validate_json(tmp.read_bytes())
         os.replace(tmp, target)
         _fsync_directory(d)
+        project_collaboration.after_persist(project, previous_shared)
     finally:
         tmp.unlink(missing_ok=True)
 
@@ -1002,6 +1012,10 @@ def write_project_archive(pid: str, archive_path: Path) -> Path:
                 if not path.is_file():
                     continue
                 rel = path.relative_to(base)
+                if rel.parts and (rel.parts[0] == 'collaboration-media' or rel.parts[0].startswith('collaboration.sqlite3')):
+                    # Discussion and expiring server media are private to this
+                    # live share, never copied into durable portable exports.
+                    continue
                 if path.name == GC_QUEUE_NAME or (path.name.startswith(".project.json.") and path.name.endswith(".tmp")):
                     continue
                 if rel.parts and rel.parts[0] == ".preview":
@@ -1071,6 +1085,8 @@ def import_project_archive(archive_path: Path, owner_user_id: int | None) -> Pro
                 if not info.filename.startswith("project/"):
                     continue
                 rel = Path(info.filename).relative_to("project")
+                if rel.parts and (rel.parts[0] == 'collaboration-media' or rel.parts[0].startswith('collaboration.sqlite3')):
+                    continue
                 if rel.name == GC_QUEUE_NAME:
                     continue
                 if rel.parts and rel.parts[0] == "vst3-checkpoints":
@@ -1093,6 +1109,7 @@ def import_project_archive(archive_path: Path, owner_user_id: int | None) -> Pro
             imported.id = new_id
             imported.owner_user_id = owner_user_id
             imported.shared_with_user_ids = []
+            imported.collaboration_revision = 0
             save_project(imported)
             validate_project_files(imported)
             return imported

@@ -16,10 +16,12 @@ import sys
 # Subprocess starts in the isolated job workspace, not the repository.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-SUPPORTED = {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals', 'markers'}
+SUPPORTED = {'whisper', 'chords-ml', 'demucs', 'drumsep', 'backing-vocals', 'markers'}
 
 
 def _backend_command(plan, folder, backend, arguments):
+    if backend != 'demucs':
+        raise ValueError('Unsupported profiled backend')
     from app.ai_torch_diagnostics import enabled
     python=sys.executable
     if backend=='demucs':
@@ -32,7 +34,6 @@ def _backend_command(plan, folder, backend, arguments):
                 '--report-dir', str(folder), '--', *arguments]
     if backend == 'demucs':
         return [python, '-I', '-m', 'demucs.separate', *arguments]
-    return [sys.executable, '-I', str(Path(__file__).with_name('sam_audio_worker.py')), *arguments]
 
 
 def _artifacts(folder: Path, entries: list[tuple[Path, str]]) -> None:
@@ -175,16 +176,6 @@ def infer(plan: dict, output: Path) -> None:
             raise RuntimeError('Configured DrumSep checkpoint is unavailable')
         paths = drumsep_infer(source, model, folder)
         _artifacts(folder, [(p, 'audio/wav') for p in paths]); return
-    if kind == 'sam-audio':
-        from app.sam_audio_worker import main as _unused  # noqa: F401
-        import subprocess
-        from app.model_selectors import sam_model
-        model = sam_model(plan.get('model'))
-        target = folder / 'separated.wav'
-        arguments=['--source',str(source),'--output',str(target),'--model',model,'--prompt',str(plan.get('prompt') or 'vocals')]
-        if plan.get('anchors'):arguments+=['--anchors-json',json.dumps(plan['anchors'])]
-        subprocess.run(_backend_command(plan,folder,'sam-audio',arguments),check=True)
-        _artifacts(folder, [(target, 'audio/wav')]); return
     if kind == 'demucs':
         import subprocess
         from app.model_selectors import demucs_model
@@ -202,31 +193,6 @@ def infer(plan: dict, output: Path) -> None:
             dest = folder / ('stem_' + p.name)
             p.replace(dest); staged.append((dest, 'audio/wav'))
         _artifacts(folder, staged); return
-    if kind == 'singer-separation':
-        import subprocess
-        singers = plan.get('singers')
-        selected = plan.get('selected','all')
-        model = str(plan.get('model') or 'sam-audio-small')
-        if model not in {'sam-audio-small','sam-audio-base','sam-audio-large'} or not isinstance(singers,list) or not 2<=len(singers)<=8:
-            raise ValueError('Invalid singer separation parameters')
-        required = {'singer_'+str(i) for i in range(1,len(singers)+1)}
-        if selected!='all' and selected not in required: raise ValueError('Unknown singer target')
-        for index, item in enumerate(singers,1):
-            if not isinstance(item,dict) or item.get('id')!='singer_'+str(index):
-                raise ValueError('Invalid singer identifier')
-            if not all(isinstance(item.get(k),(int,float)) for k in ('start','end')) or not 0<=item['start']<item['end']<=86400:
-                raise ValueError('Invalid singer interval')
-        files=[]
-        for singer in singers:
-            if selected!='all' and selected!=singer['id']:continue
-            anchors=[['+',singer['start'],singer['end']]]+[['-',v['start'],v['end']] for v in singers if v['id']!=singer['id']]
-            result=folder/(singer['id']+'.wav')
-            subprocess.run(_backend_command(plan,folder,'sam-audio',['--source',str(source),'--output',str(result),
-                            '--model','facebook/'+model,'--prompt','singing voice',
-                            '--anchors-json',json.dumps(anchors)]),check=True)
-            files.append((result,'audio/wav'))
-        _artifacts(folder,files)
-        return
     if kind == 'backing-vocals':
         from app.model_license_policy import effective_backing_model
         effective_model = effective_backing_model(plan)
@@ -276,8 +242,8 @@ def main():
     verify_plan(data)
     from app.ai_torch_diagnostics import profile_call
     # Child backends must profile themselves. Never profile the idle parent
-    # waiting for Demucs/SAM; one singer report covers only its own invocation.
-    if data.get('kind') in ('demucs', 'sam-audio', 'singer-separation'):
+    # waiting for Demucs.
+    if data.get('kind') == 'demucs':
         infer(data, args.output)
     else:
         profile_call(args.output.parent, str(data.get('gpu_profile_task_id', '')),

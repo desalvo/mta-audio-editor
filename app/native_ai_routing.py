@@ -12,7 +12,7 @@ from .platform_file_lock import private_mode
 import tempfile
 import zipfile
 
-KINDS = ('audio-to-midi','vocal-harmony','vocal-synthesis','whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals','markers')
+KINDS = ('audio-to-midi','vocal-harmony','vocal-synthesis','whisper','chords-ml','demucs','drumsep','backing-vocals','markers')
 
 
 def require_native():
@@ -54,10 +54,12 @@ def public_settings() -> dict:
             'workers':{kind:{'mode':data.get('workers',{}).get(kind,{}).get('mode','local'),
                              'url':data.get('workers',{}).get(kind,{}).get('url',''),
                              'has_token':bool(data.get('workers',{}).get(kind,{}).get('token'))}
-                       for kind in sorted(set(KINDS)|set(data.get('workers',{})))}}
+                       for kind in sorted((set(KINDS)|set(data.get('workers',{})))-{'sam-audio','singer-separation'})}}
 
 
 def configure(kind: str, mode: str, url: str = '', token: str = '') -> dict:
+    if kind in ('sam-audio','singer-separation'):
+        raise ValueError('Requested separator has been removed')
     if (not isinstance(kind,str) or not __import__('re').fullmatch(r'[a-z][a-z0-9-]{0,63}',kind) or mode not in ('local','remote')):
         raise ValueError('Invalid worker or execution mode')
     from .ai_remote_client import _endpoint
@@ -92,11 +94,15 @@ def configure(kind: str, mode: str, url: str = '', token: str = '') -> dict:
 
 
 def is_remote(kind: str) -> bool:
+    if kind in ('sam-audio','singer-separation'):
+        raise ValueError('Requested separator has been removed')
     return _read().get('workers',{}).get(kind,{}).get('mode') == 'remote'
 
 
 def infer(kind: str, audio: Path, options: dict | None = None) -> tuple[dict, str]:
     """Infer remotely, returning validated JSON and/or named WAV data. No fallback."""
+    if kind in ('sam-audio','singer-separation'):
+        raise ValueError('Requested separator has been removed')
     require_native()
     from .model_license_policy import authorize_remote_execution
     authorize_remote_execution(kind,options or {})

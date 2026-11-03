@@ -13,8 +13,8 @@ ENTRIES={
     'whisper':'whisper','whisper_progressive':'whisper','loaded_whisper':'whisper',
     'basic_pitch':'basic-pitch','studio':'basic-pitch','yourmt3':'yourmt3',
     'mrmt3':'mr-mt3-assets','mrmt3_selftest':'mr-mt3-assets','transkun':'transkun-assets',
-    'transkun_cli':'transkun-assets','drumsep':'drumsep-weights','sam_cli':'sam-audio',
-    'profile_demucs':'demucs','profile_sam':'sam-audio','oddvoices':'oddvoices',
+    'transkun_cli':'transkun-assets','drumsep':'drumsep-weights',
+    'profile_demucs':'demucs','oddvoices':'oddvoices',
     'singer_bridge':'diffsinger-nishiren','singer_onnx':'diffsinger-nishiren',
     'singer_session':'diffsinger-nishiren',
 }
@@ -58,12 +58,9 @@ def dispatch(entry,folder,monkeypatch):
         if entry=='singer_bridge':return diffsinger_bridge.run(source,out)
         if entry=='singer_onnx':return diffsinger_onnx.run(source,out)
         return diffsinger_onnx.session(source,'0'*64)
-    if entry=='sam_cli':
-        from app.sam_audio_worker import main
-        args=['worker','--source',str(source),'--output',str(out),'--model','facebook/sam-audio-small','--prompt','voice']
-    elif entry.startswith('profile_'):
+    if entry.startswith('profile_'):
         from app.ai_profiled_backend import main
-        args=['worker','--backend','demucs' if entry.endswith('demucs') else 'sam-audio',
+        args=['worker','--backend','demucs',
               '--task-id','fixture','--report-dir',str(out.parent),'--',str(source)]
     else:
         from app.transkun_runner import main
@@ -149,15 +146,14 @@ def test_singing_component_policy_cannot_be_bypassed_by_allowed_singer_and_vocod
     assert not (tmp_path/'output').exists()
 
 
-@pytest.mark.parametrize('kind',['sam','demucs','drumsep','transkun'])
+@pytest.mark.parametrize('kind',['demucs','drumsep','transkun'])
 def test_independent_actual_cli_denies_before_optional_runtime_import(tmp_path,kind):
     root=Path(__file__).resolve().parents[1]
     folder=tmp_path/'.studio-models';folder.mkdir()
-    model={'sam':'sam-audio','demucs':'demucs','drumsep':'drumsep-weights','transkun':'transkun-assets'}[kind]
+    model={'demucs':'demucs','drumsep':'drumsep-weights','transkun':'transkun-assets'}[kind]
     (folder/'license-policy.json').write_text(json.dumps({model:{'mode':'disabled'}}))
     source=str(tmp_path/'missing.wav');output=str(tmp_path/'result')
-    if kind=='sam':args=['sam_audio_worker.py','--source',source,'--output',output,'--model','facebook/sam-audio-small','--prompt','voice']
-    elif kind=='demucs':args=['ai_profiled_backend.py','--backend','demucs','--task-id','fixture','--report-dir',output,'--',source]
+    if kind=='demucs':args=['ai_profiled_backend.py','--backend','demucs','--task-id','fixture','--report-dir',output,'--',source]
     elif kind=='drumsep':args=['drumsep_onnx_worker.py','--source',source,'--model',source,'--output',output]
     else:args=['transkun_runner.py',*(arg for key in ('source','output','checkpoint','checkpoint-sha256','config','config-sha256','runtime','device') for arg in ('--'+key,source))]
     env={**os.environ,'MTA_DATA_DIR':str(tmp_path)}
@@ -170,12 +166,11 @@ def test_independent_actual_cli_denies_before_optional_runtime_import(tmp_path,k
 @pytest.mark.parametrize('mode',['disabled','cost_recovery'])
 def test_model_only_interpreter_reads_current_policy_without_web_dependencies(tmp_path,mode):
     folder=tmp_path/'.studio-models';folder.mkdir()
-    (folder/'license-policy.json').write_text(json.dumps({'sam-audio':synthetic_review(mode)}))
+    (folder/'license-policy.json').write_text(json.dumps({'demucs':synthetic_review(mode)}))
     root=Path(__file__).resolve().parents[1]
-    # -S removes site-packages: no FastAPI,qrcode,Pydantic,Torch or SAM package.
-    result=subprocess.run([sys.executable,'-S',str(root/'app/sam_audio_worker.py'),
-        '--source',str(tmp_path/'missing.wav'),'--output',str(tmp_path/'output'),
-        '--model','facebook/sam-audio-small','--prompt','voice'],
+    # -S removes site-packages: policy stays model-only and does not import the web stack.
+    script="import sys;sys.path.insert(0,sys.argv[1]);from app.model_license_policy import evaluate_model;evaluate_model('demucs');import torch"
+    result=subprocess.run([sys.executable,'-S','-c',script,str(root)],
         env={**os.environ,'MTA_DATA_DIR':str(tmp_path)},capture_output=True,text=True,timeout=10,check=False)
     assert result.returncode!=0
     assert all(name not in result.stderr for name in ["No module named 'fastapi'","No module named 'qrcode'","No module named 'pydantic'"])

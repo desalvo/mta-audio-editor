@@ -1,0 +1,51 @@
+{
+  "schema": "mta-targeted-validation-1",
+  "date": "2026-11-02",
+  "baseline_commit": "f235f4c3ca67af72006bfc6262474ccb0ff0a705",
+  "scope": "Default standard Demucs separation in import and existing-track dialogs, explicit percussion opt-in, and related regression/security gates",
+  "pytest": {
+    "tests": 179,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 179,
+    "new_cases": 36,
+    "junit": "validation/r210-standard-stem-default-regressions.xml"
+  },
+  "new_evidence": {
+    "production_javascript_dialog_and_payload_cases": 18,
+    "synthetic_audio_api_publication_cases": 16,
+    "explicit_optional_dsp_pass_cases": 2,
+    "native_local_and_configured_remote_demucs_routes": true,
+    "import_and_existing_track_endpoints": true,
+    "inactive_percussion_methods": [
+      "dsp",
+      "mvsep-mega53",
+      "sam-audio-large",
+      "drumsep-onnx"
+    ],
+    "legacy_target_ignored": true,
+    "checkbox_off_normalizes_target_at_submission": true,
+    "real_model_inference": false,
+    "browser_visual_or_native_runtime_acceptance": false
+  },
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "execution_review": {
+    "runtime_source_files": 566,
+    "reviewed_boundaries": 794,
+    "entry_dispositions_unchanged": true,
+    "changed_source_binding": [
+      "app/static/app.js"
+    ],
+    "new_execution_sites": 0
+  },
+  "remote_ci": "not run for this uncommitted delta",
+  "rc": {
+    "completed": 34,
+    "total": 42,
+    "percent": 81.0,
+    "release_candidate": false
+  },
+  "commit_push_deployment_performed": false
+}

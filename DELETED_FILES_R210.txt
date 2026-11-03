@@ -1,0 +1,5 @@
+The cumulative package retires two obsolete SAM Audio worker sources. When applying it over an existing checkout, remove the old files before committing:
+
+git rm --ignore-unmatch app/sam_audio_worker.py app/sam_audio_compat.py
+
+Merely extracting a ZIP over an existing checkout does not remove files.

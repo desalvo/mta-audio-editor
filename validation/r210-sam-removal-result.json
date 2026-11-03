@@ -1,0 +1,20 @@
+{
+  "scope": "Recovered SAM retirement regressions: software fixtures only; no real checkpoint inference, professional approval or production operation.",
+  "suite_files": 27,
+  "passed": 391,
+  "failed": 0,
+  "skipped": 0,
+  "xml": "validation/r210-sam-removal-recovered.xml",
+  "log": "validation/r210-sam-removal-recovered.log",
+  "deleted": [
+    "app/sam_audio_worker.py",
+    "app/sam_audio_compat.py"
+  ],
+  "frontend_integration": "Root owns app.js and template retirement; HTML/PDF manuals owned by timeline agent.",
+  "additional_historical_ledger_projection": {
+    "passed": 27,
+    "failed": 0,
+    "xml": "validation/r210-sam-history-projection.xml",
+    "scope": "Read-only history for all recorded kinds, including retired/future names, remains readable without enabling their runtime."
+  }
+}

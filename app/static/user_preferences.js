@@ -5,7 +5,7 @@ let values={...seed.values},pending={},inflight={},timer=null,maxTimer=null,busy
 // A native profile has one local identity. Migrate its known presentation
 // preferences once; never copy unscoped legacy data into a server account.
 if(seed.owner==='native'&&!values['mta.preferences.db-migrated.v1'])try{
- const keys=['mta.stem.target','mta.percussion.method','mtaStemCount','mtaStemExecution','mta.sidebar.collapsed.v1','mta.chordExtractionSettings.v1','mta.singer.model','mta.singer.target','mta.singer.count','mta.showPreviousNextChords','mta.showPreviousNextLyrics','mta.useFlacStorage'];
+ const keys=['mta.stem.target','mta.percussion.method','mtaStemCount','mtaStemExecution','mta.sidebar.collapsed.v1','mta.chordExtractionSettings.v1','mta.showPreviousNextChords','mta.showPreviousNextLyrics','mta.useFlacStorage'];
  for(let i=0;i<original.length;i++){const key=original.key(i);if(key?.startsWith('mta.midi.devices.local.'))keys.push(key)}
  for(const key of keys){const value=original.getItem(key);if(value!==null&&!Object.hasOwn(values,key))pending[key]=value}
  pending['mta.preferences.db-migrated.v1']='true';Object.assign(values,pending);

@@ -16,7 +16,7 @@ def test_mega53_rejects_unverified_weights(tmp_path):
     with pytest.raises(RuntimeError,match='SHA-256 mismatch'):
         mega53_runtime.verify_mega53_checkpoint(candidate)
 
-def test_multi_singer_remains_distinct_from_lead_backing():
+def test_retired_singer_workflow_is_absent_from_lead_backing():
     source=Path(main.__file__).read_text()
-    assert 'def _extract_singer_stems(' in source
-    assert 'singer_model = str(job.get("singer_model") or "sam-audio-small")' in source
+    assert 'def _extract_singer_stems(' not in source
+    assert 'singer_model = str(job.get("singer_model") or "sam-audio-small")' not in source

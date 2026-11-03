@@ -21,7 +21,7 @@ def test_reimbursement_is_not_an_automatic_license_exception(rights):
     for model in ('madmom','diffsinger-qixuan','diffsinger-nishiren','diffsinger-spore','chordformer','audio-separator-weights','drumsep-weights'):
         with pytest.raises(policy.LicenseDenied):policy.evaluate_model(model)
     assert policy.evaluate_model('oddvoices').billable
-    assert policy.evaluate_model('sam-audio').billable
+    with pytest.raises(ValueError,match='removed'):policy.evaluate('sam-audio',{})
     assert policy.evaluate_model('btc-hcqt').billable
 
 

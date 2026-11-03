@@ -10,8 +10,8 @@ import pytest
 from app import ai_billing, ai_metering_agent
 from app.auth import db, init_auth_db
 
-ADAPTERS = ('whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio',
-            'singer-separation', 'backing-vocals')
+ADAPTERS = ('whisper', 'chords-ml', 'demucs', 'drumsep', 
+            'backing-vocals')
 
 
 def source_audio():

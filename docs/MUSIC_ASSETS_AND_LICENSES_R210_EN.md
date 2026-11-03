@@ -73,7 +73,7 @@ Known restrictions are distinguished from incomplete rights/backend verification
 | Google MT3, MR-MT3, Transkun, MT3-Infer | Candidates not enabled | Adapters/checkpoints/dependencies and validation incomplete | Integrate and verify before production |
 | Future registry engines | Disabled until reviewed | Future component rights cannot be presumed | Explicit operator review and permission source |
 
-Pinned Basic Pitch and YourMT3 declare Apache-2.0; ACE-Step Apache-2.0; Whisper and Demucs MIT. BTC-HCQT explicitly declares [MIT code and weights](https://github.com/marcusfkelley/btc-hcqt), separately from runtime validation. SAM Audio uses the conditional [SAM License](https://github.com/facebookresearch/sam-audio/blob/main/LICENSE), not a blanket NC classification. These engines are **not billing-excluded solely because of those stated licences**. Installation, transitive obligations, additional conditions and hardware compatibility remain separate checks.
+Pinned Basic Pitch and YourMT3 declare Apache-2.0; ACE-Step Apache-2.0; Whisper and Demucs MIT. BTC-HCQT explicitly declares [MIT code and weights](https://github.com/marcusfkelley/btc-hcqt), separately from runtime validation. The SAM Audio workflow has been removed. These engines are **not billing-excluded solely because of those stated licences**. Installation, transitive obligations, additional conditions and hardware compatibility remain separate checks.
 
 ## Operator review and accounting
 

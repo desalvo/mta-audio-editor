@@ -1,6 +1,6 @@
 # DrumSep ONNX / DrumSep ONNX
 
-DrumSep separates Kick, Snare, Cymbals and Toms from a pre-separated drums stem (Demucs stage). Other percussion, such as congas and bongos, must be extracted with SAM Audio instead.
+DrumSep separates Kick, Snare, Cymbals and Toms from a pre-separated drums stem (Demucs stage). Other percussion, such as congas and bongos, requires a separately authorized direct percussion model. See PERCUSSION_BENCHMARK_PROTOCOL.md; no alternative model is selected automatically.
 
 Il modello è opzionale; il pulsante **Scarica modello DrumSep** nelle opzioni di separazione salva il modello in `MTA_DRUMSEP_MODEL_DIR` o, in mancanza, nella cartella `.cache/drumsep-models` dell’archivio dati.
 

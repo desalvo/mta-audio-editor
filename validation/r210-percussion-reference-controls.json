@@ -1,0 +1,3518 @@
+{
+  "controls_passed": 36,
+  "controls_run": 36,
+  "counts": {
+    "declared": 24,
+    "negative": 6,
+    "prepared": 18,
+    "real": 0,
+    "real_unavailable": 6,
+    "synthetic": 12
+  },
+  "criteria": {
+    "integrity": "Readable finite audio, unchanged frames/sample rate/channels, no newly saturated samples; reliable detected lag/drift must be within one sample.",
+    "lag_confidence_min": 0.5,
+    "lag_search_ms": 250,
+    "limits": "Onset and discontinuity measures are frozen engineering heuristics, not recognised professional-quality standards. Correlated sources may make bleed attribution non-identifiable.",
+    "onset_frame_ms": 5,
+    "onset_match_ms": 20,
+    "onset_relative_floor": 0.03,
+    "professional_acceptance": "Requires separately recorded explicit human approval of the exact model, pipeline, options and audio hashes.",
+    "quality_thresholds": null,
+    "version": "mta-percussion-metrics-1"
+  },
+  "dataset_id": "mta-synthetic-v1",
+  "human_approval": false,
+  "limits": "Exact-reference diagnostic controls only. No separator ran. These are procedural surrogates, not recordings or model quality evidence.",
+  "manifest_sha256": "0ccc8fcdc03337cae9bb5f5bee8d1d6485d3b8479967492713dcd5a9fd2e4840",
+  "neural_inference_performed": false,
+  "results": [
+    {
+      "case_id": "conga-snare",
+      "category": "conga_snare",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "snare": {
+              "gain_estimate": 8.943112967929201e-19,
+              "identifiable": true,
+              "projected_energy": 1.2190312983216826e-33,
+              "projected_energy_ratio_to_target": 5.766986395439181e-37
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": 1.4450760450157452,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 2113.8099082143717,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 2113.8099082143717,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.92811319231987,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.18411032482981682,
+          "peak": 0.4729739725589752,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04468976274699204,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "conga-snare",
+      "category": "conga_snare",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "snare": {
+              "gain_estimate": 8.943112967929201e-19,
+              "identifiable": true,
+              "projected_energy": 1.2190312983216826e-33,
+              "projected_energy_ratio_to_target": 5.766986395439181e-37
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": 1.4450760450157452,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 2113.8099082143717,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 2113.8099082143717,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.92811319231987,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.18411032482981682,
+          "peak": 0.4729739725589752,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04468976274699204,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "bongo-tom",
+      "category": "bongo_tom",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "tom": {
+              "gain_estimate": -1.573955886091234e-19,
+              "identifiable": true,
+              "projected_energy": 1.1580008292881408e-34,
+              "projected_energy_ratio_to_target": 8.110625264179863e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -5.145441954943255,
+          "input_si_sdr_state": "finite",
+          "output_energy": 1427.7577764594657,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1427.7577764594657,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.1775738000869751,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.17941462248563766,
+          "peak": 0.3924563527107239,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04978700773983683,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 35,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 35,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 35,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "bongo-tom",
+      "category": "bongo_tom",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "tom": {
+              "gain_estimate": -1.573955886091234e-19,
+              "identifiable": true,
+              "projected_energy": 1.1580008292881408e-34,
+              "projected_energy_ratio_to_target": 8.110625264179863e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -5.145441954943255,
+          "input_si_sdr_state": "finite",
+          "output_energy": 1427.7577764594657,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1427.7577764594657,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.1775738000869751,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.17941462248563766,
+          "peak": 0.3924563527107239,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04978700773983683,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 35,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 35,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 35,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "shaker-hihat",
+      "category": "shaker_hihat",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": -2.7315856810361516e-19,
+              "identifiable": true,
+              "projected_energy": 7.537510694948197e-35,
+              "projected_energy_ratio_to_target": 8.233725091810256e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -0.424836742678405,
+          "input_si_sdr_state": "finite",
+          "output_energy": 915.443570303974,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 915.443570303974,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.92182657122612,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.14258286356925964,
+          "peak": 0.33307594060897827,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04159162335862106,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 35,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 35,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 35,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "shaker-hihat",
+      "category": "shaker_hihat",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": -2.7315856810361516e-19,
+              "identifiable": true,
+              "projected_energy": 7.537510694948197e-35,
+              "projected_energy_ratio_to_target": 8.233725091810256e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -0.424836742678405,
+          "input_si_sdr_state": "finite",
+          "output_energy": 915.443570303974,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 915.443570303974,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.92182657122612,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.14258286356925964,
+          "peak": 0.33307594060897827,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04159162335862106,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 35,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 35,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 35,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "tambourine-crash",
+      "category": "tambourine_crash",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": 1.056766979679239e-19,
+              "identifiable": true,
+              "projected_energy": 7.899119944656408e-35,
+              "projected_energy_ratio_to_target": 4.760665927313698e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.289877638941861,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 1659.2468501804,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1659.2468501804,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.8634870946407318,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.16701990365982056,
+          "peak": 0.3904377520084381,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.037951527588980564,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "tambourine-crash",
+      "category": "tambourine_crash",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": 1.056766979679239e-19,
+              "identifiable": true,
+              "projected_energy": 7.899119944656408e-35,
+              "projected_energy_ratio_to_target": 4.760665927313698e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.289877638941861,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 1659.2468501804,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1659.2468501804,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.8634870946407318,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.16701990365982056,
+          "peak": 0.3904377520084381,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.037951527588980564,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "cowbell-ride",
+      "category": "cowbell_ride",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": 1.9514174553444862e-20,
+              "identifiable": true,
+              "projected_energy": 1.6900422126320142e-36,
+              "projected_energy_ratio_to_target": 1.8343918294931844e-39
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.824879042254368,
+          "input_si_sdr_state": "finite",
+          "output_energy": 921.3092783448278,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 921.3092783448278,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 1.1292002201080322,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.13224247843027115,
+          "peak": 0.3242699205875397,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04172465983074017,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "cowbell-ride",
+      "category": "cowbell_ride",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": 1.9514174553444862e-20,
+              "identifiable": true,
+              "projected_energy": 1.6900422126320142e-36,
+              "projected_energy_ratio_to_target": 1.8343918294931844e-39
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.824879042254368,
+          "input_si_sdr_state": "finite",
+          "output_energy": 921.3092783448278,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 921.3092783448278,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 1.1292002201080322,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.13224247843027115,
+          "peak": 0.3242699205875397,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04172465983074017,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "maracas-cymbals",
+      "category": "maracas_cymbals",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": -2.6315289586876487e-20,
+              "identifiable": true,
+              "projected_energy": 3.235697531707453e-36,
+              "projected_energy_ratio_to_target": 3.358127490516205e-39
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.862491024133175,
+          "input_si_sdr_state": "finite",
+          "output_energy": 963.5421945252197,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 963.5421945252197,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 1.0212606489658356,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.12830903008580208,
+          "peak": 0.3213904798030853,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04090007713855339,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "maracas-cymbals",
+      "category": "maracas_cymbals",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": -2.6315289586876487e-20,
+              "identifiable": true,
+              "projected_energy": 3.235697531707453e-36,
+              "projected_energy_ratio_to_target": 3.358127490516205e-39
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.862491024133175,
+          "input_si_sdr_state": "finite",
+          "output_energy": 963.5421945252197,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 963.5421945252197,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 1.0212606489658356,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.12830903008580208,
+          "peak": 0.3213904798030853,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04090007713855339,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "timbales-tom",
+      "category": "timbales_tom",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "tom": {
+              "gain_estimate": 2.701470081922335e-21,
+              "identifiable": true,
+              "projected_energy": 6.831347690568336e-38,
+              "projected_energy_ratio_to_target": 2.28823855022151e-41
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -4.964740097110516,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 2985.417621736613,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 2985.417621736613,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.2092914329841733,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.20456770807504654,
+          "peak": 0.5401747226715088,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.053110162520377084,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "timbales-tom",
+      "category": "timbales_tom",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "tom": {
+              "gain_estimate": 2.701470081922335e-21,
+              "identifiable": true,
+              "projected_energy": 6.831347690568336e-38,
+              "projected_energy_ratio_to_target": 2.28823855022151e-41
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -4.964740097110516,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 2985.417621736613,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 2985.417621736613,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.2092914329841733,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.20456770807504654,
+          "peak": 0.5401747226715088,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.053110162520377084,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 36,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 36,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 36,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "multiple-overlap",
+      "category": "multiple_percussions",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": 6.903530069816735e-20,
+              "identifiable": true,
+              "projected_energy": 2.397055559291538e-36,
+              "projected_energy_ratio_to_target": 1.2472991123269104e-38
+            },
+            "snare": {
+              "gain_estimate": -4.210928534353636e-19,
+              "identifiable": true,
+              "projected_energy": 6.021645062700269e-35,
+              "projected_energy_ratio_to_target": 3.133341032643241e-37
+            },
+            "tom": {
+              "gain_estimate": -2.4501255635190014e-19,
+              "identifiable": true,
+              "projected_energy": 8.94800434546726e-35,
+              "projected_energy_ratio_to_target": 4.656061405809589e-37
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -10.854129731473252,
+          "input_si_sdr_state": "finite",
+          "output_energy": 192.17968934650236,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 192.17968934650236,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.7315172255039215,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.05226391740143299,
+          "peak": 0.15118248760700226,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.01826595998036633,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "multiple-overlap",
+      "category": "multiple_percussions",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": 6.903530069816735e-20,
+              "identifiable": true,
+              "projected_energy": 2.397055559291538e-36,
+              "projected_energy_ratio_to_target": 1.2472991123269104e-38
+            },
+            "snare": {
+              "gain_estimate": -4.210928534353636e-19,
+              "identifiable": true,
+              "projected_energy": 6.021645062700269e-35,
+              "projected_energy_ratio_to_target": 3.133341032643241e-37
+            },
+            "tom": {
+              "gain_estimate": -2.4501255635190014e-19,
+              "identifiable": true,
+              "projected_energy": 8.94800434546726e-35,
+              "projected_energy_ratio_to_target": 4.656061405809589e-37
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -10.854129731473252,
+          "input_si_sdr_state": "finite",
+          "output_energy": 192.17968934650236,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 192.17968934650236,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.7315172255039215,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.05226391740143299,
+          "peak": 0.15118248760700226,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.01826595998036633,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "kick-accessory",
+      "category": "kick_percussion",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "kick": {
+              "gain_estimate": 7.413459021955058e-16,
+              "identifiable": true,
+              "projected_energy": 8.917894460120112e-28,
+              "projected_energy_ratio_to_target": 3.964331962394179e-31
+            },
+            "snare": {
+              "gain_estimate": 8.923276797774901e-18,
+              "identifiable": true,
+              "projected_energy": 3.7620732857658864e-32,
+              "projected_energy_ratio_to_target": 1.6723798917250387e-35
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": 6.795131630511624,
+          "input_si_sdr_state": "finite",
+          "output_energy": 2249.532719438139,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 2249.532719438139,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.6018427908420563,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.13468364626169205,
+          "peak": 0.5394967794418335,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.06519829511584725,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 169,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 169,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 169,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "kick-accessory",
+      "category": "kick_percussion",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "kick": {
+              "gain_estimate": -1.9004155570607283e-18,
+              "identifiable": true,
+              "projected_energy": 5.860270996813326e-33,
+              "projected_energy_ratio_to_target": 9.342587140691138e-36
+            },
+            "snare": {
+              "gain_estimate": 1.0685534875317842e-16,
+              "identifiable": true,
+              "projected_energy": 5.394746647606508e-30,
+              "projected_energy_ratio_to_target": 8.600436854306221e-33
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -5.217820712436891,
+          "input_si_sdr_state": "finite",
+          "output_energy": 627.2642586644154,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 627.2642586644154,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.6018427908420563,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.13468364626169205,
+          "peak": 0.2744188904762268,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.034428282141762946,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 32,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 32,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 32,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "stereo-distribution",
+      "category": "stereo",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": 1.5108237653677887e-18,
+              "identifiable": true,
+              "projected_energy": 4.1523594331316744e-33,
+              "projected_energy_ratio_to_target": 2.2258971827926607e-36
+            },
+            "snare": {
+              "gain_estimate": 1.896747446667696e-18,
+              "identifiable": true,
+              "projected_energy": 4.7908291869055044e-33,
+              "projected_energy_ratio_to_target": 2.5681527242768573e-36
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -2.270530097462551,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 1865.4767458405381,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1865.4767458405381,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 1.0745534896850586,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.1829964779317379,
+          "peak": 0.42375966906547546,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.040240992196845474,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "stereo-distribution",
+      "category": "stereo",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": 1.5108237653677887e-18,
+              "identifiable": true,
+              "projected_energy": 4.1523594331316744e-33,
+              "projected_energy_ratio_to_target": 2.2258971827926607e-36
+            },
+            "snare": {
+              "gain_estimate": 1.896747446667696e-18,
+              "identifiable": true,
+              "projected_energy": 4.7908291869055044e-33,
+              "projected_energy_ratio_to_target": 2.5681527242768573e-36
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -2.270530097462551,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 1865.4767458405381,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1865.4767458405381,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 1.0745534896850586,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.1829964779317379,
+          "peak": 0.42375966906547546,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.040240992196845474,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "dynamic-range",
+      "category": "dynamics",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "snare": {
+              "gain_estimate": 2.2534164153763654e-20,
+              "identifiable": true,
+              "projected_energy": 2.0279468235277966e-37,
+              "projected_energy_ratio_to_target": 6.036421604414153e-37
+            },
+            "tom": {
+              "gain_estimate": 3.3064544050610192e-21,
+              "identifiable": true,
+              "projected_energy": 1.926947322073402e-38,
+              "projected_energy_ratio_to_target": 5.735784740793745e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -37.0097920412137,
+          "input_si_sdr_state": "finite",
+          "output_energy": 0.3359518198736904,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 0.3359518198736904,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.49959973990917206,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.002643798346980475,
+          "peak": 0.006568964570760727,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0007967619416099481,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "dynamic-range",
+      "category": "dynamics",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "snare": {
+              "gain_estimate": 2.2534164153763654e-20,
+              "identifiable": true,
+              "projected_energy": 2.0279468235277966e-37,
+              "projected_energy_ratio_to_target": 6.036421604414153e-37
+            },
+            "tom": {
+              "gain_estimate": 3.3064544050610192e-21,
+              "identifiable": true,
+              "projected_energy": 1.926947322073402e-38,
+              "projected_energy_ratio_to_target": 5.735784740793745e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -37.0097920412137,
+          "input_si_sdr_state": "finite",
+          "output_energy": 0.3359518198736904,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 0.3359518198736904,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.49959973990917206,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.002643798346980475,
+          "peak": 0.006568964570760727,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0007967619416099481,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 37,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 37,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 37,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "reverb-tail",
+      "category": "reverb",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": -1.1894771000393247e-19,
+              "identifiable": true,
+              "projected_energy": 4.827489115108182e-35,
+              "projected_energy_ratio_to_target": 5.12090949726866e-38
+            },
+            "snare": {
+              "gain_estimate": 5.604801499618605e-17,
+              "identifiable": true,
+              "projected_energy": 1.666418239029085e-30,
+              "projected_energy_ratio_to_target": 1.7677050705218466e-33
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.198167116489186,
+          "input_si_sdr_state": "finite",
+          "output_energy": 942.7015098944868,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 942.7015098944868,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.9877641797065735,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.1198355620726943,
+          "peak": 0.2822788953781128,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04045534038651807,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 93,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 93,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 93,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "reverb-tail",
+      "category": "reverb",
+      "control": "unchanged_ground_truth_reference",
+      "group": "synthetic",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": -1.1894771000393247e-19,
+              "identifiable": true,
+              "projected_energy": 4.827489115108182e-35,
+              "projected_energy_ratio_to_target": 5.12090949726866e-38
+            },
+            "snare": {
+              "gain_estimate": 5.604801499618605e-17,
+              "identifiable": true,
+              "projected_energy": 1.666418239029085e-30,
+              "projected_energy_ratio_to_target": 1.7677050705218466e-33
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.198167116489186,
+          "input_si_sdr_state": "finite",
+          "output_energy": 942.7015098944868,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 942.7015098944868,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.9877641797065735,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.1198355620726943,
+          "peak": 0.2822788953781128,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.04045534038651807,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 93,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 93,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 93,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "no-accessory",
+      "category": "negative_no_percussion",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            },
+            "hi_hat": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            },
+            "snare": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            },
+            "tom": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            }
+          },
+          "desired_energy_recovered_ratio": null,
+          "desired_gain_estimate": null,
+          "error_energy": 0.0,
+          "input_si_sdr_db": null,
+          "input_si_sdr_state": "silent_reference",
+          "interchannel_correlation_error": null,
+          "output_energy": 0.0,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": null,
+              "energy_ratio": null
+            },
+            {
+              "channel": 1,
+              "correlation": null,
+              "energy_ratio": null
+            }
+          ],
+          "reference_energy": 0.0,
+          "sdr_db": null,
+          "sdr_state": "silent_reference",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "silent_reference",
+          "silent_target": true,
+          "spurious_output_energy": 0.0,
+          "spurious_output_rms": 0.0,
+          "stereo_side_error_ratio": null,
+          "temporal_correlation": null,
+          "useful_energy_loss_ratio": null
+        },
+        "technical": {
+          "alignment": {
+            "confidence": null,
+            "ms": null,
+            "samples": null
+          },
+          "alignment_verified": false,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": null,
+          "drift_verified": false,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.9078803658485413,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.0,
+          "peak": 0.0,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": null,
+          "lost_events": 0,
+          "matched_events": 0,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": null,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 0,
+          "peak_difference_absolute_mean": null,
+          "peak_difference_mean": null,
+          "reference_events": 0,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": null
+        },
+        "warnings": [
+          "Alignment/drift could not be verified from a sufficiently correlated target; no absence of drift is claimed"
+        ]
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "no-accessory",
+      "category": "negative_no_percussion",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "cymbals": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            },
+            "hi_hat": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            },
+            "snare": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            },
+            "tom": {
+              "gain_estimate": 0.0,
+              "identifiable": true,
+              "projected_energy": 0.0,
+              "projected_energy_ratio_to_target": null
+            }
+          },
+          "desired_energy_recovered_ratio": null,
+          "desired_gain_estimate": null,
+          "error_energy": 0.0,
+          "input_si_sdr_db": null,
+          "input_si_sdr_state": "silent_reference",
+          "interchannel_correlation_error": null,
+          "output_energy": 0.0,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": null,
+              "energy_ratio": null
+            },
+            {
+              "channel": 1,
+              "correlation": null,
+              "energy_ratio": null
+            }
+          ],
+          "reference_energy": 0.0,
+          "sdr_db": null,
+          "sdr_state": "silent_reference",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "silent_reference",
+          "silent_target": true,
+          "spurious_output_energy": 0.0,
+          "spurious_output_rms": 0.0,
+          "stereo_side_error_ratio": null,
+          "temporal_correlation": null,
+          "useful_energy_loss_ratio": null
+        },
+        "technical": {
+          "alignment": {
+            "confidence": null,
+            "ms": null,
+            "samples": null
+          },
+          "alignment_verified": false,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": null,
+          "drift_verified": false,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.9078803658485413,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.0,
+          "peak": 0.0,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": null,
+          "lost_events": 0,
+          "matched_events": 0,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": null,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 0,
+          "peak_difference_absolute_mean": null,
+          "peak_difference_mean": null,
+          "reference_events": 0,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": null
+        },
+        "warnings": [
+          "Alignment/drift could not be verified from a sufficiently correlated target; no absence of drift is claimed"
+        ]
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "accessory-only",
+      "category": "accessory_only",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {},
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": null,
+          "input_si_sdr_state": "perfect_reconstruction",
+          "output_energy": 1429.8965119542581,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1429.8965119542581,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.16395513154566288,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.16395513154566288,
+          "peak": 0.393155962228775,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.049824283458398164,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 33,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 33,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 33,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "accessory-only",
+      "category": "accessory_only",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {},
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": null,
+          "input_si_sdr_state": "perfect_reconstruction",
+          "output_energy": 1429.8965119542581,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1429.8965119542581,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.16395513154566288,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.16395513154566288,
+          "peak": 0.393155962228775,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.049824283458398164,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 33,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 33,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 33,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "digital-silence",
+      "category": "negative_silence",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {},
+          "desired_energy_recovered_ratio": null,
+          "desired_gain_estimate": null,
+          "error_energy": 0.0,
+          "input_si_sdr_db": null,
+          "input_si_sdr_state": "silent_reference",
+          "output_energy": 0.0,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": null,
+              "energy_ratio": null
+            }
+          ],
+          "reference_energy": 0.0,
+          "sdr_db": null,
+          "sdr_state": "silent_reference",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "silent_reference",
+          "silent_target": true,
+          "spurious_output_energy": 0.0,
+          "spurious_output_rms": 0.0,
+          "temporal_correlation": null,
+          "useful_energy_loss_ratio": null
+        },
+        "technical": {
+          "alignment": {
+            "confidence": null,
+            "ms": null,
+            "samples": null
+          },
+          "alignment_verified": false,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": null,
+          "drift_verified": false,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.0,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.0,
+          "peak": 0.0,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": null,
+          "lost_events": 0,
+          "matched_events": 0,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": null,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 0,
+          "peak_difference_absolute_mean": null,
+          "peak_difference_mean": null,
+          "reference_events": 0,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": null
+        },
+        "warnings": [
+          "Alignment/drift could not be verified from a sufficiently correlated target; no absence of drift is claimed"
+        ]
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "digital-silence",
+      "category": "negative_silence",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {},
+          "desired_energy_recovered_ratio": null,
+          "desired_gain_estimate": null,
+          "error_energy": 0.0,
+          "input_si_sdr_db": null,
+          "input_si_sdr_state": "silent_reference",
+          "output_energy": 0.0,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": null,
+              "energy_ratio": null
+            }
+          ],
+          "reference_energy": 0.0,
+          "sdr_db": null,
+          "sdr_state": "silent_reference",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "silent_reference",
+          "silent_target": true,
+          "spurious_output_energy": 0.0,
+          "spurious_output_rms": 0.0,
+          "temporal_correlation": null,
+          "useful_energy_loss_ratio": null
+        },
+        "technical": {
+          "alignment": {
+            "confidence": null,
+            "ms": null,
+            "samples": null
+          },
+          "alignment_verified": false,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": null,
+          "drift_verified": false,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.0,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.0,
+          "peak": 0.0,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": null,
+          "lost_events": 0,
+          "matched_events": 0,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": null,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 0,
+          "peak_difference_absolute_mean": null,
+          "peak_difference_mean": null,
+          "reference_events": 0,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": null
+        },
+        "warnings": [
+          "Alignment/drift could not be verified from a sufficiently correlated target; no absence of drift is claimed"
+        ]
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "very-short",
+      "category": "short_audio",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "snare": {
+              "gain_estimate": 2.876759667305705e-19,
+              "identifiable": true,
+              "projected_energy": 9.915066010039001e-36,
+              "projected_energy_ratio_to_target": 5.83691697754208e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": 1.4844398416326188,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 169.8682035085965,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 169.8682035085965,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 0.35,
+          "finite": true,
+          "frames": 16800,
+          "geometry_preserved": true,
+          "input_frames": 16800,
+          "input_maximum_sample_jump": 0.85914546251297,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.16473320126533508,
+          "peak": 0.5112335085868835,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.07110275166896642,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 3,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 3,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 3,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "very-short",
+      "category": "short_audio",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "snare": {
+              "gain_estimate": 2.876759667305705e-19,
+              "identifiable": true,
+              "projected_energy": 9.915066010039001e-36,
+              "projected_energy_ratio_to_target": 5.83691697754208e-38
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": 1.4844398416326188,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 169.8682035085965,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 169.8682035085965,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 0.35,
+          "finite": true,
+          "frames": 16800,
+          "geometry_preserved": true,
+          "input_frames": 16800,
+          "input_maximum_sample_jump": 0.85914546251297,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.16473320126533508,
+          "peak": 0.5112335085868835,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.07110275166896642,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 3,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 3,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 3,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "electronic-fast",
+      "category": "electronic",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": 1.0893407302180105e-19,
+              "identifiable": true,
+              "projected_energy": 1.3913073047869735e-35,
+              "projected_energy_ratio_to_target": 3.985690857990426e-39
+            },
+            "kick": {
+              "gain_estimate": 1.1002247809497302e-15,
+              "identifiable": true,
+              "projected_energy": 2.944267189142517e-27,
+              "projected_energy_ratio_to_target": 8.43446935042382e-31
+            },
+            "snare": {
+              "gain_estimate": 3.0271996992458184e-18,
+              "identifiable": true,
+              "projected_energy": 7.644886581608874e-33,
+              "projected_energy_ratio_to_target": 2.1900377043846204e-36
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": 2.398697694605181,
+          "input_si_sdr_state": "finite",
+          "output_energy": 3490.755691695734,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 3490.755691695734,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.9233467876911163,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.08978667203336954,
+          "peak": 0.38946250081062317,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.08121753600751362,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 406,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 406,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 406,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "electronic-fast",
+      "category": "electronic",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "hi_hat": {
+              "gain_estimate": -6.9009163332879e-19,
+              "identifiable": true,
+              "projected_energy": 5.583533230436456e-34,
+              "projected_energy_ratio_to_target": 5.2666055445816996e-37
+            },
+            "kick": {
+              "gain_estimate": -3.038778834722646e-20,
+              "identifiable": true,
+              "projected_energy": 2.2460145212207876e-36,
+              "projected_energy_ratio_to_target": 2.118528186810445e-39
+            },
+            "snare": {
+              "gain_estimate": 2.824680957640393e-17,
+              "identifiable": true,
+              "projected_energy": 6.6562206155572796e-31,
+              "projected_energy_ratio_to_target": 6.278405975764692e-34
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -6.187664045057253,
+          "input_si_sdr_state": "finite",
+          "output_energy": 1060.1768412636889,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 1060.1768412636889,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 1,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 529200,
+          "geometry_preserved": true,
+          "input_frames": 529200,
+          "input_maximum_sample_jump": 0.9233467876911163,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.08800872042775154,
+          "peak": 0.2189711332321167,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.044758882903394775,
+          "sample_rate": 44100,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 130,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 130,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 130,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    },
+    {
+      "case_id": "stereo-antiphase",
+      "category": "phase",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "tom": {
+              "gain_estimate": 2.376769597709012e-20,
+              "identifiable": true,
+              "projected_energy": 4.1257845841794e-36,
+              "projected_energy_ratio_to_target": 1.0762073486201158e-39
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -2.799933961415957,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 3833.633536761639,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 3833.633536761639,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.1743638664484024,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.171497393399477,
+          "peak": 0.47750213742256165,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0576871466580731,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 38,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 38,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 38,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "include_kick"
+    },
+    {
+      "case_id": "stereo-antiphase",
+      "category": "phase",
+      "control": "unchanged_ground_truth_reference",
+      "group": "negative",
+      "metrics": {
+        "metric_version": "mta-percussion-metrics-1",
+        "quality": {
+          "bleed": {
+            "tom": {
+              "gain_estimate": 2.376769597709012e-20,
+              "identifiable": true,
+              "projected_energy": 4.1257845841794e-36,
+              "projected_energy_ratio_to_target": 1.0762073486201158e-39
+            }
+          },
+          "desired_energy_recovered_ratio": 1.0,
+          "desired_gain_estimate": 1.0,
+          "error_energy": 0.0,
+          "input_si_sdr_db": -2.799933961415957,
+          "input_si_sdr_state": "finite",
+          "interchannel_correlation_error": 0.0,
+          "output_energy": 3833.633536761639,
+          "per_channel": [
+            {
+              "channel": 0,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            },
+            {
+              "channel": 1,
+              "correlation": 1.0,
+              "energy_ratio": 1.0
+            }
+          ],
+          "reference_energy": 3833.633536761639,
+          "sdr_db": null,
+          "sdr_state": "perfect_reconstruction",
+          "si_sdr_db": null,
+          "si_sdr_improvement_db": null,
+          "si_sdr_state": "perfect_reconstruction",
+          "silent_target": false,
+          "spurious_output_energy": null,
+          "spurious_output_rms": null,
+          "stereo_side_error_ratio": 0.0,
+          "temporal_correlation": 1.0,
+          "useful_energy_loss_ratio": 0
+        },
+        "technical": {
+          "alignment": {
+            "confidence": 1.0,
+            "ms": 0.0,
+            "samples": 0
+          },
+          "alignment_verified": true,
+          "channels": 2,
+          "channels_preserved": true,
+          "clipped_samples": 0,
+          "discontinuity_review_required": false,
+          "drift_samples": 0,
+          "drift_verified": true,
+          "duration_preserved": true,
+          "duration_seconds": 12.0,
+          "finite": true,
+          "frames": 576000,
+          "geometry_preserved": true,
+          "input_frames": 576000,
+          "input_maximum_sample_jump": 0.1743638664484024,
+          "introduced_clipped_samples": 0,
+          "maximum_sample_jump": 0.171497393399477,
+          "peak": 0.47750213742256165,
+          "polarity_reversed": false,
+          "readable": true,
+          "reference_valid": true,
+          "rms": 0.0576871466580731,
+          "sample_rate": 48000,
+          "sample_rate_preserved": true
+        },
+        "technical_pass": true,
+        "transients": {
+          "attack_rise_error_ms_mean": 0.0,
+          "lost_events": 0,
+          "matched_events": 38,
+          "matching_tolerance_ms": 20,
+          "mean_absolute_shift_ms": 0.0,
+          "method": "5ms positive RMS-envelope novelty; engineering heuristic",
+          "output_events": 38,
+          "peak_difference_absolute_mean": 0.0,
+          "peak_difference_mean": 0.0,
+          "reference_events": 38,
+          "shifted_matched_events": 0,
+          "spurious_events": 0,
+          "tail_error_energy_ratio": 0.0
+        },
+        "warnings": []
+      },
+      "variant": "exclude_kick"
+    }
+  ],
+  "schema": "mta-percussion-control-evidence-1"
+}

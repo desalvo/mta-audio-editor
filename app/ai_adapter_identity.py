@@ -14,8 +14,8 @@ import sys
 
 
 UNIFIED_KINDS = frozenset({
-    'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio',
-    'singer-separation', 'backing-vocals', 'markers',
+    'whisper', 'chords-ml', 'demucs', 'drumsep', 
+    'backing-vocals', 'markers',
 })
 ACE_KINDS = frozenset({'ace-step', 'arranger', 'remix'})
 MANAGED_RUNTIME_ROOT = Path('/opt/mta')
@@ -50,7 +50,7 @@ def require_worker_interpreter(value, kind):
     path = Path(value)
     root = MANAGED_RUNTIME_ROOT
     group = ENGINE_GROUPS.get(kind)
-    if os.name != 'posix' or group not in {'audio', 'sam'} or not path.is_absolute():
+    if os.name != 'posix' or group != 'audio' or not path.is_absolute():
         raise ValueError('Configured AI Python has no verified interpreter/import contract')
     try:
         relative = path.relative_to(root)

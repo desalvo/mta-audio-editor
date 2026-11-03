@@ -585,7 +585,7 @@ Native `.maeproj` files are lightweight JSON manifests backed by the modular wor
 
 I progetti supportano sample rate 44.1/48/96 kHz (44.1 kHz default), con conversione automatica delle sorgenti importate al rate del progetto. L’export include WAV 24/32 bit a 44.1/48/96 kHz, MP3 standard, MP3 M-Live/Merish e MP3+G (ZIP con coppia MP3+CDG).
 
-Separazione multi-cantante SAM Audio (sperimentale): consultare [SINGER_SEPARATION_SETUP.md](SINGER_SEPARATION_SETUP.md).
+SAM Audio e la separazione di singoli cantanti sono ritirati; vedere [SAM_REMOVAL_R210_IT_EN.md](docs/SAM_REMOVAL_R210_IT_EN.md) e il nuovo benchmark delle percussioni.
 
 ### VST3 user manuals / Manuali VST3
 
@@ -654,12 +654,12 @@ Consultare `docs/MVSEP_MEGA53_LEAD_BACKING_R210_IT_EN.md` per l'installazione de
 
 Diritti e abilitazione controllata UVR KARA 2: `docs/UVR_KARA2_RIGHTS_R210_IT.md`.
 
-**Registro diritti modelli AI (r210):** l'amministrazione Studio mostra le evidenze pubbliche e i diritti ancora non chiariti per UVR, DrumSep, ChordFormer, Madmom, SAM Audio e alcune voicebank DiffSinger. Le fonti non abilitano automaticamente checkpoint privi di autorizzazione. Vedere `docs/MODEL_RIGHTS_DOSSIERS_R210_IT_EN.md`.
+**Registro diritti modelli AI (r210):** l'amministrazione Studio mostra le evidenze pubbliche e i diritti ancora non chiariti per UVR, DrumSep, ChordFormer, Madmom e alcune voicebank DiffSinger. Le fonti non abilitano automaticamente checkpoint privi di autorizzazione. Vedere `docs/MODEL_RIGHTS_DOSSIERS_R210_IT_EN.md`.
 
 ### Fallback automatici autorizzati (r210)
 Se KARA 2 non è autorizzato, i nuovi job di separazione voce/cori senza scelta esplicita selezionano Mega 53 (se la policy lo ammette). Per il motore DrumSep è disponibile l’alternativa `dsp` esplicita: batteria/percussioni, non kick/snare individuali. I modelli con pesi non autorizzati restano bloccati. Mega 53 richiede runtime e checkpoint installati.
 
-Mega 53 può separare anche kick, snare, toms, hi-hat e percussioni dal selettore dei metodi percussioni. Non equivale alla separazione completa dei cymbals né alla ricostruzione garantita del kit; SAM Audio e DSP rimangono disponibili. Sono necessari checkpoint e MSST installati.
+Mega 53 può separare anche kick, snare, toms, hi-hat e percussioni dal selettore dei metodi percussioni. Non equivale alla separazione completa dei cymbals né alla ricostruzione garantita del kit; DSP rimane disponibile. Sono necessari checkpoint e MSST installati.
 
 Approfondimento licenze DrumSep e routing remoto autorizzato Mega 53: vedere `docs/DRUMSEP_RIGHTS_REVIEW_20261020.md`. I checkpoint originali con licenza non dimostrata rimangono disabilitati.
 

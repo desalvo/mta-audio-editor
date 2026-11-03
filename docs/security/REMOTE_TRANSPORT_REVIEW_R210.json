@@ -1,6 +1,6 @@
 {
   "schema": "mta-remote-transport-review-1",
-  "date": "2026-11-02",
+  "date": "2026-11-03",
   "scope": "Explicit app-owned Python HTTP/client/openers and socket constructors. Opaque operator commands, native libraries and dynamic code are separate trust boundaries; this inventory never grants rights or proves a remote checkpoint.",
   "sites": [
     {
@@ -215,10 +215,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5779,
+      "line": 5652,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "566df1da6e42c1de6ff8aa7c6432827920ffc1cd58af03174331783844d7d59a",
+      "source_sha256": "ba2146256de24c5c1aec303c94b4c81e62554158fc0b9998c95155f112fa742c",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -487,5 +487,18 @@
     "commit_baseline": "8bc97f4385b609a601da898d51dbb8f07937a1ab",
     "scope": "Read-only worker limit lookup retries only explicit transient SQLite contention; existing financial writes/cancellation remain unchanged.",
     "evidence": "docs/CI_41473520966_R210.md"
+  },
+  "shared_benchmark_review_20261103": {
+    "baseline_commit": "f235f4c3ca67af72006bfc6262474ccb0ff0a705",
+    "review": "Explicit reviewed source and boundary deltas; unchanged occurrence dispositions, family contracts and checkers retained. Hash refresh is not approval by itself.",
+    "evidence": "docs/security/SHARED_BENCHMARK_REVIEW_R210.md",
+    "not_authorized": [
+      "commercial activation",
+      "model checkpoint rights",
+      "professional audio approval",
+      "real GPU/accounting acceptance",
+      "deployed SMTP/microphone/multi-browser certification",
+      "hardware/kernel or multi-host attestation"
+    ]
   }
 }

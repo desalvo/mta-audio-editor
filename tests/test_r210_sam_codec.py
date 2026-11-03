@@ -16,7 +16,7 @@ def setup_module_object():
 
 
 @pytest.mark.parametrize('device,version', [('rocm', '0.11.1+cpu'), ('cpu', '0.17.0+cpu')])
-def test_sam_codec_variant_is_constrained_before_upstream_install(tmp_path, monkeypatch, device, version):
+def test_audio_codec_variant_is_constrained_before_upstream_install(tmp_path, monkeypatch, device, version):
     module = setup_module_object()
     calls = []
     def run(args, **kwargs):
@@ -26,9 +26,9 @@ def test_sam_codec_variant_is_constrained_before_upstream_install(tmp_path, monk
         return SimpleNamespace(stdout='torch==2.11.0+rocm7.2\ntorchaudio==2.11.0+rocm7.2\ntorchvision==0.26.0+rocm7.2\n')
     monkeypatch.setattr(module, 'run', run)
     monkeypatch.setattr(module, 'verify', lambda *a: None)
-    module.install_group('/python', tmp_path, device, 'sam')
+    module.install_group('/python', tmp_path, device, 'audio')
     codec_index = next(i for i,c in enumerate(calls) if 'torchcodec==' + version in c)
-    upstream_index = next(i for i,c in enumerate(calls) if any(x.startswith('sam_audio @') for x in c))
+    upstream_index = next(i for i,c in enumerate(calls) if any(x.endswith('native-ai-requirements.txt') for x in c))
     assert codec_index < upstream_index
     assert '--no-deps' in calls[codec_index]
     assert 'https://download.pytorch.org/whl/cpu' in calls[codec_index]
@@ -36,14 +36,14 @@ def test_sam_codec_variant_is_constrained_before_upstream_install(tmp_path, monk
     assert '-c' in calls[upstream_index]
 
 
-def test_sam_decode_failure_blocks_publication(monkeypatch):
+def test_audio_decode_failure_blocks_publication(monkeypatch):
     module = setup_module_object()
     def run(args, **kwargs):
         if 'AudioDecoder' in str(args):
             raise RuntimeError('decoder cannot load shared library')
     monkeypatch.setattr(module, 'run', run)
     with pytest.raises(RuntimeError, match='decoder cannot load'):
-        module.verify('/python', 'sam', 'rocm')
+        module.verify('/python', 'audio', 'rocm')
 
 
 def test_root_markdown_policy():

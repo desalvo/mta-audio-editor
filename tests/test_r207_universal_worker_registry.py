@@ -3,7 +3,7 @@ from app.ai_worker_registry import resolve_worker, available_workers, WORKER_KIN
 
 
 def test_all_known_model_families_have_registry_entries():
-    assert {'ace-step', 'whisper', 'demucs', 'sam-audio', 'drumsep', 'chords-ml', 'remix'} <= WORKER_KINDS
+    assert {'ace-step', 'whisper', 'demucs', 'drumsep', 'chords-ml', 'remix'} <= WORKER_KINDS
 
 
 def test_unknown_kind_fails_closed():

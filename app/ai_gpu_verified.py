@@ -15,7 +15,7 @@ import time
 
 METHOD='gpu-kernel-union-v1'
 REPORT='gpu-verified.json'
-VERIFIED_KINDS=frozenset(('ace-step','whisper','demucs','sam-audio','singer-separation','markers'))
+VERIFIED_KINDS=frozenset(('ace-step','whisper','demucs','markers'))
 
 
 def root():return Path(os.getenv('MTA_GPU_BILLING_ROOT','/var/lib/mta/gpu-billing'))

@@ -1,0 +1,43 @@
+{
+  "baseline_archive": "MTA-0.3.0-r210-ci-41491614671-cumulative.zip",
+  "baseline_sha256": "d5b73750e0660443cb66813fc9cadfaaac3ac77d8ea973c436797135e5a43bcd",
+  "baseline_entries": 5298,
+  "removed_entries": [],
+  "unchanged_baseline_entries": 5292,
+  "modified": {
+    "app/static/app.js": {
+      "before_sha256": "06620ed195ed8389df0b4689adbe2c7c2b766e45f16d071dbe171baf9f30c0b8",
+      "after_sha256": "076b79fa001c8b642934869a76066ffa3d7f990b7c9cb12ec99efae44d7c5d37"
+    },
+    "app/templates/index.html": {
+      "before_sha256": "311b484f2895fccff2fbfee2aac322dafc41f921ccf72c634be496ddd5873442",
+      "after_sha256": "ee085bcf35ef89657d499d23030694fd0b3dbbd80334837b556376b4f6e4a546"
+    },
+    "docs/security/AI_EXECUTION_REVIEW_R210.json": {
+      "before_sha256": "76786a8b7395dffb3e785d822a225b6b2cdb33a95b54e542f20ae78a34757fcb",
+      "after_sha256": "d6b9ef9dcabe5e16b43d19ca457cef59e40faf45778c96cc12989f5656c7acac"
+    },
+    "docs/DEVELOPMENT_STATUS.md": {
+      "before_sha256": "1109820f039ef78fe17a4447c5f786429aa6313b9b838367a8644f6719a1acf4",
+      "after_sha256": "0bd131b5fa56652570338c79febc7bbad43d37b83344c272c055e368628d63ad"
+    },
+    "docs/DRUMS_VS_PERCUSSION_R210_IT_EN.md": {
+      "before_sha256": "a7b2efc705d9e01984e99928b3aefd0d1f0ba0f8c2198fd42fdd03fdeb2cc5c7",
+      "after_sha256": "c76b3fe74bae720acf6e1a4d06307741a08fa634f2d5fa05927681eb4ec110d5"
+    },
+    "docs/COMMIT_MESSAGE_R210_CUMULATIVE.txt": {
+      "before_sha256": "c2918ff913ef539ff5a725cea88ba31c74e4494d5d3dc799dee7ca0073517da2",
+      "after_sha256": "8450a35e0f58ada235274d557fe4359f8b6466682595af84083c316500061881"
+    }
+  },
+  "added": {
+    "tests/test_r210_standard_stem_default.py": "0ccc678ae60d613dd9447b8315a3a530a0889ccb2cfd87b35734e76660c403db",
+    "docs/STANDARD_STEM_DEFAULT_R210_IT_EN.md": "f71d8b199dcdd372dd84404309e54612a750f07383177ca6551a11b02165d8db",
+    "validation/r210-standard-stem-default-regressions.xml": "5534bef39ab82a2c83103ab768e2aa33eea6b8dd1a3344140014600914de30b1",
+    "validation/r210-standard-stem-default-result.json": "33b4f9831df734df9410633baed1e2d55386ec5e1de9d76938bf212a34ccf40b",
+    "validation/r210-standard-stem-default-static.log": "f89c6add8d26fbda55017e440eb061a2d362f99a723a85510e64b28d6d511c0d"
+  },
+  "self_record": "validation/r210-standard-stem-default-preservation.json",
+  "self_hash_excluded": true,
+  "scope": "Cumulative base preserved byte-for-byte except the six explicit changes; five deliverable files and this preservation record added."
+}

@@ -1,4 +1,4 @@
-"""Durable stem recovery covers Demucs, DrumSep, SAM Audio and backing vocals."""
+"""Durable stem recovery covers supported Demucs, DrumSep and backing-vocal workflows."""
 import threading
 
 
