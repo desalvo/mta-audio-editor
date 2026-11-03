@@ -1,0 +1,22 @@
+{
+  "IT": {
+    "pages": 19,
+    "hits": [
+      18
+    ],
+    "outside_bounds": [],
+    "bookmarks": 38,
+    "sha256": "2c043913bd685ab71566a798c6b54168e4623ede151c1551c2d72c434bf6d059",
+    "visual_review": "page containing Mega 53 configuration reviewed"
+  },
+  "EN": {
+    "pages": 19,
+    "hits": [
+      18
+    ],
+    "outside_bounds": [],
+    "bookmarks": 38,
+    "sha256": "add733dc076b6bc1267dffd9a9dd8a6d485a6106710ae5fb16f3a46268cc9149",
+    "visual_review": "page containing Mega 53 configuration reviewed"
+  }
+}

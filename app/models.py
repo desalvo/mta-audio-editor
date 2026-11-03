@@ -202,6 +202,7 @@ class Track(BaseModel):
     name: str = Field(max_length=200)
     type: TrackType = "other"
     mta_slot: int | None = Field(default=None, ge=1, le=16)
+    mta_normalization_exempt: bool = False
     filename: str = Field(min_length=1, max_length=128)
     kind: Literal['audio', 'midi'] = 'audio'
     music_result_id: str = Field(default='', max_length=64)

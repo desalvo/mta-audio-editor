@@ -5005,6 +5005,18 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
     try:
         if job.get("singer_mode") or job.get("singers") or percussion_method not in _PERCUSSION_METHODS:
             raise RuntimeError("Queued stem job uses a removed or unsupported separator")
+        if split_percussions and percussion_method == 'mvsep-mega53':
+            # Only inspect the environment we actually own. Pull and native
+            # remote workers have their own files and must validate themselves.
+            local_mega = not _ai_external_engine('drumsep')
+            if not NATIVE_SINGLE_USER:
+                from . import ai_pull_coordinator, ai_worker_registry
+                if ai_pull_coordinator.mode() == 'local':
+                    worker = ai_worker_registry.resolve_worker('drumsep')
+                    local_mega = worker == Path(__file__).with_name('ai_unified_adapter.py').resolve()
+            if local_mega:
+                from .mega53_runtime import check_local_configuration
+                check_local_configuration()
         _stem_job_update(job_id, status="running", progress=12, message="Analisi del brano completo")
         ffprobe(source)
         if estimate_project_bpm:
@@ -5074,29 +5086,37 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     drum_body, percussion = _split_drums_percussions(drums_stem, td / "drums-percussions")
                     stems = [stem for stem in stems if Path(stem) != drums_stem] + [drum_body, percussion]
                 elif percussion_method == "mvsep-mega53":
-                    from .mega53_runtime import infer_drums
+                    from .mega53_runtime import dispatch_drums
+                    if "cymbals" in stem_targets:
+                        raise RuntimeError("Mega 53 exposes hi-hat, not an equivalent complete cymbals stem")
+                    remote = _native_remote_infer if _ai_external_engine('drumsep') else None
+                    results = []
+                    remote_jobs = []
                     # Distinguish a true DRUM KIT vs OTHER PERCUSSION split from
                     # the older kick/snare/toms part extraction. Both native model
                     # classes must run on the original mix, not a pre-filtered drum stem.
                     if "all" in stem_targets or "drums_without_percussions" in stem_targets or "percussions" in stem_targets:
-                        from .mega53_runtime import infer_drums_vs_percussion
-                        kit, nonkit = infer_drums_vs_percussion(source, td / "mega53-drums-percussion", cancel_event=cancel_event)
-                        requested_files = ([kit, nonkit] if "all" in stem_targets else
-                                           ([kit] if "drums_without_percussions" in stem_targets else []) +
-                                           ([nonkit] if "percussions" in stem_targets else []))
-                        stems = [stem for stem in stems if Path(stem) != drums_stem] + requested_files
+                        group, group_job = dispatch_drums(source, td / "mega53-drums-percussion", {'drums', 'percussion'},
+                                                         remote=remote, cancel_event=cancel_event)
+                        by_name = {path.name: path for path in group}
+                        if set(by_name) != {'drums_without_percussions.wav', 'percussions.wav'}:
+                            raise RuntimeError('Mega 53 did not produce both drums and percussion stems')
+                        kit, nonkit = by_name['drums_without_percussions.wav'], by_name['percussions.wav']
+                        results += ([kit, nonkit] if "all" in stem_targets else
+                                    ([kit] if "drums_without_percussions" in stem_targets else []) +
+                                    ([nonkit] if "percussions" in stem_targets else []))
+                        if group_job: remote_jobs.append(group_job)
                         _stem_job_update(job_id, percussion_method="mvsep-mega53", percussion_source="original_mix",
-                                         percussion_outputs=[path.name for path in requested_files])
-                        requested = set()
-                    else:
-                        requested = (stem_targets & {"kick", "snare", "toms"})
-                    if "percussions" in stem_targets:
-                        requested.add("percussion")
-                    if "cymbals" in stem_targets:
-                        raise RuntimeError("Mega 53 exposes hi-hat, not an equivalent complete cymbals stem")
+                                         percussion_outputs=[path.name for path in results])
+                    requested = stem_targets & {"kick", "snare", "toms"}
                     if requested:
-                        results = infer_drums(drums_stem, td / "mega53-drums", requested, cancel_event=cancel_event)
-                        stems = [stem for stem in stems if Path(stem) != drums_stem] + results
+                        parts, parts_job = dispatch_drums(drums_stem, td / "mega53-drums", requested,
+                                                        remote=remote, cancel_event=cancel_event)
+                        results += parts
+                        if parts_job: remote_jobs.append(parts_job)
+                    if remote_jobs:
+                        _stem_job_update(job_id, percussion_remote_job_ids=remote_jobs)
+                    stems = [stem for stem in stems if Path(stem) != drums_stem] + results
                 elif percussion_method == "drumsep-onnx":
                     # DrumSep only separates the kit; non-kit percussion requires a separate authorized model.
                     if "percussions" in stem_targets or "all" in stem_targets:
@@ -6747,6 +6767,8 @@ def _create_chords_track_locked(pid: str, request: Request):
             id=(track.clips[0].id if track.clips else uuid.uuid4().hex[:10]),
             source_start_ms=0, source_end_ms=duration_ms, timeline_start_ms=0,
         )]
+    # Persist the guide role across renames and source-format conversions.
+    track.mta_normalization_exempt = True
     track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
     save_project(project)
     return {"project": project, "track": track, "reused": reused, "chord_count": len(active_chords)}

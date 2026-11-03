@@ -65,7 +65,8 @@ def json_hash(value):
 
 def pipeline_hash():
     base = Path(__file__).parent
-    names = ('percussion_benchmark.py', 'percussion_adapters.py', 'percussion_candidates.json', 'percussion_metrics.py', 'percussion_corpus.py')
+    names = ('percussion_benchmark.py', 'percussion_adapters.py', 'percussion_candidates.json',
+             'percussion_metrics.py', 'percussion_corpus.py', 'mega53_runtime.py', 'ai_unified_adapter.py')
     return json_hash({name: digest(base / name) for name in names})
 
 

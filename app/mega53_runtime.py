@@ -41,18 +41,56 @@ def _verified_directory(value):
     return path.resolve()
 
 
+def managed_checkpoint():
+    from .auth import data_root
+    return data_root() / 'models' / 'mega53' / 'v1.0.21.ckpt'
+
+
 def configured():
-    return bool(os.getenv('MTA_MEGA53_ROOT') and os.getenv('MTA_MEGA53_CONFIG') and os.getenv('MTA_MEGA53_CHECKPOINT'))
+    checkpoint = os.getenv('MTA_MEGA53_CHECKPOINT') or (str(managed_checkpoint()) if managed_checkpoint().is_file() else '')
+    from .mega53_install import receipt
+    managed = receipt()
+    return bool((os.getenv('MTA_MEGA53_ROOT') or managed) and (os.getenv('MTA_MEGA53_CONFIG') or managed) and checkpoint)
+
+
+def _required_setting(name):
+    value = os.getenv(name, '').strip()
+    if not value and name in ('MTA_MEGA53_ROOT', 'MTA_MEGA53_CONFIG', 'MTA_MEGA53_PYTHON'):
+        from .mega53_install import receipt
+        managed = receipt()
+        key = {'MTA_MEGA53_ROOT': 'root', 'MTA_MEGA53_CONFIG': 'config', 'MTA_MEGA53_PYTHON': 'python'}[name]
+        if managed: value = str(managed[key])
+    if not value and name == 'MTA_MEGA53_CHECKPOINT' and managed_checkpoint().is_file():
+        value = str(managed_checkpoint())
+    if not value:
+        raise RuntimeError(
+            'Mega 53 runtime upstream non configurato nel processo che esegue il worker: '
+            f'impostare {name} insieme a MTA_MEGA53_ROOT, MTA_MEGA53_CONFIG e '
+            'MTA_MEGA53_CHECKPOINT; consultare la guida amministratore.'
+        )
+    return value
+
+
+def check_local_configuration():
+    """Check configured paths on this worker, without loading or hashing weights."""
+    _verified_directory(_required_setting('MTA_MEGA53_ROOT'))
+    _verified_file(_required_setting('MTA_MEGA53_CONFIG'), 'config')
+    _verified_file(_required_setting('MTA_MEGA53_CHECKPOINT'), 'checkpoint')
+    try: python = _required_setting('MTA_MEGA53_PYTHON')
+    except RuntimeError: python = sys.executable
+    _verified_file(python, 'Python interpreter')
 
 
 def infer(source, output_dir, cancel_event=None, drum_targets=None):
     """Return canonical (lead, backing) WAVs; fail closed on ambiguous outputs."""
     from .model_license_policy import evaluate_model,guarded_model_call
     evaluate_model('mvsep-mega53')
-    root = _verified_directory(os.getenv('MTA_MEGA53_ROOT', ''))
-    config = _verified_file(os.getenv('MTA_MEGA53_CONFIG', ''), 'config')
-    checkpoint = verify_mega53_checkpoint(os.getenv('MTA_MEGA53_CHECKPOINT', ''))
-    python = _verified_file(os.getenv('MTA_MEGA53_PYTHON', sys.executable), 'Python interpreter')
+    root = _verified_directory(_required_setting('MTA_MEGA53_ROOT'))
+    config = _verified_file(_required_setting('MTA_MEGA53_CONFIG'), 'config')
+    checkpoint = verify_mega53_checkpoint(_required_setting('MTA_MEGA53_CHECKPOINT'))
+    try: python_setting = _required_setting('MTA_MEGA53_PYTHON')
+    except RuntimeError: python_setting = sys.executable
+    python = _verified_file(python_setting, 'Python interpreter')
     source = _verified_file(str(source), 'source audio')
     out = Path(output_dir).resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -102,6 +140,41 @@ def infer(source, output_dir, cancel_event=None, drum_targets=None):
 def infer_drums(source, output_dir, targets, cancel_event=None):
     """AI kit-part separation using licensed Mega 53 weights, no DrumSep checkpoints."""
     return infer(source, output_dir, cancel_event=cancel_event, drum_targets=set(targets))
+
+
+def dispatch_drums(source, output_dir, targets, *, remote=None, cancel_event=None):
+    """Use the registered worker when supplied; never silently fall back locally."""
+    targets = set(targets)
+    names = {'drums': 'drums_without_percussions.wav', 'percussion': 'percussions.wav',
+             'kick': 'kick.wav', 'snare': 'snare.wav', 'toms': 'toms.wav', 'hh': 'hh.wav'}
+    if not targets or not targets <= names.keys():
+        raise ValueError('Unsupported Mega 53 drum targets')
+    if remote is None:
+        return infer_drums(source, output_dir, targets, cancel_event=cancel_event), None
+    if cancel_event is not None and cancel_event.is_set():
+        raise RuntimeError('Separazione annullata')
+    requested = sorted('hi-hat' if value == 'hh' else value for value in targets)
+    result, worker_job_id = remote('drumsep', source, {'model': 'mvsep-mega53', 'targets': requested})
+    audio = result.get('audio') if isinstance(result, dict) else None
+    expected = {names[value] for value in targets}
+    if not isinstance(audio, dict) or set(audio) != expected:
+        raise ValueError('Il worker Mega 53 ha restituito stem mancanti o inattesi')
+    from .ai_worker_artifacts import _verify_wav_bytes
+    for payload in audio.values():
+        if not isinstance(payload, bytes):
+            raise ValueError('Il worker Mega 53 ha restituito dati audio non validi')
+        _verify_wav_bytes(payload)
+    if cancel_event is not None and cancel_event.is_set():
+        raise RuntimeError('Separazione annullata')
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    paths = []
+    for name in sorted(expected):
+        path = output_dir / name
+        with path.open('xb') as stream:
+            stream.write(audio[name])
+        paths.append(path)
+    return paths, worker_job_id
 
 
 def infer_drums_vs_percussion(source, output_dir, cancel_event=None):

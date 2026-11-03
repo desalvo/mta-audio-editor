@@ -209,3 +209,10 @@ Baseline: `5e9743d1a2938be9689d9e88e1afb98468b4fe77`. Il run ha un solo fallimen
 Nessuna modifica ai sorgenti applicativi, alle licenze o ai manifest di sicurezza. Rapporto: `CI_41491614671_R210.md`. **RC 34/42 = 81,0%**, nuova CI remota da verificare sul prossimo commit.
 
 Verifica finale hotfix 41491614671: **550 test passati, zero skip/fallimenti/errori**, Ruff superato; 566 sorgenti runtime invariati e revisione di sicurezza coerente.
+
+
+## 2026-11-03 — normalizzazione MTA e installazione Mega 53
+
+- Normalizzazione MTA: misura e guadagno escludono click, accordi generati e tracce contrassegnate nell’Inspector; slot misti separati fino al ricalcolo, clipping rilevato, tracce mute effettivamente silenziose. Test locali PCM/MP3 per MTA8/MTA16; verifica fisica su Merish ancora necessaria.
+- Amministrazione: installazione locale esplicita Mega 53 con commit Git fissato, YAML/checkpoint ufficiali verificati, ambiente separato, caricamento stretto del modello e pubblicazione solo a verifica superata. Job annullabile, esecuzione effettiva e GPU ancora da validare. I test automatici simulano download e installazione.
+- Ancora aperto: installazione remota dei worker e installazione web completa di tutti i runtime accessori non già coperti dalle ricette esistenti; non dichiarare chiusa l’area fino a test reali. Nessun server reale è stato modificato.

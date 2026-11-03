@@ -103,6 +103,13 @@ _DEPENDENCIES = frozenset({'torch', 'torchaudio', 'torchcodec', 'demucs', 'sound
 _FAILURE_MARKERS = (
     ('MTA_BACKING_FAILURE:rocm_conversion_failed', 'backing_rocm_conversion_failed'),
     ('MTA_BACKING_FAILURE:unsupported_mdx_runtime', 'backing_runtime_incompatible'),
+    ('Mega 53 runtime upstream non configurato', 'mega53_configuration_missing'),
+    ('Mega 53 requires a local absolute upstream directory', 'mega53_configuration_missing'),
+    ('Mega 53 upstream inference.py not found', 'mega53_configuration_missing'),
+    ('Mega 53 requires a regular absolute config file', 'mega53_configuration_missing'),
+    ('Mega 53 requires a regular absolute checkpoint file', 'mega53_configuration_missing'),
+    ('Mega 53 requires a regular absolute Python interpreter file', 'mega53_configuration_missing'),
+    ('Mega 53 checkpoint SHA-256 mismatch', 'mega53_checkpoint_mismatch'),
 
     ('Worker outputs exceed artifact size limit', 'worker_output_size_limit'),
     ('TorchCodec is required', 'worker_audio_codec_missing'),
@@ -129,6 +136,8 @@ _FAILURE_MARKERS = (
 FAILURE_CATEGORIES = frozenset({'worker_exit', *(code for _, code in _FAILURE_MARKERS)})
 
 _FAILURE_HINTS = {
+    'mega53_configuration_missing': 'Configure MTA_MEGA53_ROOT, MTA_MEGA53_CONFIG and MTA_MEGA53_CHECKPOINT on the executing worker; see the administrator guide.',
+    'mega53_checkpoint_mismatch': 'The Mega 53 checkpoint does not match the expected v1.0.21 SHA-256; see the administrator guide.',
     'sam_checkpoint_access_denied': 'Check model approval and Hugging Face authentication for the service account.',
     'sam_checkpoint_not_found_or_inaccessible': 'Check the selected model identifier and account access.',
     'sam_hub_rate_limited': 'Hugging Face rate limit reached; retry later.',

@@ -408,8 +408,10 @@ def recipes():
     for item in LEAD_BACKING_MODELS:
         identifier=item['id']
         add('vocals-'+identifier,'vocals',item['display_name'],
-            f'/api/vocal-separation/models/{identifier}/download' if identifier!='mvsep-mega53' else '',
-            f'/api/vocal-separation/models/{identifier}',note='Operator-authorized external MSST checkpoint; use its configured files below.' if identifier=='mvsep-mega53' else '')
+            f'/api/vocal-separation/models/{identifier}/download' if identifier!='mvsep-mega53' else '/api/admin/ai/mega53/runtime/install',
+            f'/api/vocal-separation/models/{identifier}' if identifier!='mvsep-mega53' else '',
+            body={'accept_licenses':True,'device':'auto'} if identifier=='mvsep-mega53' else None,
+            note='Install the verified runtime on the local worker; remote workers need their own installation.' if identifier=='mvsep-mega53' else '')
     add('drumsep','drumsep','DrumSep ONNX','/api/drumsep/models/download','/api/drumsep/models')
     add('basic-pitch','basic-pitch','Basic Pitch 0.4.0 ONNX runtime','/api/admin/ai/studio/models/basic-pitch/install',
         '/api/admin/ai/studio/models/basic-pitch',body={'accept_licenses':True},installed=(studio_root()/'basic-pitch.json').exists())
@@ -424,7 +426,7 @@ def recipes():
         add('bundle-'+asset['id'],asset['kind'],asset['name'],'',f"/api/admin/ai/model-assets/bundles/{asset['id']}",
             installed=asset['installed'],note='Complete managed bundle; files and missing members are listed below. Import a reviewed ZIP for a new model.')
     for row in rows:
-        if row['engine'] in ('whisper','chords','vocals','drumsep'):
+        if row['engine'] in ('whisper','chords','vocals','drumsep') and row['id']!='vocals-mvsep-mega53':
             row['delete_url']='/api/admin/ai/model-assets/recipes/'+row['id']
     return rows
 

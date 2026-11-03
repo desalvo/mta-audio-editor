@@ -215,13 +215,24 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5652,
+      "line": 5672,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "ba2146256de24c5c1aec303c94b4c81e62554158fc0b9998c95155f112fa742c",
+      "source_sha256": "b2b1cc761af709395bc91ac1fec487db47e54326fef95058679ec7f8c0dcc561",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
+    },
+    {
+      "path": "app/mega53_install.py",
+      "function": "_download",
+      "line": 92,
+      "call": "secure_https.https_urlopen",
+      "call_sha256": "63fe1b63bcfd96fb8935724d8e65fdc889d0ba359e1031a16f4e557334b02075",
+      "source_sha256": "39680a52cd307de733aadf1a6ce8ff199cb9fd0c5fe5c8585e1dab8bf16aef05",
+      "category": "asset_download",
+      "boundary": "Administrator-triggered HTTPS downloads use constant original release URLs, exact expected length and SHA-256, bounded streaming and private staging; no request-supplied network destination or inference payload.",
+      "verification": "tests/test_r210_mega53_web_install.py rejects incorrect bytes and exercises explicit consent and rollback; source commit independently pinned to the upstream release."
     },
     {
       "path": "app/model_asset_admin.py",
@@ -229,7 +240,7 @@
       "line": 330,
       "call": "secure_https.https_urlopen",
       "call_sha256": "88ebab48ce7bde67d204aa4816da05630be5501fdf0bd9e6061a9a570c856394",
-      "source_sha256": "d435e1bb234cb7b95de4fcbb1aa369f527505fa151c0334799407e0428f0009f",
+      "source_sha256": "0d945532d14831f4398948b4afa9b71ef339326c28ec38f5d3997429147b0933",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -240,7 +251,7 @@
       "line": 381,
       "call": "secure_https.https_urlopen",
       "call_sha256": "508dab96af65b214cac3269c1447b166ce007c338d421ef7d4dea00170673094",
-      "source_sha256": "d435e1bb234cb7b95de4fcbb1aa369f527505fa151c0334799407e0428f0009f",
+      "source_sha256": "0d945532d14831f4398948b4afa9b71ef339326c28ec38f5d3997429147b0933",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -500,5 +511,17 @@
       "deployed SMTP/microphone/multi-browser certification",
       "hardware/kernel or multi-host attestation"
     ]
+  },
+  "mega53_worker_routing_review_20261103": {
+    "test": "tests/test_r210_mega53_worker_routing.py",
+    "scope": "Registered drumsep routing, fixed validated artifact names, explicit no-fallback behavior, configuration diagnostics and icon-only control; no new process or network boundaries. Existing site identities reviewed and preserved."
+  },
+  "mta_guides_mega53_checkpoint_review_20261103": {
+    "test": "tests/test_r210_mega53_worker_routing.py",
+    "scope": "MTA guide exclusion and two administrator-only checkpoint routes; bounded upload, pinned hash verification and fixed-path atomic publication reviewed. Existing identities preserved."
+  },
+  "mega53_web_install_review_20261103": {
+    "evidence": "tests/test_r210_mega53_web_install.py",
+    "scope": "Fixed-source administrator installation; no caller-provided URL or command; model load is not real inference or hardware attestation."
   }
 }

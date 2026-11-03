@@ -15,6 +15,81 @@ def register_routes(app,actor):
         if user.get('role')!='admin':raise HTTPException(403,'Administrator required')
         return user
 
+    @app.post('/api/admin/ai/mega53/runtime/install')
+    def install_mega53_runtime(body:dict,request:Request):
+        user=admin(request)
+        if set(body)!={'accept_licenses','device'} or body.get('accept_licenses') is not True or body.get('device') not in ('auto','cpu','cuda','rocm'):
+            raise HTTPException(422,'Explicit license acceptance and a supported device are required')
+        jid=uuid.uuid4().hex
+        def run(progress,stop):
+            from . import mega53_install
+            from .storage import _atomic_json_write
+            def update(phase,done,total):
+                _atomic_json_write(progress,{'phase':phase,'message':phase,'downloaded_bytes':done,
+                    'total_bytes':total,'progress_percent':round(done*100/total,1) if total else None})
+            result=mega53_install.install(body['device'],stop.is_set,update,job_id=jid)
+            _atomic_json_write(progress,{'phase':'mega53-installed','message':'Checkpoint and strict model load verified; real inference remains untested',
+                'progress_percent':100,'result':result})
+        _,job=queue.start('studio-models','worker:studio-install',run,job_id=jid,cancellable=True,
+            payload={'schema_version':1,'actor_user_id':user['id'],'model':'mega53-runtime'})
+        return {'job_id':jid,'job':job}
+
+    @app.get('/api/admin/ai/mega53/runtime/installations/{job_id}')
+    def mega53_installation_status(job_id:str,request:Request):
+        admin(request)
+        payload=queue.read_payload(job_id)
+        if not payload or payload.get('model')!='mega53-runtime':raise HTTPException(404,'Mega 53 installation not found')
+        return queue.get(job_id)
+
+    @app.post('/api/admin/ai/mega53/checkpoint/verify')
+    def verify_mega53(request:Request):
+        admin(request)
+        from . import mega53_runtime as mega
+        try:
+            mega.verify_mega53_checkpoint(mega._required_setting('MTA_MEGA53_CHECKPOINT'))
+            try:
+                mega.check_local_configuration()
+                paths_ready = True
+            except (RuntimeError, OSError):
+                paths_ready = False
+            return {'checkpoint_verified':True,'paths_ready':paths_ready,
+                    'inference_tested':False,'scope':'local-server'}
+        except (RuntimeError, OSError) as exc:
+            raise HTTPException(409,str(exc)) from exc
+
+    @app.post('/api/admin/ai/mega53/checkpoint/install')
+    async def install_mega53(request:Request,accept_licenses:bool=False):
+        admin(request)
+        if not accept_licenses:raise HTTPException(422,'Review the exact component licenses first')
+        from . import mega53_runtime as mega
+        destination=mega.managed_checkpoint()
+        try:
+            if os.getenv('MTA_MEGA53_CHECKPOINT'):
+                raise ValueError('An external checkpoint override is configured; remove it before installing the managed checkpoint')
+            root=destination.parent
+            if root.is_symlink() or root.parent.is_symlink():raise ValueError('Unsafe managed model directory')
+            root.mkdir(parents=True,exist_ok=True)
+            if destination.is_symlink():raise ValueError('Unsafe managed checkpoint')
+            with tempfile.TemporaryDirectory(prefix='.mega53-',dir=root) as folder:
+                staged=Path(folder)/'checkpoint';size=0
+                with staged.open('xb') as stream:
+                    async for chunk in request.stream():
+                        size+=len(chunk)
+                        if size>8*1024**3:raise ValueError('Checkpoint exceeds the maximum upload size')
+                        stream.write(chunk)
+                mega.verify_mega53_checkpoint(staged)
+                with models.mutation():
+                    if destination.is_symlink():raise ValueError('Unsafe managed checkpoint')
+                    os.replace(staged,destination)
+            try:
+                mega.check_local_configuration()
+                paths_ready=True
+            except (RuntimeError,OSError):
+                paths_ready=False
+            return {'checkpoint_verified':True,'paths_ready':paths_ready,
+                    'inference_tested':False,'scope':'local-server'}
+        except (ValueError,RuntimeError,OSError) as exc:raise HTTPException(409,str(exc)) from exc
+
     @app.get('/api/admin/ai/model-assets')
     def inventory(request:Request,engine:str='',search:str=Query('',max_length=200),offset:int=Query(0,ge=0),limit:int=Query(100,ge=1,le=250)):
         admin(request)

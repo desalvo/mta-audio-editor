@@ -160,7 +160,7 @@ def infer(plan: dict, output: Path) -> None:
             else:
                 if 'drums' in requested:
                     raise ValueError('Group drum/percussion separation requires both classes')
-                paths = infer_drums(source, folder, set(requested))
+                paths = infer_drums(source, folder, {'hh' if name == 'hi-hat' else name for name in requested})
             _artifacts(folder, [(p, 'audio/wav') for p in paths]); return
         from app.drumsep_onnx_worker import infer as drumsep_infer
         configured = os.environ.get('MTA_AI_DRUMSEP_MODEL', '')

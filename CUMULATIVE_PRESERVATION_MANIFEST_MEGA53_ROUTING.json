@@ -1,0 +1,34 @@
+{
+  "commit_base": "01b2958061eca58c501bf3aa3fe48c13a2df7e8e",
+  "previous_package_sha256": "3dd8a3d3f54ed10a77bc71b27a156498bab155f3bf8b76aa71eeb296a56a2743",
+  "changed": [
+    "app/ai_cgroup_metering.py",
+    "app/ai_unified_adapter.py",
+    "app/docs/MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+    "app/docs/MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+    "app/docs/admin-en.html",
+    "app/docs/admin.html",
+    "app/mega53_runtime.py",
+    "app/main.py",
+    "app/static/app.js",
+    "app/templates/index.html",
+    "docs/security/APP_SECURITY_REVIEW_R210.json",
+    "docs/security/AI_EXECUTION_REVIEW_R210.json",
+    "docs/security/SERVICE_ADMISSION_REVIEW_R210.json",
+    "docs/security/REMOTE_TRANSPORT_REVIEW_R210.json",
+    "app/percussion_benchmark.py",
+    "docs/WORK_STATUS_R210_20261103_IT.md"
+  ],
+  "added": [
+    "docs/MEGA53_WORKER_CONFIGURATION_R210_IT_EN.md",
+    "docs/security/MEGA53_WORKER_ROUTING_REVIEW_R210.md",
+    "docs/validation/r210/mega53-worker-routing/bandit.json",
+    "docs/validation/r210/mega53-worker-routing/review-result.json",
+    "tests/test_r210_mega53_worker_routing.py",
+    "validation/r210-mega53-admin-pdf-qa.json",
+    "validation/r210-mega53-security-gates.xml",
+    "validation/r210-mega53-worker-local.xml",
+    "validation/r210-mega53-worker-routing.xml"
+  ],
+  "deleted": []
+}

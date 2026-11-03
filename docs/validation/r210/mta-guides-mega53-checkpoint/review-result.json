@@ -1,0 +1,38 @@
+{
+  "execution": {
+    "inventory_passed": true,
+    "runtime_source_files": 575,
+    "reviewed_boundaries": 819,
+    "families": 10,
+    "hardware_model_rights_or_kernel_attestation": false,
+    "release_candidate": false
+  },
+  "transport": {
+    "reviewed_sites": 32,
+    "source_files": 21,
+    "inventory_passed": true,
+    "remote_model_attestation_complete": false,
+    "release_candidate": false
+  },
+  "admission": {
+    "inventory_passed": true,
+    "source_files": 324,
+    "reviewed_sites": 179,
+    "scope": "Supported single pinned Linux authority replicas and HTTPS-only original workers",
+    "financial_transition_authorized": false,
+    "external_kernel_or_multihost_accepted": false,
+    "release_candidate": false
+  },
+  "security": {
+    "reviewed_findings": 181,
+    "source_files": 324,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 160
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  }
+}

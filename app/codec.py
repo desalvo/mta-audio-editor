@@ -401,8 +401,17 @@ def _normalize_mta_slots(paths: list[Path], target_db: float, directory: Path) -
     return result
 
 
+def _mta_normalization_guide(track: Track) -> bool:
+    """Recognize click and the existing generated-chords track convention."""
+    name = track.name.strip().lower()
+    return (track.mta_normalization_exempt or track.type == "click" or track.filename.lower().startswith("chords-piano-")
+            or name in {"chords", "accordi", "chords piano", "accordi piano"})
+
+
 @project_scope
 def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None, profile: str | None = None, *, normalize_peak_db: float | None = None) -> Path:
+    if normalize_peak_db is not None and (not math.isfinite(normalize_peak_db) or not -30 <= normalize_peak_db <= 0):
+        raise ValueError("MTA normalization target must be between -30 and 0 dBFS")
     if normalize_peak_db is not None and any(insert.enabled for insert in project.master_inserts):
         raise ValueError("MTA proportional normalization cannot reproduce active master inserts; bypass them before export")
     if any(insert.enabled for insert in project.master_inserts):
@@ -437,6 +446,10 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
             rendered[track.id] = rw
 
         slot_files: list[Path] = []
+        # A physical slot may contain both guide and ordinary tracks. Keep the
+        # two buses separate until the common musical gain has been measured.
+        normalizable: dict[int, Path] = {}
+        guides: dict[int, Path] = {}
         physical_slots: list[MtaSlotMapping] = []
         slot_by_number = {slot.slot: slot for slot in slots}
         force_full_mta8 = project.target == "MTA8" and effective_profile in MTA8_DEVICE_LAYOUTS
@@ -469,32 +482,62 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
             if effective_profile == "merish5_xynthia2_experimental":
                 slot = slot.model_copy(update={"type": MTA8_SLOT_TYPES[effective_profile][slot_number - 1]})
             tracks = [by_id[tid] for tid in slot.track_ids]
-            cmd = ["ffmpeg", "-y", "-v", "error"]
-            for t in tracks:
-                cmd += ["-i", str(rendered[t.id])]
-            any_solo = any(t.solo for t in project.tracks)
-            filters = []
-            labels = []
-            for idx, t in enumerate(tracks):
-                muted = t.mute or (any_solo and not t.solo)
-                gain = -120.0 if muted else t.volume_db
-                pan = min(1.0, max(-1.0, t.pan))
-                filters.append(f"[{idx}:a]aformat=channel_layouts=stereo,volume={gain:.3f}dB,stereotools=balance_out={pan:.4f}[s{idx}]")
-                labels.append(f"[s{idx}]")
-            transform = f"volume={project.master_volume_db:.3f}dB," + master_fade_filter(project) + "," + project_time_pitch_filter(project)
-            if len(labels) == 1:
-                filters.append(f"{labels[0]}{transform}[out]")
+            def render_group(group, suffix):
+                cmd = ["ffmpeg", "-y", "-v", "error"]
+                for t in group:
+                    cmd += ["-i", str(rendered[t.id])]
+                any_solo = any(t.solo for t in project.tracks)
+                filters = []
+                labels = []
+                for idx, t in enumerate(group):
+                    muted = t.mute or (any_solo and not t.solo)
+                    gain = t.volume_db
+                    pan = min(1.0, max(-1.0, t.pan))
+                    volume = 'volume=0' if muted else f'volume={gain:.3f}dB'
+                    filters.append(f"[{idx}:a]aformat=channel_layouts=stereo,{volume},stereotools=balance_out={pan:.4f}[s{idx}]")
+                    labels.append(f"[s{idx}]")
+                transform = f"volume={project.master_volume_db:.3f}dB," + master_fade_filter(project) + "," + project_time_pitch_filter(project)
+                if len(labels) == 1:
+                    filters.append(f"{labels[0]}{transform}[out]")
+                else:
+                    filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]")
+                    filters.append(f"[mix]{transform}[out]")
+                merged = td / f"slot-{slot_number:02d}-{suffix}.wav"
+                cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", "-ar", "44100", "-c:a", "pcm_f32le" if normalize_peak_db is not None else "pcm_s24le", str(merged)]
+                run(cmd)
+                return merged
+
+            if normalize_peak_db is None:
+                merged = render_group(tracks, "mix")
             else:
-                filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]")
-                filters.append(f"[mix]{transform}[out]")
-            merged = td / f"slot-{slot_number:02d}.wav"
-            cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", "-ar", "44100", "-c:a", "pcm_f32le" if normalize_peak_db is not None else "pcm_s24le", str(merged)]
-            run(cmd)
+                music = [t for t in tracks if not _mta_normalization_guide(t)]
+                guide = [t for t in tracks if _mta_normalization_guide(t)]
+                index = len(slot_files)
+                if music:
+                    normalizable[index] = render_group(music, "music")
+                if guide:
+                    guides[index] = render_group(guide, "guides")
+                merged = normalizable.get(index) or guides[index]
             slot_files.append(merged)
             physical_slots.append(slot)
 
-        if normalize_peak_db is not None:
-            slot_files = _normalize_mta_slots(slot_files, float(normalize_peak_db), td)
+        if normalize_peak_db is not None and normalizable:
+            indices = list(normalizable)
+            normalized = _normalize_mta_slots([normalizable[i] for i in indices], float(normalize_peak_db), td)
+            for index, path in zip(indices, normalized):
+                if index in guides:
+                    mixed = td / f"normalized-with-guides-{index:02d}.wav"
+                    run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-i", str(guides[index]),
+                         "-filter_complex", "[0:a][1:a]amix=inputs=2:duration=longest:normalize=0[out]",
+                         "-map", "[out]", "-c:a", "pcm_f32le", str(mixed)])
+                    import numpy as np
+                    import soundfile as sf
+                    with sf.SoundFile(str(mixed)) as audio:
+                        for block in audio.blocks(blocksize=65536, dtype="float64", always_2d=True):
+                            if not np.isfinite(block).all() or np.max(np.abs(block), initial=0) > 1.0 + 1e-7:
+                                raise ValueError("MTA normalization with a guide would clip a mixed slot; lower the target peak")
+                    path = mixed
+                slot_files[index] = path
 
         # Stock M-Live material uses CBR 320 kb/s stereo streams. Pad every
         # physical slot to the same sample count before encoding so a shorter
