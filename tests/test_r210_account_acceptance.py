@@ -59,7 +59,7 @@ def assert_accessible_owner_page(page):
 @pytest.mark.parametrize('language',['it','en'])
 @pytest.mark.parametrize('width',[390,1280])
 def test_full_account_and_credit_pages_regime_policy_language_and_keyboard(account,monkeypatch,nc_browser_config,scenario,language,width):
-    from playwright.sync_api import sync_playwright
+    from playwright.sync_api import expect, sync_playwright
     configure(account,scenario,language);web=client(account,monkeypatch);calls=[];errors=[]
     with sync_playwright() as pw:
         browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000},locale='it-IT' if language=='it' else 'en-GB')
@@ -76,7 +76,8 @@ def test_full_account_and_credit_pages_regime_policy_language_and_keyboard(accou
             assert page.locator('[data-resource-account]').is_visible()
             if scenario=='no_plan':assert page.locator('[data-activate=trial]').count()==1
             if scenario=='paid':assert page.get_by_role('button',name='Paga abbonamento con PayPal' if language=='it' else 'Pay subscription with PayPal',exact=False).count()==0
-            if scenario in ('active','trial','paid','credits_disabled','permission_disabled'):assert page.locator('[data-cancel]').count()==1
+            if scenario in ('active','trial','paid','credits_disabled','permission_disabled'):
+                expect(page.locator('[data-cancel]')).to_have_count(1)
         # Keyboard reaches the named refresh control, without an artificial click.
         page.locator('#accountLimitsRefresh').focus();assert page.locator('#accountLimitsRefresh').evaluate('e=>document.activeElement===e')
         page.keyboard.press('Enter');page.locator('[data-account-financial]').wait_for()

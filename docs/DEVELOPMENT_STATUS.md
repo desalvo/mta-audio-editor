@@ -231,3 +231,11 @@ La CI conferma il ripristino dei permessi. Il solo test fallito riguarda il rapp
 - La dashboard gestisce testo, immagini, audio e video. Gli allegati sono verificati lato server, con limite di 20 MiB per file e quota di 512 MiB per mittente. Le conversazioni restano disponibili ai partecipanti finché gli account e i relativi dati sono conservati. Le email sono accodate sul server e contengono un avviso generico e, con URL pubblico configurato, il link alla dashboard. La consegna richiede SMTP configurato.
 - Reso esplicito il contrasto e il rendering delle etichette nei pulsanti della scelta formato, dei parametri di export e della mappatura MTA.
 - **RC invariata al 73%**. Questo batch aggiunge una funzionalità al perimetro e non chiude un gate esterno. CI remota, verifica visiva nel browser e consegna SMTP su server reale da confermare.
+
+## CI 41717062183 — cutover e revisione sicurezza dopo la messaggistica
+
+- Baseline verificata contro l’albero Git del commit `e54f7113fd26d01592dcb2a11e0895e024e5e799`. La full CI ha riportato 101 test falliti e un falso positivo Gitleaks sul digest pubblico di `app/auth.py`.
+- Il cutover riconosce esplicitamente `direct_messages` come tabella di comunicazione. La prova di cutover in entrambe le direzioni conserva i messaggi esistenti e il controllo continua a rifiutare tabelle ignote o storico finanziario inatteso.
+- Un nuovo collegamento SQLite può ripetere una sola volta la lettura iniziale della barriera su BUSY/LOCKED. L’errore persistente e le prove mancanti continuano a bloccare l’operazione. Il test browser del profilo aspetta il pulsante di annullamento con un’asserzione Playwright mantenendo il conteggio atteso.
+- Il registro Bandit marca i digest pubblici con `sha256:` e li confronta integralmente. La regola Gitleaks responsabile del falso positivo è stata verificata sulla riga originale e su quella corretta. Nessuna allowlist aggiunta. Le disposizioni Bandit restano le stesse e le verifiche degli inventari restano attive.
+- **RC 73%**. Le verifiche locali coprono API, cutover, cronologia privata, contesa e inventari. Chromium e lo scanner Gitleaks completo vanno rieseguiti nella prossima full CI.

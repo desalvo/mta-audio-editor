@@ -27,7 +27,11 @@ def test_prepared_providers_and_prices_are_not_money_and_actual_api_preserves_ev
         json={'start':1,'end':2,'documented_cost_cents':0,'operator_cost_exclusion_confirmed':True})
     assert statement.status_code==200,statement.text
     with auth.db() as c:
-        c.execute('BEGIN IMMEDIATE');before=snapshot(c)
+        c.execute('BEGIN IMMEDIATE')
+        c.execute("INSERT INTO direct_messages(sender,recipient,text,created_at) VALUES(?,?,?,?)",
+                  (uid, admin, 'Private history across cutover', 1))
+        messages = [tuple(row) for row in c.execute('SELECT * FROM direct_messages')]
+        before = snapshot(c)
     review=client.get(BASE+'/preflight?target=COMMERCIAL').json()
     assert review['maintenance_eligibility']=='verified_precommercial_profile'
     assert review['financial_model']['legacy_migration_supported'] is False
@@ -44,6 +48,7 @@ def test_prepared_providers_and_prices_are_not_money_and_actual_api_preserves_ev
     assert client.post(BASE,headers=HEADERS,json=back).status_code==200
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE');assert snapshot(c)==before
+        assert [tuple(row) for row in c.execute('SELECT * FROM direct_messages')] == messages
 
 
 @pytest.mark.parametrize('table,sql',[

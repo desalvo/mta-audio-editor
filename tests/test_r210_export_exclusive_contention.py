@@ -60,6 +60,27 @@ def test_barrier_timeout_is_bounded_restored_and_its_reader_is_released(installe
     with lease.lease(exclusive=True):pass
 
 
+def test_new_connection_retries_only_original_barrier_read(installed, monkeypatch):
+    original = lease.fence_held
+    blocked = []
+    with sqlite3.connect(auth.db_path()) as writer:
+        writer.execute('BEGIN EXCLUSIVE')
+
+        def observe(connection):
+            try:
+                return original(connection)
+            except BarrierUnavailable as exc:
+                assert exc.retryable
+                blocked.append(exc)
+                writer.rollback()
+                raise
+
+        monkeypatch.setattr(lease, 'fence_held', observe)
+        with auth.db() as con:
+            assert con.execute('SELECT 1').fetchone()[0] == 1
+    assert len(blocked) == 1
+
+
 @pytest.mark.parametrize('damage',['missing-row','missing-table'])
 def test_missing_barrier_evidence_is_unavailable_and_never_retryable(installed,damage):
     from app import main

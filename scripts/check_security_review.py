@@ -37,7 +37,7 @@ def validate(root,scan,review):
         raise ReviewInvalid('Incomplete or errored Bandit scan')
     hashes=source_hashes(root)
     if (not isinstance(review,dict) or review.get('schema')!='mta-security-review-1'
-            or review.get('source_sha256')!=hashes or not isinstance(review.get('findings'),list)):
+            or review.get('source_sha256')!={p:'sha256:'+digest for p,digest in hashes.items()} or not isinstance(review.get('findings'),list)):
         raise ReviewInvalid('Security review is missing or stale for current source')
     metrics=scan.get('metrics',{});totals=metrics.get('_totals',{})
     if set(metrics)-{'_totals'}!=set(hashes) or any(totals.get(k)!=0 for k in ('nosec','skipped_tests','SEVERITY.HIGH')):

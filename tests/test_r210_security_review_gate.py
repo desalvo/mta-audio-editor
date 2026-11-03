@@ -18,7 +18,7 @@ def fixture_review(tmp_path):
     scan={'errors':[],'results':[row],'metrics':{'app/example.py':{},'_totals':{'nosec':0,'skipped_tests':0,'SEVERITY.HIGH':0,'SEVERITY.MEDIUM':0,'SEVERITY.LOW':1}}}
     item={'id':gate.finding_identity(row),'disposition':'false_positive','rationale':'Fixture constant is not an authentication secret.',
           'boundary':'Synthetic application source with no external inputs.','verification':'The exact source and finding are checked in this test.'}
-    review={'schema':'mta-security-review-1','source_sha256':gate.source_hashes(tmp_path),'findings':[item]}
+    review={'schema':'mta-security-review-1','source_sha256':{p:'sha256:'+digest for p,digest in gate.source_hashes(tmp_path).items()},'findings':[item]}
     return scan,review
 
 

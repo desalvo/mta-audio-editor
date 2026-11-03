@@ -120,7 +120,7 @@ class _Connection(sqlite3.Connection):
             # An interrupted cutover outlives the flock. New non-owner database
             # connections may inspect it, but cannot mutate any financial/schema
             # state. Login/session operations remain available for recovery.
-            if not _owns_lease() and fence_held(self):
+            if not _owns_lease() and self._initial_fence_held():
                 writes = {sqlite3.SQLITE_INSERT, sqlite3.SQLITE_UPDATE, sqlite3.SQLITE_DELETE}
                 ddl = {sqlite3.SQLITE_CREATE_INDEX, sqlite3.SQLITE_CREATE_TABLE,
                        sqlite3.SQLITE_CREATE_TRIGGER, sqlite3.SQLITE_CREATE_VIEW,
@@ -142,6 +142,17 @@ class _Connection(sqlite3.Connection):
             self._admission.__exit__(None,None,None)
             self._admission = None
             raise
+
+    def _initial_fence_held(self):
+        from .sqlite_availability import BarrierUnavailable
+        try:
+            return fence_held(self)
+        except BarrierUnavailable as exc:
+            if not exc.retryable:
+                raise
+            # The connection has not been handed to its caller. Replay only
+            # the original read, never a caller transaction or a write.
+            return fence_held(self)
 
     def __exit__(self, *args):
         try:
