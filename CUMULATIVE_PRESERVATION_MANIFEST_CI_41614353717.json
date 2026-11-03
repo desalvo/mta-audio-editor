@@ -1,0 +1,14 @@
+{
+  "commit_base": "c64c8951973c1c0a7b32531038a458ecf7f6d7a0",
+  "previous_package_sha256": "6b176913ac85f5c66322b7cb371845b56ca6a5314763a1a5cee72f17e06855ac",
+  "changed": [
+    "tests/test_r210_admin_cutover_e2e.py",
+    "tests/test_r210_guardian_cutover_history.py",
+    "docs/WORK_STATUS_R210_20261103_IT.md"
+  ],
+  "added": [
+    "docs/CI_41614353717_REVIEW_R210_IT.md",
+    "validation/r210-ci-41614353717-hotfix.xml"
+  ],
+  "deleted": []
+}

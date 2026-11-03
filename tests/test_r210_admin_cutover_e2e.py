@@ -47,8 +47,18 @@ def ready(account, monkeypatch, tmp_path):
     return client, account, admin
 
 
-def begin(client, *, target='NON_COMMERCIAL', identifier='actual-cutover-1'):
-    review = client.get(BASE + '/preview', params={'target': target})
+def begin(client, *, target='NON_COMMERCIAL', identifier='actual-cutover-1', retry_lease_seconds=0):
+    # Tests that have just waited for a real worker may briefly overlap its
+    # cleanup lease. Only retry this exact, explicitly transient response; an
+    # actual persistent lock or a different readiness failure remains fatal.
+    deadline = time.monotonic() + retry_lease_seconds
+    while True:
+        review = client.get(BASE + '/preview', params={'target': target})
+        if (review.status_code != 409 or
+                review.json().get('detail') != 'Service activity or another cutover holds the lease' or
+                time.monotonic() >= deadline):
+            break
+        time.sleep(min(.05, max(0, deadline - time.monotonic())))
     assert review.status_code == 200, review.text
     data = review.json()
     assert data['transition_enabled'] is True

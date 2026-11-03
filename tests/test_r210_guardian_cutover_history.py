@@ -1,6 +1,7 @@
 """Real builtin execution/guardian history through the authenticated cutover API."""
 from pathlib import Path
 import sys
+import threading
 
 import pytest
 
@@ -33,12 +34,69 @@ def test_closed_intact_guardian_history_allows_two_way_cutover_and_replay(comple
     with auth.db() as con:
         original = [tuple(r) for r in con.execute('SELECT * FROM worker_cgroup_receipts')]
     for target in ('NON_COMMERCIAL', 'COMMERCIAL'):
-        body = begin(client, target=target, identifier='guardian-roundtrip-' + target)
+        body = begin(client, target=target, identifier='guardian-roundtrip-' + target, retry_lease_seconds=3)
         response = client.post(BASE, headers=HEADERS, json=body)
         assert response.status_code == 200, response.text
         assert client.post(BASE, headers=HEADERS, json=body).status_code == 200
     with auth.db() as con:
         assert [tuple(r) for r in con.execute('SELECT * FROM worker_cgroup_receipts')] == original
+
+
+def test_preview_retry_waits_for_real_reader_to_release_lease(ready):
+    client, _, _ = ready
+    acquired, release = threading.Event(), threading.Event()
+    errors = []
+    def holder():
+        try:
+            with auth.db():
+                acquired.set()
+                if not release.wait(5):
+                    raise AssertionError('reader lease was not released')
+        except BaseException as exc:
+            errors.append(exc)
+            acquired.set()
+    thread = threading.Thread(target=holder, daemon=True)
+    thread.start()
+    try:
+        assert acquired.wait(5) and not errors
+        responses = []
+        class ObservedClient:
+            def get(self, *args, **kwargs):
+                response = client.get(*args, **kwargs)
+                responses.append(response.status_code)
+                if response.status_code == 409:
+                    release.set()
+                return response
+        body = begin(ObservedClient(), identifier='guardian-retry-real-lease', retry_lease_seconds=3)
+        assert responses[0] == 409 and responses[-1] == 200
+        assert client.post(BASE, headers=HEADERS, json=body).status_code == 200
+    finally:
+        release.set()
+        thread.join(5)
+    assert not thread.is_alive() and not errors
+
+
+def test_preview_retry_never_authorizes_a_persistent_lease(ready):
+    client, _, _ = ready
+    with auth.db():
+        with pytest.raises(AssertionError, match='Service activity or another cutover holds the lease'):
+            begin(client, identifier='guardian-held-lease', retry_lease_seconds=.1)
+
+
+def test_preview_retry_does_not_retry_other_readiness_conflicts():
+    calls = []
+    class Response:
+        status_code = 409
+        text = 'other readiness conflict'
+        def json(self):
+            return {'detail': self.text}
+    class Client:
+        def get(self, *args, **kwargs):
+            calls.append(1)
+            return Response()
+    with pytest.raises(AssertionError, match='other readiness conflict'):
+        begin(Client(), retry_lease_seconds=3)
+    assert len(calls) == 1
 
 
 @pytest.mark.parametrize('damage', ['missing-receipt', 'bad-receipt', 'bad-scope', 'missing-journal', 'count', 'open-operation', 'uncertain-job'])
