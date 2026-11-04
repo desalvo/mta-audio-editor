@@ -1622,7 +1622,18 @@ def _execution_ai_catalog():
         configured=NATIVE_SINGLE_USER or execution_available('chords-ml')
         catalog['chords']['execution']='ai-queue'
         catalog['chords']['availability_basis']='trusted-worker-configuration'
-        for engine in catalog['chords']['engines']:engine['available']=configured
+        from . import ai_pull_coordinator
+        from .ai_worker_registry import resolve_worker
+        local_adapter = (not NATIVE_SINGLE_USER and ai_pull_coordinator.mode() != 'pull' and
+                         resolve_worker('chords-ml') == Path(__file__).with_name('ai_unified_adapter.py').resolve())
+        models = {model['id']: model for model in catalog['chords']['models']}
+        for engine in catalog['chords']['engines']:
+            available = configured and engine['license_mode'] != 'disabled'
+            if local_adapter and engine['id'] == 'chordino':
+                available = available and engine['available']
+            if local_adapter and engine['id'] == 'btc-hcqt':
+                available = available and (models['btc-hcqt']['installed'] or models['btc-hcqt']['download_available'])
+            engine['available'] = available
     return catalog
 
 

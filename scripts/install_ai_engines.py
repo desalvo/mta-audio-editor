@@ -274,6 +274,11 @@ def cleanup_runtimes(base, env_file, dry_run=False, proc=Path('/proc'), now=None
                 protected.update(runtime_references(base, path.read_text()))
             elif path == Path(env_file):
                 raise ValueError('Server configuration missing')
+        web_receipt = base / '.mta-web-audio.json'
+        if web_receipt.is_file() and not web_receipt.is_symlink():
+            value = json.loads(web_receipt.read_text())
+            if value.get('enabled') is True and re.fullmatch(r'[0-9a-f]{16}', value.get('generation', '')):
+                protected.add(str(base / ('ai-' + value['generation'])))
         protected.update(process_runtime_references(base, proc))
         mounts = []
         for line in (proc / 'self/mountinfo').read_text().splitlines():
@@ -320,6 +325,7 @@ def main():
     parser.add_argument('--env-file', default='/etc/mta/mta.env')
     parser.add_argument('--device', choices=('auto', 'cpu', 'cuda', 'rocm'), default='auto')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--runtime-only', metavar='GENERATION', help='Build one web-managed audio runtime without changing server settings')
     parser.add_argument('--cleanup', action='store_true', help='Remove unused runtimes older than 24 hours after successful setup')
     args = parser.parse_args()
     import fcntl  # Linux installer; keep module importable by cross-platform tests.
@@ -338,7 +344,23 @@ def main():
     fd = os.open(base / '.mta-ai-setup.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     with os.fdopen(fd, 'a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        if args.cleanup:
+        if args.runtime_only:
+            generation = args.runtime_only
+            if not re.fullmatch(r'[0-9a-f]{16}', generation) or base != Path('/opt/mta'):
+                raise ValueError('Invalid managed runtime generation')
+            parent = base / ('ai-' + generation)
+            if parent.is_symlink() or not parent.is_dir() or parent.stat().st_uid != os.geteuid() or parent.stat().st_mode & 0o022:
+                raise ValueError('Unsafe managed runtime generation')
+            if (parent / 'audio').exists() or (parent / 'audio').is_symlink():
+                raise ValueError('Managed runtime generation already in use')
+            if not all(shutil.which(name) for name in ('ffmpeg', 'ffprobe')):
+                raise ValueError('Install FFmpeg and ffprobe through the host package manager first')
+            device = selected_device(args.device)
+            folder = parent / 'audio'
+            install_group(args.python, folder, device, 'audio')
+            (folder / '.mta-ai-ready.json').write_text(json.dumps(
+                {'group': 'audio', 'fingerprint': generation, 'device': device}))
+        elif args.cleanup:
             cleanup_runtimes(base, args.env_file, args.dry_run)
         else:
             install(args)

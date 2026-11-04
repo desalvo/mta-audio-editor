@@ -1204,6 +1204,9 @@ def extract_chords(path: Path, *, interval_ms: int = 500, engine: str | None = N
     if engine == "btc-hcqt":
         from .chord_ml import extract_btc_hcqt
         return extract_btc_hcqt(path)
+    if engine in {"chordmini-btc", "chordmini-2e1d"}:
+        from .chord_ml import extract_chordmini
+        return extract_chordmini(path, engine)
     if engine == "chordformer":
         from .chord_ml import extract_chordformer
         return extract_chordformer(path)

@@ -9,7 +9,7 @@ def test_chordformer_download_denied_before_network(tmp_path, monkeypatch):
     monkeypatch.setenv('MTA_DATA_DIR',str(tmp_path))
     def no_download(*args,**kwargs):
         raise AssertionError('network download must not be reached')
-    monkeypatch.setattr(chord_ml,'_download_zip',no_download)
+    monkeypatch.setattr(chord_ml,'_download_file',no_download)
     with pytest.raises(policy.LicenseDenied):
         chord_ml.download_model('chordformer')
 

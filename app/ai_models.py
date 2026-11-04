@@ -39,7 +39,7 @@ CHORD_MODELS = [
         "quality": "high",
         "license": "CC BY-NC-SA 4.0 (checkpoint weights; non-commercial)",
     },
-    {"id": "btc-hcqt", "display_name": "BTC-HCQT (Beatles-FT)", "engine": "btc-hcqt", "quality": "high", "license": "MIT (code + published weights)"},
+    {"id": "btc-hcqt", "display_name": "BTC-HCQT (authorized checkpoint)", "engine": "btc-hcqt", "quality": "high", "license": "MIT code; replacement weights require separate authorization"},
     {"id": "chordformer", "display_name": "ChordFormer 5-fold ensemble", "engine": "chordformer", "quality": "very-high", "license": "Research implementation; upstream checkpoints downloaded on demand"},
 ]
 CHORD_ENGINES = [
@@ -48,12 +48,17 @@ CHORD_ENGINES = [
     {"id": "profile-accurate", "display_name": "Accurate · ChordFormer/BTC + harmonic refinement", "model_id": None, "ai": True, "profile": "accurate"},
     {"id": "profile-maximum", "display_name": "Maximum accuracy · Ensemble multi-engine", "model_id": None, "ai": True, "profile": "maximum"},
     {"id": "chordformer", "display_name": "ChordFormer 5-fold ensemble", "model_id": "chordformer", "ai": True},
-    {"id": "btc-hcqt", "display_name": "BTC-HCQT (Beatles-FT)", "model_id": "btc-hcqt", "ai": True},
+    {"id": "btc-hcqt", "display_name": "BTC-HCQT (authorized checkpoint)", "model_id": "btc-hcqt", "ai": True},
     {"id": "madmom-deep-chroma", "display_name": "Madmom Deep Chroma + CRF", "model_id": "madmom-deep-chroma-crf", "ai": True},
     {"id": "madmom-cnn-crf", "display_name": "Madmom CNN + CRF", "model_id": "madmom-cnn-crf", "ai": True},
     {"id": "chordino", "display_name": "Chordino / NNLS-Chroma", "model_id": None, "ai": False},
     {"id": "mta-chromagram", "display_name": "MTA Chromagram", "model_id": None, "ai": False},
 ]
+EXTERNAL_CHORD_MODELS = frozenset({"btc-hcqt", "chordformer", "chordmini-btc", "chordmini-2e1d"})
+for _engine, _name in (("chordmini-btc", "ChordMini BTC · distilled"), ("chordmini-2e1d", "ChordMini 2E1D · ChordNet")):
+    CHORD_MODELS.append({"id": _engine, "display_name": _name, "engine": _engine, "quality": "high",
+                         "license": "MIT source; exact checkpoint rights require review"})
+    CHORD_ENGINES.append({"id": _engine, "display_name": _name, "model_id": _engine, "ai": True})
 CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "mta-chromagram").strip() or "mta-chromagram"
 
 CHORD_PIPELINE_PRESETS = [
@@ -84,6 +89,12 @@ def lyrics_model_dir() -> Path:
 def _isolated_model_python(kind):
     """Use the same trusted runtime as inference, never a path from the API."""
     import sys
+    from .ai_runtime_admin import override as audio_override
+    managed, disabled = audio_override(kind)
+    if disabled:
+        raise ValueError('Shared audio runtime was uninstalled by the administrator')
+    if managed:
+        return managed if os.path.abspath(managed) != os.path.abspath(sys.executable) else None
     if os.getenv('MTA_AI_UNIFIED_WORKERS_ENABLED') != 'true':
         return None
     value = os.getenv('MTA_AI_WORKER_' + kind.upper().replace('-', '_') + '_PYTHON') or os.getenv('MTA_AI_DEFAULT_PYTHON')
@@ -97,10 +108,22 @@ def _isolated_model_python(kind):
 
 def _isolated_model_download(python, kind, model_id, model_dir=None):
     import subprocess
-    result = subprocess.run([python, str(Path(__file__).with_name('ai_model_download.py')),
+    from .ai_execution_policy import isolated_env
+    result = subprocess.run([python, '-I', str(Path(__file__).with_name('ai_model_download.py')),
                              '--kind', kind, '--model', model_id,
                              *(['--model-dir', str(model_dir)] if model_dir is not None else [])],
-                            capture_output=True, text=True, check=True, timeout=3600)
+                            capture_output=True, text=True, check=False, timeout=3600, env=isolated_env())
+    if result.returncode:
+        from .ai_cgroup_metering import _worker_failure
+        diagnostic = _worker_failure(result.stderr[-8192:], result.returncode)
+        category = {
+            'ace_unauthorized': 'model_download_http_401',
+            'ace_forbidden': 'model_download_http_403',
+            'ace_endpoint_missing': 'model_download_http_404',
+        }.get(diagnostic['category'], diagnostic['category'])
+        missing = diagnostic.get('missing_dependency')
+        LOGGER.warning("Model download failed (%s/%s): %s", kind, model_id, diagnostic)
+        raise RuntimeError(f"Model download failed ({category}{': ' + missing if missing else ''}); see server journal")
     if len(result.stdout) > 1048576:
         raise ValueError('Oversized model installation response')
     document = json.loads(result.stdout)
@@ -110,7 +133,11 @@ def _isolated_model_download(python, kind, model_id, model_dir=None):
 
 
 def _whisper_filename(model_id: str) -> str | None:
-    if _isolated_model_python('whisper') and any(item['id'] == model_id for item in LYRICS_MODELS):
+    try:
+        isolated = _isolated_model_python('whisper')
+    except (ValueError, OSError):
+        isolated = None
+    if isolated and any(item['id'] == model_id for item in LYRICS_MODELS):
         return ('large-v3-turbo' if model_id == 'turbo' else model_id) + '.pt'
     try:
         import whisper  # type: ignore
@@ -178,13 +205,17 @@ def _chord_marker(model_id: str) -> Path:
 def chord_engine_available(engine_id: str) -> bool:
     if engine_id in {"profile-stable", "profile-fast", "profile-accurate", "profile-maximum"}:
         return True
-    if engine_id in {"btc-hcqt", "chordformer"}:
+    if engine_id in EXTERNAL_CHORD_MODELS:
         from .chord_ml import engine_available
         return engine_available(engine_id)
     if engine_id in {"madmom-deep-chroma", "madmom-cnn-crf"}:
         # Web service and inference can use separate virtual environments.
         # Check the actual registered worker interpreter, not just the web venv.
-        if os.getenv('MTA_AI_UNIFIED_WORKERS_ENABLED') == 'true':
+        try:
+            isolated = _isolated_model_python('chords-ml')
+        except (ValueError, OSError):
+            return False
+        if os.getenv('MTA_AI_UNIFIED_WORKERS_ENABLED') == 'true' or isolated:
             from .ai_worker_registry import resolve_worker, worker_python
             if resolve_worker('chords-ml') is not None:
                 import subprocess
@@ -215,9 +246,29 @@ def chords_catalog(*, native: bool = False) -> dict:
     models=[]
     for raw in CHORD_MODELS:
         item=dict(raw)
-        if item["id"] in {"btc-hcqt", "chordformer"}:
-            from .chord_ml import installed
+        if item["id"] in EXTERNAL_CHORD_MODELS:
+            from .chord_ml import installed, model_dir
             item["installed"] = installed(item["id"])
+            folder = model_dir(item["id"])
+            item["installation_present"] = folder.exists() or folder.is_symlink()
+            if item["id"].startswith("chordmini-"):
+                from .model_license_policy import LicenseDenied, evaluate_model
+                try:
+                    evaluate_model(item["id"])
+                except LicenseDenied as exc:
+                    item["download_available"] = False
+                    item["download_reason"] = str(exc)
+                else:
+                    item["download_available"] = True
+            if item["id"] == "btc-hcqt":
+                from .chord_ml import authorize_btc_download
+                try:
+                    authorize_btc_download()
+                except (ValueError, RuntimeError) as exc:
+                    item["download_available"] = False
+                    item["download_reason"] = str(exc)
+                else:
+                    item["download_available"] = True
         else:
             item["installed"]=_chord_marker(item["id"]).is_file()
         models.append(item)
@@ -247,13 +298,19 @@ def _cache_snapshot() -> set[str]:
 def download_chord_model(model_id: str, *, native: bool = False) -> dict:
     spec=next((x for x in CHORD_MODELS if x["id"]==model_id),None)
     if not spec: raise ValueError("unsupported chord model")
+    if model_id in EXTERNAL_CHORD_MODELS:
+        from .model_license_policy import evaluate_model
+        if model_id == "btc-hcqt":
+            from .chord_ml import authorize_btc_download
+            authorize_btc_download()
+        else:
+            evaluate_model(model_id)
     python = None if native else _isolated_model_python('chords-ml')
     if python:
         return _isolated_model_download(python, 'chords-ml', model_id)
-    if model_id in {"btc-hcqt", "chordformer"}:
+    if model_id in EXTERNAL_CHORD_MODELS:
         from .chord_ml import download_model
-        download_model(model_id)
-        return next(x for x in chords_catalog(native=native)["models"] if x["id"]==model_id)
+        return {**spec, **download_model(model_id), "installed": True}
     if not importlib.util.find_spec("madmom_infer"):
         raise RuntimeError("madmom-infer is not installed in this runtime")
     before=_cache_snapshot()
@@ -275,7 +332,7 @@ def download_chord_model(model_id: str, *, native: bool = False) -> dict:
 def delete_chord_model(model_id: str, *, native: bool = False) -> dict:
     spec=next((x for x in CHORD_MODELS if x["id"]==model_id),None)
     if not spec: raise ValueError("unsupported chord model")
-    if model_id in {"btc-hcqt", "chordformer"}:
+    if model_id in EXTERNAL_CHORD_MODELS:
         from .chord_ml import delete_model
         removed = delete_model(model_id)
         return {"ok": True, "model_id": model_id, "removed": [model_id] if removed else [], "storage": "local" if native else "server"}

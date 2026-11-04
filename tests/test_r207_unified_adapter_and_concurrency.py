@@ -40,3 +40,35 @@ def test_concurrent_wizard_help():
     proc=subprocess.run(['bash',str(root/'scripts/install_ace_step.sh'),'--benchmark-concurrent'],capture_output=True,text=True)
     assert proc.returncode == 2
     assert 'Missing --benchmark-remote-url' in proc.stderr
+
+
+def test_chromagram_runs_without_project_bpm_in_isolated_worker(tmp_path, monkeypatch):
+    import json
+    import math
+    import struct
+    import wave
+
+    from app.ai_execution_policy import admitted_env
+    from app.model_license_policy import evaluate
+
+    monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path))
+    source = tmp_path / 'source.wav'
+    with wave.open(str(source), 'wb') as pcm:
+        pcm.setparams((1, 2, 16000, 0, 'NONE', 'not compressed'))
+        pcm.writeframes(b''.join(
+            struct.pack('<h', round(sum(2700 * math.sin(2 * math.pi * hz * i / 16000)
+                                         for hz in (130.81, 164.81, 196.00))))
+            for i in range(24000)
+        ))
+    plan = {'kind': 'chords-ml', 'engine': 'mta-chromagram', 'source_audio': str(source),
+            'options': {'preset': 'raw'}, 'bpm': None}
+    request = tmp_path / 'request.json'
+    request.write_text(json.dumps(plan))
+    monkeypatch.setenv('MTA_AI_ADMITTED_POLICY', admitted_env('chords-ml', evaluate('chords-ml', plan))['MTA_AI_ADMITTED_POLICY'])
+    result = subprocess.run(
+        [sys.executable, '-I', str(Path(adapter.__file__).resolve()), '--request', str(request),
+         '--output', str(tmp_path / 'preview.wav')], cwd=tmp_path,
+        capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    assert json.loads((tmp_path / 'chords.json').read_text())['chords']

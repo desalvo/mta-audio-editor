@@ -170,14 +170,14 @@
     },
     {
       "path": "app/chord_ml.py",
-      "function": "_download_zip",
-      "line": 122,
+      "function": "_download_file",
+      "line": 191,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "f426f9f02cd85f916058ee258f0a4f4368ced967b1e9a5edce9e857119279395",
-      "source_sha256": "dad908b9b8d0f43b6bff995388e84a977e27f4753acfd80e7fb44c70c1e23f58",
+      "source_sha256": "cd3d72fed2c96d047136f2ed806ca46ce45d8b93a679f83d6b436f7935f6938f",
       "category": "asset_download",
-      "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
-      "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
+      "boundary": "HTTPS-only transfers of fixed upstream archives and code, or an operator-configured HCQT checkpoint; archives are bounded and safely unpacked. ChordMini uses pinned commit and selected checkpoint Git blob and performs a strict CPU probe.",
+      "verification": "The ChordMini and BTC lifecycle tests verify strict loading, checkpoint integrity and atomic publication."
     },
     {
       "path": "app/credit_purchases.py",
@@ -215,10 +215,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5675,
+      "line": 5686,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "9dfccd9dd3a2af524fadac05c402831ca0b629642ede46d3ce3fb6c60efd5f76",
+      "source_sha256": "c15cc8d22012a5eb941ed83e2e4cd198aade5439677cec8ca1bd8066b4add286",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -229,7 +229,7 @@
       "line": 92,
       "call": "secure_https.https_urlopen",
       "call_sha256": "63fe1b63bcfd96fb8935724d8e65fdc889d0ba359e1031a16f4e557334b02075",
-      "source_sha256": "39680a52cd307de733aadf1a6ce8ff199cb9fd0c5fe5c8585e1dab8bf16aef05",
+      "source_sha256": "bf5ca2996bc2b8fdd90d3cf8a40e2c35ab546986ebe7251a82b48e91bda0f6ee",
       "category": "asset_download",
       "boundary": "Administrator-triggered HTTPS downloads use constant original release URLs, exact expected length and SHA-256, bounded streaming and private staging; no request-supplied network destination or inference payload.",
       "verification": "tests/test_r210_mega53_web_install.py rejects incorrect bytes and exercises explicit consent and rollback; source commit independently pinned to the upstream release."
@@ -240,7 +240,7 @@
       "line": 330,
       "call": "secure_https.https_urlopen",
       "call_sha256": "88ebab48ce7bde67d204aa4816da05630be5501fdf0bd9e6061a9a570c856394",
-      "source_sha256": "0d945532d14831f4398948b4afa9b71ef339326c28ec38f5d3997429147b0933",
+      "source_sha256": "2bc7c104e64b0a0cabee749738d1a215466d24cbc18eae310bddaa3ad4a06bea",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -251,7 +251,7 @@
       "line": 381,
       "call": "secure_https.https_urlopen",
       "call_sha256": "508dab96af65b214cac3269c1447b166ce007c338d421ef7d4dea00170673094",
-      "source_sha256": "0d945532d14831f4398948b4afa9b71ef339326c28ec38f5d3997429147b0933",
+      "source_sha256": "2bc7c104e64b0a0cabee749738d1a215466d24cbc18eae310bddaa3ad4a06bea",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."

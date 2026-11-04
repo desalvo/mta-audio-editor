@@ -64,31 +64,19 @@ def test_model_download_budget_removes_only_own_partial_file(tmp_path,monkeypatc
     monkeypatch.setattr(chord_ml,'https_urlopen',lambda *a,**kw:Response(b'123456'))
     monkeypatch.setattr(chord_ml,'MAX_DOWNLOAD_BYTES',3)
     dest=tmp_path/'model.zip'
-    with pytest.raises(RuntimeError,match='size limit'):chord_ml._download_zip('https://models.test/archive.zip',dest)
+    with pytest.raises(RuntimeError,match='size limit'):chord_ml._download_file('https://models.test/archive.zip',dest)
     assert not dest.exists()
     dest.write_bytes(b'keep')
-    with pytest.raises(FileExistsError):chord_ml._download_zip('https://models.test/archive.zip',dest)
+    with pytest.raises(FileExistsError):chord_ml._download_file('https://models.test/archive.zip',dest)
     assert dest.read_bytes()==b'keep'
-
-
-def test_failed_secondary_download_never_publishes_partial_model(tmp_path,monkeypatch):
-    monkeypatch.setenv('MTA_CHORD_ML_MODEL_DIR',str(tmp_path/'models'))
-    monkeypatch.setattr('app.model_license_policy.evaluate_model',lambda *a:None)
-    def download(url,dest):
-        if url==chord_ml.BTC_BODY_ARCHIVE:raise RuntimeError('secondary unavailable')
-        dest.write_bytes(archive([('repo/btc_hcqt_beatlesft.pt',b'weights')]))
-    monkeypatch.setattr(chord_ml,'_download_zip',download)
-    with pytest.raises(RuntimeError,match='secondary'):chord_ml.download_model('btc-hcqt')
-    assert not chord_ml.model_dir('btc-hcqt').exists()
-    assert not list((tmp_path/'models').glob('.chord-install-*'))
 
 
 def test_existing_install_is_preserved_without_redownload(tmp_path,monkeypatch):
     monkeypatch.setenv('MTA_CHORD_ML_MODEL_DIR',str(tmp_path/'models'))
     monkeypatch.setattr('app.model_license_policy.evaluate_model',lambda *a:None)
-    root=chord_ml.model_dir('btc-hcqt');root.mkdir(parents=True);(root/'keep').write_bytes(b'original')
-    monkeypatch.setattr(chord_ml,'_download_zip',lambda *a:pytest.fail('must not redownload or replace installed model'))
-    with pytest.raises(ValueError,match='existing'):chord_ml.download_model('btc-hcqt')
+    root=chord_ml.model_dir('chordformer');root.mkdir(parents=True);(root/'keep').write_bytes(b'original')
+    monkeypatch.setattr(chord_ml,'_download_file',lambda *a:pytest.fail('must not redownload or replace installed model'))
+    with pytest.raises(ValueError,match='existing'):chord_ml.download_model('chordformer')
     assert (root/'keep').read_bytes()==b'original'
 
 
@@ -98,7 +86,7 @@ def test_revoked_rights_at_publication_preserve_absent_install(tmp_path,monkeypa
         calls.append(args)
         if len(calls)==2:raise ValueError('rights revoked')
     monkeypatch.setattr('app.model_license_policy.evaluate_model',evaluate)
-    monkeypatch.setattr(chord_ml,'_download_zip',lambda url,dest:dest.write_bytes(archive([(f'repo/cache_data/{i}.sdict',b'x') for i in range(5)])))
+    monkeypatch.setattr(chord_ml,'_download_file',lambda url,dest:dest.write_bytes(archive([('repo/chord_recognition.py',b'fixture'),*((f'repo/cache_data/{i}.sdict',b'x') for i in range(5))])))
     with pytest.raises(ValueError,match='revoked'):chord_ml.download_model('chordformer')
     assert not chord_ml.model_dir('chordformer').exists()
 
@@ -172,7 +160,7 @@ def test_failed_member_crc_never_publishes_an_installed_model(tmp_path,monkeypat
     monkeypatch.setattr('app.model_license_policy.evaluate_model',lambda *a:None)
     data=archive([(f'repo/cache_data/{i}.sdict',b'unique-weights-'+str(i).encode()) for i in range(5)])
     position=data.index(b'unique-weights-4');data=data[:position]+b'X'+data[position+1:]
-    monkeypatch.setattr(chord_ml,'_download_zip',lambda url,dest:dest.write_bytes(data))
+    monkeypatch.setattr(chord_ml,'_download_file',lambda url,dest:dest.write_bytes(data))
     with pytest.raises(zipfile.BadZipFile):chord_ml.download_model('chordformer')
     assert not chord_ml.model_dir('chordformer').exists()
     assert not list((tmp_path/'models').glob('.chord-install-*'))

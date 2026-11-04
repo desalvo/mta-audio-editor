@@ -27,7 +27,7 @@ def test_admin_catalog_reflects_backend_denial_and_ui_contract(tmp_path, monkeyp
         pass
     else:
         raise AssertionError('Backend admitted model blocked by catalog')
-    js=Path(__file__).resolve().parents[1]/'app/static/ai_studio.js'
+    js=Path(__file__).resolve().parents[1]/'app/static/ai_license_settings.js'
     source=js.read_text()
     assert 'm.available_in_current_regime' in source
     assert 'm.effective_mode' in source

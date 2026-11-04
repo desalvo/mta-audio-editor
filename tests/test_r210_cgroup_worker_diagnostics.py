@@ -23,3 +23,20 @@ def test_worker_diagnostic_redacts_secret_and_url():
 
 def test_worker_diagnostic_does_not_echo_unstructured_stderr():
     assert _safe_worker_error('user supplied prompt line') == 'no safe exception detail in stderr'
+
+
+def test_chord_download_exit_exposes_fixed_diagnostic_only(monkeypatch):
+    import subprocess
+
+    import pytest
+
+    from app.ai_models import _isolated_model_download
+
+    def failed(argv, **kwargs):
+        assert argv[1] == '-I'
+        return subprocess.CompletedProcess(argv, 1, '', 'urllib.error.HTTPError: HTTP Error 404: private URL')
+
+    monkeypatch.setattr(subprocess, 'run', failed)
+    with pytest.raises(RuntimeError, match='model_download_http_404') as exc:
+        _isolated_model_download('/installed/python', 'chords-ml', 'chordformer')
+    assert 'private URL' not in str(exc.value)

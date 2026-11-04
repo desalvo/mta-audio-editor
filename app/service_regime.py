@@ -100,28 +100,36 @@ def current_regime() -> Regime:
     installation must have an initialized, matching SQLite fence epoch.
     """
     import sqlite3
+    from contextlib import closing
     from .runtime_paths import policy_paths
+    from .sqlite_availability import is_busy
     data_root,db_file = policy_paths()
     mirror = read_regime(data_root / "service-regime.json")
     if not db_file.exists():
         if mirror.regime == Regime.COMMERCIAL:
             raise RegimeError("Commercial regime requires a matching initialized fence")
         return mirror.regime
-    connection = sqlite3.connect(f"{db_file.resolve().as_uri()}?mode=ro", uri=True)
-    try:
-        table = connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='regime_fence_state'").fetchone()
-        if table is None:
-            if mirror.regime == Regime.COMMERCIAL:
-                raise RegimeError("Commercial regime requires a matching initialized fence")
-            return mirror.regime
-        row = connection.execute("SELECT regime, revision, transitioning FROM regime_fence_state WHERE singleton=1").fetchone()
-        if row is None or row[2] or (row[0], row[1]) != (mirror.regime.value, mirror.revision):
-            raise RegimeError("Service regime epoch mismatch or transition in progress")
-        return mirror.regime
-    except sqlite3.DatabaseError as exc:
-        raise RegimeError("Unable to verify service regime fence") from exc
-    finally:
-        connection.close()
+    for attempt in range(2):
+        try:
+            with closing(sqlite3.connect(f"{db_file.resolve().as_uri()}?mode=ro", uri=True, timeout=1)) as connection:
+                connection.execute("BEGIN")
+                table = connection.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='regime_fence_state'"
+                ).fetchone()
+                if table is None:
+                    if mirror.regime == Regime.COMMERCIAL:
+                        raise RegimeError("Commercial regime requires a matching initialized fence")
+                    return mirror.regime
+                row = connection.execute("SELECT regime, revision, transitioning FROM regime_fence_state WHERE singleton=1").fetchone()
+                if row is None or row[2] or (row[0], row[1]) != (mirror.regime.value, mirror.revision):
+                    raise RegimeError("Service regime epoch mismatch or transition in progress")
+                return mirror.regime
+        except sqlite3.DatabaseError as exc:
+            if attempt == 0 and is_busy(exc):
+                continue
+            if is_busy(exc):
+                raise RegimeError("Unable to verify service regime fence: database temporarily busy") from exc
+            raise RegimeError("Unable to verify service regime fence: database unavailable or damaged") from exc
 
 
 def require_commercial(operation: str = "commercial operation") -> None:

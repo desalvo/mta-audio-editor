@@ -195,3 +195,59 @@ def install(device, cancelled, progress, job_id=None):
             if (not published and not directory.is_symlink() and directory.is_dir()
                     and directory.stat().st_ino == directory_inode):
                 shutil.rmtree(directory, ignore_errors=True)
+
+
+def remove(*, checkpoint, job_id=None):
+    from .ai_project_lock import project_publication_lock
+    from .model_asset_admin import mutation
+    if any(os.getenv(name) for name in ('MTA_MEGA53_ROOT', 'MTA_MEGA53_CONFIG',
+                                        'MTA_MEGA53_PYTHON', 'MTA_MEGA53_CHECKPOINT')):
+        raise ValueError('Mega 53 is configured externally')
+    with project_publication_lock('mega53-installation'), mutation(job_id):
+        directory = root()
+        if directory.is_symlink() or directory.parent.is_symlink():
+            raise ValueError('Unsafe Mega 53 directory')
+        if checkpoint:
+            target = managed_checkpoint()
+            if target.is_symlink():
+                raise ValueError('Unsafe Mega 53 checkpoint')
+            target.unlink(missing_ok=True)
+        else:
+            state = receipt()
+            if not state:
+                raise ValueError('Verified managed Mega 53 runtime not found')
+            if not shutil.rmtree.avoids_symlink_attacks:
+                raise ValueError('Safe runtime removal unavailable')
+            (directory / 'runtime.json').unlink()
+            shutil.rmtree(directory / 'runtimes' / state['id'])
+        return {'removed':True,'checkpoint':checkpoint}
+
+
+def install_checkpoint(cancelled, job_id):
+    from tempfile import TemporaryDirectory
+    from .ai_project_lock import project_publication_lock
+    from .model_asset_admin import mutation
+    from .model_license_policy import evaluate_model
+    from .mega53_runtime import verify_mega53_checkpoint
+    if os.getenv('MTA_MEGA53_CHECKPOINT'):
+        raise ValueError('Mega 53 checkpoint is configured externally')
+    evaluate_model('mvsep-mega53')
+    target = managed_checkpoint()
+    directory = target.parent
+    if directory.is_symlink() or directory.parent.is_symlink():
+        raise ValueError('Unsafe Mega 53 directory')
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with project_publication_lock('mega53-installation'), TemporaryDirectory(dir=directory) as temp:
+        if target.is_symlink():
+            raise ValueError('Unsafe Mega 53 checkpoint')
+        if target.is_file():
+            verify_mega53_checkpoint(target)
+            return {'checkpoint_verified':True}
+        staged = Path(temp) / 'checkpoint'
+        _download(WEIGHTS, staged, cancelled, lambda *_: None)
+        with mutation(job_id):
+            evaluate_model('mvsep-mega53')
+            if cancelled():
+                raise RuntimeError('Mega 53 checkpoint installation cancelled')
+            os.replace(staged, target)
+    return {'checkpoint_verified':True}

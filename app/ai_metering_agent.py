@@ -67,6 +67,10 @@ class WorkerUncertain(RuntimeError):
         self.job_id = job_id
 
 
+class WorkerProcessFailed(RuntimeError):
+    """Supervisor-observed worker exit with a restricted public diagnostic."""
+
+
 class WorkerNotStarted(WorkerUnavailable):
     """The supervisor proves that no worker process was launched."""
 
@@ -513,7 +517,10 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             from .worker_cgroup_recovery import require_quiescent
             with ai_billing.db() as con:require_quiescent(con,job_id)
             if result is None and not isinstance(exc, WorkerNotStarted):
-                raise WorkerUncertain('Worker measurement unavailable; original owner retained', job_id=job_id) from exc
+                detail = f"{exc}; original owner retained" if isinstance(exc, WorkerProcessFailed) else (
+                    "Worker measurement unavailable; original owner retained"
+                )
+                raise WorkerUncertain(detail, job_id=job_id) from exc
             terminal_status='cancelled' if identity_lost or isinstance(exc, WorkerInterrupted) or (cancel_check is not None and cancel_check()) else 'failed'
             if gpu_slot_acquired:
                 # Do not silently finalize a job if its lease cannot be

@@ -128,7 +128,7 @@ def infer(plan: dict, output: Path) -> None:
         _artifacts(folder, [(result, 'application/json')]); return
     if kind == 'chords-ml':
         from app.music_text import extract_chords_progressive
-        chords = extract_chords_progressive(source,engine=plan.get('engine') or __import__('app.ai_models',fromlist=['chords_catalog']).chords_catalog(native=False)['default_engine'],options=plan.get('options'),bpm=float(plan.get('bpm',120)),beat_origin_ms=int(plan.get('beat_origin_ms',0)))
+        chords = extract_chords_progressive(source,engine=plan.get('engine') or __import__('app.ai_models',fromlist=['chords_catalog']).chords_catalog(native=False)['default_engine'],options=plan.get('options'),bpm=float(plan.get('bpm') or 120),beat_origin_ms=int(plan.get('beat_origin_ms') or 0))
         result = folder / 'chords.json'
         result.write_text(json.dumps({'chords': [v.model_dump(mode='json') for v in chords]}, ensure_ascii=False), encoding='utf-8')
         _artifacts(folder, [(result, 'application/json')]); return

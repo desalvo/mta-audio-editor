@@ -43,3 +43,32 @@ def test_mismatch_refuses_commercial(tmp_path, monkeypatch, change):
             connection.execute("UPDATE regime_fence_state SET regime='NON_COMMERCIAL'")
     with pytest.raises(RegimeError):
         require_commercial()
+
+
+def test_fence_retries_transient_read_only_sqlite_contention(tmp_path, monkeypatch):
+    import sqlite3
+    from app import runtime_paths, service_regime
+    db = tmp_path / 'auth.sqlite3'
+    db.touch()
+    monkeypatch.setattr(runtime_paths, 'policy_paths', lambda: (tmp_path, db))
+    connect = sqlite3.connect
+    attempts = []
+
+    def open_database(*args, **kwargs):
+        attempts.append(args[0])
+        if len(attempts) == 1:
+            raise sqlite3.OperationalError('database is locked')
+        return connect(*args, **kwargs)
+
+    monkeypatch.setattr(sqlite3, 'connect', open_database)
+    assert service_regime.current_regime() == service_regime.Regime.NON_COMMERCIAL
+    assert attempts == [db.as_uri() + '?mode=ro'] * 2
+
+
+def test_fence_does_not_retry_a_damaged_database(tmp_path, monkeypatch):
+    from app import runtime_paths, service_regime
+    db = tmp_path / 'auth.sqlite3'
+    db.write_bytes(b'invalid database contents')
+    monkeypatch.setattr(runtime_paths, 'policy_paths', lambda: (tmp_path, db))
+    with pytest.raises(service_regime.RegimeError, match='unavailable or damaged'):
+        service_regime.current_regime()

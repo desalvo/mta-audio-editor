@@ -20,7 +20,7 @@ from pathlib import Path
 from threading import Event, Lock
 from .service_admission import worker_thread as Thread
 
-from .ai_metering_agent import Measurement
+from .ai_metering_agent import Measurement, WorkerProcessFailed
 
 # The child enters the dedicated cgroup *before* exec'ing the worker. No
 # preexec_fn (unsafe from a multithreaded server) and no shell are involved.
@@ -99,7 +99,7 @@ _EXCEPTION_TYPES = frozenset({'ImportError', 'ModuleNotFoundError', 'RuntimeErro
     'TypeError', 'AttributeError', 'OSError', 'PermissionError', 'FileNotFoundError',
     'CalledProcessError', 'OutOfMemoryError', 'NotImplementedError', 'AssertionError'})
 _DEPENDENCIES = frozenset({'torch', 'torchaudio', 'torchcodec', 'demucs', 'soundfile', 'whisper',
-    'audio_separator', 'numpy'})
+    'audio_separator', 'numpy', 'librosa', 'madmom_infer', 'mir_eval', 'h5py', 'pumpp', 'jams'})
 _FAILURE_MARKERS = (
     ('MTA_BACKING_FAILURE:rocm_conversion_failed', 'backing_rocm_conversion_failed'),
     ('MTA_BACKING_FAILURE:unsupported_mdx_runtime', 'backing_runtime_incompatible'),
@@ -116,8 +116,23 @@ _FAILURE_MARKERS = (
     ("No module named 'torchcodec'", 'worker_audio_codec_missing'),
     ('Could not load libtorchcodec', 'worker_audio_codec_unavailable'),
 
+    ('Unable to verify service regime fence', 'worker_service_fence_unavailable'),
+    ('Service regime epoch mismatch or transition in progress', 'worker_service_epoch_mismatch'),
+    ('Model disabled pending license review:', 'worker_model_permission_denied'),
+    ('Restricted model permission requires', 'worker_model_permission_denied'),
+    ('ChordFormer inference script or five-fold checkpoints missing', 'chord_assets_incomplete'),
+    ('BTC-HCQT model/runtime not installed', 'chord_assets_incomplete'),
+    ('BTC-HCQT inference files are incomplete', 'chord_assets_incomplete'),
+    ('BTC-HCQT checkpoint SHA-256 mismatch', 'btc_checkpoint_mismatch'),
+    ('BTC-HCQT requires PyTorch 2.6', 'btc_checkpoint_loader_unavailable'),
+    ('BTC-HCQT checkpoint failed the local inference probe', 'btc_checkpoint_probe_failed'),
+    ('ChordFormer model/runtime not installed', 'chord_assets_incomplete'),
+    ('Chordino / NNLS-Chroma unavailable:', 'chordino_runtime_failed'),
+    ('URLError:', 'worker_download_transport_error'),
+    ('BadZipFile:', 'worker_download_archive_error'),
     ('attempted relative import with no known parent package', 'worker_import_context'),
     ('ModuleNotFoundError:', 'worker_dependency_missing'),
+    ('Chord ML engine failed', 'chord_inference_failed'),
     ('ROCm requested but unavailable', 'worker_rocm_unavailable'),
     ('Expected one of cpu, cuda', 'worker_invalid_device'),
     ('torch.OutOfMemoryError:', 'worker_out_of_memory'),
@@ -126,6 +141,7 @@ _FAILURE_MARKERS = (
     ('HTTP Error 401', 'ace_unauthorized'),
     ('HTTP Error 403', 'ace_forbidden'),
     ('HTTP Error 404', 'ace_endpoint_missing'),
+    ('HTTP Error', 'worker_download_http_error'),
     ('ACE-Step backend generation timeout', 'ace_backend_timeout'),
     ('ACE-Step backend GPU out of memory', 'ace_gpu_out_of_memory'),
     ('ACE-Step generation failed', 'ace_backend_failed'),
@@ -136,6 +152,11 @@ _FAILURE_MARKERS = (
 FAILURE_CATEGORIES = frozenset({'worker_exit', *(code for _, code in _FAILURE_MARKERS)})
 
 _FAILURE_HINTS = {
+    'worker_service_fence_unavailable': 'Check the SQLite service database and its access on the executing worker.',
+    'worker_service_epoch_mismatch': 'Check service cutover state and the worker data directory.',
+    'worker_model_permission_denied': 'Review the authorization of the exact checkpoint in server settings.',
+    'chord_assets_incomplete': 'Check the installed chord assets and the AI interpreter on the executing worker.',
+    'chordino_runtime_failed': 'Check the Vamp host and NNLS-Chroma plugin on the executing worker.',
     'mega53_configuration_missing': 'Configure MTA_MEGA53_ROOT, MTA_MEGA53_CONFIG and MTA_MEGA53_CHECKPOINT on the executing worker; see the administrator guide.',
     'mega53_checkpoint_mismatch': 'The Mega 53 checkpoint does not match the expected v1.0.21 SHA-256; see the administrator guide.',
     'sam_checkpoint_access_denied': 'Check model approval and Hugging Face authentication for the service account.',
@@ -358,7 +379,7 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
                        proc.pid, proc.returncode, _safe_worker_error(detail),
                        extra={'mta_worker_failure': failure})
             hint = _FAILURE_HINTS.get(failure['category'], 'check server diagnostics and journal')
-            raise RuntimeError(
+            raise WorkerProcessFailed(
                 f'AI worker failed (exit code {proc.returncode}); metering invalid; '
                 f'diagnostic: {failure["category"]}; {hint}')
         cpu = _cpu(job_group)

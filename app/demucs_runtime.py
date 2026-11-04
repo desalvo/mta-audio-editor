@@ -6,6 +6,12 @@ import subprocess
 
 
 def python_path():
+    from .ai_runtime_admin import override as audio_override
+    managed, disabled = audio_override('demucs')
+    if disabled:
+        raise ValueError('Shared audio runtime was uninstalled by the administrator')
+    if managed:
+        return Path(managed)
     value=os.getenv('MTA_DEMUCS_PYTHON','').strip()
     if not value:return None
     path=Path(value)

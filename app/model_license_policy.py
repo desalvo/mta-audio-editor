@@ -12,7 +12,7 @@ import time
 
 FREE_ADMISSION=ContextVar('mta_license_free_admission',default=False)
 
-RESTRICTED_MODELS = frozenset({'madmom','chordformer','audio-separator-weights','uvr-kara-2','drumsep-weights',
+RESTRICTED_MODELS = frozenset({'madmom','btc-hcqt','chordformer','chordmini-btc','chordmini-2e1d','audio-separator-weights','uvr-kara-2','drumsep-weights',
     'diffsinger-qixuan','diffsinger-nishiren','diffsinger-spore','diffsinger-vocoder','seed-vc-assets','rvc-assets','transkun-assets','mr-mt3-assets'})
 
 CATALOG={
@@ -29,9 +29,11 @@ CATALOG={
     'demucs':('MIT','cost_recovery','https://github.com/facebookresearch/demucs/blob/main/LICENSE'),
     'mta-analysis':('EUPL-1.2 / dependency licenses','cost_recovery','https://github.com/desalvo/mta-audio-editor'),
     'madmom':('CC-BY-NC-SA-4.0 weights; separate code license','disabled','https://github.com/CPJKU/madmom/blob/main/LICENSE'),
+    'chordmini-btc':('MIT source; exact distilled BTC checkpoint rights require review','disabled','https://github.com/ptnghia-j/ChordMini'),
+    'chordmini-2e1d':('MIT source; exact ChordNet checkpoint rights require review','disabled','https://github.com/ptnghia-j/ChordMini'),
     'chordformer':('Checkpoint rights require review','disabled','https://github.com/mwaseemrandhawa/ChordFormer'),
     'mvsep-mega53':('MIT weights: author ZFTurbo confirmed commercial use and redistribution for Mega 53 v1.0.21; training-data rights not warranted','cost_recovery','https://github.com/ZFTurbo/Music-Source-Separation-Training/issues/245'),
-    'btc-hcqt':('MIT code and weights, with upstream attribution','cost_recovery','https://github.com/marcusfkelley/btc-hcqt/blob/main/LICENSE'),
+    'btc-hcqt':('MIT code; original research checkpoint withdrawn, exact weights require separate authorization','disabled','https://github.com/marcusfkelley/btc-hcqt#checkpoint-availability-and-commercial-use-boundary'),
     'uvr-kara-2':('UVR upstream MIT model statement; exact checkpoint commercial rights not independently confirmed','disabled','https://github.com/Anjok07/ultimatevocalremovergui/blob/master/README.md'),
     'audio-separator-weights':('Selected checkpoint rights require review','disabled','https://github.com/Anjok07/ultimatevocalremovergui'),
     'drumsep-weights':('Selected checkpoint rights require review','disabled','https://github.com/inagoy/drumsep'),
@@ -127,7 +129,7 @@ def _require_recorded_review(model_id,custom):
         if (custom.get('confirm_risk_twice') is not True
                 or custom.get('authorization_basis') not in ('written_permission','verified_license','noncommercial_context')):
             raise LicenseDenied('Restricted model permission requires a recorded authorization basis and second confirmation')
-        if model_id in ('chordformer','audio-separator-weights','uvr-kara-2','drumsep-weights') and custom['authorization_basis']=='noncommercial_context':
+        if model_id in ('btc-hcqt','chordformer','chordmini-btc','chordmini-2e1d','audio-separator-weights','uvr-kara-2','drumsep-weights') and custom['authorization_basis']=='noncommercial_context':
             raise LicenseDenied('Unknown checkpoint permissions require actual reviewed authorization')
 
 
@@ -206,7 +208,7 @@ def selected(kind,plan):
         from .ai_models import CHORD_DEFAULT_ENGINE
         engine=str(plan.get('engine') or CHORD_DEFAULT_ENGINE)
         if engine.startswith('madmom'):return 'madmom'
-        if engine=='chordformer':return 'chordformer'
+        if engine in {'chordformer','chordmini-btc','chordmini-2e1d'}:return engine
         if engine=='btc-hcqt':return 'btc-hcqt'
         return 'mta-analysis'
     return kind
@@ -336,7 +338,7 @@ def configure(model_id,body,actor_id):
                 raise ValueError('Restricted model activation requires a second explicit confirmation')
             if body.get('authorization_basis') not in ('written_permission','verified_license','noncommercial_context'):
                 raise ValueError('Document an actual authorization basis; operator responsibility alone is insufficient')
-            if model_id in ('chordformer','audio-separator-weights','uvr-kara-2','drumsep-weights') and body['authorization_basis']=='noncommercial_context':
+            if model_id in ('btc-hcqt','chordformer','chordmini-btc','chordmini-2e1d','audio-separator-weights','uvr-kara-2','drumsep-weights') and body['authorization_basis']=='noncommercial_context':
                 raise ValueError('Unknown checkpoint permissions cannot be cured by selecting noncommercial mode')
             if body['authorization_basis']=='noncommercial_context' and commercial_service_enabled():
                 raise ValueError('Disable the entire commercial service before using a NonCommercial-only permission')

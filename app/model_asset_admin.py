@@ -401,17 +401,35 @@ def recipes():
         identifier=item['id'];filename=_whisper_filename(identifier) or ('large-v3-turbo' if identifier=='turbo' else identifier)+'.pt'
         add('whisper-'+identifier,'whisper',item['display_name'],f'/api/ai-models/lyrics/{identifier}/download-jobs',
             f'/api/ai-models/lyrics/{identifier}',installed=bool(filename and (lyrics_model_dir()/filename).is_file()))
+    from .ai_models import chords_catalog
+    chord_models = {model['id']:model for model in chords_catalog()['models']}
     for item in CHORD_MODELS:
-        identifier=item['id']
-        add('chords-'+identifier,'chords',item['display_name'],f'/api/ai-models/chords/{identifier}/download-jobs',f'/api/ai-models/chords/{identifier}')
+        identifier = item['id']
+        model = chord_models[identifier]
+        present = model.get('installation_present', model['installed'])
+        add('chords-' + identifier, 'chords', item['display_name'],
+            f'/api/ai-models/chords/{identifier}/download-jobs' if not present and model.get('download_available', True) else '',
+            f'/api/ai-models/chords/{identifier}' if present else '', installed=model['installed'],
+            note=model.get('download_reason','') if not present else '')
     from .ai_backend_models import LEAD_BACKING_MODELS
+    from . import mega53_install
+    from .mega53_runtime import managed_checkpoint
     for item in LEAD_BACKING_MODELS:
         identifier=item['id']
-        add('vocals-'+identifier,'vocals',item['display_name'],
-            f'/api/vocal-separation/models/{identifier}/download' if identifier!='mvsep-mega53' else '/api/admin/ai/mega53/runtime/install',
-            f'/api/vocal-separation/models/{identifier}' if identifier!='mvsep-mega53' else '',
-            body={'accept_licenses':True,'device':'auto'} if identifier=='mvsep-mega53' else None,
-            note='Install the verified runtime on the local worker; remote workers need their own installation.' if identifier=='mvsep-mega53' else '')
+        if identifier == 'mvsep-mega53':
+            present = managed_checkpoint().is_file()
+            external = bool(os.getenv('MTA_MEGA53_CHECKPOINT'))
+            add('vocals-' + identifier, 'vocals', 'Mega 53 v1.0.21 · checkpoint',
+                '' if external or present else '/api/admin/ai/mega53/weights/install',
+                body={'accept_licenses':True}, installed=present or external)
+            if present and not external:
+                rows[-1]['remove_job_url'] = '/api/admin/ai/mega53/weights/remove'
+            if mega53_install.receipt():
+                add('mega53-runtime', 'runtimes', 'Mega 53 · runtime', '', installed=True)
+                rows[-1]['remove_job_url'] = '/api/admin/ai/mega53/runtime/remove'
+        else:
+            add('vocals-' + identifier, 'vocals', item['display_name'],
+                f'/api/vocal-separation/models/{identifier}/download', f'/api/vocal-separation/models/{identifier}')
     add('drumsep','drumsep','DrumSep ONNX','/api/drumsep/models/download','/api/drumsep/models')
     add('basic-pitch','basic-pitch','Basic Pitch 0.4.0 ONNX runtime','/api/admin/ai/studio/models/basic-pitch/install',
         '/api/admin/ai/studio/models/basic-pitch',body={'accept_licenses':True},installed=(studio_root()/'basic-pitch.json').exists())
@@ -427,15 +445,18 @@ def recipes():
             installed=asset['installed'],note='Complete managed bundle; files and missing members are listed below. Import a reviewed ZIP for a new model.')
     for row in rows:
         if row['engine'] in ('whisper','chords','vocals','drumsep') and row['id']!='vocals-mvsep-mega53':
-            row['delete_url']='/api/admin/ai/model-assets/recipes/'+row['id']
+            if row['delete_url']:
+                route = '/api/admin/ai/model-assets/recipes/' + row['id']
+                row['delete_url'] = route
+                row['remove_job_url'] = route + '/remove'
     return rows
 
 
-def remove_recipe(identifier):
+def remove_recipe(identifier, job_id=None):
     recipe=next((row for row in recipes() if row['id']==identifier),None)
     if recipe is None or recipe['engine'] not in ('whisper','chords','vocals','drumsep'):
         raise ValueError('Unknown managed model removal recipe')
-    with mutation():
+    with mutation(job_id):
         if recipe['engine']=='whisper':
             from .ai_models import delete_lyrics_model
             return delete_lyrics_model(identifier.removeprefix('whisper-'))

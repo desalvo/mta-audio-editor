@@ -47,6 +47,12 @@ def worker_python(kind):
     import sys
     item=extensions().get(kind,{})
     from .studio_catalog import KINDS,python_for
+    from .ai_runtime_admin import override as audio_override
+    managed, disabled = audio_override(kind)
+    if disabled:
+        raise ValueError('Shared audio runtime was uninstalled by the administrator')
+    if managed:
+        return managed
     configured=os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON')
     override=item.get('python') or configured or os.getenv('MTA_AI_DEFAULT_PYTHON')
     if override:
@@ -66,8 +72,15 @@ def resolve_worker(kind: str) -> Path | None:
     from .studio_catalog import KINDS,available
     if not isinstance(kind, str) or kind not in WORKER_KINDS|extra.keys()|KINDS:
         raise ValueError('Unsupported AI worker kind')
+    from .ai_runtime_admin import override as audio_override
+    try:
+        managed, disabled = audio_override(kind)
+    except (ValueError, OSError):
+        return None
+    if disabled:
+        return None
     # Before availability/admission/ledger, including the legacy ACE fallback.
-    override=(extra.get(kind,{}).get('python')
+    override=managed or (extra.get(kind,{}).get('python')
               or os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON')
               or os.getenv('MTA_AI_DEFAULT_PYTHON'))
     if override:
@@ -78,7 +91,7 @@ def resolve_worker(kind: str) -> Path | None:
             return None
     env_name = 'MTA_AI_WORKER_' + re.sub(r'[^A-Z0-9]', '_', kind.upper()) + '_EXECUTABLE'
     value = os.environ.get(env_name, '') or extra.get(kind,{}).get('executable','')
-    if not value and kind in {'whisper', 'chords-ml', 'demucs', 'drumsep', 'backing-vocals','markers'} and os.environ.get('MTA_AI_UNIFIED_WORKERS_ENABLED') == 'true':
+    if not value and kind in {'whisper', 'chords-ml', 'demucs', 'drumsep', 'backing-vocals','markers'} and (managed or os.environ.get('MTA_AI_UNIFIED_WORKERS_ENABLED') == 'true'):
         value = str(Path(__file__).with_name('ai_unified_adapter.py').resolve())
     if not value and kind in KINDS and available(kind):
         value=str(Path(__file__).with_name('ai_studio_adapter.py').resolve())
@@ -86,7 +99,7 @@ def resolve_worker(kind: str) -> Path | None:
         # Backward compatibility for existing ACE-Step installations only.
         return configured_worker() if kind == 'ace-step' else None
     native_studio=kind in KINDS and os.getenv('MTA_NATIVE_SINGLE_USER','').lower()=='true'
-    if os.environ.get('MTA_AI_WORKER_ENABLED', '').lower() != 'true' and not native_studio:
+    if os.environ.get('MTA_AI_WORKER_ENABLED', '').lower() != 'true' and not (native_studio or managed):
         return None
     path = Path(value)
     # Frozen bundles may extract data .py files without Unix execute bits.

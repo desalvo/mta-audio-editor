@@ -15,6 +15,64 @@ def register_routes(app,actor):
         if user.get('role')!='admin':raise HTTPException(403,'Administrator required')
         return user
 
+    def lifecycle_job(user, action, run):
+        jid = uuid.uuid4().hex
+        def execute(progress, stop):
+            from .storage import _atomic_json_write
+            _atomic_json_write(progress, {'phase':action, 'message':action})
+            result = run(jid, stop.is_set)
+            _atomic_json_write(progress, {'phase':action, 'message':'Completed',
+                                          'progress_percent':100, 'result':result})
+        _, job = queue.start('studio-models', 'worker:studio-install', execute, job_id=jid,
+            payload={'schema_version':1, 'actor_user_id':user['id'], 'model':'model-assets', 'action':action})
+        return {'job_id':jid, 'job':job}
+
+    @app.post('/api/admin/ai/model-assets/runtime/install')
+    def install_audio_runtime(body:dict, request:Request):
+        user = admin(request)
+        from . import ai_runtime_admin
+        if set(body) != {'accept_licenses', 'device'} or body['accept_licenses'] is not True or body['device'] not in ('auto','cpu','cuda','rocm'):
+            raise HTTPException(422, 'Explicit license acceptance and a supported device are required')
+        if not ai_runtime_admin.status()['can_install']:
+            raise HTTPException(409, 'The local server cannot provision this runtime')
+        return lifecycle_job(user, 'install-audio-runtime',
+            lambda jid, cancelled: ai_runtime_admin.install(body['device'], cancelled, jid))
+
+    @app.post('/api/admin/ai/model-assets/runtime/remove')
+    def remove_audio_runtime(request:Request):
+        user = admin(request)
+        from . import ai_runtime_admin
+        if not ai_runtime_admin.status()['can_remove']:
+            raise HTTPException(409, 'The local server cannot remove this runtime')
+        return lifecycle_job(user, 'remove-audio-runtime', lambda jid, _: ai_runtime_admin.remove(jid))
+
+    @app.post('/api/admin/ai/model-assets/recipes/{identifier}/remove')
+    def remove_recipe_job(identifier:str, request:Request):
+        user = admin(request)
+        if not any(row['id'] == identifier and row.get('remove_job_url') for row in models.recipes()):
+            raise HTTPException(404, 'Unknown managed model removal recipe')
+        return lifecycle_job(user, 'remove-model', lambda jid, _: models.remove_recipe(identifier, jid))
+
+    @app.post('/api/admin/ai/mega53/runtime/remove')
+    def remove_mega53_runtime(request:Request):
+        user = admin(request)
+        from . import mega53_install
+        return lifecycle_job(user, 'remove-mega53-runtime', lambda jid, _: mega53_install.remove(checkpoint=False, job_id=jid))
+
+    @app.post('/api/admin/ai/mega53/weights/install')
+    def install_mega53_weights(body:dict, request:Request):
+        user = admin(request)
+        if body != {'accept_licenses':True}:
+            raise HTTPException(422, 'Review the exact component licenses first')
+        from . import mega53_install
+        return lifecycle_job(user, 'install-mega53-checkpoint', lambda jid, cancelled: mega53_install.install_checkpoint(cancelled, jid))
+
+    @app.post('/api/admin/ai/mega53/weights/remove')
+    def remove_mega53_weights(request:Request):
+        user = admin(request)
+        from . import mega53_install
+        return lifecycle_job(user, 'remove-mega53-checkpoint', lambda jid, _: mega53_install.remove(checkpoint=True, job_id=jid))
+
     @app.post('/api/admin/ai/mega53/runtime/install')
     def install_mega53_runtime(body:dict,request:Request):
         user=admin(request)
@@ -93,7 +151,8 @@ def register_routes(app,actor):
     @app.get('/api/admin/ai/model-assets')
     def inventory(request:Request,engine:str='',search:str=Query('',max_length=200),offset:int=Query(0,ge=0),limit:int=Query(100,ge=1,le=250)):
         admin(request)
-        try:return {**models.inventory(engine,search,offset,limit),'recipes':models.recipes()}
+        from .ai_runtime_admin import status
+        try:return {**models.inventory(engine,search,offset,limit),'recipes':models.recipes(),'runtime':status()}
         except (ValueError,OSError) as exc:raise HTTPException(409,str(exc)) from exc
 
     @app.delete('/api/admin/ai/model-assets/bundles/{asset_id}')

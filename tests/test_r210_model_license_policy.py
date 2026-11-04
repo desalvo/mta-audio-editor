@@ -22,7 +22,10 @@ def test_reimbursement_is_not_an_automatic_license_exception(rights):
         with pytest.raises(policy.LicenseDenied):policy.evaluate_model(model)
     assert policy.evaluate_model('oddvoices').billable
     with pytest.raises(ValueError,match='removed'):policy.evaluate('sam-audio',{})
-    assert policy.evaluate_model('btc-hcqt').billable
+    with pytest.raises(policy.LicenseDenied, match='pending license review'):
+        policy.evaluate_model('btc-hcqt')
+    with pytest.raises(ValueError, match='Unknown checkpoint permissions'):
+        policy.configure('btc-hcqt',{**reviewed(),'authorization_basis':'noncommercial_context'},rights)
 
 
 def test_review_requires_permission_and_free_access_acknowledgement(rights):
