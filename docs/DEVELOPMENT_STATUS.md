@@ -258,3 +258,11 @@ La CI conferma il ripristino dei permessi. Il solo test fallito riguarda il rapp
 - I pannelli di diritti e permessi dei modelli sono in **Modelli AI** sul server e nelle **Impostazioni** native. Le conferme e i controlli di licenza preesistenti restano in vigore.
 - Nuovi motori accordi **ChordMini BTC distillato** e **ChordMini 2E1D / ChordNet** con codice e checkpoint fissati a commit. L’installazione scarica solo il checkpoint selezionato, controlla la sua identità e prova il caricamento PyTorch weights-only con inferenza CPU prima di pubblicare l’installazione. Richiedono autorizzazione documentata per i pesi e PyTorch ≥2.6. I benchmark pubblicati motivano la valutazione ma non garantiscono un miglioramento per ogni traccia MTA.
 - Corretto il parsing dell’output BTC-HCQT in `master` e la distinzione fra `maj7` e dominante. Verificate localmente le azioni amministrative e i gate di sicurezza. Rimangono la full CI e la prova con runtime e pesi reali. **RC 73%**.
+
+## CI 41759036727 · cache frontend e test delle impostazioni licenze
+
+Baseline verificata contro tutti i blob e i permessi del commit `819d13405480289b1e9e83e4df50d4df106e9783`. SAST, dipendenze e compilazione VST3 sono passati. Il job di qualità ha riportato cinque fallimenti, 8913 test passati e copertura 78,31%.
+
+Il riferimento di app.js conserva nuovamente il prefisso della release `0.3.0-r210`, seguito dal suffisso del batch. I quattro casi Chromium IT/EN e server/native verificano ora i permessi nella relativa pagina delle impostazioni. La prova nativa usa l’effettiva funzione showNativeSettings; la prova server controlla il contenitore distribuito nel tab Modelli AI. Restano coperti il consenso al download degli asset, il salvataggio dei permessi e la richiesta di sintesi vocale.
+
+Ruff e 100 test locali passano, inclusi i gate di sicurezza e la gestione completa dei modelli. I quattro casi browser sono stati tentati con Chromium di sistema ma l’ambiente blocca la creazione del socket Unix del browser, prima del caricamento della pagina. Con la configurazione standard sono saltati per assenza del binario Playwright. La loro esecuzione deve essere confermata in full CI. I registri di sicurezza restano coerenti perché questo hotfix modifica soltanto HTML, test e stato sviluppo. **RC 73%**.
