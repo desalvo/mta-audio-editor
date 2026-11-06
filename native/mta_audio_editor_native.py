@@ -71,7 +71,7 @@ def _prepare_environment() -> Path:
     os.environ.setdefault("MTA_DIAGNOSTIC_DIR", str(root / "diagnostics"))
     os.environ["XDG_CACHE_HOME"] = str(cache)
     os.environ["TORCH_HOME"] = str(cache / "torch")
-    os.environ["MTA_DEMUCS_LOCAL_REPO"] = str(root / "demucs-models" / "repo")
+    # Native Demucs resolves supported models through its standard Torch cache.
     settings_path = root / "native-settings.json"
     configured_upload_mb = 1024
     if settings_path.is_file():

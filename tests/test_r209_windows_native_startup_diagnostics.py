@@ -114,3 +114,19 @@ def test_native_diagnostics_uses_user_directory_and_honors_override(monkeypatch,
     monkeypatch.setenv('MTA_DIAGNOSTIC_DIR', str(tmp_path / 'custom'))
     native._prepare_environment()
     assert Path(os.environ['MTA_DIAGNOSTIC_DIR']) == tmp_path / 'custom'
+
+
+
+def test_native_demucs_startup_uses_standard_torch_cache(monkeypatch, tmp_path):
+    import os
+
+    native = launcher()
+    monkeypatch.setattr(os, 'environ', dict(os.environ))
+    monkeypatch.setattr(native, '_configure_native_tls', lambda: None)
+    monkeypatch.setenv('MTA_NATIVE_DATA_DIR', str(tmp_path))
+    monkeypatch.delenv('MTA_DEMUCS_LOCAL_REPO', raising=False)
+
+    native._prepare_environment()
+
+    assert 'MTA_DEMUCS_LOCAL_REPO' not in os.environ
+    assert Path(os.environ['TORCH_HOME']) == tmp_path / '.cache/torch'

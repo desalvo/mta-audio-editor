@@ -440,7 +440,7 @@
     "native/host_transport/MtaHostTransport.h": "sha256:c7c806d5869a28403ed342e551939e6e5053939b144005b62889e8bacef2b815",
     "native/host_transport/MtaSidechainMethods.h": "sha256:e72663230014fc1acab6cadb389a086b121a0d723255af16ce173f847f8dcacc",
     "native/model_manager.py": "sha256:9652c6d900ecb23c53c7f6bdb6a385086d1961d44911a94732e00799958106eb",
-    "native/mta_audio_editor_native.py": "sha256:250469950efb3259602f328d92d5bc7715339a1c3cb5ba655ba495acef1fa5e9",
+    "native/mta_audio_editor_native.py": "sha256:9cfd1db6eba610e04016c475117be2cec0f5c93699e4c0e24bc3d00ffd8c807e",
     "native/third_party/miniaudio/miniaudio.h": "sha256:7e4f3f13c8fe66df2080ac3dd12a89193e3c2463cb7f067c798abd7331cd8ee6",
     "native/third_party/oddvoices/cpp/src/deque.hpp": "sha256:76b52c38fdda2b5c7f0b7fb968109d0885dda93dc54e090b9e7e793f706f4d6a",
     "native/third_party/oddvoices/cpp/src/g2p.cpp": "sha256:4a950fca5e21d72089b9deccff5b9d51cda28e89e100eb857347ff1556385057",
