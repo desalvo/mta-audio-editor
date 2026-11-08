@@ -284,3 +284,13 @@ Gli avvisi si aggiornano durante le modifiche, l’inserimento, la divisione, la
 
 Verificati **152 test locali distinti**, Ruff, sintassi JavaScript e gate degli inventari di sicurezza. I nuovi test confrontano i casi di rifiuto con l’encoder Merish effettivo e verificano visualizzazione, traduzioni IT/EN, aggiornamenti e escaping del testo nei normali entry point degli editor. Un test Chromium aggiunto resta saltato per assenza del pacchetto Python Playwright. Il tentativo con Chromium di sistema termina prima del caricamento della pagina perché l’ambiente nega i socket Unix. La prova visiva deve essere eseguita nella prossima full CI. **RC 73%**.
 
+
+
+## 2026-11-08 · Correzione automatica dei tempi lyrics
+
+Baseline verificata contro tutti i blob e i permessi del commit `4abc9eeea3ecce09dcee40df3a1501e6c87eb866`. I run 42497190375 (matrice runtime offline) e 42500816485 (pacchetti server firmati) sono conclusi con successo. Il run principale 42497190311 risulta ancora in esecuzione al controllo durante questo batch.
+
+- Ogni problema nell’editor Edit Lyrics e nell’editor combinato Lyrics + Chords + Markers ha un pulsante **Correggi**. Il pulsante **Correggi tutti** applica una correzione globale alla bozza.
+- Una parola che supera la fine riga, l’inizio della riga successiva o la fine audio viene accorciata. In caso di sovrapposizione viene prima anticipata la fine della parola precedente, preservando l’inizio della successiva quando possibile. Se i tempi vicini occupano lo spazio necessario, vengono accorciati e ridistribuiti entro i limiti della riga. I segmenti corretti rispettano la risoluzione MTA di 10 ms. I casi gestiti includono durata nulla o invertita, inizio prima della riga, collisioni fra inizi riga e tempi delle sillabe.
+- Le correzioni conservano testo, parole e sillabe e aggiornano gli avvisi. Si applicano al progetto con **Salva**. La chiusura senza salvataggio conserva il progetto precedente. Nell’editor combinato ogni correzione è un’operazione Undo/Redo e mantiene gli anchor manuali identificabili. Una combinazione che non può contenere neppure gli intervalli minimi produce un avviso sulla riga e lascia la bozza intatta.
+- Verificati **175 test locali distinti**, Ruff, sintassi JavaScript e inventari di sicurezza. I test verificano il passaggio bozza → salvataggio, l’Undo/Redo con anchor, le correzioni individuali e globali contro l’encoder Merish e 300 combinazioni deterministiche di tempi errati. Il test Chromium esteso copre i pulsanti singoli, Correggi tutti e il salvataggio, ma resta saltato localmente per assenza del pacchetto Python Playwright e deve essere eseguito nella prossima full CI. **RC 73%**.

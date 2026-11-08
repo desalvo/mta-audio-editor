@@ -1765,3 +1765,5 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 .lyrics-timing-problem > .timed-editor-index::after { content: ' ⚠'; }
 .lyrics-timing-summary { color: #ffe4a3; background: #392914; border-radius: 5px; padding: 8px; }
 .lyrics-timing-summary[hidden] { display: none; }
+.lyrics-timing-warning li { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.lyrics-timing-fix { flex: 0 0 auto; }

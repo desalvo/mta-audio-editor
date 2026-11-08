@@ -176,12 +176,22 @@ def test_editor_warning_disclosure_in_chromium(nc_browser_config):
         page.add_script_tag(content=r'''
 function tr(en,it){return it}function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
 function projectDurationMs(){return 10000}function showUtilityModal(title,html){document.getElementById('modal').innerHTML=html}
+function toast(){}function render(){}function markDirty(){}function closeUtilityModal(){}
 '''+EDITOR)
+        snapshot_start = JS.index('function ensureEventSnapshot(ev)')
+        page.add_script_tag(content=JS[snapshot_start:JS.index('\nfunction newOverrideEvent(', snapshot_start)])
         page.evaluate("editTimed('lyrics')")
         page.locator('.lyrics-timing-warning summary').click()
         assert 'Parola 2' in page.locator('.lyrics-timing-warning').inner_text()
-        page.locator('.timed-value').first.fill('Changed')
+        page.locator('[data-timing-fix]').first.click()
         assert page.locator('.lyrics-timing-warning').count() == 0
         assert page.locator('#lyricsTimingSummary').is_hidden()
+        assert page.evaluate('current.lyrics[0].words[1].start_ms') == 1400
+        page.evaluate("current.lyrics[0].words[1].end_ms=6000;editTimed('lyrics')")
+        page.locator('#lyricsTimingFixAll').click()
+        assert page.locator('.lyrics-timing-warning').count() == 0
+        page.evaluate("saveTimedEditor('lyrics')")
+        assert page.evaluate('current.lyrics[0].words[1].end_ms') == 2500
+        assert page.evaluate('MtaLyricsTiming.issues(current.lyrics,10000).length') == 0
         assert not errors
         browser.close()
