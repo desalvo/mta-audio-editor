@@ -333,6 +333,9 @@ def _bootstrap_admin() -> None:
     password = os.getenv("MTA_ADMIN_PASSWORD", "")
     email = os.getenv("MTA_ADMIN_EMAIL", "").strip().lower() or f"{username}@localhost.invalid"
     with db() as con:
+        # Serialize the empty-database check and insert across connections and
+        # processes. A deferred transaction leaves both callers seeing no users.
+        con.execute("BEGIN IMMEDIATE")
         if con.execute("SELECT COUNT(*) FROM users").fetchone()[0]:
             return
         if not password:

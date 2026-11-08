@@ -1,6 +1,6 @@
 {
   "errors": [],
-  "generated_at": "2026-11-04T01:50:37Z",
+  "generated_at": "2026-11-08T22:37:40Z",
   "metrics": {
     "_totals": {
       "CONFIDENCE.HIGH": 145,
@@ -11,7 +11,7 @@
       "SEVERITY.LOW": 166,
       "SEVERITY.MEDIUM": 21,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 61696,
+      "loc": 61697,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -1350,7 +1350,7 @@
       "SEVERITY.LOW": 7,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 1038,
+      "loc": 1039,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -5733,7 +5733,7 @@
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "551     \"google\": {\n552         \"label\": \"Google\", \"enabled_env\": \"MTA_OAUTH_GOOGLE_ENABLED\", \"client_env\": \"MTA_OAUTH_GOOGLE_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GOOGLE_CLIENT_SECRET\",\n553         \"authorize\": \"https://accounts.google.com/o/oauth2/v2/auth\", \"token\": \"https://oauth2.googleapis.com/token\", \"userinfo\": \"https://openidconnect.googleapis.com/v1/userinfo\", \"scope\": \"openid email profile\",\n554     },\n555     \"github\": {\n556         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n",
+      "code": "554     \"google\": {\n555         \"label\": \"Google\", \"enabled_env\": \"MTA_OAUTH_GOOGLE_ENABLED\", \"client_env\": \"MTA_OAUTH_GOOGLE_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GOOGLE_CLIENT_SECRET\",\n556         \"authorize\": \"https://accounts.google.com/o/oauth2/v2/auth\", \"token\": \"https://oauth2.googleapis.com/token\", \"userinfo\": \"https://openidconnect.googleapis.com/v1/userinfo\", \"scope\": \"openid email profile\",\n557     },\n558     \"github\": {\n559         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n",
       "col_offset": 114,
       "end_col_offset": 126,
       "filename": "app/auth.py",
@@ -5744,19 +5744,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'MTA_OAUTH_GOOGLE_CLIENT_SECRET'",
-      "line_number": 552,
+      "line_number": 555,
       "line_range": [
-        551,
-        552,
-        553,
-        554
+        554,
+        555,
+        556,
+        557
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
       "test_id": "B105",
       "test_name": "hardcoded_password_string"
     },
     {
-      "code": "552         \"label\": \"Google\", \"enabled_env\": \"MTA_OAUTH_GOOGLE_ENABLED\", \"client_env\": \"MTA_OAUTH_GOOGLE_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GOOGLE_CLIENT_SECRET\",\n553         \"authorize\": \"https://accounts.google.com/o/oauth2/v2/auth\", \"token\": \"https://oauth2.googleapis.com/token\", \"userinfo\": \"https://openidconnect.googleapis.com/v1/userinfo\", \"scope\": \"openid email profile\",\n554     },\n555     \"github\": {\n556         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n557         \"authorize\": \"https://github.com/login/oauth/authorize\", \"token\": \"https://github.com/login/oauth/access_token\", \"userinfo\": \"https://api.github.com/user\", \"scope\": \"read:user user:email\",\n",
+      "code": "555         \"label\": \"Google\", \"enabled_env\": \"MTA_OAUTH_GOOGLE_ENABLED\", \"client_env\": \"MTA_OAUTH_GOOGLE_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GOOGLE_CLIENT_SECRET\",\n556         \"authorize\": \"https://accounts.google.com/o/oauth2/v2/auth\", \"token\": \"https://oauth2.googleapis.com/token\", \"userinfo\": \"https://openidconnect.googleapis.com/v1/userinfo\", \"scope\": \"openid email profile\",\n557     },\n558     \"github\": {\n559         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n560         \"authorize\": \"https://github.com/login/oauth/authorize\", \"token\": \"https://github.com/login/oauth/access_token\", \"userinfo\": \"https://api.github.com/user\", \"scope\": \"read:user user:email\",\n",
       "col_offset": 69,
       "end_col_offset": 76,
       "filename": "app/auth.py",
@@ -5767,19 +5767,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'https://oauth2.googleapis.com/token'",
-      "line_number": 553,
+      "line_number": 556,
       "line_range": [
-        551,
-        552,
-        553,
-        554
+        554,
+        555,
+        556,
+        557
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
       "test_id": "B105",
       "test_name": "hardcoded_password_string"
     },
     {
-      "code": "555     \"github\": {\n556         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n557         \"authorize\": \"https://github.com/login/oauth/authorize\", \"token\": \"https://github.com/login/oauth/access_token\", \"userinfo\": \"https://api.github.com/user\", \"scope\": \"read:user user:email\",\n558     },\n559     \"facebook\": {\n560         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n",
+      "code": "558     \"github\": {\n559         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n560         \"authorize\": \"https://github.com/login/oauth/authorize\", \"token\": \"https://github.com/login/oauth/access_token\", \"userinfo\": \"https://api.github.com/user\", \"scope\": \"read:user user:email\",\n561     },\n562     \"facebook\": {\n563         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n",
       "col_offset": 114,
       "end_col_offset": 126,
       "filename": "app/auth.py",
@@ -5790,19 +5790,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'MTA_OAUTH_GITHUB_CLIENT_SECRET'",
-      "line_number": 556,
+      "line_number": 559,
       "line_range": [
-        555,
-        556,
-        557,
-        558
+        558,
+        559,
+        560,
+        561
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
       "test_id": "B105",
       "test_name": "hardcoded_password_string"
     },
     {
-      "code": "556         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n557         \"authorize\": \"https://github.com/login/oauth/authorize\", \"token\": \"https://github.com/login/oauth/access_token\", \"userinfo\": \"https://api.github.com/user\", \"scope\": \"read:user user:email\",\n558     },\n559     \"facebook\": {\n560         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n561         \"authorize\": \"https://www.facebook.com/dialog/oauth\", \"token\": \"https://graph.facebook.com/oauth/access_token\", \"userinfo\": \"https://graph.facebook.com/me?fields=id,name,email\", \"scope\": \"email,public_profile\",\n",
+      "code": "559         \"label\": \"GitHub\", \"enabled_env\": \"MTA_OAUTH_GITHUB_ENABLED\", \"client_env\": \"MTA_OAUTH_GITHUB_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_GITHUB_CLIENT_SECRET\",\n560         \"authorize\": \"https://github.com/login/oauth/authorize\", \"token\": \"https://github.com/login/oauth/access_token\", \"userinfo\": \"https://api.github.com/user\", \"scope\": \"read:user user:email\",\n561     },\n562     \"facebook\": {\n563         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n564         \"authorize\": \"https://www.facebook.com/dialog/oauth\", \"token\": \"https://graph.facebook.com/oauth/access_token\", \"userinfo\": \"https://graph.facebook.com/me?fields=id,name,email\", \"scope\": \"email,public_profile\",\n",
       "col_offset": 65,
       "end_col_offset": 72,
       "filename": "app/auth.py",
@@ -5813,19 +5813,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'https://github.com/login/oauth/access_token'",
-      "line_number": 557,
+      "line_number": 560,
       "line_range": [
-        555,
-        556,
-        557,
-        558
+        558,
+        559,
+        560,
+        561
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
       "test_id": "B105",
       "test_name": "hardcoded_password_string"
     },
     {
-      "code": "559     \"facebook\": {\n560         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n561         \"authorize\": \"https://www.facebook.com/dialog/oauth\", \"token\": \"https://graph.facebook.com/oauth/access_token\", \"userinfo\": \"https://graph.facebook.com/me?fields=id,name,email\", \"scope\": \"email,public_profile\",\n562     },\n563 }\n564 \n",
+      "code": "562     \"facebook\": {\n563         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n564         \"authorize\": \"https://www.facebook.com/dialog/oauth\", \"token\": \"https://graph.facebook.com/oauth/access_token\", \"userinfo\": \"https://graph.facebook.com/me?fields=id,name,email\", \"scope\": \"email,public_profile\",\n565     },\n566 }\n567 \n",
       "col_offset": 120,
       "end_col_offset": 132,
       "filename": "app/auth.py",
@@ -5836,19 +5836,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'MTA_OAUTH_FACEBOOK_CLIENT_SECRET'",
-      "line_number": 560,
+      "line_number": 563,
       "line_range": [
-        559,
-        560,
-        561,
-        562
+        562,
+        563,
+        564,
+        565
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
       "test_id": "B105",
       "test_name": "hardcoded_password_string"
     },
     {
-      "code": "560         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n561         \"authorize\": \"https://www.facebook.com/dialog/oauth\", \"token\": \"https://graph.facebook.com/oauth/access_token\", \"userinfo\": \"https://graph.facebook.com/me?fields=id,name,email\", \"scope\": \"email,public_profile\",\n562     },\n563 }\n564 \n565 def oauth_enabled(provider: str) -> bool:\n",
+      "code": "563         \"label\": \"Facebook\", \"enabled_env\": \"MTA_OAUTH_FACEBOOK_ENABLED\", \"client_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_ID\", \"secret_env\": \"MTA_OAUTH_FACEBOOK_CLIENT_SECRET\",\n564         \"authorize\": \"https://www.facebook.com/dialog/oauth\", \"token\": \"https://graph.facebook.com/oauth/access_token\", \"userinfo\": \"https://graph.facebook.com/me?fields=id,name,email\", \"scope\": \"email,public_profile\",\n565     },\n566 }\n567 \n568 def oauth_enabled(provider: str) -> bool:\n",
       "col_offset": 62,
       "end_col_offset": 69,
       "filename": "app/auth.py",
@@ -5859,19 +5859,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'https://graph.facebook.com/oauth/access_token'",
-      "line_number": 561,
+      "line_number": 564,
       "line_range": [
-        559,
-        560,
-        561,
-        562
+        562,
+        563,
+        564,
+        565
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
       "test_id": "B105",
       "test_name": "hardcoded_password_string"
     },
     {
-      "code": "798         )\n799     return {\"token\": token, \"token_type\": \"Bearer\", \"scopes\": clean, \"expires_at\": expires}\n800 \n",
+      "code": "801         )\n802     return {\"token\": token, \"token_type\": \"Bearer\", \"scopes\": clean, \"expires_at\": expires}\n803 \n",
       "col_offset": 28,
       "end_col_offset": 40,
       "filename": "app/auth.py",
@@ -5882,9 +5882,9 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'Bearer'",
-      "line_number": 799,
+      "line_number": 802,
       "line_range": [
-        799
+        802
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
       "test_id": "B105",

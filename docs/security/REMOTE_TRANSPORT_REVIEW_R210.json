@@ -149,10 +149,10 @@
     {
       "path": "app/auth.py",
       "function": "_oauth_json",
-      "line": 633,
+      "line": 636,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "c09252cdd7cc155687642807834eac7f6889cb44732a0694710fbdf4878bad1f",
-      "source_sha256": "7862136dc5d18c92c1a692e5311161127c24ed40e0c31078d4edce0901278111",
+      "source_sha256": "403e57e502ac1b2e4773a17b54fa67c27e23deb039df3b34b1aad83a78ec0210",
       "category": "authentication",
       "boundary": "OAuth/account/device credentials only. Native device helper now accepts exactly /api/ai-device/start and /poll; it cannot post to inference paths.",
       "verification": "Explicit caller/path review and test_r210_remote_transport_inventory.py native helper path-denial cases; existing device-account authorization tests are retained."

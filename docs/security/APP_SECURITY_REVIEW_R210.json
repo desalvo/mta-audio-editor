@@ -105,7 +105,7 @@
     "app/audio_backend.py": "sha256:4d91382bcd6eb8e6c7792c52e440df2dd50a01db1cb31eeee4ebaf1835cc064c",
     "app/audio_capture.py": "sha256:3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a",
     "app/audio_engine.py": "sha256:1b7579278628d91bc9b019e101e30ff4462fe0a8ca6ec7334b5ec5af2d77040d",
-    "app/auth.py": "sha256:7862136dc5d18c92c1a692e5311161127c24ed40e0c31078d4edce0901278111",
+    "app/auth.py": "sha256:403e57e502ac1b2e4773a17b54fa67c27e23deb039df3b34b1aad83a78ec0210",
     "app/auto_mix.py": "sha256:3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "sha256:ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa",
     "app/beat_sync.py": "sha256:48e427e70dedf19ffe26306c3d88ce5d40546fc76c8f7679d389a29d524b7b87",
@@ -522,7 +522,7 @@
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "210c8468fddde7584314b9de14c8a45049d83d4b7a4e55687e0a4070363bbb19",
+      "id": "5326cd5169ca11f35a7cdbd94c22dae64691be90ff98161136be7da06122f2a2",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -564,7 +564,7 @@
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified. Direct-executor policy now rechecked before source/child launch; original argv/code and trust scope unchanged, tests/test_r210_direct_executor_rights.py. Current model selector validated against the declared engine registry before fixed argv;tests/test_r210_model_selector_boundaries.py covers direct,parent/API and profile child refusals."
     },
     {
-      "id": "2be7ae749edde64a3c57e0eafe346be170c660a5c949a97e67eae4f7c8fbd5e9",
+      "id": "40ea1fad38f7ca9e2f8b1fc47a7d4036b5b02ff614e1e5816eed326261aba221",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in create_model_access_token is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -648,7 +648,7 @@
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "3839a2cf3809d5277e49c596d1e73fbff3dd7242574a084a78c91f116116b2c2",
+      "id": "2fa91ca6c6678924b2245e6974a9426be67ef8584faacf695d8ce291f33a5414",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -662,7 +662,7 @@
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "3883894bc9a9531e4371b8793775c73e4d9b148e6e060babea7bdaeadd9468d3",
+      "id": "9f86773b9ebbbb511d9d49e3ca752d07c296e23f236309b9d9b543b662ec22c0",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -704,7 +704,7 @@
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "3fb4e986fdbefc89ed1e84701002b9c8717e9babf6b972e3aa599b8497b07804",
+      "id": "79cd6a838255f90b56b76ea604927e9654a5e59cef774e3e70e59cfc0a0fc618",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -767,7 +767,7 @@
       "verification": "tests/test_r210_paypal_settlement_reports.py validates fixed host/options,private modes/symlinks,filename/username injection,timeout/reaping,space-safe batch paths and actual durable C2 admission. No real provider was contacted."
     },
     {
-      "id": "4d2efed93f53bb79d872c28622c03964ff554b934e6349487c80ff39c2b1617e",
+      "id": "8647b9c4839900a72ce53f4a3d06927abdcb40522e682f81288e52a7440db702",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -1054,7 +1054,7 @@
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "862e598b6dd00b6b7e5cbf6562d0f29adac4e9bc68fb455e04629d84aee42547",
+      "id": "ede157e950b2e3776358dd21be998600f30b769fffbaed010f8e890568271745",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -2934,5 +2934,11 @@
     "new_findings": [],
     "evidence": "tests/test_r210_mega53_web_install.py",
     "boundary": "Administrator-scoped fixed-source Git/Python/pip execution and bounded, pinned HTTPS assets; no shell and no user-selected command or URL. Strict model loading is not inference certification."
+  },
+  "auth_bootstrap_atomicity_review_20261108": {
+    "baseline_commit": "186dc010a034eaecb1d57e14dc91f408278686dd",
+    "source": "app/auth.py",
+    "review": "BEGIN IMMEDIATE serializes the existing empty-users check and first administrator insert across SQLite connections. Existing credentials, uniqueness constraints and database error propagation remain enforced. No new network, inference, process or admission boundaries; unchanged Bandit findings retain reviewed dispositions with only three-line offsets.",
+    "evidence": "tests/test_auth_bootstrap_concurrency.py"
   }
 }
