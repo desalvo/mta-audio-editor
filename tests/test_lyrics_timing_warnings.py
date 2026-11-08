@@ -183,9 +183,28 @@ function toast(){}function render(){}function markDirty(){}function closeUtility
         page.evaluate("editTimed('lyrics')")
         page.locator('.lyrics-timing-warning summary').click()
         assert 'Parola 2' in page.locator('.lyrics-timing-warning').inner_text()
+        contrasts = page.locator('.timed-editor button:visible').evaluate_all(r'''buttons => {
+          const luminance = color => {
+            const rgb = color.match(/[\d.]+/g).slice(0,3).map(Number).map(value => {
+              const channel = value / 255;
+              return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
+            });
+            return rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722;
+          };
+          return buttons.filter(button => !button.disabled).map(button => {
+            const style = getComputedStyle(button);
+            const foreground = luminance(style.webkitTextFillColor || style.color);
+            const background = luminance(style.backgroundColor);
+            return {label:button.textContent.trim(),fontSize:parseFloat(style.fontSize),
+              ratio:(Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05)};
+          });
+        }''')
+        assert contrasts
+        assert all(item['ratio'] >= 4.5 and item['fontSize'] >= 12 for item in contrasts), contrasts
         page.locator('[data-timing-fix]').first.click()
         assert page.locator('.lyrics-timing-warning').count() == 0
         assert page.locator('#lyricsTimingSummary').is_hidden()
+        assert page.locator('#lyricsTimingFixAll').is_hidden()
         assert page.evaluate('current.lyrics[0].words[1].start_ms') == 1400
         page.evaluate("current.lyrics[0].words[1].end_ms=6000;editTimed('lyrics')")
         page.locator('#lyricsTimingFixAll').click()

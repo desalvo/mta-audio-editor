@@ -1767,3 +1767,39 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 .lyrics-timing-summary[hidden] { display: none; }
 .lyrics-timing-warning li { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
 .lyrics-timing-fix { flex: 0 0 auto; }
+.utility-modal.timed-editor-modal .timed-editor button {
+  appearance: none;
+  background: #183247 !important;
+  border: 1px solid #52738a !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  text-indent: 0 !important;
+  text-shadow: none !important;
+}
+.utility-modal.timed-editor-modal .timed-editor button.primary {
+  background: #0f5f96 !important;
+  border-color: #2aa9ff !important;
+}
+.utility-modal.timed-editor-modal .timed-editor button.timed-row-delete {
+  background: #4a2029 !important;
+  border-color: #8d4a58 !important;
+  color: #ffdbe1 !important;
+  -webkit-text-fill-color: #ffdbe1 !important;
+}
+.utility-modal.timed-editor-modal .timed-editor button:disabled {
+  background: #172631 !important;
+  color: #b7c5cf !important;
+  -webkit-text-fill-color: #b7c5cf !important;
+  opacity: .65 !important;
+  cursor: not-allowed;
+}
+.utility-modal.timed-editor-modal .timed-editor button:focus-visible {
+  outline: 2px solid #72c7ff;
+  outline-offset: 2px;
+}
+.utility-modal.timed-editor-modal .timed-editor button[hidden] {
+  display: none !important;
+}
