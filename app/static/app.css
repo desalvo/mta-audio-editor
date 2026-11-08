@@ -1747,3 +1747,21 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 .utility-modal .export-settings button.primary,
 #exportMapModal button.accent { background-color: #12639b !important; }
 .utility-modal :is(.export-dialog,.export-settings) button:disabled { opacity: .65; }
+.lyrics-timing-warning {
+  color: #ffe4a3;
+  background: #392914;
+  border: 1px solid #d6a348;
+  border-radius: 5px;
+  padding: 6px 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.lyrics-timing-warning summary { cursor: pointer; font-weight: 600; }
+.lyrics-timing-warning ul { margin: 6px 0; padding-left: 20px; }
+.lyrics-timing-warning li + li { margin-top: 5px; }
+.lyrics-timing-problem > .timed-editor-index { color: #ffe4a3; border-left: 3px solid #d6a348; }
+.lyrics-timing-problem > .timed-editor-index::after { content: ' ⚠'; }
+.lyrics-timing-summary { color: #ffe4a3; background: #392914; border-radius: 5px; padding: 8px; }
+.lyrics-timing-summary[hidden] { display: none; }
