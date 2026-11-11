@@ -6,13 +6,13 @@ COPY native/third_party/tinysoundfont /src/third_party/tinysoundfont
 COPY native/third_party/oddvoices /src/third_party/oddvoices
 RUN cmake -S /src/audio_core -B /build -DCMAKE_BUILD_TYPE=Release && cmake --build /build --parallel 2
 
-FROM python:3.14-slim-trixie AS vst3-host-build
+FROM python:3.15-slim-trixie AS vst3-host-build
 RUN apt-get update && apt-get install -y --no-install-recommends git cmake g++ make pkg-config libfreetype6-dev libasound2-dev libx11-dev libxext-dev libxrender-dev libxcomposite-dev libxrandr-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev libpixman-1-dev libxfont-dev libxkbfile-dev x11proto-dev xtrans-dev && rm -rf /var/lib/apt/lists/*
 COPY scripts/build_vst3_runtime.py scripts/patch_vst3_runtime.py /src/scripts/
 COPY native/host_transport /src/native/host_transport
 RUN python /src/scripts/build_vst3_runtime.py --wheel-dir /wheels
 
-FROM python:3.14-slim-trixie
+FROM python:3.15-slim-trixie
 ARG APP_VERSION=0.3.0
 ARG APP_REVISION=210
 ARG RELEASE_CHANNEL=stable
