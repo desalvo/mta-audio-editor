@@ -3,7 +3,7 @@ from pathlib import Path
 
 def test_native_build_validates_roformer_pep604_hints():
     workflow = Path('.github/workflows/ci-cd.yml').read_text()
-    assert workflow.count('beartype>=0.22.2,<0.23') >= 2
+    assert workflow.count('beartype>=0.23.1,<0.24') >= 2
     assert workflow.count('RoFormer Callable | None annotation OK') == 2
     assert 'is_bearable(None, Callable | None)' in workflow
 

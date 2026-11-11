@@ -46,7 +46,7 @@ def test_workflow_manual_pinned_checkout_and_artifact():
     assert 'steps.release.outputs.commit' in data
     assert 'vendor_ace_step.sh' in data
     assert 'verify_ace_step_bundle.py' in data
-    assert 'actions/upload-artifact@v4' in data
+    assert 'actions/upload-artifact@v7' in data
 
 
 def test_default_ace_step_stable_release():

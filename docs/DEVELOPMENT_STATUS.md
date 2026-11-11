@@ -1,5 +1,21 @@
 # Stato corrente — 11 novembre 2026
 
+## Revisione PR Dependabot — 11 novembre 2026
+
+Baseline pubblicata `b314301`, full CI verde con 9069 test passati, 126 saltati
+e copertura 78,31%; immagine Docker latest e pacchetti pubblicati. Sei PR
+riesaminate: h5py #16, beartype #18, Android #28 e Actions #33 integrate insieme
+alle correzioni dei test e degli override nativi; Python 3.15 #32 e il gruppo
+Python #34 esclusi perché incompatibili con il gate container e le ricette
+Intel/evidenze storiche. Dettagli IT/EN: `DEPENDABOT_RECONCILIATION_R210_IT_EN.md`.
+
+Verificati localmente 22 test con h5py 3.16.0 e beartype 0.23.1 reali, inclusi
+round-trip HDF5 e rifiuto di callback non valide. Allineati i due smoke nativi
+Callable/None, conservati gate di firma e autorizzazione dei workflow.
+La policy Dependabot protegge i freeze storici e le famiglie ABI accoppiate.
+La verifica locale usa Python 3.12: CI Python 3.14, Android e installer sul
+commit integrato restano necessari. **0.3.0-r210, PRE-RC 73%** invariata.
+
 Versione **0.3.0-r210**, **PRE-RC 73%**. Ripresa dalla chat Work #17 e dal cumulativo BS RoFormer verificato; commit, push su main e full CI autorizzati esplicitamente. Contesto, impostazioni e prossimi passi: `CONTINUATION_20261111_R210.md`. Mantenere sempre l'handoff corrente e i cumulativi non ancora pubblicati in ChatGPT Library, come richiesto dall'utente. Le percentuali e le istruzioni delle sezioni storiche restano riferite ai rispettivi checkpoint.
 
 ## 11 novembre 2026 — attivazione CPU/GPU e pubblicazione bundle

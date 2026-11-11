@@ -15,4 +15,4 @@ librosa>=1.0.0,<1.1; sys_platform != 'darwin' or platform_machine != 'x86_64'
 soundfile>=0.14.0,<0.15
 mir_eval>=0.8.2,<0.9
 PyYAML>=6.0.3,<7
-h5py>=3.14,<4
+h5py>=3.16.0,<4

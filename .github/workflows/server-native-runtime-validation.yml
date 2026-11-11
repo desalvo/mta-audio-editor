@@ -48,7 +48,7 @@ jobs:
     container:
       image: ${{ matrix.image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Provision Ubuntu 24.04 Python 3.12 for target-runtime build
         if: matrix.name == 'ubuntu2404-python312'
         shell: bash
@@ -105,7 +105,7 @@ jobs:
           MTA_CI_DISPOSABLE_CONTAINER=1 MTA_SERVER_DEB="$(find "$RUNNER_TEMP/out" -maxdepth 1 -name '*.deb' -print -quit)" bash scripts/server_packages/test_deb_upgrade.sh
       - name: Publish validation artifact (not a release)
         if: matrix.name == 'debian13' || matrix.name == 'ubuntu2404-python312'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mta-server-deb-${{ matrix.name }}-unreleased-test
           path: ${{ runner.temp }}/out/*.deb
@@ -125,7 +125,7 @@ jobs:
           dnf config-manager --set-enabled crb
           dnf -y install 'pkgconfig(pixman-1)' 'pkgconfig(xfont2)' 'pkgconfig(xau)' 'pkgconfig(xdmcp)' 'pkgconfig(xkbfile)' 'pkgconfig(xproto)' 'pkgconfig(xtrans)' 'pkgconfig(libcrypto)' 'pkgconfig(dri)'
           command -v rpm2cpio || { echo "Rocky rpm tools must provide rpm2cpio" >&2; exit 1; }
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Prepare release-ready offline runtime
         run: |
           set -euo pipefail
@@ -173,7 +173,7 @@ jobs:
           dnf -y install gnupg2 createrepo_c rpm-sign
           MTA_CI_DISPOSABLE_CONTAINER=1 MTA_SERVER_RPM="$(find /tmp/mta-rpm-out -name '*.rpm' -print -quit)" bash scripts/repositories/test_signed_rpm_repository_ci.sh
       - name: Upload unreleased RPM for inspection
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mta-server-rpm-unreleased-test
           path: /tmp/mta-rpm-out/*.rpm
@@ -191,7 +191,7 @@ jobs:
           - { name: rocky10, image: 'rockylinux/rockylinux:10' }
           - { name: alma10, image: 'almalinux:10' }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install EL10 trusted build prerequisites
         shell: bash
         run: |
@@ -239,7 +239,7 @@ jobs:
           MTA_CI_DISPOSABLE_CONTAINER=1 MTA_SERVER_RPM="$(find /tmp/el10-out -name '*.rpm' -print -quit)" bash scripts/repositories/test_signed_rpm_repository_ci.sh
       - name: Upload validated Rocky 10 RPM for EL10 repository
         if: matrix.name == 'rocky10'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mta-server-rpm-el10-unreleased-test
           path: /tmp/el10-out/*.rpm
@@ -252,7 +252,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build offline Python 3.12 server payload
         shell: bash
         run: |
