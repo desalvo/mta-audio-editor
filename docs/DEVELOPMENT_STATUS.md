@@ -340,3 +340,9 @@ I WAV sono preparati prima della pubblicazione. I collegamenti esclusivi impedis
 Verifica: 214 test distinti (80 basso/default, 134 amministrazione/policy/selettori/inventari), Ruff completo, sintassi JS e controllo whitespace. Bandit corrente: 191 finding, 170 LOW, 21 MEDIUM, zero HIGH, senza soppressioni né nuove identità. Censimento dei confini invariato. La full CI e le prove neurali/hardware/ascolto restano da verificare. RC **73%**, invariata.
 
 Regola di continuità richiesta dall'utente: mantenere sempre in ChatGPT Library l'handoff corrente e i cumulativi con modifiche non ancora pubblicate con commit verificato, prima di fermarsi o chiedere autorizzazioni. Il checkpoint completo e l'handoff sono salvati prima del push; l'handoff viene aggiornato con SHA remoto e CI dopo la pubblicazione.
+
+## 2026-11-11 · Continuità di annullamento e diritti BS RoFormer
+
+Ripresa dal commit locale `a416a2200c4e2e72e762ceff6ebd42df7e84a16c`, ancora non pubblicato; `main` remoto verificato su `6dae37ec8128e07aeb59e20798c7e68ea7193daa`. Un annullamento viene controllato prima e immediatamente dopo il rendering della traccia, evitando di proseguire verso ritaglio o inferenza. Il rendering già avviato non è interrompibile a metà. Dopo il callback di progresso finale si ricontrollano revoca dei diritti e annullamento: in entrambi i casi gli stem pubblicati dall’operazione vengono rimossi, preservando gli altri file. La verifica non rende atomico il gruppo in caso di arresto improvviso.
+
+Passati **54 test** di runtime, progetto e installer, inclusi sei nuovi casi su annullamento prima/durante il rendering e annullamento/revoca dal callback finale; **61 test** degli inventari e dei gate di sicurezza; Ruff sui file modificati. Nuova scansione Bandit: 191 segnalazioni (170 LOW, 21 MEDIUM, nessuna HIGH), zero nuove identità e nessuna soppressione. La full CI su questo lavoro e le prove neurali reali restano aperte. RC **73%** invariata.

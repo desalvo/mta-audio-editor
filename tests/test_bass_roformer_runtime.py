@@ -129,6 +129,39 @@ def test_interval_renders_timeline_gain_and_cuts_before_separation(tmp_path):
     assert .24 < float(np.mean(data[5000:])) < .26
 
 
+@pytest.mark.parametrize('when', ['before', 'during'])
+@pytest.mark.parametrize('interval', [False, True])
+def test_cancelled_track_preparation_never_returns_or_starts_crop(tmp_path, monkeypatch, when, interval):
+    from types import SimpleNamespace
+    from app import audio_engine, separator_process
+    event = threading.Event()
+    calls = []
+    if when == 'before': event.set()
+    def render(*args, **kwargs):
+        calls.append('render')
+        event.set()
+    monkeypatch.setattr(audio_engine, 'render_track', render)
+    monkeypatch.setattr(separator_process, 'run', lambda *args, **kwargs: calls.append('crop'))
+    monkeypatch.setattr(runtime.shutil, 'which', lambda _: '/usr/bin/ffmpeg')
+    with pytest.raises(RuntimeError, match='cancelled'):
+        runtime.prepare_track_source(SimpleNamespace(sample_rate=44100), None, tmp_path/'source',
+                                     tmp_path, 0, 100 if interval else None, event)
+    assert calls == ([] if when == 'before' else ['render'])
+
+
+@pytest.mark.parametrize('action', ['cancel', 'revoke'])
+def test_final_progress_callback_cannot_publish_after_cancellation_or_revocation(adapter, tmp_path, action):
+    event = threading.Event()
+    def progress(percent, text):
+        if percent == 88:
+            if action == 'cancel': event.set()
+            else: adapter[3].write_text(json.dumps({runtime.POLICY: {'mode': 'disabled'}}))
+    output = tmp_path / 'out'
+    with pytest.raises((RuntimeError, policy.LicenseDenied)):
+        runtime.infer(adapter[0], output, progress=progress, cancel_event=event)
+    assert list(output.iterdir()) == []
+
+
 @pytest.mark.parametrize('kind', ['file', 'dangling-symlink'])
 def test_conflicting_second_output_leaves_no_first_output(adapter, tmp_path, kind):
     output = tmp_path / 'out'; output.mkdir()

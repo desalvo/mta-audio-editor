@@ -109,7 +109,7 @@
     "app/auto_mix.py": "sha256:3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "sha256:ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa",
     "app/bass_roformer_install.py": "sha256:a8e1edfe1cde7e1fa79a402e3a9e2c424507f4f05ec30631b0560baf2f42fc9c",
-    "app/bass_roformer_runtime.py": "sha256:db11c362eeb2d6d24b271503fa4043000b10cc4733b3d539fb61216dc0e7b928",
+    "app/bass_roformer_runtime.py": "sha256:d2c4d5621641788c1314eb0aeb6d20bd8cc3d8f974bcd351977bd09483c1a9c5",
     "app/beat_sync.py": "sha256:48e427e70dedf19ffe26306c3d88ce5d40546fc76c8f7679d389a29d524b7b87",
     "app/bounce.py": "sha256:64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61",
     "app/checkout_reference_recovery.py": "sha256:b94176ebea634d2d8b08c7e6c042d7f8eeeec806012a609ac4601db1c6c22a9c",
@@ -1908,7 +1908,7 @@
     "evidence": "docs/validation/r210/executor-boundaries-result.json",
     "native_error_mapping": "Denied or unverifiable native compatibility-model rights now return readable HTTP409 before upload copy; no unchecked exception or model side effect."
   },
-  "current_scan_sha256": "sha256:c8cec5bf0c0d40b5b8737f96390072674a5b4fd2935c899461efd9cddcc63daa",
+  "current_scan_sha256": "sha256:2ab7bfb96550be0be80de473287db0e6bd8e01e06e85a18d3725fe3935484515",
   "date": "2026-11-03",
   "export_exclusive_contention_review": {
     "date": "2026-10-27",

@@ -59,9 +59,13 @@ def prepare_track_source(project, track, source, directory, start_ms=0, end_ms=N
     from .ai_execution_policy import isolated_env
     if type(start_ms) is not int or start_ms < 0 or (end_ms is not None and (type(end_ms) is not int or end_ms <= start_ms)):
         raise ValueError('Invalid separation interval')
+    if cancel_event is not None and cancel_event.is_set():
+        raise RuntimeError('stem separation cancelled')
     directory = Path(directory)
     rendered = directory / 'edited-source.wav'
     render_track(track, source, rendered, sample_rate=project.sample_rate)
+    if cancel_event is not None and cancel_event.is_set():
+        raise RuntimeError('stem separation cancelled')
     if start_ms == 0 and end_ms is None: return rendered
     ffmpeg = shutil.which('ffmpeg')
     if not ffmpeg: raise RuntimeError('FFmpeg is required for interval separation')
@@ -164,6 +168,11 @@ def _publish_audio(audio, rate, output_dir, progress, cancel_event):
             if cancel_event is not None and cancel_event.is_set():
                 raise RuntimeError('stem separation cancelled')
             if progress: progress(88, 'BS RoFormer: separation complete')
+            # The callback may synchronously cancel the job or revoke rights.
+            # Treat that exactly like a failure during publication.
+            evaluate_model(POLICY)
+            if cancel_event is not None and cancel_event.is_set():
+                raise RuntimeError('stem separation cancelled')
             return paths
         except BaseException:
             for source, target in published:
