@@ -59,3 +59,16 @@ quality. The separate BS RoFormer recipe keeps its own beartype 0.22.5 pin.
 - [PR MTA](https://github.com/desalvo/mta-audio-editor/pulls)
 - [AGP 9.5 compatibility](https://developer.android.com/build/releases/agp-9-5-0-release-notes)
 - [Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
+
+## Verifica della cronologia / History scan
+
+La prima CI della PR35 rileva un solo falso positivo: il digest pubblico di
+`app/auth.py` nel ledger del commit storico `e54f7113`. Il sorgente esatto è
+stato riletto da GitHub e SHA-256 ricalcolato, uguale al valore segnalato.
+Il dossier GITLEAKS_REVIEW_R210 registra fonte e prova; l’eccezione identifica
+soltanto commit, file, regola e riga. La scansione predefinita resta attiva.
+
+The first integration scan flags one historical public source digest. The
+exact source was retrieved and its SHA-256 recomputed. The review records the
+proof and restricts the exception to that commit/file/rule/line; default
+secret scanning remains enabled.
