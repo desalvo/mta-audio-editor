@@ -3,6 +3,13 @@ updates:
   - package-ecosystem: pip
     directory: /
     schedule: {interval: weekly}
+    # Validation freezes are evidence of executed environments, not manifests.
+    # Vendored model/SDK source is updated through its own reviewed recipe.
+    exclude-paths:
+      - "validation/**"
+      - "docs/validation/**"
+      - "native/third_party/**"
+      - "third_party/**"
     groups:
       python-dependencies:
         patterns: ["*"]
@@ -13,6 +20,17 @@ updates:
       # Review these manually instead of grouping incompatible pins.
       - dependency-name: torch
       - dependency-name: torchaudio
+      - dependency-name: torchvision
+      # NumPy/Numba/LLVM and plotting binaries have platform-specific recipes.
+      # Permit patch proposals, but review a new minor/major line as a unit.
+      - dependency-name: numba
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: llvmlite
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: scipy
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: contourpy
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       # Pydantic 2.13.x currently resolves pydantic-core 2.46.5 unreliably on
       # CPython 3.14 in GitHub-hosted runners. Stay on 2.12.5 / core 2.41.5
       # until the production gate is deterministic across all supported arches.
@@ -30,6 +48,9 @@ updates:
     # Python 3.14 is the current production baseline. The Docker image tag is
     # intentionally pinned in Dockerfile; review Python major/minor base-image
     # upgrades manually together with PyTorch/Demucs compatibility.
+    ignore:
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: gradle
     directory: /mobile/android

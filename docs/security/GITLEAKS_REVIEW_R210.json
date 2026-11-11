@@ -652,5 +652,20 @@
       }
     ],
     "scope": "Five exact commit/path/rule/line fingerprints; no global rule, path or commit exclusions. New findings remain blocking."
+  },
+  "dependency_integration_history_20261111": {
+    "run_id": 43078775529,
+    "finding_count": 1,
+    "disposition": "false_positive_public_source_digest",
+    "fingerprint": "e54f7113fd26d01592dcb2a11e0895e024e5e799:docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:107",
+    "commit": "e54f7113fd26d01592dcb2a11e0895e024e5e799",
+    "path": "docs/security/APP_SECURITY_REVIEW_R210.json",
+    "line": 107,
+    "rule": "generic-api-key",
+    "source": "app/auth.py",
+    "source_sha256": "7862136dc5d18c92c1a692e5311161127c24ed40e0c31078d4edce0901278111",
+    "source_git_blob_sha1": "a51a8e02dec9e160781e9aedda9bf79da5c8a982",
+    "source_url": "https://github.com/desalvo/mta-audio-editor/blob/e54f7113fd26d01592dcb2a11e0895e024e5e799/app/auth.py",
+    "verification": "Fetched the exact historical source from GitHub and recomputed SHA-256; it equals the flagged ledger value. This is a public integrity digest. Exception is restricted to this commit, file, rule and line; default scanning remains enabled."
   }
 }

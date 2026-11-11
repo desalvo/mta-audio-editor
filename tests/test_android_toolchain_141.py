@@ -9,7 +9,7 @@ def test_android_api37_toolchain_matches_androidx_core_1191():
     workflow = (ROOT / ".github/workflows/ci-cd.yml").read_text(encoding="utf-8")
     assert "compileSdk = 37" in app
     assert 'androidx.core:core:1.19.1' in app
-    assert 'onnxruntime-android:1.30.0' in app
-    assert 'version "9.4.1"' in root
+    assert 'onnxruntime-android:1.31.1' in app
+    assert 'version "9.5.1"' in root
     assert "gradle-version: '9.6.0'" in workflow
     assert 'sdkmanager "platforms;android-37.0" "build-tools;37.0.0"' in workflow

@@ -52,3 +52,6 @@ e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-sour
 852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/validation/r210/shared-benchmark/source-snapshot.json:generic-api-key:40
 852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/validation/r210/shared-benchmark/source-snapshot.json:generic-api-key:92
 852259d56ead9e50cc886dd6ee287ba13cd404e6:docs/validation/r210/shared-benchmark/source-snapshot.json:generic-api-key:248
+
+# Reviewed public app/auth.py digest from the historical security ledger; CI 43078775529.
+e54f7113fd26d01592dcb2a11e0895e024e5e799:docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:107

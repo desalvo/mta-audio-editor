@@ -13,3 +13,7 @@ weasyprint==70.0
 # Documentation maintenance and bilingual manual rendering
 beautifulsoup4==4.15.0
 markdown-it-py==4.2.0
+
+# Exercise the reviewed optional runtime compatibility contracts in Quality.
+beartype>=0.23.1,<0.24
+h5py>=3.16.0,<4

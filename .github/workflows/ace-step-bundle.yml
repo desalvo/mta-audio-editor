@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout MTA
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Resolve pinned stable ACE-Step release to immutable SHA
@@ -62,7 +62,7 @@ jobs:
           cp third_party/ace-step-1.5/UPSTREAM_COMMIT dist-ace-step/UPSTREAM_COMMIT
           cp third_party/ace-step-1.5/LICENSE dist-ace-step/ACE_STEP_LICENSE
       - name: Publish audited ACE-Step source artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ace-step-source-${{ steps.release.outputs.commit }}
           path: dist-ace-step/
