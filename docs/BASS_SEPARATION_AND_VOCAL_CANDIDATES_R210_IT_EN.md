@@ -1,6 +1,6 @@
 # MTA 0.3.0-r210 — basso e separazione delle voci
 
-Aggiornato: 10 novembre 2026. Questo documento distingue integrazione software,
+Aggiornato: 11 novembre 2026. Questo documento distingue integrazione software,
 diritti dei checkpoint e validazione musicale. Nessun ascolto reale è approvato
 automaticamente dall’installazione.
 
@@ -34,7 +34,9 @@ della traccia. La traccia originale rimane disponibile.
    Auto, CPU, CUDA o ROCm. Premere il tasto di installazione del runtime completo.
 4. Il job con finestra di progresso installa il sorgente a commit fissato,
    dipendenze, configurazione e checkpoint. L’attivazione tecnica del runtime
-   avviene solo dopo verifica degli hash e caricamento rigoroso dei quattro stem.
+   avviene solo dopo verifica degli hash, backend CPU/CUDA/ROCm, calcolo sul
+   dispositivo e caricamento rigoroso dei quattro stem con trasferimento sul
+   dispositivo scelto. Dettagli e limiti: [verifica dispositivo](BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md).
 5. Completare la revisione documentata dei diritti prima dell’inferenza. Il
    download non attiva la policy: il modello è disabilitato per default, anche
    in un servizio non commerciale. Il controllo si applica anche al worker.
@@ -139,7 +141,10 @@ the server rather than a different local Core ML model.
 
 Under administrator/native **AI Models**, choose the BS RoFormer accelerator
 and explicitly install the complete runtime. Progress covers source acquisition,
-dependencies, YAML, checkpoint and strict state loading. Runtime and checkpoint
+dependencies, YAML, checkpoint, device computation and strict state loading
+with model transfer to the selected CPU/CUDA/ROCm device. See
+[device validation](BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md) for scope and limits.
+Runtime and checkpoint
 can be removed independently. Install on the actual execution node; installing
 the web host does not configure a remote worker. No inference-time download or
 fallback occurs. Downloading and successful loading do not grant deployment

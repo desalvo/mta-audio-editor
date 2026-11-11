@@ -108,7 +108,7 @@
     "app/auth.py": "sha256:403e57e502ac1b2e4773a17b54fa67c27e23deb039df3b34b1aad83a78ec0210",
     "app/auto_mix.py": "sha256:3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "sha256:ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa",
-    "app/bass_roformer_install.py": "sha256:a8e1edfe1cde7e1fa79a402e3a9e2c424507f4f05ec30631b0560baf2f42fc9c",
+    "app/bass_roformer_install.py": "sha256:a6f8add983e56003d18f0332c4cc26849c992e58ef794ff48693b5914fc5f8c0",
     "app/bass_roformer_runtime.py": "sha256:d2c4d5621641788c1314eb0aeb6d20bd8cc3d8f974bcd351977bd09483c1a9c5",
     "app/beat_sync.py": "sha256:48e427e70dedf19ffe26306c3d88ce5d40546fc76c8f7679d389a29d524b7b87",
     "app/bounce.py": "sha256:64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61",
@@ -1651,25 +1651,25 @@
       "verification": "tests/test_bass_roformer_install.py covers admin route admission, checksum rejection, strict-load ordering and rollback preserving the previous runtime. Neural quality and deployment rights are not granted by installation."
     },
     {
-      "id": "03063b3a8d3c17a575fac7815bec69224ffeb0f25d24a8e20e28b1345c448143",
+      "id": "43a6b41d6f5171995cd33ea0dff37e0d9d2210b5048d737f3aa92bc46e552852",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Administrator-only explicit installer runs fixed Git/venv/pip/model-load commands without a shell; device is a closed enum and no request supplies commands, paths or URLs.",
       "boundary": "Versioned private BS RoFormer runtime; source commit, YAML and checkpoint size/SHA256 are pinned. Environment injection is removed, child timeout/cancellation is bounded, and only strict-load success publishes the receipt.",
-      "verification": "tests/test_bass_roformer_install.py covers admin route admission, checksum rejection, strict-load ordering and rollback preserving the previous runtime. Neural quality and deployment rights are not granted by installation."
+      "verification": "tests/test_bass_roformer_install.py covers admin route admission, checksum rejection, strict-load ordering and rollback preserving the previous runtime. Neural quality and deployment rights are not granted by installation. Device-validation continuation: fixed probe program and one enumerated device argument reviewed; tests/test_bass_roformer_device_probe.py covers synthetic backend and kernel errors. No new process call shape."
     },
     {
-      "id": "3a4fc26593f506fe30d86453b66fd41a5ad955f15b340dfcc16d8c8867e075d1",
+      "id": "ac4331fe19b4ba59faa9aef5eb90731e1d796d839771763b20b429f1d714eee5",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Administrator-only explicit installer runs fixed Git/venv/pip/model-load commands without a shell; device is a closed enum and no request supplies commands, paths or URLs.",
       "boundary": "Versioned private BS RoFormer runtime; source commit, YAML and checkpoint size/SHA256 are pinned. Environment injection is removed, child timeout/cancellation is bounded, and only strict-load success publishes the receipt.",
-      "verification": "tests/test_bass_roformer_install.py covers admin route admission, checksum rejection, strict-load ordering and rollback preserving the previous runtime. Neural quality and deployment rights are not granted by installation."
+      "verification": "tests/test_bass_roformer_install.py covers admin route admission, checksum rejection, strict-load ordering and rollback preserving the previous runtime. Neural quality and deployment rights are not granted by installation. Device-validation continuation: fixed probe program and one enumerated device argument reviewed; tests/test_bass_roformer_device_probe.py covers synthetic backend and kernel errors. No new process call shape."
     },
     {
-      "id": "011dcf9df04cd4c9dd5f68092131ab546a33c48310e39af76de093c32f4ed473",
+      "id": "3d0329399bfa65a4cd1cae77a800fa94cf775b5b9962b3f87b1cbf318ede4998",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Administrator-only explicit installer runs fixed Git/venv/pip/model-load commands without a shell; device is a closed enum and no request supplies commands, paths or URLs.",
       "boundary": "Versioned private BS RoFormer runtime; source commit, YAML and checkpoint size/SHA256 are pinned. Environment injection is removed, child timeout/cancellation is bounded, and only strict-load success publishes the receipt.",
-      "verification": "tests/test_bass_roformer_install.py covers admin route admission, checksum rejection, strict-load ordering and rollback preserving the previous runtime. Neural quality and deployment rights are not granted by installation."
+      "verification": "tests/test_bass_roformer_install.py covers admin route admission, checksum rejection, strict-load ordering and rollback preserving the previous runtime. Neural quality and deployment rights are not granted by installation. Device-validation continuation: fixed probe program and one enumerated device argument reviewed; tests/test_bass_roformer_device_probe.py covers synthetic backend and kernel errors. No new process call shape."
     }
   ],
   "resolved_historical": [
@@ -1908,7 +1908,7 @@
     "evidence": "docs/validation/r210/executor-boundaries-result.json",
     "native_error_mapping": "Denied or unverifiable native compatibility-model rights now return readable HTTP409 before upload copy; no unchecked exception or model side effect."
   },
-  "current_scan_sha256": "sha256:2ab7bfb96550be0be80de473287db0e6bd8e01e06e85a18d3725fe3935484515",
+  "current_scan_sha256": "sha256:05c8e3c37c83e9fba8a4a99873ad0221e6d9e239ab131ce17c595a57ebed0b3c",
   "date": "2026-11-03",
   "export_exclusive_contention_review": {
     "date": "2026-10-27",
@@ -2980,6 +2980,16 @@
     "evidence": [
       "tests/test_bass_roformer_runtime.py",
       "docs/CONTINUATION_20261111_R210.md"
+    ]
+  },
+  "bs_roformer_device_review": {
+    "date": "2026-11-11",
+    "source": "app/bass_roformer_install.py",
+    "review": "Reviewed the fixed strict-load program and its device argument. CPU/CUDA/ROCm is resolved once and checked before activation. Matrix arithmetic, synchronization and model transfer introduce no request-supplied code, command or network target. Existing subprocess/HTTPS call shapes are unchanged; only source digest and offsets moved. Local backend tests are synthetic; no real hardware or model inference is attested.",
+    "evidence": [
+      "tests/test_bass_roformer_install.py",
+      "tests/test_bass_roformer_device_probe.py",
+      "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
     ]
   }
 }

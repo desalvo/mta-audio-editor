@@ -2,6 +2,38 @@
 
 Versione **0.3.0-r210**, **PRE-RC 73%**. Ripresa dalla chat Work #17 e dal cumulativo BS RoFormer verificato; commit, push su main e full CI autorizzati esplicitamente. Contesto, impostazioni e prossimi passi: `CONTINUATION_20261111_R210.md`. Mantenere sempre l'handoff corrente e i cumulativi non ancora pubblicati in ChatGPT Library, come richiesto dall'utente. Le percentuali e le istruzioni delle sezioni storiche restano riferite ai rispettivi checkpoint.
 
+## 11 novembre 2026 — attivazione CPU/GPU e pubblicazione bundle
+
+Completata la verifica tecnica del dispositivo nell'installer BS RoFormer:
+`Auto` viene risolto una sola volta per pacchetti, probe e ricevuta. Il programma
+isolato verifica backend CPU/CUDA/ROCm, disponibilità GPU, risultato numerico
+di un calcolo, sincronizzazione e trasferimento del modello caricato con
+`weights_only=True` e `strict=True`. Fallimenti e annullamento prima
+dell'attivazione conservano runtime e checkpoint precedenti. La ricevuta registra
+la verifica al momento dell'installazione; le vecchie ricevute non la dichiarano.
+Dettagli IT/EN: `BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md`.
+
+Verificati **138 test distinti**: 77 per separatore/installer/progetto/probe e
+61 per i gate e gli inventari. Nessun fallimento o skip; un warning Starlette.
+Ruff completo e `git diff --check` passati. Scansione Bandit e gate live passati:
+191 finding (170 LOW, 21 MEDIUM, zero HIGH), senza soppressioni. Riesaminati
+il programma fisso e l'argomento dispositivo; tre identità Bandit cambiano
+per gli offset, senza nuove categorie o chiamate di processo/rete. Evidenze:
+`validation/r210/bass-device-validation.xml` e
+`validation/r210/bass-device-validation-result.json`.
+
+La guida `PUBLISH_BUNDLE_R210_IT_EN.md` spiega checksum, importazione dell'ultimo
+bundle cumulativo, push fast-forward e controllo full CI sullo SHA pubblicato.
+La base remota verificata resta `6dae37ec8128e07aeb59e20798c7e68ea7193daa`.
+Nessun push o nuova CI remota eseguiti in questo ciclo: permane il blocco di
+pubblicazione già documentato. I commit originali non sono riscritti.
+
+I test del probe usano backend sintetici: nessuna prova hardware CUDA/ROCm,
+caricamento dei pesi reali, inferenza neurale o certificazione musicale. Restano
+installazione e inferenza sul nodo effettivo, confronto A/B, decisione sui
+diritti del deployment e full CI. **PRE-RC 73%** invariata, ciclo software
+della verifica del dispositivo completato.
+
 # Default separazione Demucs — 2 novembre 2026
 
 Corretto il ripristino involontario di “Solo percussioni” dalle preferenze: entrambe le finestre partono da tutti gli stem standard Demucs, senza secondo passaggio drums/percussioni. Metodo avanzato inattivo finché non richiesto esplicitamente; checkbox e target vengono sincronizzati anche all'invio. Dettagli, prove e limiti: `STANDARD_STEM_DEFAULT_R210_IT_EN.md` e `validation/r210-standard-stem-default-result.json`. Verifiche: 179 test passati, inclusi 36 nuovi casi; Ruff, sintassi JS e gate correlati superati. Nessuna nuova prova neurale/browser/nativa o CI remota. Baseline utente `f235f4c3ca67af72006bfc6262474ccb0ff0a705`; RC invariata **34/42 = 81,0% PRE-RC**.

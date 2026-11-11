@@ -108,7 +108,7 @@
     "app/auth.py": "sha256:403e57e502ac1b2e4773a17b54fa67c27e23deb039df3b34b1aad83a78ec0210",
     "app/auto_mix.py": "sha256:3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "sha256:ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa",
-    "app/bass_roformer_install.py": "sha256:a8e1edfe1cde7e1fa79a402e3a9e2c424507f4f05ec30631b0560baf2f42fc9c",
+    "app/bass_roformer_install.py": "sha256:a6f8add983e56003d18f0332c4cc26849c992e58ef794ff48693b5914fc5f8c0",
     "app/bass_roformer_runtime.py": "sha256:d2c4d5621641788c1314eb0aeb6d20bd8cc3d8f974bcd351977bd09483c1a9c5",
     "app/beat_sync.py": "sha256:48e427e70dedf19ffe26306c3d88ce5d40546fc76c8f7679d389a29d524b7b87",
     "app/bounce.py": "sha256:64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61",
@@ -2771,40 +2771,46 @@
     {
       "path": "app/bass_roformer_install.py",
       "function": "_run",
-      "line": 113,
+      "line": 131,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "13fe3f25b9259d06b34af6e4a29b0d150e747a5ce4361dc91b74f93d876877a5",
       "family": "operator_diagnostic",
       "boundary": "Authenticated administrator starts a fixed-source installation queue job. Fixed argv without a shell invokes Git, an operator-approved Python, pip and the strict local model-load check. No arbitrary URL, command or executable is accepted in the request; installer use is not customer inference or hardware attestation.",
       "evidence": [
-        "tests/test_bass_roformer_install.py"
+        "tests/test_bass_roformer_install.py",
+        "tests/test_bass_roformer_device_probe.py",
+        "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
       ]
     },
     {
       "path": "app/bass_roformer_install.py",
       "function": "install",
-      "line": 159,
+      "line": 178,
       "kind": "process_boundary",
       "call": "subprocess.check_output",
       "shape_sha256": "a510003b95c422cc5a53bd06ea9df21fc7b070f3577b18b4d0ca6f4b2a8a006e",
       "family": "operator_diagnostic",
       "boundary": "Authenticated administrator starts a fixed-source installation queue job. Fixed argv without a shell invokes Git, an operator-approved Python, pip and the strict local model-load check. No arbitrary URL, command or executable is accepted in the request; installer use is not customer inference or hardware attestation.",
       "evidence": [
-        "tests/test_bass_roformer_install.py"
+        "tests/test_bass_roformer_install.py",
+        "tests/test_bass_roformer_device_probe.py",
+        "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
       ]
     },
     {
       "path": "app/bass_roformer_install.py",
       "function": "install",
-      "line": 179,
+      "line": 198,
       "kind": "process_boundary",
       "call": "subprocess.check_output",
       "shape_sha256": "af883b5a329ad5bf9e891b26bfbb5973832a7eacfc8fdb10b187550853657da5",
       "family": "operator_diagnostic",
       "boundary": "Authenticated administrator starts a fixed-source installation queue job. Fixed argv without a shell invokes Git, an operator-approved Python, pip and the strict local model-load check. No arbitrary URL, command or executable is accepted in the request; installer use is not customer inference or hardware attestation.",
       "evidence": [
-        "tests/test_bass_roformer_install.py"
+        "tests/test_bass_roformer_install.py",
+        "tests/test_bass_roformer_device_probe.py",
+        "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
       ]
     },
     {
@@ -13068,6 +13074,16 @@
     "evidence": [
       "tests/test_bass_roformer_runtime.py",
       "docs/CONTINUATION_20261111_R210.md"
+    ]
+  },
+  "bs_roformer_device_review": {
+    "date": "2026-11-11",
+    "source": "app/bass_roformer_install.py",
+    "review": "Reviewed the fixed strict-load program and its device argument. CPU/CUDA/ROCm is resolved once and checked before activation. Matrix arithmetic, synchronization and model transfer introduce no request-supplied code, command or network target. Existing subprocess/HTTPS call shapes are unchanged; only source digest and offsets moved. Local backend tests are synthetic; no real hardware or model inference is attested.",
+    "evidence": [
+      "tests/test_bass_roformer_install.py",
+      "tests/test_bass_roformer_device_probe.py",
+      "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
     ]
   }
 }

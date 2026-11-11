@@ -1,5 +1,26 @@
 # MTA Audio Editor — ripresa dalla chat Work #17
 
+## Ultima ripresa — 11 novembre 2026, verifica dispositivo e bundle
+
+Ripresa dal cumulativo `MTA-0.3.0-r210-bs-roformer-rights-cumulative.zip`
+con SHA-256 `514622847403be28f4b57ab23d4047bc4207b243b4e94822834da2de9ed42b63`;
+verificati checksum, CRC e corrispondenza di tutti i 4662 file tracciati prima
+delle modifiche. I commit originali `a416a22`, `66a5698`, `54d7b00` sono
+preservati, ancora non pubblicati sulla base remota `6dae37e`.
+
+Aggiunta verifica del dispositivo CPU/CUDA/ROCm prima dell'attivazione gestita,
+con scelta Auto stabile e rollback. Verificati 138 test, Ruff completo,
+whitespace e gate live di sicurezza: 191 finding, zero HIGH, nessuna
+soppressione. Il nuovo bundle `MTA-r210-device-validation.bundle` include
+tutti e quattro i commit non pubblicati; usare solo questo per pubblicare.
+Guida: `PUBLISH_BUNDLE_R210_IT_EN.md`. Nessun push o CI remota in questa ripresa.
+
+Leggere per primo l'handoff corrente aggiornato, quindi la sezione iniziale
+di `DEVELOPMENT_STATUS.md`. Versione **0.3.0-r210**, **PRE-RC 73%** invariata.
+Sono ancora necessarie le prove CPU/GPU reali, inferenza e ascolto A/B, decisione
+diritti per il deployment e full CI. I test del probe sono sintetici.
+Le sezioni seguenti conservano la cronologia della ripresa precedente.
+
 Aggiornato: 11 novembre 2026. Versione **0.3.0-r210**, **PRE-RC 73%**.
 
 ## Sorgenti e decisioni recuperate

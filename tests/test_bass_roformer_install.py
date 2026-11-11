@@ -50,6 +50,67 @@ def test_installer_activates_only_after_strict_validation(fake_install):
     assert bass_roformer_runtime.managed_checkpoint().read_bytes() == weights
     assert install.receipt()['checkpoint_validated']
     assert bass_roformer_runtime.configured()
+    assert result['device'] == 'cpu' and result['device_validated']
+    assert install.receipt()['device_validated']
+
+
+def test_auto_device_is_resolved_once_for_packages_probe_and_receipt(fake_install, monkeypatch):
+    selections, commands = [], []
+    original = install._run
+    def select(device):
+        selections.append(device)
+        return 'rocm' if len(selections) == 1 else 'cpu'
+    def record(command, *args):
+        commands.append(command)
+        return original(command, *args)
+    monkeypatch.setattr(install, 'selected_device', select)
+    monkeypatch.setattr(install, '_run', record)
+    result = install.install('auto', lambda: False, lambda *args: None)
+    assert selections == ['auto']
+    assert any('torch==2.11.0+rocm7.2' in command for command in commands)
+    assert commands[-1][-1] == 'rocm'
+    assert result['device'] == install.receipt()['device'] == 'rocm'
+
+
+@pytest.mark.parametrize('failure', ['backend mismatch', 'accelerator unavailable', 'kernel failed', 'model transfer failed'])
+def test_device_validation_failure_preserves_runtime_and_weights(fake_install, monkeypatch, failure):
+    install.install('cpu', lambda: False, lambda *args: None)
+    previous = (install.root() / 'runtime.json').read_bytes()
+    checkpoint = bass_roformer_runtime.managed_checkpoint().read_bytes()
+    original = install._run
+    def fail(command, cwd, cancelled, progress, phase):
+        if phase == 'strict-model-load': raise RuntimeError(failure)
+        return original(command, cwd, cancelled, progress, phase)
+    monkeypatch.setattr(install, '_run', fail)
+    with pytest.raises(RuntimeError, match=failure):
+        install.install('rocm', lambda: False, lambda *args: None)
+    assert (install.root() / 'runtime.json').read_bytes() == previous
+    assert bass_roformer_runtime.managed_checkpoint().read_bytes() == checkpoint
+    assert len(list((install.root() / 'runtimes').iterdir())) == 1
+
+
+def test_older_receipt_does_not_claim_device_validation(fake_install):
+    import json
+    install.install('cpu', lambda: False, lambda *args: None)
+    path = install.root() / 'runtime.json'
+    value = json.loads(path.read_text())
+    value.pop('device_validated')
+    path.write_text(json.dumps(value))
+    assert install.receipt()['checkpoint_validated']
+    assert not install.receipt()['device_validated']
+
+
+def test_cancellation_after_device_probe_preserves_previous_install(fake_install):
+    install.install('cpu', lambda: False, lambda *args: None)
+    previous = (install.root() / 'runtime.json').read_bytes()
+    cancelled = False
+    def progress(phase, *args):
+        nonlocal cancelled
+        if phase == 'strict-model-load': cancelled = True
+    with pytest.raises(RuntimeError, match='cancelled'):
+        install.install('cpu', lambda: cancelled, progress)
+    assert (install.root() / 'runtime.json').read_bytes() == previous
+    assert len(list((install.root() / 'runtimes').iterdir())) == 1
 
 
 def test_failed_model_validation_preserves_previous_runtime(fake_install, monkeypatch):

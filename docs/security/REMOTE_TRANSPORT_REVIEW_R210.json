@@ -160,13 +160,13 @@
     {
       "path": "app/bass_roformer_install.py",
       "function": "_download",
-      "line": 92,
+      "line": 110,
       "call": "secure_https.https_urlopen",
       "call_sha256": "63fe1b63bcfd96fb8935724d8e65fdc889d0ba359e1031a16f4e557334b02075",
-      "source_sha256": "a8e1edfe1cde7e1fa79a402e3a9e2c424507f4f05ec30631b0560baf2f42fc9c",
+      "source_sha256": "a6f8add983e56003d18f0332c4cc26849c992e58ef794ff48693b5914fc5f8c0",
       "category": "asset_download",
       "boundary": "Administrator-triggered HTTPS downloads use constant original release URLs, exact expected length and SHA-256, bounded streaming and private staging; no request-supplied network destination or inference payload.",
-      "verification": "tests/test_r210_bass-roformer_web_install.py rejects incorrect bytes and exercises explicit consent and rollback; source commit independently pinned to the upstream release."
+      "verification": "tests/test_bass_roformer_install.py covers administrator submission, exact downloads and rollback; tests/test_bass_roformer_device_probe.py executes the fixed program with synthetic CPU/CUDA/ROCm backends. Real device inference remains unverified."
     },
     {
       "path": "app/checkout_reference_recovery.py",
@@ -541,6 +541,16 @@
     "evidence": [
       "tests/test_bass_roformer_runtime.py",
       "docs/CONTINUATION_20261111_R210.md"
+    ]
+  },
+  "bs_roformer_device_review": {
+    "date": "2026-11-11",
+    "source": "app/bass_roformer_install.py",
+    "review": "Reviewed the fixed strict-load program and its device argument. CPU/CUDA/ROCm is resolved once and checked before activation. Matrix arithmetic, synchronization and model transfer introduce no request-supplied code, command or network target. Existing subprocess/HTTPS call shapes are unchanged; only source digest and offsets moved. Local backend tests are synthetic; no real hardware or model inference is attested.",
+    "evidence": [
+      "tests/test_bass_roformer_install.py",
+      "tests/test_bass_roformer_device_probe.py",
+      "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
     ]
   }
 }

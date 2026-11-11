@@ -1,0 +1,42 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-11-11",
+  "baseline_commit": "54d7b00e68a818d7ab56f80dfa7e19f5eea756d9",
+  "remote_main_verified": "6dae37ec8128e07aeb59e20798c7e68ea7193daa",
+  "test_result": {
+    "passed": 138,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "warnings": 1,
+    "functional": 77,
+    "review_gates": 61
+  },
+  "ruff": "passed: app native tests scripts/k8s-wizard.py",
+  "bandit": {
+    "low": 170,
+    "medium": 21,
+    "high": 0,
+    "total": 191,
+    "suppressed": 0,
+    "live_review_gate": "passed",
+    "shifted_finding_identities": 3,
+    "new_process_or_network_call_shapes": 0
+  },
+  "device_probe_tests": "synthetic backends with NumPy arithmetic; no real CUDA/ROCm execution",
+  "real_checkpoint_load_tested": false,
+  "real_neural_inference_tested": false,
+  "remote_ci_started": false,
+  "published": false,
+  "pre_rc_percent": 73,
+  "tests": [
+    "tests/test_bass_roformer_install.py",
+    "tests/test_bass_roformer_device_probe.py",
+    "tests/test_bass_roformer_runtime.py",
+    "tests/test_bass_roformer_project.py",
+    "tests/test_r210_security_review_gate.py",
+    "tests/test_r210_execution_entry_inventory.py",
+    "tests/test_r210_remote_transport_inventory.py",
+    "tests/test_r210_service_admission_inventory.py"
+  ]
+}

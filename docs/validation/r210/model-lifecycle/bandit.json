@@ -1,6 +1,6 @@
 {
   "errors": [],
-  "generated_at": "2026-11-11T00:55:21Z",
+  "generated_at": "2026-11-11T01:15:56Z",
   "metrics": {
     "_totals": {
       "CONFIDENCE.HIGH": 149,
@@ -11,7 +11,7 @@
       "SEVERITY.LOW": 170,
       "SEVERITY.MEDIUM": 21,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 62203,
+      "loc": 62222,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -1389,7 +1389,7 @@
       "SEVERITY.LOW": 4,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 231,
+      "loc": 250,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -5937,7 +5937,7 @@
       "test_name": "blacklist"
     },
     {
-      "code": "112     with (root() / 'installation.log').open('ab') as log:\n113         process = subprocess.Popen(list(map(str, command)), cwd=str(cwd), env=env,\n114                                    stdin=subprocess.DEVNULL, stdout=log, stderr=log,\n115                                    start_new_session=(os.name == 'posix'))\n116         deadline = time.monotonic() + 3600\n",
+      "code": "130     with (root() / 'installation.log').open('ab') as log:\n131         process = subprocess.Popen(list(map(str, command)), cwd=str(cwd), env=env,\n132                                    stdin=subprocess.DEVNULL, stdout=log, stderr=log,\n133                                    start_new_session=(os.name == 'posix'))\n134         deadline = time.monotonic() + 3600\n",
       "col_offset": 18,
       "end_col_offset": 74,
       "filename": "app/bass_roformer_install.py",
@@ -5948,18 +5948,18 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 113,
+      "line_number": 131,
       "line_range": [
-        113,
-        114,
-        115
+        131,
+        132,
+        133
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "158             _run(git_base + ['-C', str(src), 'checkout', '--detach', COMMIT], directory, cancelled, progress, 'source-checkout')\n159             actual = subprocess.check_output(git_base + ['-C', str(src), 'rev-parse', 'HEAD'], text=True,\n160                                              env=isolated_env(), timeout=30).strip()\n161             if actual != COMMIT: raise ValueError('BS RoFormer source commit mismatch')\n",
+      "code": "177             _run(git_base + ['-C', str(src), 'checkout', '--detach', COMMIT], directory, cancelled, progress, 'source-checkout')\n178             actual = subprocess.check_output(git_base + ['-C', str(src), 'rev-parse', 'HEAD'], text=True,\n179                                              env=isolated_env(), timeout=30).strip()\n180             if actual != COMMIT: raise ValueError('BS RoFormer source commit mismatch')\n",
       "col_offset": 21,
       "end_col_offset": 76,
       "filename": "app/bass_roformer_install.py",
@@ -5970,17 +5970,17 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 159,
+      "line_number": 178,
       "line_range": [
-        159,
-        160
+        178,
+        179
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "178             constraints = directory / 'constraints.txt'\n179             versions = subprocess.check_output([str(python), '-I', '-c',\n180                 'import importlib.metadata as m;print(\"\\\\n\".join(n+\"==\"+m.version(n) for n in (\"torch\",\"torchaudio\",\"torchvision\")))'],\n181                 text=True, env=isolated_env(), timeout=30)\n182             constraints.write_text(versions)\n",
+      "code": "197             constraints = directory / 'constraints.txt'\n198             versions = subprocess.check_output([str(python), '-I', '-c',\n199                 'import importlib.metadata as m;print(\"\\\\n\".join(n+\"==\"+m.version(n) for n in (\"torch\",\"torchaudio\",\"torchvision\")))'],\n200                 text=True, env=isolated_env(), timeout=30)\n201             constraints.write_text(versions)\n",
       "col_offset": 23,
       "end_col_offset": 58,
       "filename": "app/bass_roformer_install.py",
@@ -5991,11 +5991,11 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 179,
+      "line_number": 198,
       "line_range": [
-        179,
-        180,
-        181
+        198,
+        199,
+        200
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
