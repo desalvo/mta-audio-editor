@@ -65,6 +65,29 @@ scaricati dalla release. Non è stata eseguita inferenza con il modello neurale
 reale. I test sintetici dimostrano il protocollo, il DSP e la pubblicazione,
 non un miglioramento sonoro rispetto a Demucs.
 
+### Evidenze dei diritti e decisione di deployment — 11 novembre 2026
+
+La release ufficiale identifica MUSDB18-HQ come dataset di addestramento. Nella
+[risposta del 30 settembre 2026](https://github.com/ZFTurbo/Music-Source-Separation-Training/issues/254#issuecomment-5914058767)
+ZFTurbo dichiara MIT per **questo checkpoint**, richiede il credito ZFTurbo e
+lascia all'utilizzatore la verifica delle eventuali condizioni dei dati. La
+[pagina ufficiale SigSep](https://sigsep.github.io/datasets/musdb.html) precisa
+che il dataset contiene brani di provenienze diverse, alcuni con condizioni
+non commerciali, e che l'accesso ai brani è per scopi accademici; identifica
+MUSDB18-HQ come versione non compressa dello stesso dataset. Queste informazioni
+riguardano il dataset: non stabiliscono da sole se o come le sue restrizioni si
+applichino ai pesi addestrati o a uno specifico servizio. La risposta del
+creatore dei pesi non risolve i diritti di terzi.
+
+Per ogni deployment, documentare separatamente: identità e hash del checkpoint;
+crediti e avvisi MIT; uso previsto (ricerca, servizio non commerciale o
+commerciale, distribuzione di pesi/conversioni); base dei diritti dei dati e
+relative fonti o parere competente; responsabile e data della decisione. Le
+autorizzazioni relative ai brani caricati dagli utenti sono un tema distinto.
+Fino a una decisione documentata per il caso specifico la policy rimane
+disabilitata. Nessuna approvazione di deployment è stata ottenuta in questa
+revisione, né viene dedotta automaticamente dal regime non commerciale.
+
 ### Confronto musicale prima di cambiare il predefinito
 
 Eseguire entrambi i separatori sulla stessa sorgente e sullo stesso intervallo;
@@ -129,6 +152,16 @@ Non-commercial operation does not itself settle missing rights. Preserve
 ZFTurbo credit and the applicable notices. The exact official configuration and
 checkpoint hashes were verified during development; real neural inference and
 listening acceptance remain pending.
+
+On 11 November 2026 the official dataset description was reviewed alongside the
+author's checkpoint-specific statement. SigSep describes multiple data sources,
+some with non-commercial conditions, and academic access to the recordings;
+MUSDB18-HQ is the uncompressed version. Whether and how these data terms apply to
+trained weights or a particular deployment remains an open question, not an
+automatic prohibition or permission. Record the exact checkpoint/hash, MIT
+notices, intended deployment and distribution, training-data rights evidence,
+decision maker and date. User-provided music rights require separate review.
+The model policy remains disabled pending a documented decision for the use.
 
 ## EN — Vocal candidates
 
