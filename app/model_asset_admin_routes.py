@@ -59,6 +59,46 @@ def register_routes(app,actor):
         from . import mega53_install
         return lifecycle_job(user, 'remove-mega53-runtime', lambda jid, _: mega53_install.remove(checkpoint=False, job_id=jid))
 
+    @app.post('/api/admin/ai/bass-roformer/runtime/install')
+    def install_bass_runtime(body:dict, request:Request):
+        user = admin(request)
+        if set(body) != {'accept_licenses','device'} or body['accept_licenses'] is not True or body['device'] not in ('auto','cpu','cuda','rocm'):
+            raise HTTPException(422, 'Review exact code and checkpoint licenses and select a supported device')
+        jid = uuid.uuid4().hex
+        def run(progress, stop):
+            from . import bass_roformer_install
+            from .storage import _atomic_json_write
+            def update(phase, done, total):
+                _atomic_json_write(progress, {'phase':phase, 'message':phase,
+                    'downloaded_bytes':done, 'total_bytes':total,
+                    'progress_percent':round(done*100/total,1) if total else None})
+            result = bass_roformer_install.install(body['device'], stop.is_set, update, job_id=jid)
+            _atomic_json_write(progress, {'phase':'bass-roformer-installed', 'progress_percent':100,
+                'message':'Checkpoint and strict model load verified; deployment rights and real inference require validation', 'result':result})
+        _, job = queue.start('studio-models','worker:studio-install',run,job_id=jid,cancellable=True,
+            payload={'schema_version':1,'actor_user_id':user['id'],'model':'model-assets','action':'install-bass-roformer'})
+        return {'job_id':jid, 'job':job}
+
+    @app.post('/api/admin/ai/bass-roformer/runtime/remove')
+    def remove_bass_runtime(request:Request):
+        user = admin(request)
+        from . import bass_roformer_install
+        return lifecycle_job(user,'remove-bass-runtime',lambda jid, _:bass_roformer_install.remove(checkpoint=False,job_id=jid))
+
+    @app.post('/api/admin/ai/bass-roformer/weights/install')
+    def install_bass_weights(body:dict, request:Request):
+        user = admin(request)
+        if body != {'accept_licenses':True}:
+            raise HTTPException(422,'Review exact checkpoint license first')
+        from . import bass_roformer_install
+        return lifecycle_job(user,'install-bass-checkpoint',lambda jid, cancelled:bass_roformer_install.install_checkpoint(cancelled,jid))
+
+    @app.post('/api/admin/ai/bass-roformer/weights/remove')
+    def remove_bass_weights(request:Request):
+        user = admin(request)
+        from . import bass_roformer_install
+        return lifecycle_job(user,'remove-bass-checkpoint',lambda jid, _:bass_roformer_install.remove(checkpoint=True,job_id=jid))
+
     @app.post('/api/admin/ai/mega53/weights/install')
     def install_mega53_weights(body:dict, request:Request):
         user = admin(request)

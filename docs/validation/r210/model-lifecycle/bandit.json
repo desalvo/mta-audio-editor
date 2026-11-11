@@ -1,17 +1,17 @@
 {
   "errors": [],
-  "generated_at": "2026-11-08T22:37:40Z",
+  "generated_at": "2026-11-11T00:08:09Z",
   "metrics": {
     "_totals": {
-      "CONFIDENCE.HIGH": 145,
+      "CONFIDENCE.HIGH": 149,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 42,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
-      "SEVERITY.LOW": 166,
+      "SEVERITY.LOW": 170,
       "SEVERITY.MEDIUM": 21,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 61697,
+      "loc": 62196,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -1233,7 +1233,7 @@
       "SEVERITY.LOW": 2,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 226,
+      "loc": 234,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -1377,6 +1377,32 @@
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
       "loc": 72,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/bass_roformer_install.py": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 231,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/bass_roformer_runtime.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 157,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -1805,7 +1831,7 @@
       "SEVERITY.LOW": 15,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 7253,
+      "loc": 7281,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -2000,7 +2026,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 423,
+      "loc": 435,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -2013,7 +2039,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 217,
+      "loc": 253,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -2026,7 +2052,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 360,
+      "loc": 363,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -2039,7 +2065,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 56,
+      "loc": 68,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -2052,7 +2078,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 54,
+      "loc": 58,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -2715,7 +2741,7 @@
       "SEVERITY.LOW": 2,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 614,
+      "loc": 622,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -5454,7 +5480,7 @@
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "179     if kind == 'demucs':\n180         import subprocess\n181         from app.model_selectors import demucs_model\n",
+      "code": "187             _artifacts(folder, staged); return\n188         import subprocess\n189         from app.model_selectors import demucs_model\n",
       "col_offset": 8,
       "end_col_offset": 25,
       "filename": "app/ai_unified_adapter.py",
@@ -5465,16 +5491,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Consider possible security implications associated with the subprocess module.",
-      "line_number": 180,
+      "line_number": 188,
       "line_range": [
-        180
+        188
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
       "test_id": "B404",
       "test_name": "blacklist"
     },
     {
-      "code": "187         if count==2:arguments+=['--two-stems','vocals']\n188         subprocess.run(_backend_command(plan, folder, 'demucs', [*arguments,str(source)]), check=True)\n189         paths = sorted((folder/'demucs'/model/source.stem).glob('*.wav'))\n",
+      "code": "195         if count==2:arguments+=['--two-stems','vocals']\n196         subprocess.run(_backend_command(plan, folder, 'demucs', [*arguments,str(source)]), check=True)\n197         paths = sorted((folder/'demucs'/model/source.stem).glob('*.wav'))\n",
       "col_offset": 8,
       "end_col_offset": 102,
       "filename": "app/ai_unified_adapter.py",
@@ -5485,9 +5511,9 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 188,
+      "line_number": 196,
       "line_range": [
-        188
+        196
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
@@ -5891,6 +5917,91 @@
       "test_name": "hardcoded_password_string"
     },
     {
+      "code": "13 import shutil\n14 import subprocess\n15 import time\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app/bass_roformer_install.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 14,
+      "line_range": [
+        14
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "112     with (root() / 'installation.log').open('ab') as log:\n113         process = subprocess.Popen(list(map(str, command)), cwd=str(cwd), env=env,\n114                                    stdin=subprocess.DEVNULL, stdout=log, stderr=log,\n115                                    start_new_session=(os.name == 'posix'))\n116         deadline = time.monotonic() + 3600\n",
+      "col_offset": 18,
+      "end_col_offset": 74,
+      "filename": "app/bass_roformer_install.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 113,
+      "line_range": [
+        113,
+        114,
+        115
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "158             _run(git_base + ['-C', str(src), 'checkout', '--detach', COMMIT], directory, cancelled, progress, 'source-checkout')\n159             actual = subprocess.check_output(git_base + ['-C', str(src), 'rev-parse', 'HEAD'], text=True,\n160                                              env=isolated_env(), timeout=30).strip()\n161             if actual != COMMIT: raise ValueError('BS RoFormer source commit mismatch')\n",
+      "col_offset": 21,
+      "end_col_offset": 76,
+      "filename": "app/bass_roformer_install.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 159,
+      "line_range": [
+        159,
+        160
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "178             constraints = directory / 'constraints.txt'\n179             versions = subprocess.check_output([str(python), '-I', '-c',\n180                 'import importlib.metadata as m;print(\"\\\\n\".join(n+\"==\"+m.version(n) for n in (\"torch\",\"torchaudio\",\"torchvision\")))'],\n181                 text=True, env=isolated_env(), timeout=30)\n182             constraints.write_text(versions)\n",
+      "col_offset": 23,
+      "end_col_offset": 58,
+      "filename": "app/bass_roformer_install.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 179,
+      "line_range": [
+        179,
+        180,
+        181
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
       "code": "10 import stat\n11 import subprocess\n12 import sys\n",
       "col_offset": 0,
       "end_col_offset": 17,
@@ -6197,7 +6308,7 @@
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "976 @app.get(\"/verify-email\", response_class=HTMLResponse)\n977 def verify_email_page(token: str = \"\"):\n978     ok = bool(token) and confirm_email(token)\n979     if ok:\n980         from . import account_lifecycle as life\n981         with __import__('app.auth',fromlist=['db']).db() as con:\n982             row=con.execute('SELECT user_id FROM email_tokens WHERE token_hash=?',(__import__('app.auth',fromlist=['_token_hash'])._token_hash(token),)).fetchone()\n983         if row and life.info(row[0])['state']=='enrolling':\n984             from .account_routes import enrollment\n985             return RedirectResponse(enrollment(row[0]),status_code=303)\n986         if row:life.ready(row[0])\n987     return _template(\n988         \"message.html\",\n989         title=\"Email confermata\" if ok else \"Link non valido\",\n990         message=\"La tua email \u00e8 stata confermata. Il tuo account \u00e8 ora in attesa di approvazione.\" if ok else \"Il link \u00e8 scaduto, non valido o gi\u00e0 utilizzato.\",\n991         extra=\"\",\n992     )\n993 \n",
+      "code": "979 @app.get(\"/verify-email\", response_class=HTMLResponse)\n980 def verify_email_page(token: str = \"\"):\n981     ok = bool(token) and confirm_email(token)\n982     if ok:\n983         from . import account_lifecycle as life\n984         with __import__('app.auth',fromlist=['db']).db() as con:\n985             row=con.execute('SELECT user_id FROM email_tokens WHERE token_hash=?',(__import__('app.auth',fromlist=['_token_hash'])._token_hash(token),)).fetchone()\n986         if row and life.info(row[0])['state']=='enrolling':\n987             from .account_routes import enrollment\n988             return RedirectResponse(enrollment(row[0]),status_code=303)\n989         if row:life.ready(row[0])\n990     return _template(\n991         \"message.html\",\n992         title=\"Email confermata\" if ok else \"Link non valido\",\n993         message=\"La tua email \u00e8 stata confermata. Il tuo account \u00e8 ora in attesa di approvazione.\" if ok else \"Il link \u00e8 scaduto, non valido o gi\u00e0 utilizzato.\",\n994         extra=\"\",\n995     )\n996 \n",
       "col_offset": 0,
       "end_col_offset": 5,
       "filename": "app/main.py",
@@ -6208,11 +6319,8 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: ''",
-      "line_number": 977,
+      "line_number": 980,
       "line_range": [
-        977,
-        978,
-        979,
         980,
         981,
         982,
@@ -6225,14 +6333,17 @@
         989,
         990,
         991,
-        992
+        992,
+        993,
+        994,
+        995
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b107_hardcoded_password_default.html",
       "test_id": "B107",
       "test_name": "hardcoded_password_default"
     },
     {
-      "code": "1026 @app.get(\"/reset-password\", response_class=HTMLResponse)\n1027 def reset_password_page(token: str = \"\"):\n1028     return _template(\"reset-password.html\", error=\"\", token=token)\n1029 \n",
+      "code": "1029 @app.get(\"/reset-password\", response_class=HTMLResponse)\n1030 def reset_password_page(token: str = \"\"):\n1031     return _template(\"reset-password.html\", error=\"\", token=token)\n1032 \n",
       "col_offset": 0,
       "end_col_offset": 66,
       "filename": "app/main.py",
@@ -6243,17 +6354,17 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: ''",
-      "line_number": 1027,
+      "line_number": 1030,
       "line_range": [
-        1027,
-        1028
+        1030,
+        1031
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b107_hardcoded_password_default.html",
       "test_id": "B107",
       "test_name": "hardcoded_password_default"
     },
     {
-      "code": "1590 def vst3_parameters(request: Request, path: str):\n1591     import subprocess\n1592     import json\n",
+      "code": "1593 def vst3_parameters(request: Request, path: str):\n1594     import subprocess\n1595     import json\n",
       "col_offset": 4,
       "end_col_offset": 21,
       "filename": "app/main.py",
@@ -6264,16 +6375,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Consider possible security implications associated with the subprocess module.",
-      "line_number": 1591,
+      "line_number": 1594,
       "line_range": [
-        1591
+        1594
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
       "test_id": "B404",
       "test_name": "blacklist"
     },
     {
-      "code": "1600             result=Path(root)/'result.json'\n1601             proc = subprocess.run(worker_command('--inspect-plugin',plugin,'--inspect-result',result),\n1602                                   capture_output=True,text=True,timeout=15)\n1603             if proc.returncode:raise ValueError(proc.stderr[-500:] or 'VST3 inspection failed')\n",
+      "code": "1603             result=Path(root)/'result.json'\n1604             proc = subprocess.run(worker_command('--inspect-plugin',plugin,'--inspect-result',result),\n1605                                   capture_output=True,text=True,timeout=15)\n1606             if proc.returncode:raise ValueError(proc.stderr[-500:] or 'VST3 inspection failed')\n",
       "col_offset": 19,
       "end_col_offset": 75,
       "filename": "app/main.py",
@@ -6284,17 +6395,17 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 1601,
+      "line_number": 1604,
       "line_range": [
-        1601,
-        1602
+        1604,
+        1605
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "3018     try:\n3019         proc = subprocess.run([\n3020             \"ffmpeg\", \"-y\", \"-v\", \"error\", \"-i\", str(source), \"-map\", \"0:a:0\",\n3021             \"-ar\", str(target_rate), \"-c:a\", \"pcm_s24le\", str(tmp),\n3022         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n3023     except BaseException:\n",
+      "code": "3021     try:\n3022         proc = subprocess.run([\n3023             \"ffmpeg\", \"-y\", \"-v\", \"error\", \"-i\", str(source), \"-map\", \"0:a:0\",\n3024             \"-ar\", str(target_rate), \"-c:a\", \"pcm_s24le\", str(tmp),\n3025         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n3026     except BaseException:\n",
       "col_offset": 15,
       "end_col_offset": 69,
       "filename": "app/main.py",
@@ -6305,19 +6416,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Starting a process with a partial executable path",
-      "line_number": 3019,
+      "line_number": 3022,
       "line_range": [
-        3019,
-        3020,
-        3021,
-        3022
+        3022,
+        3023,
+        3024,
+        3025
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
       "test_id": "B607",
       "test_name": "start_process_with_partial_path"
     },
     {
-      "code": "3018     try:\n3019         proc = subprocess.run([\n3020             \"ffmpeg\", \"-y\", \"-v\", \"error\", \"-i\", str(source), \"-map\", \"0:a:0\",\n3021             \"-ar\", str(target_rate), \"-c:a\", \"pcm_s24le\", str(tmp),\n3022         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n3023     except BaseException:\n",
+      "code": "3021     try:\n3022         proc = subprocess.run([\n3023             \"ffmpeg\", \"-y\", \"-v\", \"error\", \"-i\", str(source), \"-map\", \"0:a:0\",\n3024             \"-ar\", str(target_rate), \"-c:a\", \"pcm_s24le\", str(tmp),\n3025         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n3026     except BaseException:\n",
       "col_offset": 15,
       "end_col_offset": 69,
       "filename": "app/main.py",
@@ -6328,19 +6439,19 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 3019,
+      "line_number": 3022,
       "line_range": [
-        3019,
-        3020,
-        3021,
-        3022
+        3022,
+        3023,
+        3024,
+        3025
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "3503         wav = Path(td) / 'input.wav'\n3504         subprocess.run(['ffmpeg','-y','-v','error','-i',str(source),'-acodec','pcm_s16le',wav.as_posix()],check=True)\n3505         return native_ai_routing.infer(kind, wav, options)\n",
+      "code": "3506         wav = Path(td) / 'input.wav'\n3507         subprocess.run(['ffmpeg','-y','-v','error','-i',str(source),'-acodec','pcm_s16le',wav.as_posix()],check=True)\n3508         return native_ai_routing.infer(kind, wav, options)\n",
       "col_offset": 8,
       "end_col_offset": 117,
       "filename": "app/main.py",
@@ -6351,16 +6462,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Starting a process with a partial executable path",
-      "line_number": 3504,
+      "line_number": 3507,
       "line_range": [
-        3504
+        3507
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
       "test_id": "B607",
       "test_name": "start_process_with_partial_path"
     },
     {
-      "code": "3503         wav = Path(td) / 'input.wav'\n3504         subprocess.run(['ffmpeg','-y','-v','error','-i',str(source),'-acodec','pcm_s16le',wav.as_posix()],check=True)\n3505         return native_ai_routing.infer(kind, wav, options)\n",
+      "code": "3506         wav = Path(td) / 'input.wav'\n3507         subprocess.run(['ffmpeg','-y','-v','error','-i',str(source),'-acodec','pcm_s16le',wav.as_posix()],check=True)\n3508         return native_ai_routing.infer(kind, wav, options)\n",
       "col_offset": 8,
       "end_col_offset": 117,
       "filename": "app/main.py",
@@ -6371,16 +6482,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 3504,
+      "line_number": 3507,
       "line_range": [
-        3504
+        3507
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "3530                 duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)\n3531                 subprocess.run([\"ffmpeg\",\"-y\",\"-v\",\"error\",\"-ss\",f\"{start_s:.6f}\",\"-t\",f\"{duration_s:.6f}\",\"-i\",str(rendered),\"-vn\",\"-acodec\",\"pcm_s16le\",str(clipped)],check=True)\n3532                 source = clipped\n",
+      "code": "3533                 duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)\n3534                 subprocess.run([\"ffmpeg\",\"-y\",\"-v\",\"error\",\"-ss\",f\"{start_s:.6f}\",\"-t\",f\"{duration_s:.6f}\",\"-i\",str(rendered),\"-vn\",\"-acodec\",\"pcm_s16le\",str(clipped)],check=True)\n3535                 source = clipped\n",
       "col_offset": 16,
       "end_col_offset": 179,
       "filename": "app/main.py",
@@ -6391,16 +6502,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Starting a process with a partial executable path",
-      "line_number": 3531,
+      "line_number": 3534,
       "line_range": [
-        3531
+        3534
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
       "test_id": "B607",
       "test_name": "start_process_with_partial_path"
     },
     {
-      "code": "3530                 duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)\n3531                 subprocess.run([\"ffmpeg\",\"-y\",\"-v\",\"error\",\"-ss\",f\"{start_s:.6f}\",\"-t\",f\"{duration_s:.6f}\",\"-i\",str(rendered),\"-vn\",\"-acodec\",\"pcm_s16le\",str(clipped)],check=True)\n3532                 source = clipped\n",
+      "code": "3533                 duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)\n3534                 subprocess.run([\"ffmpeg\",\"-y\",\"-v\",\"error\",\"-ss\",f\"{start_s:.6f}\",\"-t\",f\"{duration_s:.6f}\",\"-i\",str(rendered),\"-vn\",\"-acodec\",\"pcm_s16le\",str(clipped)],check=True)\n3535                 source = clipped\n",
       "col_offset": 16,
       "end_col_offset": 179,
       "filename": "app/main.py",
@@ -6411,16 +6522,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 3531,
+      "line_number": 3534,
       "line_range": [
-        3531
+        3534
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "5725             \"--model\", str(_DRUMSEP_PATH)]\n5726     result = subprocess.run(args, capture_output=True, text=True, timeout=7200, check=False)\n5727     if result.returncode:\n",
+      "code": "5735             \"--model\", str(_DRUMSEP_PATH)]\n5736     result = subprocess.run(args, capture_output=True, text=True, timeout=7200, check=False)\n5737     if result.returncode:\n",
       "col_offset": 13,
       "end_col_offset": 92,
       "filename": "app/main.py",
@@ -6431,16 +6542,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 5726,
+      "line_number": 5736,
       "line_range": [
-        5726
+        5736
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "7221         ]\n7222     proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n7223     if proc.returncode:\n",
+      "code": "7249         ]\n7250     proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n7251     if proc.returncode:\n",
       "col_offset": 11,
       "end_col_offset": 89,
       "filename": "app/main.py",
@@ -6451,16 +6562,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 7222,
+      "line_number": 7250,
       "line_range": [
-        7222
+        7250
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
     },
     {
-      "code": "7440             cmd = [\"ffmpeg\", \"-y\", \"-v\", \"error\", \"-f\", \"lavfi\", \"-i\", \"color=c=black:s=1920x1080:r=30\", \"-i\", str(mix), \"-vf\", f\"ass='{ass_filter}'\", \"-c:v\", \"libx264\", \"-preset\", \"medium\", \"-crf\", \"18\", \"-pix_fmt\", \"yuv420p\", \"-c:a\", \"aac\", \"-b:a\", \"320k\", \"-shortest\", str(out)]\n7441         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n7442         if proc.returncode or not out.is_file():\n",
+      "code": "7468             cmd = [\"ffmpeg\", \"-y\", \"-v\", \"error\", \"-f\", \"lavfi\", \"-i\", \"color=c=black:s=1920x1080:r=30\", \"-i\", str(mix), \"-vf\", f\"ass='{ass_filter}'\", \"-c:v\", \"libx264\", \"-preset\", \"medium\", \"-crf\", \"18\", \"-pix_fmt\", \"yuv420p\", \"-c:a\", \"aac\", \"-b:a\", \"320k\", \"-shortest\", str(out)]\n7469         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n7470         if proc.returncode or not out.is_file():\n",
       "col_offset": 15,
       "end_col_offset": 93,
       "filename": "app/main.py",
@@ -6471,9 +6582,9 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 7441,
+      "line_number": 7469,
       "line_range": [
-        7441
+        7469
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
@@ -7022,7 +7133,7 @@
       "test_name": "blacklist"
     },
     {
-      "code": "631         from .ai_execution_policy import isolated_env\n632         proc = subprocess.Popen(\n633             cmd,\n634             stdout=subprocess.PIPE,\n635             stderr=subprocess.STDOUT,\n636             text=True,\n637             bufsize=1,\n638             env=isolated_env(),\n639         )\n640         tail: list[str] = []\n",
+      "code": "639         from .ai_execution_policy import isolated_env\n640         proc = subprocess.Popen(\n641             cmd,\n642             stdout=subprocess.PIPE,\n643             stderr=subprocess.STDOUT,\n644             text=True,\n645             bufsize=1,\n646             env=isolated_env(),\n647         )\n648         tail: list[str] = []\n",
       "col_offset": 15,
       "end_col_offset": 9,
       "filename": "app/plugins.py",
@@ -7033,16 +7144,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 632,
+      "line_number": 640,
       "line_range": [
-        632,
-        633,
-        634,
-        635,
-        636,
-        637,
-        638,
-        639
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",

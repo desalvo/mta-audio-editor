@@ -419,7 +419,7 @@ def _stem_durable_payload(job: dict, source: Path, keep_original_track: bool) ->
     fields = ("source_track_id", "model", "stem_count", "filename", "estimate_bpm",
               "stem_name_prefix", "extract_lyrics", "extract_chords", "lyrics_model",
               "chords_engine", "split_backing_vocals", "backing_vocal_model",
-              "split_percussions", "percussion_method", "stem_targets")
+              "split_percussions", "percussion_method", "stem_targets", "range_start_ms", "range_end_ms")
     return {"schema_version": 1, "project_id": pid, "source_category": locator,
             "source_name": source.name, "keep_original_track": bool(keep_original_track),
             "options": {name: job.get(name) for name in fields}}
@@ -452,6 +452,9 @@ def _restore_stem_split_job(pid, payload, job_id):
             raise ValueError("Invalid stem flag")
     if options.get("singer_mode") or options.get("singers") or str(options.get("percussion_method") or "dsp") not in _PERCUSSION_METHODS:
         raise ValueError("Queued stem job uses a removed or unsupported separator")
+    start, end = options.get('range_start_ms') or 0, options.get('range_end_ms')
+    if type(start) is not int or start < 0 or (end is not None and (type(end) is not int or end <= start)):
+        raise ValueError('Invalid durable stem interval')
     load_project(pid)
     now = time.time()
     with STEM_JOB_LOCK:
@@ -4982,7 +4985,7 @@ def _split_drums_percussions(drums_stem: Path, output_dir: Path) -> tuple[Path, 
 
 
 _PERCUSSION_METHODS = {"dsp", "drumsep-onnx", "mvsep-mega53"}
-_STEM_TARGETS = {"all", "lead_vocals", "percussions", "drums_without_percussions", "other", "kick", "snare", "toms", "cymbals"}
+_STEM_TARGETS = {"all", "lead_vocals", "percussions", "drums_without_percussions", "other", "bass", "accompaniment", "kick", "snare", "toms", "cymbals"}
 
 
 def _reject_removed_separation_request(request: Request) -> None:
@@ -5052,6 +5055,13 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
             raise RuntimeError("stem separation cancelled")
         with tempfile.TemporaryDirectory(prefix=f"mta-stems-{job_id}-") as td_raw:
             td = Path(td_raw)
+            if model in ('bs-roformer-bass','bs-roformer-4stem') and job.get('source_track_id'):
+                from .bass_roformer_runtime import prepare_track_source
+                snapshot = load_project(project_id)
+                selected_track = next((t for t in snapshot.tracks if t.id == job['source_track_id']), None)
+                if selected_track is None: raise ValueError('Source track no longer exists')
+                source = prepare_track_source(snapshot, selected_track, source, td,
+                    job.get('range_start_ms') or 0, job.get('range_end_ms'), cancel_event)
             if _ai_external_engine('demucs'):
                 result, remote_id = _native_remote_infer('demucs',source,{'model':model,'stem_count':stem_count})
                 if not result['audio']:
@@ -5207,7 +5217,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                                     id=uuid.uuid4().hex[:10],
                                     source_start_ms=0,
                                     source_end_ms=duration,
-                                    timeline_start_ms=0,
+                                    timeline_start_ms=int(job.get("range_start_ms") or 0),
                                 )
                             ],
                         )
@@ -5215,7 +5225,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     # of duplicating it. Preserve its identity and mixer settings.
                     original_track_id = str(job.get("source_track_id") or "")
                     existing_output = None
-                    if original_track_id and "all" not in stem_targets:
+                    if original_track_id and "all" not in stem_targets and not job.get("range_start_ms") and job.get("range_end_ms") is None:
                         existing_output = next((item for item in project.tracks
                             if item.id != original_track_id and item.derived_source_track_id == original_track_id and item.derived_stem_key == stem_name), None)
                     if existing_output is not None:
@@ -5812,7 +5822,11 @@ async def stem_job_start(
     if Path(file.filename or "").suffix.lower() != ".mp3":
         raise HTTPException(400, "La separazione strumenti accetta attualmente file MP3.")
     remote_demucs = _ai_external_engine('demucs')
-    if not remote_demucs and not STEM_SPLITTER.available():
+    if model in ("bs-roformer-bass", "bs-roformer-4stem"):
+        from .bass_roformer_runtime import validate_options
+        try: validate_options(model, stem_count)
+        except ValueError as exc: raise HTTPException(400, str(exc)) from exc
+    if model not in ("bs-roformer-bass", "bs-roformer-4stem") and not remote_demucs and not STEM_SPLITTER.available():
         raise HTTPException(503, "Il plugin Demucs non è installato in questo runtime.")
     status = STEM_SPLITTER.status()
     supported_counts = [int(value) for value in status.get("supported_stem_counts", [])]
@@ -5820,7 +5834,7 @@ async def stem_job_start(
         raise HTTPException(400, "Numero di stem non valido. Usa Auto oppure una cardinalità tra 2 e 64.")
     if stem_count and stem_count not in supported_counts and not remote_demucs:
         raise HTTPException(400, f"Nessun modello configurato fornisce {stem_count} stem.")
-    if stem_count == 2:
+    if stem_count == 2 and model not in ("bs-roformer-bass", "bs-roformer-4stem"):
         model = "htdemucs" if model not in {"htdemucs", "htdemucs_ft"} else model
     elif stem_count:
         profiles = [item for item in status.get("model_profiles", []) if int(item.get("stem_count", 0)) == stem_count]
@@ -6079,13 +6093,25 @@ def start_track_stem_job(
     split_percussions: bool = False,
     percussion_method: str = "dsp",
     stem_targets: str = "all",
+    range_start_ms: int = 0,
+    range_end_ms: int | None = None,
 ):
     _reject_removed_separation_request(request)
     project = _project_for_actor(request, pid)
     from .project_kinds import require_kind
     require_kind(project, "audio")
+    if range_start_ms < 0 or (range_end_ms is not None and range_end_ms <= range_start_ms):
+        raise HTTPException(400, 'Invalid separation interval')
+    if (range_start_ms or range_end_ms is not None) and model not in ('bs-roformer-bass','bs-roformer-4stem'):
+        raise HTTPException(400, 'Timeline interval requires BS RoFormer profile')
+    if range_end_ms is not None and range_end_ms > project_duration_ms(project):
+        raise HTTPException(400, 'Separation interval exceeds project duration')
     remote_demucs = _ai_external_engine('demucs')
-    if not remote_demucs and not STEM_SPLITTER.available():
+    if model in ("bs-roformer-bass", "bs-roformer-4stem"):
+        from .bass_roformer_runtime import validate_options
+        try: validate_options(model, stem_count)
+        except ValueError as exc: raise HTTPException(400, str(exc)) from exc
+    if model not in ("bs-roformer-bass", "bs-roformer-4stem") and not remote_demucs and not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
     stem_status = STEM_SPLITTER.status()
     supported_counts = [int(value) for value in stem_status.get("supported_stem_counts", [])]
@@ -6093,7 +6119,7 @@ def start_track_stem_job(
         raise HTTPException(400, "Unsupported stem count")
     if stem_count and stem_count not in supported_counts and not remote_demucs:
         raise HTTPException(400, f"No configured model provides {stem_count} stems")
-    if stem_count == 2:
+    if stem_count == 2 and model not in ("bs-roformer-bass", "bs-roformer-4stem"):
         model = "htdemucs" if model not in {"htdemucs", "htdemucs_ft"} else model
     elif stem_count:
         profiles = [item for item in stem_status.get("model_profiles", []) if int(item.get("stem_count", 0)) == stem_count]
@@ -6160,6 +6186,8 @@ def start_track_stem_job(
         "error": None,
         "estimate_bpm": False,
         "stem_name_prefix": track.name,
+        "range_start_ms": range_start_ms,
+        "range_end_ms": range_end_ms,
     }
     with STEM_JOB_LOCK:
         STEM_JOBS[job_id] = job

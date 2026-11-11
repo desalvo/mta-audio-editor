@@ -158,6 +158,17 @@
       "verification": "Explicit caller/path review and test_r210_remote_transport_inventory.py native helper path-denial cases; existing device-account authorization tests are retained."
     },
     {
+      "path": "app/bass_roformer_install.py",
+      "function": "_download",
+      "line": 92,
+      "call": "secure_https.https_urlopen",
+      "call_sha256": "63fe1b63bcfd96fb8935724d8e65fdc889d0ba359e1031a16f4e557334b02075",
+      "source_sha256": "a8e1edfe1cde7e1fa79a402e3a9e2c424507f4f05ec30631b0560baf2f42fc9c",
+      "category": "asset_download",
+      "boundary": "Administrator-triggered HTTPS downloads use constant original release URLs, exact expected length and SHA-256, bounded streaming and private staging; no request-supplied network destination or inference payload.",
+      "verification": "tests/test_r210_bass-roformer_web_install.py rejects incorrect bytes and exercises explicit consent and rollback; source commit independently pinned to the upstream release."
+    },
+    {
       "path": "app/checkout_reference_recovery.py",
       "function": "recover",
       "line": 38,
@@ -215,10 +226,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5686,
+      "line": 5696,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "c15cc8d22012a5eb941ed83e2e4cd198aade5439677cec8ca1bd8066b4add286",
+      "source_sha256": "6bacf1cee624b432eac6afd29f783e58cc271dec32bc529d8abb37df13d389b7",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -240,7 +251,7 @@
       "line": 330,
       "call": "secure_https.https_urlopen",
       "call_sha256": "88ebab48ce7bde67d204aa4816da05630be5501fdf0bd9e6061a9a570c856394",
-      "source_sha256": "2bc7c104e64b0a0cabee749738d1a215466d24cbc18eae310bddaa3ad4a06bea",
+      "source_sha256": "b5ff8b4741b9dccd1db960a9c8841aea0426499095cbc226c9e84bb2396b22b0",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -251,7 +262,7 @@
       "line": 381,
       "call": "secure_https.https_urlopen",
       "call_sha256": "508dab96af65b214cac3269c1447b166ce007c338d421ef7d4dea00170673094",
-      "source_sha256": "2bc7c104e64b0a0cabee749738d1a215466d24cbc18eae310bddaa3ad4a06bea",
+      "source_sha256": "b5ff8b4741b9dccd1db960a9c8841aea0426499095cbc226c9e84bb2396b22b0",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -523,5 +534,13 @@
   "mega53_web_install_review_20261103": {
     "evidence": "tests/test_r210_mega53_web_install.py",
     "scope": "Fixed-source administrator installation; no caller-provided URL or command; model load is not real inference or hardware attestation."
+  },
+  "bass_publication_review_20261111": {
+    "date": "2026-11-11",
+    "scope": "Reviewed bass output staging, exclusive publication and rollback. All audio is finite before publication; final rights and cancellation checks precede successful return. Rollback compares device and inode and preserves pre-existing or replaced files. No process, transport or admission entry changed. This does not certify crash atomicity across the entire output set or neural separation quality.",
+    "evidence": [
+      "tests/test_bass_roformer_runtime.py",
+      "docs/CONTINUATION_20261111_R210.md"
+    ]
   }
 }

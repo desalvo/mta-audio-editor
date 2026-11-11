@@ -4,6 +4,18 @@ An operator must still verify the exact checkpoint and deployment before enablin
 """
 
 DOSSIERS = {
+    'bs-roformer-zfturbo': {
+        'status': 'checkpoint_mit_training_data_review_required',
+        'references': [
+            'https://github.com/ZFTurbo/Music-Source-Separation-Training/issues/254#issuecomment-5914058767',
+            'https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/tag/v1.0.12',
+            'https://sigsep.github.io/datasets/musdb.html',
+        ],
+        'note': 'Code and exact v1.0.12 checkpoint are MIT per author confirmation, with ZFTurbo credit. '
+                'The author explicitly leaves MUSDB18-HQ training-data conditions for deployment review. '
+                'Only SHA-256 3e9daecd70aaed5b5a0d1f861cc4d77eaa45afb3fc6301b1cf32c1be0f5868fb is supported. '
+                'Not BS RoFormer SW: those weights have unverified rights. Disabled until documented operator review.',
+    },
     'uvr-kara-2': {
         'status': 'public_grant_scope_unconfirmed',
         'references': [

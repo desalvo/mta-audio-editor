@@ -421,6 +421,8 @@ class DemucsStemSplitter:
 
     @staticmethod
     def available() -> bool:
+        from .bass_roformer_runtime import configured
+        if configured(): return True
         from .demucs_runtime import available
         if os.getenv('MTA_DEMUCS_PYTHON','').strip():
             return available()
@@ -450,6 +452,8 @@ class DemucsStemSplitter:
             {"id": "repro_mdx_a_hybrid_only", "model": "repro_mdx_a_hybrid_only", "stem_count": 4, "display_name": "Repro MDX A Hybrid", "stem_labels": ["drums", "bass", "other", "vocals"]},
             {"id": "repro_mdx_a_time_only", "model": "repro_mdx_a_time_only", "stem_count": 4, "display_name": "Repro MDX A Time", "stem_labels": ["drums", "bass", "other", "vocals"]},
         ]
+        from .bass_roformer_runtime import profiles as bass_profiles
+        profiles.extend(bass_profiles())
         raw = os.getenv("MTA_DEMUCS_MODEL_REGISTRY", "").strip()
         registry_file = os.getenv("MTA_DEMUCS_MODEL_REGISTRY_FILE", "").strip()
         if registry_file:
@@ -531,6 +535,10 @@ class DemucsStemSplitter:
         progress=None,
         cancel_event=None,
     ) -> list[Path]:
+        if model in ('bs-roformer-bass', 'bs-roformer-4stem'):
+            from .bass_roformer_runtime import infer
+            return infer(source, output_dir, model, stem_count=stem_count,
+                         progress=progress, cancel_event=cancel_event)
         from .model_license_policy import evaluate
         from .model_selectors import demucs_model
         # Direct native/diagnostic callers do not pass through the server API.

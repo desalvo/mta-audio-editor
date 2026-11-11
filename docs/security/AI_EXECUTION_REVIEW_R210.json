@@ -96,7 +96,7 @@
     "app/ai_token_routes.py": "sha256:c437a893c2bbb76bdaf53e27b46ace1fb006a834c35469c272332fee26956177",
     "app/ai_torch_diagnostics.py": "sha256:a639fcd5c98fd9519ec0855b8f02cdad3088abe4d41372259178fd3535466ce8",
     "app/ai_trusted_estimates.py": "sha256:1103bf458c9f8912b04fd0f676d2699f67ddcbbbb743c6f156f0b790b0c5a552",
-    "app/ai_unified_adapter.py": "sha256:7d84fccacde4840ddb0e952ee112d4108773ccbd5a179eec02e72c61c5bbec48",
+    "app/ai_unified_adapter.py": "sha256:ce605e78cf271b2b00e37f54bfb6cb787156a92c89f7019e750351cf1b51cdec",
     "app/ai_upload_transaction.py": "sha256:2fbaf2ad0b181a20827f681c8fbe2f40bc076e3eef9e92cf1a3d748b13580ed5",
     "app/ai_usage_reporting.py": "sha256:6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
     "app/ai_worker_artifacts.py": "sha256:9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28",
@@ -108,6 +108,8 @@
     "app/auth.py": "sha256:403e57e502ac1b2e4773a17b54fa67c27e23deb039df3b34b1aad83a78ec0210",
     "app/auto_mix.py": "sha256:3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "sha256:ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa",
+    "app/bass_roformer_install.py": "sha256:a8e1edfe1cde7e1fa79a402e3a9e2c424507f4f05ec30631b0560baf2f42fc9c",
+    "app/bass_roformer_runtime.py": "sha256:db11c362eeb2d6d24b271503fa4043000b10cc4733b3d539fb61216dc0e7b928",
     "app/beat_sync.py": "sha256:48e427e70dedf19ffe26306c3d88ce5d40546fc76c8f7679d389a29d524b7b87",
     "app/bounce.py": "sha256:64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61",
     "app/checkout_reference_recovery.py": "sha256:b94176ebea634d2d8b08c7e6c042d7f8eeeec806012a609ac4601db1c6c22a9c",
@@ -140,7 +142,7 @@
     "app/live_mixer.py": "sha256:c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291",
     "app/live_sources.py": "sha256:729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
     "app/lyric_layout.py": "sha256:c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
-    "app/main.py": "sha256:c15cc8d22012a5eb941ed83e2e4cd198aade5439677cec8ca1bd8066b4add286",
+    "app/main.py": "sha256:6bacf1cee624b432eac6afd29f783e58cc271dec32bc529d8abb37df13d389b7",
     "app/mega53_install.py": "sha256:bf5ca2996bc2b8fdd90d3cf8a40e2c35ab546986ebe7251a82b48e91bda0f6ee",
     "app/mega53_runtime.py": "sha256:a7e696e29a82a3875c28ec95c29c6bf52d70b219ac600f637b24457c58ce91ce",
     "app/merish_mta16.py": "sha256:a5b114a5c3e29491890d28f92b7e5e6a76c21bde3f6989f262429d331bdec816",
@@ -155,11 +157,11 @@
     "app/midi_ump.py": "sha256:5bc915e5a04b841937fec3ebb7ec453fd48dc37b7eb03fcfe0c9d2c0b3825bee",
     "app/mlive_mp3.py": "sha256:d83e56a2142fed65fe0ad85053c18aa0af293186f271619b22bb3ca3b557fe31",
     "app/mlive_profile.py": "sha256:4ebfd83f1137fcd3c88d413078170481ec41d24cb2e909ccb17a502b1b87c695",
-    "app/model_asset_admin.py": "sha256:2bc7c104e64b0a0cabee749738d1a215466d24cbc18eae310bddaa3ad4a06bea",
-    "app/model_asset_admin_routes.py": "sha256:29edb4085f47922213438a8467e5ebee2cb388f93f04eaa138ffa4384170515f",
-    "app/model_license_policy.py": "sha256:c305391928006131d44a7d3ba97083af241a785841dfe1b5826396696c5dc8b1",
-    "app/model_rights_dossiers.py": "sha256:5e98fa960a3d3b52019301707982ea0ed00f2605692f28a6db7feca8d0ea1374",
-    "app/model_selectors.py": "sha256:ad9f896097677e1fd87a4916cace94b17f8def59404b758a4067b25abf449900",
+    "app/model_asset_admin.py": "sha256:b5ff8b4741b9dccd1db960a9c8841aea0426499095cbc226c9e84bb2396b22b0",
+    "app/model_asset_admin_routes.py": "sha256:db34e4ddf331c57f29d7c7fb1260f95b51433bd7243bf12ff9ad2bd6f181421e",
+    "app/model_license_policy.py": "sha256:98a22c99761a59ba84b09fc3a5b95355c3fc4a67860dcdc8bfded8652c7659bc",
+    "app/model_rights_dossiers.py": "sha256:11df3374fa033cbc5843e9429aa1dd1b7340bfe2cf768af80aa05e809b6dec32",
+    "app/model_selectors.py": "sha256:f0d8cdd4073630767cabae11f2c4077a72b034691426506ddeceb2b5a8bab51e",
     "app/model_storage.py": "sha256:99a7c255f886ae7bf1cd6a9506455592f2efd0da9aaba8327a8940a916b1da6b",
     "app/model_updater.py": "sha256:2ceb9df25b17d70d46427bda86fc5a52a9adabe0587b6af944d469306d0ce977",
     "app/models.py": "sha256:7ef663d17e962306c873816ef8c8cf446039e8c93be22569faac6b2d985f6329",
@@ -210,7 +212,7 @@
     "app/percussion_dataset_import.py": "sha256:88aff3d18e5ad3116b37421a1cc5bdebc4834b07624d4d6cda88589686445893",
     "app/percussion_metrics.py": "sha256:d6973ead4fd9711f804ff5e7b1fcf884998c6bf4a703d06f3b9603fc6133395f",
     "app/platform_file_lock.py": "sha256:f465c089ff94a35fe80708e26b8ed69bcc8cf1dbfd8004f12a2051065ffb2a74",
-    "app/plugins.py": "sha256:08eb7f847cbd6eb5c65976be8e04feddb1553c895f79653f573942f262c3a5f2",
+    "app/plugins.py": "sha256:a205dfb7b3cc285705aa8f99500952fa606a75952924e3c74596c2ccacf20391",
     "app/preview_publish.py": "sha256:72b54e1ec35c11b6367d193188eb19621673654fa3aefb52c5b54fe5fd2a887a",
     "app/project_collaboration.py": "sha256:0ed558812dfc81e98ccbd80628ae79461e5cd3725ca4f3c4c4892654853a10da",
     "app/project_kinds.py": "sha256:d2043a15db7f478bf7aca0e9d6e1205e09d9886e5c56ea5d786d2ad6ba8181f1",
@@ -290,7 +292,7 @@
     "app/static/ai_studio.js": "sha256:26bdd4964fc9b6463713e520741abfd34f36bba14b137cae74e7e797f3ed8057",
     "app/static/ai_tokens.js": "sha256:b8230165ed07196489bbe892829d7e0d760c61f23b08f80d454411626770e009",
     "app/static/ai_usage_panel.js": "sha256:36948517e3daed898ad776e2f7239f5f30faa59ae4493c6d46d5fe5c9b9b2ed6",
-    "app/static/app.js": "sha256:db120868fe14889c5cc5a9d1ce09fbef91381158d991044b727bf24fe9d21add",
+    "app/static/app.js": "sha256:d86637488fd2a8a901f8092fca7436a72ccc3404a268816f3538bd02e68e1f93",
     "app/static/audio_capture.js": "sha256:35bced64b929beb014dc96d37906200518959773365aa9e1c300cf258acb6328",
     "app/static/audio_capture_worklet.js": "sha256:9a7e53d96f016f7446f38f1545ba371049e31d5d65b858497b43f0a2ff70627d",
     "app/static/credit_notice.js": "sha256:a890accb63ab1b03570530c5ecfa067ed33c77261f1231352b2b5ab9ec813007",
@@ -311,7 +313,7 @@
     "app/static/midi_rules.js": "sha256:e0622fc4f33cb83fb8ab9170c7e8a239dd76ffc8076ef280cd5af72936839198",
     "app/static/midi_tempo.js": "sha256:33c51eaca3cbae0c30361b8699e991d8bb6fb203060f6d24333f167064a31551",
     "app/static/mlive_profile.js": "sha256:b6f10cc01ec1359624bbbd772b849f7dac256830af34e83b030ebcc5947c1d40",
-    "app/static/model_asset_admin.js": "sha256:b66362acb2d13f52ab7500a38f7c7eae29b40b1453578af8447d460a444198f9",
+    "app/static/model_asset_admin.js": "sha256:7d44f08d9d6c1bec27cb8fcadbac9cd5496e691e203974cc1710e400286e5cf7",
     "app/static/musical_clock.js": "sha256:f793c06f779340121eb0990e0fc310a0d67d17e3b5a65cb1c74f71b00832e171",
     "app/static/native_audio_io.js": "sha256:5ac7647cb8fa2737107a01a13aea709d8ec0a972878150d3bbfb05723334fe30",
     "app/static/native_transport.js": "sha256:d4c19976dc128fac4d46178c420defd9d81f61a95b7cf3e67ffdf29cc0d0db7e",
@@ -2491,9 +2493,24 @@
       ]
     },
     {
+      "family": "registered_server",
+      "boundary": "Explicit BS RoFormer profile follows the original project job or admitted registered worker. Separate exact checkpoint policy is disabled until documented rights review. No substitution or inference-time download.",
+      "evidence": [
+        "tests/test_bass_roformer_runtime.py",
+        "tests/test_bass_roformer_project.py",
+        "tests/test_bass_roformer_install.py"
+      ],
       "path": "app/ai_unified_adapter.py",
       "function": "infer",
-      "line": 188,
+      "line": 182,
+      "kind": "inference_call",
+      "call": "app.bass_roformer_runtime.infer",
+      "shape_sha256": "643df727fc491dc4251b99dea6a903654dd2b78827be4874cbf2567e0e8b6160"
+    },
+    {
+      "path": "app/ai_unified_adapter.py",
+      "function": "infer",
+      "line": 196,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "372a03c9d011be4f62fecadd122817f5e3ff05b69843bc791d88eea6919de445",
@@ -2508,7 +2525,7 @@
     {
       "path": "app/ai_unified_adapter.py",
       "function": "infer",
-      "line": 206,
+      "line": 214,
       "kind": "inference_call",
       "call": "app.mega53_runtime.infer",
       "shape_sha256": "414634fc96d2227d9e10f8f58dd761608eabf4fa03508fca6b4e4fb155327248",
@@ -2523,7 +2540,7 @@
     {
       "path": "app/ai_unified_adapter.py",
       "function": "main",
-      "line": 247,
+      "line": 255,
       "kind": "inference_call",
       "call": "infer",
       "shape_sha256": "5676a77e53ada4a94ec1a284e6ff568e01792ff13575f1c1d4aac0062cc3501e",
@@ -2538,7 +2555,7 @@
     {
       "path": "app/ai_unified_adapter.py",
       "function": "main",
-      "line": 250,
+      "line": 258,
       "kind": "inference_call",
       "call": "infer",
       "shape_sha256": "5676a77e53ada4a94ec1a284e6ff568e01792ff13575f1c1d4aac0062cc3501e",
@@ -2749,6 +2766,45 @@
         "tests/test_r210_legacy_separator_rights.py",
         "tests/test_r210_sam_hub_backing_rocm.py",
         "tests/test_r266_separator_output_paths.py"
+      ]
+    },
+    {
+      "path": "app/bass_roformer_install.py",
+      "function": "_run",
+      "line": 113,
+      "kind": "process_boundary",
+      "call": "subprocess.Popen",
+      "shape_sha256": "13fe3f25b9259d06b34af6e4a29b0d150e747a5ce4361dc91b74f93d876877a5",
+      "family": "operator_diagnostic",
+      "boundary": "Authenticated administrator starts a fixed-source installation queue job. Fixed argv without a shell invokes Git, an operator-approved Python, pip and the strict local model-load check. No arbitrary URL, command or executable is accepted in the request; installer use is not customer inference or hardware attestation.",
+      "evidence": [
+        "tests/test_bass_roformer_install.py"
+      ]
+    },
+    {
+      "path": "app/bass_roformer_install.py",
+      "function": "install",
+      "line": 159,
+      "kind": "process_boundary",
+      "call": "subprocess.check_output",
+      "shape_sha256": "a510003b95c422cc5a53bd06ea9df21fc7b070f3577b18b4d0ca6f4b2a8a006e",
+      "family": "operator_diagnostic",
+      "boundary": "Authenticated administrator starts a fixed-source installation queue job. Fixed argv without a shell invokes Git, an operator-approved Python, pip and the strict local model-load check. No arbitrary URL, command or executable is accepted in the request; installer use is not customer inference or hardware attestation.",
+      "evidence": [
+        "tests/test_bass_roformer_install.py"
+      ]
+    },
+    {
+      "path": "app/bass_roformer_install.py",
+      "function": "install",
+      "line": 179,
+      "kind": "process_boundary",
+      "call": "subprocess.check_output",
+      "shape_sha256": "af883b5a329ad5bf9e891b26bfbb5973832a7eacfc8fdb10b187550853657da5",
+      "family": "operator_diagnostic",
+      "boundary": "Authenticated administrator starts a fixed-source installation queue job. Fixed argv without a shell invokes Git, an operator-approved Python, pip and the strict local model-load check. No arbitrary URL, command or executable is accepted in the request; installer use is not customer inference or hardware attestation.",
+      "evidence": [
+        "tests/test_bass_roformer_install.py"
       ]
     },
     {
@@ -3172,7 +3228,7 @@
     {
       "path": "app/main.py",
       "function": "oauth_start",
-      "line": 866,
+      "line": 869,
       "kind": "http_entry",
       "route": "/oauth/{provider}/start",
       "shape_sha256": "a9f14c9a7ef05997f2b9c74c2d1c2def2d7cf7973b130b6c4ec15a16f4dfcc46",
@@ -3186,7 +3242,7 @@
     {
       "path": "app/main.py",
       "function": "oauth_callback",
-      "line": 874,
+      "line": 877,
       "kind": "http_entry",
       "route": "/oauth/{provider}/callback",
       "shape_sha256": "84cf174b32306810b66263dacc3b40262292d7177c9798e2a61697830e110d92",
@@ -3200,7 +3256,7 @@
     {
       "path": "app/main.py",
       "function": "login_page",
-      "line": 902,
+      "line": 905,
       "kind": "http_entry",
       "route": "/login",
       "shape_sha256": "b0042fd168540e0f4f38016d1de0dfab69c3cbaf4f7ffc888610037a85fbf20a",
@@ -3214,7 +3270,7 @@
     {
       "path": "app/main.py",
       "function": "login_submit",
-      "line": 912,
+      "line": 915,
       "kind": "http_entry",
       "route": "/login",
       "shape_sha256": "345f5c06778961d651bd9d7201831c5a113fc61ff549490e72086a384070a967",
@@ -3228,7 +3284,7 @@
     {
       "path": "app/main.py",
       "function": "logout",
-      "line": 934,
+      "line": 937,
       "kind": "http_entry",
       "route": "/logout",
       "shape_sha256": "c9dc9179f571e0e31aa7e4fe1be438acdff071335f6df93e0720d98cf6572906",
@@ -3242,7 +3298,7 @@
     {
       "path": "app/main.py",
       "function": "register_page",
-      "line": 942,
+      "line": 945,
       "kind": "http_entry",
       "route": "/register",
       "shape_sha256": "f2b724d852d119066225e8bf50b91638cf4151ba511a06295c5c1b45f4eacefb",
@@ -3256,7 +3312,7 @@
     {
       "path": "app/main.py",
       "function": "register_submit",
-      "line": 949,
+      "line": 952,
       "kind": "http_entry",
       "route": "/register",
       "shape_sha256": "dbdbd29dc23d620477280d7b1b6a6bbb71bcf240854b33b80c807a9b0d422eb3",
@@ -3270,7 +3326,7 @@
     {
       "path": "app/main.py",
       "function": "verify_email_page",
-      "line": 976,
+      "line": 979,
       "kind": "http_entry",
       "route": "/verify-email",
       "shape_sha256": "92583cc86aed64b4cfe0e5290f1b437eebdc69d47cf8471bf6ae9c61bb742a51",
@@ -3284,7 +3340,7 @@
     {
       "path": "app/main.py",
       "function": "resend_verification_page",
-      "line": 995,
+      "line": 998,
       "kind": "http_entry",
       "route": "/resend-verification",
       "shape_sha256": "8b7965e2c42612c94327a2b86acf12b1deafbb53eb7a4ea9c0c89ce481bf8afe",
@@ -3298,7 +3354,7 @@
     {
       "path": "app/main.py",
       "function": "forgot_password_page",
-      "line": 1009,
+      "line": 1012,
       "kind": "http_entry",
       "route": "/forgot-password",
       "shape_sha256": "7ae302074048add2df13d94ce0a6d1988889538b974668e9032fda1f97766841",
@@ -3312,7 +3368,7 @@
     {
       "path": "app/main.py",
       "function": "forgot_password_submit",
-      "line": 1014,
+      "line": 1017,
       "kind": "http_entry",
       "route": "/forgot-password",
       "shape_sha256": "ab868005298c42ee80fb4bdfaea15131f51536ee12959a005e7de4af35c6c6f3",
@@ -3326,7 +3382,7 @@
     {
       "path": "app/main.py",
       "function": "reset_password_page",
-      "line": 1026,
+      "line": 1029,
       "kind": "http_entry",
       "route": "/reset-password",
       "shape_sha256": "e1d2d72523a6f6c593c32097fd94bb5cdd36c4e99941af0ff3952f29f6a74f2a",
@@ -3340,7 +3396,7 @@
     {
       "path": "app/main.py",
       "function": "reset_password_submit",
-      "line": 1031,
+      "line": 1034,
       "kind": "http_entry",
       "route": "/reset-password",
       "shape_sha256": "0a4e18383600832f0b9f43fc2ad15d20237b732cb47574537d33c5c9ba80e1a6",
@@ -3354,7 +3410,7 @@
     {
       "path": "app/main.py",
       "function": "account_page",
-      "line": 1048,
+      "line": 1051,
       "kind": "http_entry",
       "route": "/account",
       "shape_sha256": "ab4c4363d80dba31f2b612b7716cb1c600543e5f22d2685c34373faff7591d3b",
@@ -3368,7 +3424,7 @@
     {
       "path": "app/main.py",
       "function": "admin_users_page",
-      "line": 1057,
+      "line": 1060,
       "kind": "http_entry",
       "route": "/admin/users",
       "shape_sha256": "df3fa058372b14495d7d57eff1eae109a8d4c1b06eedd96b1684fb5c5b04ae67",
@@ -3382,7 +3438,7 @@
     {
       "path": "app/main.py",
       "function": "settings_page",
-      "line": 1063,
+      "line": 1066,
       "kind": "http_entry",
       "route": "/settings",
       "shape_sha256": "74676d88d6cfc33b8cd9552e544678e96e008e3ba0946a3b6243d441ec37fa78",
@@ -3396,7 +3452,7 @@
     {
       "path": "app/main.py",
       "function": "server_audio_engine_status",
-      "line": 1069,
+      "line": 1072,
       "kind": "http_entry",
       "route": "/api/admin/audio-engine",
       "shape_sha256": "a979aeedd876a49a259007230702195af3937e840c38bcd10a0efd464c2d5b2e",
@@ -3410,7 +3466,7 @@
     {
       "path": "app/main.py",
       "function": "server_audio_engine_select",
-      "line": 1076,
+      "line": 1079,
       "kind": "http_entry",
       "route": "/api/admin/audio-engine",
       "shape_sha256": "96e019df27414824fc264483322183fef3c213dbb80e4f429ce2f80ba02e5f9e",
@@ -3424,7 +3480,7 @@
     {
       "path": "app/main.py",
       "function": "native_audio_engine_status",
-      "line": 1090,
+      "line": 1093,
       "kind": "http_entry",
       "route": "/api/native/audio-engine",
       "shape_sha256": "76bb07a759d098fbb8bc6fef85b45b7e02a1bba8f05f6d2bdb038885b3e4f44f",
@@ -3438,7 +3494,7 @@
     {
       "path": "app/main.py",
       "function": "api_session",
-      "line": 1098,
+      "line": 1101,
       "kind": "http_entry",
       "route": "/api/session",
       "shape_sha256": "42c499d6b2c87c0ef3e93a6fca8deabcf8b702587da5e0d1ee32cd18bef0dc9a",
@@ -3452,7 +3508,7 @@
     {
       "path": "app/main.py",
       "function": "credit_purchase_page",
-      "line": 1107,
+      "line": 1110,
       "kind": "http_entry",
       "route": "/account/credits",
       "shape_sha256": "db07627b90fbc9d98e2e41c28d2cca7b0694497ebe5692cefb53750bb4bc80e7",
@@ -3466,7 +3522,7 @@
     {
       "path": "app/main.py",
       "function": "api_account",
-      "line": 1113,
+      "line": 1116,
       "kind": "http_entry",
       "route": "/api/account",
       "shape_sha256": "1fdc4199025cbfb8401424898c1c83138d33c5e48ea019a79bacfdfbf995f13a",
@@ -3480,7 +3536,7 @@
     {
       "path": "app/main.py",
       "function": "api_account_update",
-      "line": 1118,
+      "line": 1121,
       "kind": "http_entry",
       "route": "/api/account",
       "shape_sha256": "bbae6d767039412443eb0b1968869b18e96ca58ad5d17824499def00bad911fa",
@@ -3494,7 +3550,7 @@
     {
       "path": "app/main.py",
       "function": "api_account_password",
-      "line": 1136,
+      "line": 1139,
       "kind": "http_entry",
       "route": "/api/account/password",
       "shape_sha256": "72c33ce4e513eb7dbd317c44be5a6ddbedacb217d6f56956386701a5b70eadc9",
@@ -3508,7 +3564,7 @@
     {
       "path": "app/main.py",
       "function": "api_totp_begin",
-      "line": 1147,
+      "line": 1150,
       "kind": "http_entry",
       "route": "/api/account/totp/begin",
       "shape_sha256": "19989e21ba7d2caad6210836c9a564f6999c6fe2d924603ac895f84d2b6dca42",
@@ -3522,7 +3578,7 @@
     {
       "path": "app/main.py",
       "function": "api_totp_qr",
-      "line": 1154,
+      "line": 1157,
       "kind": "http_entry",
       "route": "/api/account/totp/qr",
       "shape_sha256": "d776d3a70372278369fcde0e4339f6beb9511e6d40e0b10c662827e75c3bcc1c",
@@ -3536,7 +3592,7 @@
     {
       "path": "app/main.py",
       "function": "api_totp_enable",
-      "line": 1163,
+      "line": 1166,
       "kind": "http_entry",
       "route": "/api/account/totp/enable",
       "shape_sha256": "d5b1c17a2adf5e981fbb642c17b6ff435caed329e26298a380393e47360d5d5a",
@@ -3550,7 +3606,7 @@
     {
       "path": "app/main.py",
       "function": "api_totp_disable",
-      "line": 1173,
+      "line": 1176,
       "kind": "http_entry",
       "route": "/api/account/totp/disable",
       "shape_sha256": "ed121e1d9f3def1f28fc90553c5da2ba8b891a7bf4e1356390ccb5b84e45ce1a",
@@ -3564,7 +3620,7 @@
     {
       "path": "app/main.py",
       "function": "api_account_limits",
-      "line": 1200,
+      "line": 1203,
       "kind": "http_entry",
       "route": "/api/account/limits",
       "shape_sha256": "c06e60c7f424789d33fb02fdbf52c01c3e15c8813cc23e3212cf0854fceefe1b",
@@ -3578,7 +3634,7 @@
     {
       "path": "app/main.py",
       "function": "api_storage",
-      "line": 1244,
+      "line": 1247,
       "kind": "http_entry",
       "route": "/api/storage",
       "shape_sha256": "8675113091390023d0d987206c7f196cf9b3140d913bdb8406f9c630e1544082",
@@ -3592,7 +3648,7 @@
     {
       "path": "app/main.py",
       "function": "api_storage_shared_rescan",
-      "line": 1250,
+      "line": 1253,
       "kind": "http_entry",
       "route": "/api/storage/shared/rescan",
       "shape_sha256": "db9008786d89819697400443f65afb4bb7b0ccedc2d34d850d47aaebe39f4c30",
@@ -3606,7 +3662,7 @@
     {
       "path": "app/main.py",
       "function": "admin_diagnostics_settings",
-      "line": 1260,
+      "line": 1263,
       "kind": "http_entry",
       "route": "/api/admin/diagnostics/settings",
       "shape_sha256": "5bc303c90990c68d6142ff22c2ae33e4ac343c6a67688ce695ab34f48b017283",
@@ -3620,7 +3676,7 @@
     {
       "path": "app/main.py",
       "function": "admin_diagnostics_update",
-      "line": 1267,
+      "line": 1270,
       "kind": "http_entry",
       "route": "/api/admin/diagnostics/settings",
       "shape_sha256": "dcb68e9fb20cc25e52cafbee72809174c48cc794e05b2bc9b84c99cc52623b6f",
@@ -3634,7 +3690,7 @@
     {
       "path": "app/main.py",
       "function": "admin_diagnostics_create",
-      "line": 1276,
+      "line": 1279,
       "kind": "http_entry",
       "route": "/api/admin/diagnostics/bundles",
       "shape_sha256": "82772344d7d39dea0b3c95fc13ab6f501679131f812edbc30e870116ae8c7b2a",
@@ -3648,7 +3704,7 @@
     {
       "path": "app/main.py",
       "function": "admin_diagnostics_download",
-      "line": 1312,
+      "line": 1315,
       "kind": "http_entry",
       "route": "/api/admin/diagnostics/bundles/{name}",
       "shape_sha256": "e0cd10b57d42b110677c7455163d16b4b9c4e24e88eca2bf5abfa7d59f513766",
@@ -3662,7 +3718,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_web_settings",
-      "line": 1325,
+      "line": 1328,
       "kind": "http_entry",
       "route": "/api/admin/web-settings",
       "shape_sha256": "9a9a4ea6cb0d4aa362c2c0c65b7cef1991356ace80a840c9109d97ccca13c525",
@@ -3676,7 +3732,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_users",
-      "line": 1330,
+      "line": 1333,
       "kind": "http_entry",
       "route": "/api/admin/users",
       "shape_sha256": "48380a54136a73e4ce5b20792ed97429ee8bc27ba5bdb47e9215e0357b1af204",
@@ -3690,7 +3746,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_user_update",
-      "line": 1336,
+      "line": 1339,
       "kind": "http_entry",
       "route": "/api/admin/users/{user_id}",
       "shape_sha256": "df8ff5471e370f7afa7757393390a21694bb7ae6693074b9615a251c324bb4bf",
@@ -3704,7 +3760,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_user_delete",
-      "line": 1345,
+      "line": 1348,
       "kind": "http_entry",
       "route": "/api/admin/users/{user_id}",
       "shape_sha256": "e3cca34eba3cb42bf999eb9e9d9417aecd2d466d8d2c1a63eb0768e7f349aa84",
@@ -3718,7 +3774,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_smtp",
-      "line": 1355,
+      "line": 1358,
       "kind": "http_entry",
       "route": "/api/admin/smtp",
       "shape_sha256": "dd9dc8278b17cd377b3fa616e89fdee4f464bfe290641858abef79369220094e",
@@ -3732,7 +3788,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_smtp_save",
-      "line": 1361,
+      "line": 1364,
       "kind": "http_entry",
       "route": "/api/admin/smtp",
       "shape_sha256": "185bd186070476377c673ff430e64e2a1ea90c72306925e288d95544db2a78ff",
@@ -3746,7 +3802,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_smtp_test",
-      "line": 1370,
+      "line": 1373,
       "kind": "http_entry",
       "route": "/api/admin/smtp/test",
       "shape_sha256": "6fd7cd0ec17b827258d50ddbcfe7663567eca7799315578a4bd5b18157c405b8",
@@ -3760,7 +3816,7 @@
     {
       "path": "app/main.py",
       "function": "admin_smtp_send_test",
-      "line": 1380,
+      "line": 1383,
       "kind": "http_entry",
       "route": "/api/admin/smtp/send-test",
       "shape_sha256": "03d80ea6de7937306dca4d4ab8b1fcabbc1336af89e89331c36a7e4db224a7c4",
@@ -3774,7 +3830,7 @@
     {
       "path": "app/main.py",
       "function": "admin_social_get",
-      "line": 1404,
+      "line": 1407,
       "kind": "http_entry",
       "route": "/api/admin/social-login",
       "shape_sha256": "59bace50c820baa273940240f3d3dacb033e0077e73d40470084c19f1c909bcc",
@@ -3788,7 +3844,7 @@
     {
       "path": "app/main.py",
       "function": "admin_social_save",
-      "line": 1411,
+      "line": 1414,
       "kind": "http_entry",
       "route": "/api/admin/social-login",
       "shape_sha256": "da70af34218048ae86fddcf8082d3e03effbfb195a89389a69683d428f89f023",
@@ -3802,7 +3858,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_projects_dump",
-      "line": 1419,
+      "line": 1422,
       "kind": "http_entry",
       "route": "/api/admin/projects-dump",
       "shape_sha256": "09f2913dd77fdada495b2a77a5d368db703536d053bee1e9174557c2773930cb",
@@ -3816,7 +3872,7 @@
     {
       "path": "app/main.py",
       "function": "home",
-      "line": 1459,
+      "line": 1462,
       "kind": "http_entry",
       "route": "/",
       "shape_sha256": "1b1343cdaa2fdbdf60ab4b7c44dd1d756a85770cda8875f0cff954a8a5cbd1be",
@@ -3830,7 +3886,7 @@
     {
       "path": "app/main.py",
       "function": "user_docs",
-      "line": 1485,
+      "line": 1488,
       "kind": "http_entry",
       "route": "/docs/user",
       "shape_sha256": "8a278f4fc36c27f63bdaa1beace97f3244592f7d463f57a25f1201fa8079ebdc",
@@ -3844,7 +3900,7 @@
     {
       "path": "app/main.py",
       "function": "admin_docs",
-      "line": 1490,
+      "line": 1493,
       "kind": "http_entry",
       "route": "/docs/admin",
       "shape_sha256": "7025accd71b410f8d7f6af716d19c996e1e1b153c4b79222fe5367ae0cb59a82",
@@ -3858,7 +3914,7 @@
     {
       "path": "app/main.py",
       "function": "user_docs_en",
-      "line": 1498,
+      "line": 1501,
       "kind": "http_entry",
       "route": "/docs/user/en",
       "shape_sha256": "b3220f6d1f5c263dfb086484a673489eb056dcc740ad6c5962a30ff183ac571f",
@@ -3872,7 +3928,7 @@
     {
       "path": "app/main.py",
       "function": "admin_docs_en",
-      "line": 1503,
+      "line": 1506,
       "kind": "http_entry",
       "route": "/docs/admin/en",
       "shape_sha256": "72e9ec82d33c113ef7a58c4fbdd52f8393097db64c7b6ab9306f9b4965ede73e",
@@ -3886,7 +3942,7 @@
     {
       "path": "app/main.py",
       "function": "user_pdf",
-      "line": 1511,
+      "line": 1514,
       "kind": "http_entry",
       "route": "/docs/pdf/user",
       "shape_sha256": "86b8d8fbcd6bbda174bdf51aa8ce54292ad10baacc112ff9b6ce0d306fdb50fe",
@@ -3900,7 +3956,7 @@
     {
       "path": "app/main.py",
       "function": "admin_pdf",
-      "line": 1516,
+      "line": 1519,
       "kind": "http_entry",
       "route": "/docs/pdf/admin",
       "shape_sha256": "d747abd395059cd4634c3eb885025d7e0837bb7ce070e07defe2138b998e0bef",
@@ -3914,7 +3970,7 @@
     {
       "path": "app/main.py",
       "function": "user_pdf_en",
-      "line": 1527,
+      "line": 1530,
       "kind": "http_entry",
       "route": "/docs/pdf/user/en",
       "shape_sha256": "8ce0ae657e374765388e777601ba02edd1b52dca3efc37fdce403b7b0e034a05",
@@ -3928,7 +3984,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_manual",
-      "line": 1532,
+      "line": 1535,
       "kind": "http_entry",
       "route": "/docs/pdf/vst3/{language}",
       "shape_sha256": "625c454128cb798b90aa2b687fe8cddb0bbc394b75cd0e704d8440c256534613",
@@ -3942,7 +3998,7 @@
     {
       "path": "app/main.py",
       "function": "admin_pdf_en",
-      "line": 1540,
+      "line": 1543,
       "kind": "http_entry",
       "route": "/docs/pdf/admin/en",
       "shape_sha256": "844acfd8afb576410b9674c4736a3d412c60203b3586b06b939bed91320f8396",
@@ -3956,7 +4012,7 @@
     {
       "path": "app/main.py",
       "function": "health",
-      "line": 1551,
+      "line": 1554,
       "kind": "http_entry",
       "route": "/health",
       "shape_sha256": "0209f796390b2bba73c70f117886b85593a55ef4c50b90f2873fccafd7eb148c",
@@ -3970,7 +4026,7 @@
     {
       "path": "app/main.py",
       "function": "health",
-      "line": 1552,
+      "line": 1555,
       "kind": "http_entry",
       "route": "/api/health",
       "shape_sha256": "3aeb76d09b902c117495c79eea65843968c8ec2b7974bff4b43441605fde6f25",
@@ -3984,7 +4040,7 @@
     {
       "path": "app/main.py",
       "function": "about",
-      "line": 1557,
+      "line": 1560,
       "kind": "http_entry",
       "route": "/api/about",
       "shape_sha256": "b21c911071f764dc323ff9bd9c95782b97174e4d7f1b83efb82ee6556eb71f32",
@@ -3998,7 +4054,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_plugin_list",
-      "line": 1577,
+      "line": 1580,
       "kind": "http_entry",
       "route": "/api/vst3/plugins",
       "shape_sha256": "5505cbb9f60488f7dc76bd2292a2baaff584cfc3abea14c81cf6404fcd290410",
@@ -4012,7 +4068,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_parameters",
-      "line": 1589,
+      "line": 1592,
       "kind": "http_entry",
       "route": "/api/vst3/parameters",
       "shape_sha256": "31fac36d78938cdbf220b77967b579b396291264d6da42687b048aae53613be6",
@@ -4026,7 +4082,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_parameters",
-      "line": 1601,
+      "line": 1604,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "ed80931ac27dbcefb0d8e3590f252599fe79c87557e31b086bd4af990c524610",
@@ -4040,7 +4096,7 @@
     {
       "path": "app/main.py",
       "function": "plugins",
-      "line": 1640,
+      "line": 1643,
       "kind": "http_entry",
       "route": "/api/plugins",
       "shape_sha256": "2cf1129a1a3ff82bd70f3e45029a477b6cda83d023a5056275ce21b50b6dc308",
@@ -4054,7 +4110,7 @@
     {
       "path": "app/main.py",
       "function": "create_custom_preset",
-      "line": 1654,
+      "line": 1657,
       "kind": "http_entry",
       "route": "/api/presets",
       "shape_sha256": "f3917bd591d43025dbd2b76426006173b90d6355ecb7ed1596ee1e6f69bb78f0",
@@ -4068,7 +4124,7 @@
     {
       "path": "app/main.py",
       "function": "remove_custom_preset",
-      "line": 1663,
+      "line": 1666,
       "kind": "http_entry",
       "route": "/api/presets/{plugin}/{name}",
       "shape_sha256": "e4d15128acfff7fb45bb03111d3e07f184de238eaaff252311a85264debae00b",
@@ -4082,7 +4138,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_model_cache",
-      "line": 1674,
+      "line": 1677,
       "kind": "http_entry",
       "route": "/api/ai-arranger/model-cache",
       "shape_sha256": "b21460a65214c1de34031d79f079ab86734e8394d487b0aae6367e283bd818df",
@@ -4096,7 +4152,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_worker_status",
-      "line": 1683,
+      "line": 1686,
       "kind": "http_entry",
       "route": "/api/ai-arranger/worker-status",
       "shape_sha256": "f77b2a3a568539c44f98843b06de268465a696dc8759f19507823ac4e42bf84b",
@@ -4110,7 +4166,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_catalog",
-      "line": 1689,
+      "line": 1692,
       "kind": "http_entry",
       "route": "/api/ai-arranger/catalog",
       "shape_sha256": "6a15041d9504f7db293503a2db0d0292b262391726e521a6de3002080bc1e71e",
@@ -4124,7 +4180,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_preflight",
-      "line": 1702,
+      "line": 1705,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/preflight",
       "shape_sha256": "1644260b85928318300511b5cf2b20cfd4fb353a33904cfff2f102cf30123724",
@@ -4138,7 +4194,7 @@
     {
       "path": "app/main.py",
       "function": "ai_remix_preflight",
-      "line": 1711,
+      "line": 1714,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/remix/preflight",
       "shape_sha256": "544a79afca89a2e7bc880a52e220ee8c15f2dcf0bfb26d5fbe4262463b46a9fe",
@@ -4152,7 +4208,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_project_plan",
-      "line": 1720,
+      "line": 1723,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/plan",
       "shape_sha256": "40a7f8831bdadbfe77962bbfc6471ab2b8befcdf471b44de5319cef9fd2d3480",
@@ -4166,7 +4222,7 @@
     {
       "path": "app/main.py",
       "function": "ai_remix_project_plan",
-      "line": 1729,
+      "line": 1732,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/remix/plan",
       "shape_sha256": "6c0d69c6f5c4c4265a97ce69f4bb47b00ef22831bc9a745ff0e98898c3df8dd0",
@@ -4180,7 +4236,7 @@
     {
       "path": "app/main.py",
       "function": "create_ai_arranger_job",
-      "line": 1738,
+      "line": 1741,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/jobs",
       "shape_sha256": "9456de0a84cd6927ef5d28f29accd4b3bf77043ff9d1aefc368d2e9c460eb69b",
@@ -4195,7 +4251,7 @@
     {
       "path": "app/main.py",
       "function": "create_ai_remix_job",
-      "line": 1748,
+      "line": 1751,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/remix/jobs",
       "shape_sha256": "03117910d3446f5c291397ff2a949e479c9158786894addaa90aa150fb3ea4f7",
@@ -4210,7 +4266,7 @@
     {
       "path": "app/main.py",
       "function": "list_ai_planning_jobs",
-      "line": 1758,
+      "line": 1761,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-jobs",
       "shape_sha256": "88f164cbcfb371cfcc6ceb110357a87c3cc52f821b6972bc339fb21eeafccada",
@@ -4224,7 +4280,7 @@
     {
       "path": "app/main.py",
       "function": "get_ai_job",
-      "line": 1769,
+      "line": 1772,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-jobs/{job_id}",
       "shape_sha256": "8739d6703c099de9fe0f99b06d7499da451b282bd10d1ee52f1f597997d84bcd",
@@ -4238,7 +4294,7 @@
     {
       "path": "app/main.py",
       "function": "cancel_ai_job",
-      "line": 1778,
+      "line": 1781,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-jobs/{job_id}/cancel",
       "shape_sha256": "c87769a1076f8063207e90538345e564b5a956bea7018e3051a544eb9c87d3f5",
@@ -4252,7 +4308,7 @@
     {
       "path": "app/main.py",
       "function": "_generate_ai_preview",
-      "line": 1820,
+      "line": 1823,
       "kind": "inference_call",
       "call": "native_ai_account.execute_arranger",
       "shape_sha256": "adb4eb5b6585a2531767110411092fa49e481528b5b65c02f51b99bf1c5323e1",
@@ -4267,7 +4323,7 @@
     {
       "path": "app/main.py",
       "function": "_generate_ai_preview",
-      "line": 1822,
+      "line": 1825,
       "kind": "inference_call",
       "call": "ai_worker_protocol.run_worker_with_project_audio",
       "shape_sha256": "5715c0f4d6f5fceddfd001772fe4a2f4422ff58c5fdae8335dca255cd653f66a",
@@ -4282,7 +4338,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_generate",
-      "line": 1835,
+      "line": 1838,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/generate",
       "shape_sha256": "1ec22506841f78b6d30da588ed3729f476af00be66b564c0b76b90c7f24baec9",
@@ -4297,7 +4353,7 @@
     {
       "path": "app/main.py",
       "function": "ai_remix_generate",
-      "line": 1851,
+      "line": 1854,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/remix/generate",
       "shape_sha256": "95c43f0abc967884ad1aafa8cef5eac8bfdcd68bbdd049454e72a1f185f7c4c1",
@@ -4312,7 +4368,7 @@
     {
       "path": "app/main.py",
       "function": "ai_execution_jobs",
-      "line": 2025,
+      "line": 2028,
       "kind": "http_entry",
       "route": "/api/ai-execution/jobs",
       "shape_sha256": "e0656cfa1f2bbe2e25d8ad7d6d6ec636e38fac4b69f6e79578e1bdbbcc389e71",
@@ -4326,7 +4382,7 @@
     {
       "path": "app/main.py",
       "function": "ai_execution_bulk",
-      "line": 2036,
+      "line": 2039,
       "kind": "http_entry",
       "route": "/api/ai-execution/jobs/bulk",
       "shape_sha256": "ad80652cec10ffe1ced5ac0d077ff6128bef39349cefb3d07d62869d3dbcef67",
@@ -4340,7 +4396,7 @@
     {
       "path": "app/main.py",
       "function": "ai_execution_ack",
-      "line": 2046,
+      "line": 2049,
       "kind": "http_entry",
       "route": "/api/ai-execution/notifications/ack",
       "shape_sha256": "3a5bd85242ceb4d322f25ce3664551a6617ecf2f242678b92b998dd1b911ea76",
@@ -4354,7 +4410,7 @@
     {
       "path": "app/main.py",
       "function": "admin_home",
-      "line": 2056,
+      "line": 2059,
       "kind": "http_entry",
       "route": "/admin",
       "shape_sha256": "c67d3426f802b40a25ce1d32233640fd18454f68680bb98dffebcddcb23531ac",
@@ -4368,7 +4424,7 @@
     {
       "path": "app/main.py",
       "function": "admin_ai_execution_jobs",
-      "line": 2062,
+      "line": 2065,
       "kind": "http_entry",
       "route": "/api/admin/ai-execution/jobs",
       "shape_sha256": "725c13df555ce9d3b4f0ca1cd31661c837ca1a3455103c8e9c422e5fe264b066",
@@ -4382,7 +4438,7 @@
     {
       "path": "app/main.py",
       "function": "admin_ai_execution_history",
-      "line": 2070,
+      "line": 2073,
       "kind": "http_entry",
       "route": "/api/admin/ai-execution/history",
       "shape_sha256": "13a26de42ff07759b5ab7e8c99b35fcb1fb65c2a63b6582d0137202e2f1d71f0",
@@ -4396,7 +4452,7 @@
     {
       "path": "app/main.py",
       "function": "admin_ai_execution_settings",
-      "line": 2078,
+      "line": 2081,
       "kind": "http_entry",
       "route": "/api/admin/ai-execution/settings",
       "shape_sha256": "9c4fdeef0187d2c1996a64365c5716e6bc7ca9b505ed38011f7fe13c5590fac6",
@@ -4410,7 +4466,7 @@
     {
       "path": "app/main.py",
       "function": "admin_ai_execution_settings_update",
-      "line": 2086,
+      "line": 2089,
       "kind": "http_entry",
       "route": "/api/admin/ai-execution/settings",
       "shape_sha256": "c3fee1ddfacac94056b1eebd663ca3483572ff2484b8f585482e13f59e7196fb",
@@ -4424,7 +4480,7 @@
     {
       "path": "app/main.py",
       "function": "admin_ai_execution_cancel",
-      "line": 2096,
+      "line": 2099,
       "kind": "http_entry",
       "route": "/api/admin/ai-execution/jobs/{job_id}/cancel",
       "shape_sha256": "aa3fb37aee9d8edaf17d2978c4ed6580da34fb0f78689c2c805b2c5bf99cc004",
@@ -4438,7 +4494,7 @@
     {
       "path": "app/main.py",
       "function": "admin_ai_execution_move",
-      "line": 2108,
+      "line": 2111,
       "kind": "http_entry",
       "route": "/api/admin/ai-execution/jobs/{job_id}/move",
       "shape_sha256": "ca9bc49b062768b9e9d97015c317a6ea25d9ec0952cca4e502afcf754d2e5ce4",
@@ -4452,7 +4508,7 @@
     {
       "path": "app/main.py",
       "function": "generate",
-      "line": 2135,
+      "line": 2138,
       "kind": "inference_call",
       "call": "native_ai_account.execute_arranger",
       "shape_sha256": "ddfa263d5a29d95fa4cb4914cc37ee252ea3180b02ed6695ae6813422724fbbb",
@@ -4467,7 +4523,7 @@
     {
       "path": "app/main.py",
       "function": "generate",
-      "line": 2144,
+      "line": 2147,
       "kind": "inference_call",
       "call": "ai_server_execution.infer",
       "shape_sha256": "08cbd3889567b4880227deacc34a250b5d2e8790dac06f876887e23c5a8a096c",
@@ -4482,7 +4538,7 @@
     {
       "path": "app/main.py",
       "function": "generate",
-      "line": 2150,
+      "line": 2153,
       "kind": "inference_call",
       "call": "ai_worker_protocol.run_worker_with_project_audio",
       "shape_sha256": "19539f9a705b4eea7db8ed0dd449db405a06702b0ced0e0aa21e0f97e54a827a",
@@ -4497,7 +4553,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_active_generation",
-      "line": 2219,
+      "line": 2222,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/active-generation",
       "shape_sha256": "849575c8528fb3a31c0290ae58374fab53c5fb4e4cc4b19e8047f60597a7f010",
@@ -4511,7 +4567,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_cancel_generation",
-      "line": 2225,
+      "line": 2228,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/generations/{job_id}/cancel",
       "shape_sha256": "d1799817112a3d424840c456e310905783ca1ebf3a163d09ec6480d88f74dd08",
@@ -4525,7 +4581,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_start_generation",
-      "line": 2237,
+      "line": 2240,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/start-generation",
       "shape_sha256": "0a20a82926a7238a94dee455c34d6e40de41b8c73ad4144ec5bdfb0b7a7c5a20",
@@ -4540,7 +4596,7 @@
     {
       "path": "app/main.py",
       "function": "ai_remix_start_generation",
-      "line": 2279,
+      "line": 2282,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/remix/start-generation",
       "shape_sha256": "44fb9e7c321fe7c75ddba687eebab7d94fd7d448752a30b0fce1052d93a4296d",
@@ -4555,7 +4611,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_generate_and_add",
-      "line": 2317,
+      "line": 2320,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/ai-arranger/generate-and-add",
       "shape_sha256": "46b09d738d4c7d8310116ba3f93dc1c915873fc670da191914bb2a9a0c0e3c90",
@@ -4570,7 +4626,7 @@
     {
       "path": "app/main.py",
       "function": "ai_arranger_generate_and_add",
-      "line": 2328,
+      "line": 2331,
       "kind": "inference_call",
       "call": "ai_worker_protocol.run_worker_with_project_audio",
       "shape_sha256": "5715c0f4d6f5fceddfd001772fe4a2f4422ff58c5fdae8335dca255cd653f66a",
@@ -4585,7 +4641,7 @@
     {
       "path": "app/main.py",
       "function": "ai_remix_generate_and_add",
-      "line": 2337,
+      "line": 2340,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/remix/generate-and-add",
       "shape_sha256": "d5e067b8479d642363ca262952bc79341f1cdd3eb7769f9a422e4a54aea71e3e",
@@ -4600,7 +4656,7 @@
     {
       "path": "app/main.py",
       "function": "ai_remix_generate_and_add",
-      "line": 2348,
+      "line": 2351,
       "kind": "inference_call",
       "call": "ai_worker_protocol.run_worker_with_project_audio",
       "shape_sha256": "5715c0f4d6f5fceddfd001772fe4a2f4422ff58c5fdae8335dca255cd653f66a",
@@ -4615,7 +4671,7 @@
     {
       "path": "app/main.py",
       "function": "projects",
-      "line": 2357,
+      "line": 2360,
       "kind": "http_entry",
       "route": "/api/projects",
       "shape_sha256": "9d7f971fb38e8c43d9d7ae7463f14e0b79dfc3cda5acb587e7cbfc5afdfeb1ef",
@@ -4629,7 +4685,7 @@
     {
       "path": "app/main.py",
       "function": "project_new",
-      "line": 2378,
+      "line": 2381,
       "kind": "http_entry",
       "route": "/api/projects",
       "shape_sha256": "3bad1fcf15ddd990bbf96419db9687414b304950be1db920bde0e145ee6bde0b",
@@ -4643,7 +4699,7 @@
     {
       "path": "app/main.py",
       "function": "project_migrate_flac",
-      "line": 2527,
+      "line": 2530,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/migrate-flac",
       "shape_sha256": "1567f81f36baa223db5064406684a1803a85e573912418e11ad2b102a9e758a2",
@@ -4657,7 +4713,7 @@
     {
       "path": "app/main.py",
       "function": "project_get",
-      "line": 2540,
+      "line": 2543,
       "kind": "http_entry",
       "route": "/api/projects/{pid}",
       "shape_sha256": "f213e4cb0df5c5a4f6ca038a9dffd86cedc8244049be58d50c8052f002a8c20e",
@@ -4671,7 +4727,7 @@
     {
       "path": "app/main.py",
       "function": "project_put",
-      "line": 2563,
+      "line": 2566,
       "kind": "http_entry",
       "route": "/api/projects/{pid}",
       "shape_sha256": "f92b7e94729c596d11b973851a07b4797e7e30259227d0474b93559fed9f25d4",
@@ -4685,7 +4741,7 @@
     {
       "path": "app/main.py",
       "function": "project_delete",
-      "line": 2621,
+      "line": 2624,
       "kind": "http_entry",
       "route": "/api/projects/{pid}",
       "shape_sha256": "b463e420c0d0e8e5c20f4e6ec6c3847f8963aa571c44cbc175d34419d7ac7b27",
@@ -4699,7 +4755,7 @@
     {
       "path": "app/main.py",
       "function": "project_shares",
-      "line": 2632,
+      "line": 2635,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/shares",
       "shape_sha256": "e2071457a5ffd0a44b7fe143d61ad8fd9eb6cc3446f550ab435dc31858e10bb0",
@@ -4713,7 +4769,7 @@
     {
       "path": "app/main.py",
       "function": "project_share_add",
-      "line": 2646,
+      "line": 2649,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/shares",
       "shape_sha256": "e8048f29561bb68d4389ae3bd96bcf9f87ed7af9bc79a17892067b2d528888b2",
@@ -4727,7 +4783,7 @@
     {
       "path": "app/main.py",
       "function": "project_share_remove",
-      "line": 2664,
+      "line": 2667,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/shares/{user_id}",
       "shape_sha256": "0502bac0ec81c8d8989d1c4eb8e66b076446bc017fa92f301f5bde572b0cfff6",
@@ -4741,7 +4797,7 @@
     {
       "path": "app/main.py",
       "function": "project_file_list",
-      "line": 2673,
+      "line": 2676,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files",
       "shape_sha256": "fde715615aec33fc83947477d2c3f085e14c31a33139f55d569b3f12d7c6463e",
@@ -4755,7 +4811,7 @@
     {
       "path": "app/main.py",
       "function": "project_media_cleanup",
-      "line": 2679,
+      "line": 2682,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files/cleanup",
       "shape_sha256": "be8c566a379b816f7228204953502092577673003b71a5b3ecfa2f844f209504",
@@ -4769,7 +4825,7 @@
     {
       "path": "app/main.py",
       "function": "project_media_convert",
-      "line": 2691,
+      "line": 2694,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files/convert",
       "shape_sha256": "6b63402abd4de89aefbd3c74d0624e5e798c9390a7b82398b5d00291bfe25a5d",
@@ -4784,7 +4840,7 @@
     {
       "path": "app/main.py",
       "function": "project_media_restore_backup",
-      "line": 2703,
+      "line": 2706,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files/restore-backup",
       "shape_sha256": "d995b0f525115383947573149f56f6ded7d8a2aded5f1fe6ff2f29d5737ea9ab",
@@ -4799,7 +4855,7 @@
     {
       "path": "app/main.py",
       "function": "project_file_upload",
-      "line": 2715,
+      "line": 2718,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files/upload",
       "shape_sha256": "d5b0717b491d1f4ac7633fdd1a868b108e1ca04d8eae554e6d61f5bbd818a484",
@@ -4813,7 +4869,7 @@
     {
       "path": "app/main.py",
       "function": "project_file_download",
-      "line": 2733,
+      "line": 2736,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files/{category}/{filename}",
       "shape_sha256": "4292b9f93d4a1744659fe5eef3f780893b8baf3dd617501faffc8f3f501e1769",
@@ -4827,7 +4883,7 @@
     {
       "path": "app/main.py",
       "function": "project_file_delete",
-      "line": 2745,
+      "line": 2748,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files/{category}/{filename}",
       "shape_sha256": "65dde9359b3ef9d983466271025499bdbe84880c343e0df4d2d1da02fa8034c3",
@@ -4841,7 +4897,7 @@
     {
       "path": "app/main.py",
       "function": "project_files_batch_delete",
-      "line": 2758,
+      "line": 2761,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/files/batch-delete",
       "shape_sha256": "5411f077b40941b3240e97c47e48e55934751fbfbf2c3b6287f1312a0aaf7281",
@@ -4855,7 +4911,7 @@
     {
       "path": "app/main.py",
       "function": "project_archive_export",
-      "line": 2778,
+      "line": 2781,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/archive",
       "shape_sha256": "e1660c4c2e607f33f725cfc8e2c0aedc759efb987eacfe8a5758f34696628d54",
@@ -4869,7 +4925,7 @@
     {
       "path": "app/main.py",
       "function": "project_save_as",
-      "line": 2795,
+      "line": 2798,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/save-as",
       "shape_sha256": "33455e04b49a1005eecef3ef31a605d954b7076f3af545a96e1baf7682b35798",
@@ -4883,7 +4939,7 @@
     {
       "path": "app/main.py",
       "function": "project_archive_import",
-      "line": 2828,
+      "line": 2831,
       "kind": "http_entry",
       "route": "/api/project-archives/import",
       "shape_sha256": "b8727965d6482789978a51ac883efa2c7e5e48dd94d4c9df7514d81f19f77752",
@@ -4897,7 +4953,7 @@
     {
       "path": "app/main.py",
       "function": "project_audio",
-      "line": 2843,
+      "line": 2846,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/audio/{filename}",
       "shape_sha256": "2cb6c2d045ee124341b91cdd5b1313a8b64900c70cbb294924144cf7434cc03c",
@@ -4911,7 +4967,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_info",
-      "line": 2857,
+      "line": 2860,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/sample-editor",
       "shape_sha256": "c690c73733ac49d1220a54317eb60473eca91251be00ce1bfb77a3ff4176595d",
@@ -4925,7 +4981,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_audio",
-      "line": 2875,
+      "line": 2878,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/sample-editor/audio",
       "shape_sha256": "3deb069ae7b97c5f9217e0a584d0141da9749efef0cf60ed06651f7b7655498f",
@@ -4939,7 +4995,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_edit",
-      "line": 2898,
+      "line": 2901,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/sample-editor/edit",
       "shape_sha256": "f9aa32fd694e4a1fa917ff10f210e86d7160cc56b4220e465483b2162f875b56",
@@ -4953,7 +5009,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_match_analysis",
-      "line": 2918,
+      "line": 2921,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/sample-editor/match-analysis",
       "shape_sha256": "38d1de8e08c447b28225459044cfe05271c93127f740992ed8c4b66d3e68bf0c",
@@ -4967,7 +5023,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_effect_preview",
-      "line": 2932,
+      "line": 2935,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/sample-editor/effect-preview",
       "shape_sha256": "5f10a733b9257658c83176ea80bb193fe4dc155351ac48a00b67b16c34213392",
@@ -4981,7 +5037,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_effect_apply",
-      "line": 2945,
+      "line": 2948,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/sample-editor/effect-apply",
       "shape_sha256": "cd6e5cf9331e7e7bf15e32155c9b47f699ca7b7ce3467acd74213c182349e590",
@@ -4995,7 +5051,7 @@
     {
       "path": "app/main.py",
       "function": "_normalize_audio_to_project_rate",
-      "line": 3019,
+      "line": 3022,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "1ef3cbaf0a3abeca889313cd85b3eb87211f557a3dba84291ffe6d0e541d70ba",
@@ -5009,7 +5065,7 @@
     {
       "path": "app/main.py",
       "function": "start_waveform_job",
-      "line": 3215,
+      "line": 3218,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/waveform-jobs",
       "shape_sha256": "c250cdba0d569cfa56ee90e0fb3b1d00c42afcedbd2a643a985f962293a0095f",
@@ -5023,7 +5079,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_import_job",
-      "line": 3381,
+      "line": 3384,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/track-import-jobs",
       "shape_sha256": "243f2b4b3bc4c890aa9d0d1dabf556ac7283e46753581b5ae31337bfa441c8db",
@@ -5037,7 +5093,7 @@
     {
       "path": "app/main.py",
       "function": "_native_remote_infer",
-      "line": 3501,
+      "line": 3504,
       "kind": "inference_call",
       "call": ".ai_server_execution.infer",
       "shape_sha256": "de548938c6bc4299da45148e90ddf7109171dbf52b927c6f5ac0e1b8325482cc",
@@ -5052,7 +5108,7 @@
     {
       "path": "app/main.py",
       "function": "_native_remote_infer",
-      "line": 3504,
+      "line": 3507,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "63354d4a762c50c82a3ee076466ad3186afcfe33afcf9ec6be8fdd300359c035",
@@ -5067,7 +5123,7 @@
     {
       "path": "app/main.py",
       "function": "_native_remote_infer",
-      "line": 3505,
+      "line": 3508,
       "kind": "inference_call",
       "call": ".native_ai_routing.infer",
       "shape_sha256": "83beee30f6f3e553d17edf71db260430662d983cf45e7702f1e376c6b77f9b72",
@@ -5082,7 +5138,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3531,
+      "line": 3534,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "f55f9882602b8af337cfa6c132dad2e18f7c325b3e04c915ef169492cd65983d",
@@ -5097,7 +5153,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3551,
+      "line": 3554,
       "kind": "inference_call",
       "call": "music_text.extract_lyrics",
       "shape_sha256": "6f2d4a59f19057559dffa976acdfa02dac06ab615014b3b4cc0dcaeb74ac151a",
@@ -5112,7 +5168,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3552,
+      "line": 3555,
       "kind": "inference_call",
       "call": "music_text.extract_lyrics",
       "shape_sha256": "2e70d9c0359b2a3a182717c6783228e5558411ec7431561505f55a963bf2a1b0",
@@ -5127,7 +5183,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3555,
+      "line": 3558,
       "kind": "inference_call",
       "call": "music_text.extract_lyrics_progressive",
       "shape_sha256": "db17cde10da7c9c51af5d2eae7e9d708e816ab799b4629771569f3e3500a73c1",
@@ -5142,7 +5198,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3605,
+      "line": 3608,
       "kind": "inference_call",
       "call": "music_text.extract_chords",
       "shape_sha256": "ca177e1ce6931898004fcd646073d4ea2b26a9c2a42d6417ff888f4306ec9a2c",
@@ -5157,7 +5213,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3606,
+      "line": 3609,
       "kind": "inference_call",
       "call": "music_text.extract_chords",
       "shape_sha256": "149f470e51ae8b5f207f3607ee47e08e5bfffd5d30eb277f50c66d3d64897da1",
@@ -5172,7 +5228,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3609,
+      "line": 3612,
       "kind": "inference_call",
       "call": "music_text.extract_chords_progressive",
       "shape_sha256": "99fdc329d3022b5371069b17e94832520879caa349d4230dfd833b81db7e8f80",
@@ -5186,7 +5242,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3650,
+      "line": 3653,
       "kind": "inference_call",
       "call": "music_text.extract_markers",
       "shape_sha256": "f860febd678e90fa7a08fdfac1ad9f8d9393cae23f64c24f302a704139d800c5",
@@ -5201,7 +5257,7 @@
     {
       "path": "app/main.py",
       "function": "start_lyrics_extraction",
-      "line": 3730,
+      "line": 3733,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/extract-lyrics-jobs",
       "shape_sha256": "c9757e37d39b8e381fe8ede50e822809d2c0dcd917137e93e79511341917ca03",
@@ -5216,7 +5272,7 @@
     {
       "path": "app/main.py",
       "function": "start_chord_extraction",
-      "line": 3735,
+      "line": 3738,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs",
       "shape_sha256": "cb5d7fceaf738d032f0ee2e155d894cd7122469d18d2b546d14f6f928bbc9b6d",
@@ -5231,7 +5287,7 @@
     {
       "path": "app/main.py",
       "function": "start_marker_extraction",
-      "line": 3761,
+      "line": 3764,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/extract-markers-jobs",
       "shape_sha256": "a0f5557bf68ef1e41622ca9ff5031e41cf082aa85e7b6f631da5a8b7c893dae9",
@@ -5246,7 +5302,7 @@
     {
       "path": "app/main.py",
       "function": "reset_project_lyrics",
-      "line": 3766,
+      "line": 3769,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/lyrics/reset",
       "shape_sha256": "ce6bca4c938162d003c6452d159e91dced7509d2d97c1af46c284c8dbf6a4d0c",
@@ -5260,7 +5316,7 @@
     {
       "path": "app/main.py",
       "function": "reset_project_chords",
-      "line": 3777,
+      "line": 3780,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/chords/reset",
       "shape_sha256": "b91893ed84fcd2e1856c2790755985d8fb2a651da3cad2526ba1595ea3f160cf",
@@ -5274,7 +5330,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics",
-      "line": 3788,
+      "line": 3791,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/lyrics.txt",
       "shape_sha256": "4fb616d31aefd8917882a5832875a4f6f354da1d7ee83950662ec7c0f9864e1a",
@@ -5288,7 +5344,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_chordpro",
-      "line": 3802,
+      "line": 3805,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/lyrics.chordpro",
       "shape_sha256": "03053c2910d23ec1510c7e7ad010741bf802fd4da7b1d1bca737c45c847b2060",
@@ -5302,7 +5358,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics_pdf",
-      "line": 3838,
+      "line": 3841,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/lyrics.pdf",
       "shape_sha256": "1e6622f94e36334e47e3f52f39c53d25544c7ae031f8fce89b453f9f4977f872",
@@ -5316,7 +5372,7 @@
     {
       "path": "app/main.py",
       "function": "preview_project_lyrics_pdf_exact",
-      "line": 3857,
+      "line": 3860,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/lyrics.pdf.preview",
       "shape_sha256": "6b1f5d629d6b42f9ac1b0e76b52ef613a1a750b35668e734323ebab3bcc5b2d0",
@@ -5330,7 +5386,7 @@
     {
       "path": "app/main.py",
       "function": "api_project_metadata_search",
-      "line": 3893,
+      "line": 3896,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metadata-search",
       "shape_sha256": "3b251d68e471d1181163c9cb6ce6913b66b7791d1ac3dcf8418f238f827218e3",
@@ -5344,7 +5400,7 @@
     {
       "path": "app/main.py",
       "function": "api_project_metadata_resolve",
-      "line": 3916,
+      "line": 3919,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metadata-resolve/{mbid}",
       "shape_sha256": "f05db56d126552e17f9f01138bcf46342d6fdb4886b34e7817bfd228af8e68d4",
@@ -5358,7 +5414,7 @@
     {
       "path": "app/main.py",
       "function": "api_rights_providers",
-      "line": 3926,
+      "line": 3929,
       "kind": "http_entry",
       "route": "/api/rights-providers",
       "shape_sha256": "fdb09819030fea86684b46d5c91f13d6eb71ac023087e0245af9394d548b4a53",
@@ -5372,7 +5428,7 @@
     {
       "path": "app/main.py",
       "function": "api_project_rights_search",
-      "line": 3932,
+      "line": 3935,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/rights-search",
       "shape_sha256": "7eeaffd3a65c1fea56c6036673dbfccc48a51d86be51bca2cc2b6ef41f62d125",
@@ -5386,7 +5442,7 @@
     {
       "path": "app/main.py",
       "function": "api_project_rights_records",
-      "line": 3960,
+      "line": 3963,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/rights-records",
       "shape_sha256": "dc31ffb49e81be1851918607af605af87e80d0fed64fc243f28999caaa0f4f2f",
@@ -5400,7 +5456,7 @@
     {
       "path": "app/main.py",
       "function": "start_youtube_import_job",
-      "line": 4112,
+      "line": 4115,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/youtube-import-jobs",
       "shape_sha256": "958b0ce712cf643dc28158e8b8a5693150a44a60a334e6fa167cfc63962cc0db",
@@ -5414,7 +5470,7 @@
     {
       "path": "app/main.py",
       "function": "media_job_status",
-      "line": 4186,
+      "line": 4189,
       "kind": "http_entry",
       "route": "/api/media-jobs/{job_id}",
       "shape_sha256": "bc131432b2606ae3e938175f3c4d3c33f73646c1b29642b064afcace8959cbb8",
@@ -5428,7 +5484,7 @@
     {
       "path": "app/main.py",
       "function": "cancel_media_job",
-      "line": 4202,
+      "line": 4205,
       "kind": "http_entry",
       "route": "/api/media-jobs/{job_id}/cancel",
       "shape_sha256": "30d7e9ffa384a72f6652b7510d6f019c8e74e18fb77854eaaecca3ddb7af0a62",
@@ -5442,7 +5498,7 @@
     {
       "path": "app/main.py",
       "function": "bounce_project_job",
-      "line": 4265,
+      "line": 4268,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/bounce",
       "shape_sha256": "7a8a3e55aff63d34fdf014c8dca6bfed98b4eb757066ebefda89f2a5570995d5",
@@ -5456,7 +5512,7 @@
     {
       "path": "app/main.py",
       "function": "bounce_track_job",
-      "line": 4269,
+      "line": 4272,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/bounce",
       "shape_sha256": "17c2d2d153dae1ade86a45ebd875258569461497d59660bf6eee4e2cc13aabd7",
@@ -5470,7 +5526,7 @@
     {
       "path": "app/main.py",
       "function": "add_empty_timeline_track",
-      "line": 4273,
+      "line": 4276,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/empty",
       "shape_sha256": "f451d0c979366ce8b67a40213bbdb010ef2d76303dec0e15fb7ad0acd28f3ed1",
@@ -5485,7 +5541,7 @@
     {
       "path": "app/main.py",
       "function": "transfer_timeline_segments",
-      "line": 4284,
+      "line": 4287,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/timeline/transfer",
       "shape_sha256": "17742541260a5a954f8acdea3cdaa343767add00f2c9b569b74c977bfa255c27",
@@ -5500,7 +5556,7 @@
     {
       "path": "app/main.py",
       "function": "join_timeline_segments",
-      "line": 4295,
+      "line": 4298,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/timeline/join",
       "shape_sha256": "2de630e0a9144710938fc6f4c1ed73c275e57e3dff2baf682fa64ee9a969755b",
@@ -5515,7 +5571,7 @@
     {
       "path": "app/main.py",
       "function": "duplicate_track",
-      "line": 4306,
+      "line": 4309,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/duplicate",
       "shape_sha256": "2e84f4686b8021144095e12429654c90c9242278244885266b4cb6d7364aedb1",
@@ -5529,7 +5585,7 @@
     {
       "path": "app/main.py",
       "function": "add_track",
-      "line": 4351,
+      "line": 4354,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks",
       "shape_sha256": "393dc1993355499358b55861c662f75f7fbe2150e3ed587a25ea7de2b26f0bd8",
@@ -5543,7 +5599,7 @@
     {
       "path": "app/main.py",
       "function": "replace_track",
-      "line": 4423,
+      "line": 4426,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/replace",
       "shape_sha256": "24e8e4c0b2ce89305b2ed633c9f0f7d881ad7dacb46370b587cc4e5b88d9044f",
@@ -5557,7 +5613,7 @@
     {
       "path": "app/main.py",
       "function": "update_project_clip",
-      "line": 4493,
+      "line": 4496,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/clip-library/{clip_id}",
       "shape_sha256": "2b51161eba5352474fc3b8d2f6e8c996a8991d2bb30c3608cad75faf183abc1c",
@@ -5571,7 +5627,7 @@
     {
       "path": "app/main.py",
       "function": "instantiate_project_clip",
-      "line": 4513,
+      "line": 4516,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/clip-library/{clip_id}/instantiate",
       "shape_sha256": "c75e4eecc6f17cc0177a7e8742896860e5cff6909591c57095a031c8a3ab430b",
@@ -5585,7 +5641,7 @@
     {
       "path": "app/main.py",
       "function": "delete_tracks",
-      "line": 4602,
+      "line": 4605,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/delete-tracks",
       "shape_sha256": "50bb7f593ad7005b6ff69053f92e2c122ea312b679e066f7eaf9fc7cab7939c3",
@@ -5599,7 +5655,7 @@
     {
       "path": "app/main.py",
       "function": "set_track_delay",
-      "line": 4655,
+      "line": 4658,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/delay",
       "shape_sha256": "20b0701112a8682931ae47b40164798df8c4e850a5e770d7e5b4b35b67f4ec0f",
@@ -5613,7 +5669,7 @@
     {
       "path": "app/main.py",
       "function": "sync_metronome_to_track",
-      "line": 4667,
+      "line": 4670,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/sync-metronome",
       "shape_sha256": "fd63ce71dc01f2e7824f584b535b1f1c5b7cbaaceb07f5424cb58711a96c00b6",
@@ -5627,7 +5683,7 @@
     {
       "path": "app/main.py",
       "function": "move_track",
-      "line": 4686,
+      "line": 4689,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/move",
       "shape_sha256": "426749ce2dd853bdba5965f0884cafa8065674ace37056fc2565995bde9d272c",
@@ -5641,7 +5697,7 @@
     {
       "path": "app/main.py",
       "function": "autosync_track",
-      "line": 4698,
+      "line": 4701,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/autosync",
       "shape_sha256": "ccfc324ca01361a273d834ca43e53e0b9ca98fab4a616aabb39c97f66f132547",
@@ -5655,7 +5711,7 @@
     {
       "path": "app/main.py",
       "function": "project_auto_mix",
-      "line": 4716,
+      "line": 4719,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/auto-mix",
       "shape_sha256": "27d2dadb345386f8ab5bdc9e8ac43fba40b00af9d5da3b3ff6825005b9ad885d",
@@ -5669,7 +5725,7 @@
     {
       "path": "app/main.py",
       "function": "edit_delete_range",
-      "line": 4728,
+      "line": 4731,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/delete-range",
       "shape_sha256": "07c29a35ffddf4cd06244fe2ab511d447f9557429c249914e1bb3f0c6b78271f",
@@ -5683,7 +5739,7 @@
     {
       "path": "app/main.py",
       "function": "start_mta_import_job",
-      "line": 4781,
+      "line": 4784,
       "kind": "http_entry",
       "route": "/api/import-jobs",
       "shape_sha256": "5a9f1f43d2e2b93dab7f939d3b0142b74841b74166e6e856b1b89f314b57aef2",
@@ -5697,7 +5753,7 @@
     {
       "path": "app/main.py",
       "function": "import_file",
-      "line": 4820,
+      "line": 4823,
       "kind": "http_entry",
       "route": "/api/import",
       "shape_sha256": "420e5999d6c0dd4728dbe3612c1273535fff2be4de1a674ab10096ec9be1f80a",
@@ -5711,7 +5767,7 @@
     {
       "path": "app/main.py",
       "function": "_split_lead_backing_vocals",
-      "line": 4879,
+      "line": 4882,
       "kind": "inference_call",
       "call": "mega53_runtime.infer",
       "shape_sha256": "8dd93bdd71b1422d77b0a57b3babfbe6b5efcb4d9aee49671c0d0030a45d76cf",
@@ -5726,7 +5782,7 @@
     {
       "path": "app/main.py",
       "function": "_stem_split_worker",
-      "line": 5271,
+      "line": 5281,
       "kind": "inference_call",
       "call": "music_text.extract_lyrics",
       "shape_sha256": "c3b21ff4dd438dbce0729da49cfc4ca3eb30b99b497794f1faa04d0d88e6d328",
@@ -5741,7 +5797,7 @@
     {
       "path": "app/main.py",
       "function": "_stem_split_worker",
-      "line": 5300,
+      "line": 5310,
       "kind": "inference_call",
       "call": "music_text.extract_chords",
       "shape_sha256": "e91ce52f2abc7707d564da343983712604c17e68c952cab54961fd67b22c72fb",
@@ -5756,7 +5812,7 @@
     {
       "path": "app/main.py",
       "function": "mobile_demucs_coreml_status",
-      "line": 5380,
+      "line": 5390,
       "kind": "http_entry",
       "route": "/api/mobile/demucs-coreml/status",
       "shape_sha256": "a62f4b4a260305b2d6e1afa2c42185b025e92cd74c578eb86ffb74e2db406354",
@@ -5770,7 +5826,7 @@
     {
       "path": "app/main.py",
       "function": "mobile_demucs_coreml_bootstrap",
-      "line": 5395,
+      "line": 5405,
       "kind": "http_entry",
       "route": "/api/mobile/demucs-coreml/bootstrap",
       "shape_sha256": "5df4de882b9249965d5319e8075caed2919d308bdb487a75a2ef673dd5b524d4",
@@ -5784,7 +5840,7 @@
     {
       "path": "app/main.py",
       "function": "mobile_demucs_coreml_model",
-      "line": 5417,
+      "line": 5427,
       "kind": "http_entry",
       "route": "/api/mobile/demucs-coreml/models/{stem_count}",
       "shape_sha256": "ac9cabfa90c9b3e18a8dd18e978bc134e4d9ab61b7a7ac1feaa8fb1ed1f91cb9",
@@ -5798,7 +5854,7 @@
     {
       "path": "app/main.py",
       "function": "mobile_demucs_onnx_status",
-      "line": 5430,
+      "line": 5440,
       "kind": "http_entry",
       "route": "/api/mobile/demucs-onnx/status",
       "shape_sha256": "fb40322d79723b80dccda035148dd0425c6fa365b00688b9e4d21401867bca98",
@@ -5812,7 +5868,7 @@
     {
       "path": "app/main.py",
       "function": "mobile_demucs_onnx_bootstrap",
-      "line": 5437,
+      "line": 5447,
       "kind": "http_entry",
       "route": "/api/mobile/demucs-onnx/bootstrap",
       "shape_sha256": "edba759d5345e68b4ef667ff70dc147c5ee430543bdb31dfab7bb758d5045066",
@@ -5826,7 +5882,7 @@
     {
       "path": "app/main.py",
       "function": "mobile_demucs_onnx_model",
-      "line": 5445,
+      "line": 5455,
       "kind": "http_entry",
       "route": "/api/mobile/demucs-onnx/models/{stem_count}",
       "shape_sha256": "ffdad6d903015056066b623ac69dc73789bd31f040bb42185a13696b17287778",
@@ -5840,7 +5896,7 @@
     {
       "path": "app/main.py",
       "function": "issue_model_access_token",
-      "line": 5453,
+      "line": 5463,
       "kind": "http_entry",
       "route": "/api/models/token",
       "shape_sha256": "f4000a5e97f23a8c321538fa6847ecfc0b9008424e2c013f812437693c1c7478",
@@ -5854,7 +5910,7 @@
     {
       "path": "app/main.py",
       "function": "revoke_my_model_access_tokens",
-      "line": 5460,
+      "line": 5470,
       "kind": "http_entry",
       "route": "/api/models/tokens",
       "shape_sha256": "f1b4cd118095b5f2a3a01fa6e3b6d271fb2d35df7bc9d7eaa07c7621365a73af",
@@ -5868,7 +5924,7 @@
     {
       "path": "app/main.py",
       "function": "demucs_model_catalog",
-      "line": 5466,
+      "line": 5476,
       "kind": "http_entry",
       "route": "/api/models/catalog",
       "shape_sha256": "98d5255febe2ff14d4027494d77cb6e31fbfa2e848d6349adc52f00ef501ae85",
@@ -5882,7 +5938,7 @@
     {
       "path": "app/main.py",
       "function": "demucs_native_model_download",
-      "line": 5470,
+      "line": 5480,
       "kind": "http_entry",
       "route": "/api/models/native/{model_id}",
       "shape_sha256": "e67995ac1cc5fcc056da37a9eef3a2b1348688165cda7ed625d5bfee1040ae43",
@@ -5896,7 +5952,7 @@
     {
       "path": "app/main.py",
       "function": "demucs_coreml_model_by_id",
-      "line": 5484,
+      "line": 5494,
       "kind": "http_entry",
       "route": "/api/models/coreml/{model_id}",
       "shape_sha256": "4193293b2a2fe2e38b2586668e892148557772f2621a618befa42af20202f6b7",
@@ -5910,7 +5966,7 @@
     {
       "path": "app/main.py",
       "function": "demucs_onnx_model_by_id",
-      "line": 5496,
+      "line": 5506,
       "kind": "http_entry",
       "route": "/api/models/onnx/{model_id}",
       "shape_sha256": "bfcae10a1bb6c40f216a1e46dc8223073cac622243141e478a377cebc7a6d7f5",
@@ -5924,7 +5980,7 @@
     {
       "path": "app/main.py",
       "function": "admin_update_demucs_mobile_models",
-      "line": 5508,
+      "line": 5518,
       "kind": "http_entry",
       "route": "/api/admin/demucs-mobile-models/update",
       "shape_sha256": "467037b1ee2a7912c7ea618f483a71fd3d15067ef5edce84c373b0c63b92b015",
@@ -5938,7 +5994,7 @@
     {
       "path": "app/main.py",
       "function": "admin_demucs_models",
-      "line": 5513,
+      "line": 5523,
       "kind": "http_entry",
       "route": "/api/admin/demucs-models",
       "shape_sha256": "74601e4d72cd1af6729ab5dd45b7c103e6499dc7a6b78f43108bdf3794208eed",
@@ -5952,7 +6008,7 @@
     {
       "path": "app/main.py",
       "function": "admin_demucs_models_update",
-      "line": 5518,
+      "line": 5528,
       "kind": "http_entry",
       "route": "/api/admin/demucs-models/update",
       "shape_sha256": "d2423b9871d39ca2c40eda93d8f039ad86beb67a371acdeafecf1f894f975a07",
@@ -5966,7 +6022,7 @@
     {
       "path": "app/main.py",
       "function": "admin_demucs_model_update",
-      "line": 5523,
+      "line": 5533,
       "kind": "http_entry",
       "route": "/api/admin/demucs-models/{model_id}/update",
       "shape_sha256": "b0f4949eb3e40d5c0753bc17185f2df10cbec3d5cf3ca1301d07350a5a01c30f",
@@ -5980,7 +6036,7 @@
     {
       "path": "app/main.py",
       "function": "admin_demucs_model_blacklist",
-      "line": 5530,
+      "line": 5540,
       "kind": "http_entry",
       "route": "/api/admin/demucs-models/{model_id}/blacklist",
       "shape_sha256": "2332150f0ccf4087f559300d88567c11e187561d8d1cd0ae61fe4343d05bc955",
@@ -5994,7 +6050,7 @@
     {
       "path": "app/main.py",
       "function": "admin_demucs_model_unblacklist",
-      "line": 5535,
+      "line": 5545,
       "kind": "http_entry",
       "route": "/api/admin/demucs-models/{model_id}/blacklist",
       "shape_sha256": "6baa113d21af75be23d390fef1491c2cd1a35a9e95a57fdb023d6e7a93188453",
@@ -6008,7 +6064,7 @@
     {
       "path": "app/main.py",
       "function": "admin_demucs_model_delete_local",
-      "line": 5541,
+      "line": 5551,
       "kind": "http_entry",
       "route": "/api/admin/demucs-models/{model_id}/local",
       "shape_sha256": "1f6bd54c4b71499a80ec4cc8807b265f0e9c9ce46e6094526addace8973dda52",
@@ -6022,7 +6078,7 @@
     {
       "path": "app/main.py",
       "function": "managed_ai_models",
-      "line": 5549,
+      "line": 5559,
       "kind": "http_entry",
       "route": "/api/ai-models",
       "shape_sha256": "b087b5a1467e9ca871d9a8c5acc662b1f2949e18b1cf56f5573596281ae13424",
@@ -6036,7 +6092,7 @@
     {
       "path": "app/main.py",
       "function": "managed_lyrics_model_download",
-      "line": 5554,
+      "line": 5564,
       "kind": "http_entry",
       "route": "/api/ai-models/lyrics/{model_id}/download",
       "shape_sha256": "4dedd78ba56760dcdb5e83693948843bd46a43212eac13d464b2190feba61273",
@@ -6050,7 +6106,7 @@
     {
       "path": "app/main.py",
       "function": "managed_lyrics_model_download_job",
-      "line": 5625,
+      "line": 5635,
       "kind": "http_entry",
       "route": "/api/ai-models/lyrics/{model_id}/download-jobs",
       "shape_sha256": "fc33bce8c81cd29599844d7daabc0473a8338049887378363146265a45f8a8a6",
@@ -6064,7 +6120,7 @@
     {
       "path": "app/main.py",
       "function": "managed_chord_model_download_job",
-      "line": 5632,
+      "line": 5642,
       "kind": "http_entry",
       "route": "/api/ai-models/chords/{model_id}/download-jobs",
       "shape_sha256": "1ebcace049fae186030a7da2e6837a8d64960314993149e11793b4a4b2dc4246",
@@ -6078,7 +6134,7 @@
     {
       "path": "app/main.py",
       "function": "managed_lyrics_model_delete",
-      "line": 5639,
+      "line": 5649,
       "kind": "http_entry",
       "route": "/api/ai-models/lyrics/{model_id}",
       "shape_sha256": "6e8929bda3f32c0e67ba6224953b01be164d7704bd481d251a94f2820e95e63a",
@@ -6092,7 +6148,7 @@
     {
       "path": "app/main.py",
       "function": "managed_chord_model_download",
-      "line": 5645,
+      "line": 5655,
       "kind": "http_entry",
       "route": "/api/ai-models/chords/{model_id}/download",
       "shape_sha256": "126a7bd93088940e21b908241ae8d726ae76c91cfe90b9dd04c2a5881c770054",
@@ -6106,7 +6162,7 @@
     {
       "path": "app/main.py",
       "function": "managed_chord_model_delete",
-      "line": 5655,
+      "line": 5665,
       "kind": "http_entry",
       "route": "/api/ai-models/chords/{model_id}",
       "shape_sha256": "d7e21dcf69b66eecbf7485ac4b3db8ef8d0722997808da067a456c83ee8ecfe1",
@@ -6120,7 +6176,7 @@
     {
       "path": "app/main.py",
       "function": "_drumsep_extract",
-      "line": 5726,
+      "line": 5736,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "16ed5cdd033b2e3fc4bf7190188bdfceca04b04671cde85b4f1b66c449fc7c91",
@@ -6135,7 +6191,7 @@
     {
       "path": "app/main.py",
       "function": "drumsep_models",
-      "line": 5733,
+      "line": 5743,
       "kind": "http_entry",
       "route": "/api/drumsep/models",
       "shape_sha256": "bc0ce9735731528e3b1bddc9afb257dea3d41b0aeca824c2c3585a8cc4d75e76",
@@ -6149,7 +6205,7 @@
     {
       "path": "app/main.py",
       "function": "drumsep_model_download",
-      "line": 5739,
+      "line": 5749,
       "kind": "http_entry",
       "route": "/api/drumsep/models/download",
       "shape_sha256": "e86412f0b56bee54cebd9fbf6304e61f069a904da13da74226829a8c52d1f565",
@@ -6163,7 +6219,7 @@
     {
       "path": "app/main.py",
       "function": "drumsep_model_delete",
-      "line": 5746,
+      "line": 5756,
       "kind": "http_entry",
       "route": "/api/drumsep/models",
       "shape_sha256": "f716b4ac597fe0e1175d177ec8189fbb521c1a3a109e5bfa43ceeae71f3d33c2",
@@ -6177,7 +6233,7 @@
     {
       "path": "app/main.py",
       "function": "lead_backing_models",
-      "line": 5752,
+      "line": 5762,
       "kind": "http_entry",
       "route": "/api/vocal-separation/models",
       "shape_sha256": "d03f517042c5c76720c925ec968733849ddee55ae1e8ca65eb191e04cf83e8d9",
@@ -6191,7 +6247,7 @@
     {
       "path": "app/main.py",
       "function": "lead_backing_model_delete",
-      "line": 5757,
+      "line": 5767,
       "kind": "http_entry",
       "route": "/api/vocal-separation/models/{model_id}",
       "shape_sha256": "742cf8606edfb38ae5e5bbe7412d39c61c084bcb060e3a22fdafc401877e15aa",
@@ -6205,7 +6261,7 @@
     {
       "path": "app/main.py",
       "function": "lead_backing_model_download",
-      "line": 5769,
+      "line": 5779,
       "kind": "http_entry",
       "route": "/api/vocal-separation/models/{model_id}/download",
       "shape_sha256": "1525a0369a109d5b3bd59d556e302c7fad54f7579f0d8631c6ad57c485a37ae0",
@@ -6219,7 +6275,7 @@
     {
       "path": "app/main.py",
       "function": "stem_job_start",
-      "line": 5779,
+      "line": 5789,
       "kind": "http_entry",
       "route": "/api/stems/jobs",
       "shape_sha256": "2274daebd0282af7eb1261844b866ed9b69329957f12936873a16b0dfa55ca61",
@@ -6234,7 +6290,7 @@
     {
       "path": "app/main.py",
       "function": "stem_job_status",
-      "line": 5960,
+      "line": 5974,
       "kind": "http_entry",
       "route": "/api/stems/jobs/{job_id}",
       "shape_sha256": "b293628242d4b76ccb40269a54336025eb6da29c202e938239441ee1e2eca1fb",
@@ -6248,7 +6304,7 @@
     {
       "path": "app/main.py",
       "function": "stem_job_cancel",
-      "line": 5971,
+      "line": 5985,
       "kind": "http_entry",
       "route": "/api/stems/jobs/{job_id}/cancel",
       "shape_sha256": "d8d75f813c82bdee43372b44c0b1361edb2b86a579716a186e511ccb68efc37d",
@@ -6262,7 +6318,7 @@
     {
       "path": "app/main.py",
       "function": "split_stems_compat",
-      "line": 5999,
+      "line": 6013,
       "kind": "http_entry",
       "route": "/api/stems/split",
       "shape_sha256": "74fbd035629cd554d850d46630ecd844d3451e52fe673ee2a5b39553d3b4b95c",
@@ -6277,7 +6333,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_stem_job",
-      "line": 6070,
+      "line": 6084,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/stem-jobs",
       "shape_sha256": "8c0b2f24defe7847dfc84480426eb7e2111e496cd6ebe21be5fe59e7eee63b90",
@@ -6292,7 +6348,7 @@
     {
       "path": "app/main.py",
       "function": "create_metronome_track",
-      "line": 6206,
+      "line": 6234,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metronome-track",
       "shape_sha256": "944ffc8638fb0d7b5e0a1a492b0dc86907ef0567a2093712fbee3f49b551597e",
@@ -6306,7 +6362,7 @@
     {
       "path": "app/main.py",
       "function": "set_metronome_zone_bpm",
-      "line": 6547,
+      "line": 6575,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metronome-zone-bpm",
       "shape_sha256": "45d01ba97fc4162378a38ea47634f7668a2b3a26241bcbdea0aa63c0edf05265",
@@ -6320,7 +6376,7 @@
     {
       "path": "app/main.py",
       "function": "refresh_metronome_at_playhead",
-      "line": 6588,
+      "line": 6616,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metronome-track/refresh",
       "shape_sha256": "6a165ab5adaf0bdec5fa1bf0d421172ab538bf1f665ba1236ab86ba6b30d44d6",
@@ -6334,7 +6390,7 @@
     {
       "path": "app/main.py",
       "function": "shift_adaptive_metronome",
-      "line": 6607,
+      "line": 6635,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metronome-shift",
       "shape_sha256": "95b432ddd0ff904dc08d218aa9d7259c1c6f712c3aeb19adf3fe38c5d34d7889",
@@ -6348,7 +6404,7 @@
     {
       "path": "app/main.py",
       "function": "set_transport_time_mode",
-      "line": 6646,
+      "line": 6674,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/transport-time-mode",
       "shape_sha256": "80eb1e0af298dcdf30ff2e233e24b9a590ae7e5ad735b9b9a68e0f09268b1f7e",
@@ -6362,7 +6418,7 @@
     {
       "path": "app/main.py",
       "function": "create_chords_track",
-      "line": 6658,
+      "line": 6686,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/chords-track",
       "shape_sha256": "4d4fb793b0adec161469baae00179e7347505ee8ac6189867498f50762299fac",
@@ -6376,7 +6432,7 @@
     {
       "path": "app/main.py",
       "function": "refresh_chords_track",
-      "line": 6665,
+      "line": 6693,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/chords-track/refresh",
       "shape_sha256": "c495788ea72f163fca7783f36397c010f92d646316e4d8c2b518a7647223d4ed",
@@ -6390,7 +6446,7 @@
     {
       "path": "app/main.py",
       "function": "estimate_track_bpm",
-      "line": 6790,
+      "line": 6818,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/estimate-bpm",
       "shape_sha256": "88a63ddea00e6ea9f7f803322c9ea07a5ed1c30104b2b0055b28f75af680d4e0",
@@ -6404,7 +6460,7 @@
     {
       "path": "app/main.py",
       "function": "preview_track",
-      "line": 6844,
+      "line": 6872,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/preview-track/{track_id}",
       "shape_sha256": "6c2485f3c67abfd982a7183b4034c39f04e8f75827b074500de8f1b1418c5717",
@@ -6418,7 +6474,7 @@
     {
       "path": "app/main.py",
       "function": "preview_mix",
-      "line": 6886,
+      "line": 6914,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/preview-mix",
       "shape_sha256": "d16bf201799801a9d0b3cb7e98ef3e3fc3a89b13d41e458add7d41a39580c2b9",
@@ -6432,7 +6488,7 @@
     {
       "path": "app/main.py",
       "function": "clear_project_preview_cache",
-      "line": 6920,
+      "line": 6948,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/preview-cache",
       "shape_sha256": "b8313a4abbe4987fe0db362467ee4c8d12b3ca50816345ae779c1286a008a65f",
@@ -6446,7 +6502,7 @@
     {
       "path": "app/main.py",
       "function": "export_plan",
-      "line": 6926,
+      "line": 6954,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/export-plan",
       "shape_sha256": "45271874bd9aca31111b53551e6116b8ef15eef741b65ce013f3eb1759c84878",
@@ -6460,7 +6516,7 @@
     {
       "path": "app/main.py",
       "function": "get_mlive_profile",
-      "line": 6952,
+      "line": 6980,
       "kind": "http_entry",
       "route": "/api/account/m-live",
       "shape_sha256": "5f7f438456e6e6aee2b7591eca5cf94bf144de964ca99e91328068de46e85275",
@@ -6475,7 +6531,7 @@
     {
       "path": "app/main.py",
       "function": "put_mlive_profile",
-      "line": 6959,
+      "line": 6987,
       "kind": "http_entry",
       "route": "/api/account/m-live",
       "shape_sha256": "e7a62f002e8f0ad78ada04527e5238395ec9e9a062be0ed599ca69354c69069a",
@@ -6490,7 +6546,7 @@
     {
       "path": "app/main.py",
       "function": "import_mlive_profile",
-      "line": 6972,
+      "line": 7000,
       "kind": "http_entry",
       "route": "/api/account/m-live/import",
       "shape_sha256": "f3e7bfe18b606365854a7bd03578ef6ac14434dd28f4d20d5c4dbe84dba6e841",
@@ -6505,7 +6561,7 @@
     {
       "path": "app/main.py",
       "function": "export_mta_with_mapping",
-      "line": 7000,
+      "line": 7028,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/export-mta",
       "shape_sha256": "85f2647f460a75ea4a9b5a96f1aeec313582e06dcf8ea487ba574d7c150d1b75",
@@ -6519,7 +6575,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_export_job",
-      "line": 7059,
+      "line": 7087,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/track-export-jobs",
       "shape_sha256": "b191f04d4ab34d62b1fb8277b5db3a56415d72fe3cd9e76fb53abb15a5d572fa",
@@ -6533,7 +6589,7 @@
     {
       "path": "app/main.py",
       "function": "media_job_download",
-      "line": 7082,
+      "line": 7110,
       "kind": "http_entry",
       "route": "/api/media-jobs/{job_id}/download",
       "shape_sha256": "808e139eeddfdb20dc879a3eddf35b11feb10f119a2abc02d47b66e751be1d91",
@@ -6547,7 +6603,7 @@
     {
       "path": "app/main.py",
       "function": "export_single_track",
-      "line": 7107,
+      "line": 7135,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/tracks/{track_id}/export",
       "shape_sha256": "4fbf479b0a287a8b5bb8a45950735fd8641fc8312ddd17654a7d4d33357b5178",
@@ -6561,7 +6617,7 @@
     {
       "path": "app/main.py",
       "function": "mta_analysis",
-      "line": 7126,
+      "line": 7154,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/mta-analysis",
       "shape_sha256": "882264dad7c0fbad22cae2da87ee1e43a814489d13cbb26a02251484665f2230",
@@ -6575,7 +6631,7 @@
     {
       "path": "app/main.py",
       "function": "mta_miditk",
-      "line": 7142,
+      "line": 7170,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/mta-miditk",
       "shape_sha256": "98cc24f2404059aea8a063f515e31593f35df301b3f1b48e37e8b2e67f8a2dfb",
@@ -6589,7 +6645,7 @@
     {
       "path": "app/main.py",
       "function": "mta_binary_diff",
-      "line": 7165,
+      "line": 7193,
       "kind": "http_entry",
       "route": "/api/mta/diff",
       "shape_sha256": "4cc0f5507b2a0fa4ddaf6b92b200f97e2d064aa77a97d22a2c764ee043510249",
@@ -6603,7 +6659,7 @@
     {
       "path": "app/main.py",
       "function": "_render_karaoke_video",
-      "line": 7222,
+      "line": 7250,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -6617,7 +6673,7 @@
     {
       "path": "app/main.py",
       "function": "upload_karaoke_background",
-      "line": 7227,
+      "line": 7255,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/karaoke-background",
       "shape_sha256": "8571e29925d6c1f2fb9c6d9f401db9375800791b7182ea72e566da6bab09b08a",
@@ -6631,7 +6687,7 @@
     {
       "path": "app/main.py",
       "function": "configured_project_export",
-      "line": 7318,
+      "line": 7346,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/configured-export",
       "shape_sha256": "6c51cdc585c6b0738a138caccc2d4a0ba45038d436c8b365463b8bd52a25c93b",
@@ -6645,7 +6701,7 @@
     {
       "path": "app/main.py",
       "function": "start_configured_project_export_job",
-      "line": 7384,
+      "line": 7412,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/configured-export-jobs",
       "shape_sha256": "36a78a55692c6522167588742d28537f6d9ffa72e412b0e22becbed4fd817289",
@@ -6659,7 +6715,7 @@
     {
       "path": "app/main.py",
       "function": "_karaoke_export_worker",
-      "line": 7441,
+      "line": 7469,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "shape_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -6673,7 +6729,7 @@
     {
       "path": "app/main.py",
       "function": "start_karaoke_export_job",
-      "line": 7453,
+      "line": 7481,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/karaoke-export-jobs",
       "shape_sha256": "508ea96fbe689f6d90573bede7f2eb08d0a8e801bc7c1a7b2711c77623786b0f",
@@ -6687,7 +6743,7 @@
     {
       "path": "app/main.py",
       "function": "export",
-      "line": 7483,
+      "line": 7511,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/export",
       "shape_sha256": "c7af3b646d6cc57021ab7b0c075062b29359d21a95249d6f5db526a55b7686e3",
@@ -6701,7 +6757,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_status",
-      "line": 7545,
+      "line": 7573,
       "kind": "http_entry",
       "route": "/api/ai-arranger/desktop-ace/status",
       "shape_sha256": "1b01fdc8f8ee4b6d710494a93b5a890f72d1129e0242c5d3c2ad0fd9d4c743c9",
@@ -6715,7 +6771,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_settings",
-      "line": 7553,
+      "line": 7581,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/settings",
       "shape_sha256": "f9a76cffaeeb214323e4e8f904301d3877fe28ee0a9da02c44fb48af553b9981",
@@ -6729,7 +6785,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_pending",
-      "line": 7560,
+      "line": 7588,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/pending",
       "shape_sha256": "d3950191db1e1babbabfa66d7f0d0f5d1c55c499b943d69d95beff75fd802c5f",
@@ -6743,7 +6799,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_remote_history",
-      "line": 7567,
+      "line": 7595,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/remote-history/{kind}",
       "shape_sha256": "a5686a0043618d50dae15fba683217c60c567ea173700c29e928cb941c82bdb3",
@@ -6757,7 +6813,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_discovered_artifact",
-      "line": 7595,
+      "line": 7623,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/remote-history/{kind}/artifact/{request_id}",
       "shape_sha256": "4df2e557fea76bb0e3cf385acd6fa033993d36a73d4718dd5e5dc2b138a817b5",
@@ -6771,7 +6827,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_pending_status",
-      "line": 7636,
+      "line": 7664,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/pending/{request_id}/status",
       "shape_sha256": "41362d152c1953a7789c0872dc4f933f9edc27d367efc18aa1a15b1e5a69101b",
@@ -6785,7 +6841,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_pending_artifact",
-      "line": 7656,
+      "line": 7684,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/pending/{request_id}/artifact",
       "shape_sha256": "ea296bd78c9deb87016e17ca0dc08a6ef77cba73b56669d01f256b9eee982e92",
@@ -6799,7 +6855,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_import_recovered_wav",
-      "line": 7690,
+      "line": 7718,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/pending/{request_id}/import-wav/{pid}",
       "shape_sha256": "7431b70c8a6134a3a7be965940274af38522df6e79b6fd5b17c38b8463ebd9f1",
@@ -6813,7 +6869,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_import_discovered_wav",
-      "line": 7738,
+      "line": 7766,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/remote-history/{kind}/import-wav/{request_id}/{pid}",
       "shape_sha256": "30f1873c68e24f33b7575b18e05cfc1845a2ff75a0ea24dd94d172cccb30e948",
@@ -6827,7 +6883,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_import_recovered_json",
-      "line": 7777,
+      "line": 7805,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/pending/{request_id}/import-json/{pid}",
       "shape_sha256": "e9caeb213be4602c5b2ea98b84c561c45b158bcca294a5988a0c61f7dedd0e8a",
@@ -6841,7 +6897,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_import_recovered_stems",
-      "line": 7869,
+      "line": 7897,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/pending/{request_id}/import-stems/{pid}",
       "shape_sha256": "802eb56742f1cf640c2bd08da6c7531ef55e125a064910f02a840abf4a05ae9f",
@@ -6855,7 +6911,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_import_discovered_json",
-      "line": 7991,
+      "line": 8019,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/remote-history/{kind}/import-json/{request_id}/{pid}",
       "shape_sha256": "373f4dc3a186ec9c837bdb47e7d2e6a035453189615881597229d3c54654e94e",
@@ -6869,7 +6925,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_import_discovered_stems",
-      "line": 8001,
+      "line": 8029,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/remote-history/{kind}/import-stems/{request_id}/{pid}",
       "shape_sha256": "9f5a7c9d0d021264dbf86eb0bfa79c55cfada59bad28370764cea94a312fdf68",
@@ -6883,7 +6939,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_workers_configure",
-      "line": 8007,
+      "line": 8035,
       "kind": "http_entry",
       "route": "/api/native/ai-workers/settings",
       "shape_sha256": "7b2a496c35e9f5b43a49f3f317e41e5bff3e906d83879c8d55638ae5362ac766",
@@ -6897,7 +6953,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_connection",
-      "line": 8018,
+      "line": 8046,
       "kind": "http_entry",
       "route": "/api/ai-arranger/desktop-ace/connection",
       "shape_sha256": "d2a06e7e21673471824f1ee5d853953448db48ace3daae130f79f1dddb16496e",
@@ -6911,7 +6967,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_install",
-      "line": 8030,
+      "line": 8058,
       "kind": "http_entry",
       "route": "/api/ai-arranger/desktop-ace/install",
       "shape_sha256": "a9fdf2ac4b70dcf44c75c5b144b1808bc1cca729febba454f660d7b4a403771f",
@@ -6925,7 +6981,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_start",
-      "line": 8039,
+      "line": 8067,
       "kind": "http_entry",
       "route": "/api/ai-arranger/desktop-ace/start",
       "shape_sha256": "0763861f19727c8f93dedc28cc040aa66bceb65d38f9ea6f0aac971081be9e20",
@@ -6939,7 +6995,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_stop",
-      "line": 8059,
+      "line": 8087,
       "kind": "http_entry",
       "route": "/api/ai-arranger/desktop-ace/stop",
       "shape_sha256": "26ada90c20cf5278faaab001e3f00ebbf06c48d9230b989feafa2d453839a315",
@@ -6953,7 +7009,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_test",
-      "line": 8065,
+      "line": 8093,
       "kind": "http_entry",
       "route": "/api/ai-arranger/desktop-ace/test",
       "shape_sha256": "2b9a6849b0d56b251a885f780df8422b7d0d810f5048e221bbb3a9a31adce866",
@@ -6967,7 +7023,7 @@
     {
       "path": "app/main.py",
       "function": "recovered_stem_orphans_review",
-      "line": 8076,
+      "line": 8104,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/recovered-stem-orphans",
       "shape_sha256": "16850ae5c9c928c68837571b575b19a02d65e2e6a7e1176d1631ae343a3d9ccb",
@@ -6981,7 +7037,7 @@
     {
       "path": "app/main.py",
       "function": "recovered_stem_quarantine_review",
-      "line": 8085,
+      "line": 8113,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/recovered-stem-orphans/quarantine",
       "shape_sha256": "815eb6b32db727505f82ef2ad772871f6d7a566dd16da4a9163967abf9628b2d",
@@ -6995,7 +7051,7 @@
     {
       "path": "app/main.py",
       "function": "recovered_stem_quarantine_restore",
-      "line": 8094,
+      "line": 8122,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/recovered-stem-orphans/restore",
       "shape_sha256": "311a65085e63d60f6a5ef5658e7f257a765387cd1501fcf06c23e32483964282",
@@ -7009,7 +7065,7 @@
     {
       "path": "app/main.py",
       "function": "recovered_stem_orphans_quarantine",
-      "line": 8109,
+      "line": 8137,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/recovered-stem-orphans/quarantine",
       "shape_sha256": "8d6c6651279acc359b3ac16f742887f12dbaa5a060f3999da3f7c41a7612e304",
@@ -7023,7 +7079,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_account_status",
-      "line": 8124,
+      "line": 8152,
       "kind": "http_entry",
       "route": "/api/native/ai-account",
       "shape_sha256": "780ede864dee143a982f94c6ca40cd9b1f3cff5b49dea70f96042ff856cd8bc1",
@@ -7037,7 +7093,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_account_connect",
-      "line": 8131,
+      "line": 8159,
       "kind": "http_entry",
       "route": "/api/native/ai-account/connect",
       "shape_sha256": "181b6fa1b628c9a7ed04266fd21966ed91c2aedee55a7e363cfeed9e062d8008",
@@ -7051,7 +7107,7 @@
     {
       "path": "app/main.py",
       "function": "native_ai_account_poll",
-      "line": 8139,
+      "line": 8167,
       "kind": "http_entry",
       "route": "/api/native/ai-account/poll",
       "shape_sha256": "c103ef611b3233e61fa2a133d81879032d93d514ff9b048dd57ebf7e2b2b3fc7",
@@ -7065,7 +7121,7 @@
     {
       "path": "app/main.py",
       "function": "admin_social_login_docs",
-      "line": 8155,
+      "line": 8183,
       "kind": "http_entry",
       "route": "/docs/admin/social-login",
       "shape_sha256": "02ba275b09a6d7fc11203bf6cadf74fae939c8f0a839049802eaedf97e562da0",
@@ -7079,7 +7135,7 @@
     {
       "path": "app/main.py",
       "function": "timeline_trim",
-      "line": 8165,
+      "line": 8193,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/timeline-trim",
       "shape_sha256": "386966b9d751949e289a32b8b5ced4bac871e80afc1bb9ccc53c0522df7e83b6",
@@ -7093,7 +7149,7 @@
     {
       "path": "app/main.py",
       "function": "metronome_insert",
-      "line": 8184,
+      "line": 8212,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metronome-insert",
       "shape_sha256": "b6dab66c4a59c593a4eb46a3bf8ef852d5f37ece9ae353f899e76da1036310fe",
@@ -7107,7 +7163,7 @@
     {
       "path": "app/main.py",
       "function": "configure_metronome_grid",
-      "line": 8203,
+      "line": 8231,
       "kind": "http_entry",
       "route": "/api/projects/{pid}/metronome-grid",
       "shape_sha256": "c68c73c36efcad807e8ca42e324805ca03118ca4fbbd2f6a00a072f0d3f6d915",
@@ -7121,7 +7177,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_docs_it",
-      "line": 8253,
+      "line": 8281,
       "kind": "http_entry",
       "route": "/docs/user/vst3",
       "shape_sha256": "309dc5d2beb748cf671511af7056d9b1b25b3afe9928810fb58a63fb4e1c3407",
@@ -7135,7 +7191,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_docs_en",
-      "line": 8258,
+      "line": 8286,
       "kind": "http_entry",
       "route": "/docs/user/vst3/en",
       "shape_sha256": "6adfdeb3bd846b3ee95fe19777086468ff52165a1941bc86ff7a3185838452d6",
@@ -7437,13 +7493,73 @@
     },
     {
       "family": "non_inference",
+      "boundary": "Explicit BS RoFormer profile follows the original project job or admitted registered worker. Separate exact checkpoint policy is disabled until documented rights review. No substitution or inference-time download.",
+      "evidence": [
+        "tests/test_bass_roformer_runtime.py",
+        "tests/test_bass_roformer_project.py",
+        "tests/test_bass_roformer_install.py"
+      ],
+      "path": "app/model_asset_admin_routes.py",
+      "function": "install_bass_runtime",
+      "line": 62,
+      "kind": "http_entry",
+      "route": "/api/admin/ai/bass-roformer/runtime/install",
+      "shape_sha256": "8d2eda07d4ef664c927013cb5613b6cf8971cf0894f9a83915c5eeb772aefad3"
+    },
+    {
+      "family": "non_inference",
+      "boundary": "Explicit BS RoFormer profile follows the original project job or admitted registered worker. Separate exact checkpoint policy is disabled until documented rights review. No substitution or inference-time download.",
+      "evidence": [
+        "tests/test_bass_roformer_runtime.py",
+        "tests/test_bass_roformer_project.py",
+        "tests/test_bass_roformer_install.py"
+      ],
+      "path": "app/model_asset_admin_routes.py",
+      "function": "remove_bass_runtime",
+      "line": 82,
+      "kind": "http_entry",
+      "route": "/api/admin/ai/bass-roformer/runtime/remove",
+      "shape_sha256": "afd8b9c7058213d1a9f0a0ce96a2761bd75ea519424446b3686302d35c545ddc"
+    },
+    {
+      "family": "non_inference",
+      "boundary": "Explicit BS RoFormer profile follows the original project job or admitted registered worker. Separate exact checkpoint policy is disabled until documented rights review. No substitution or inference-time download.",
+      "evidence": [
+        "tests/test_bass_roformer_runtime.py",
+        "tests/test_bass_roformer_project.py",
+        "tests/test_bass_roformer_install.py"
+      ],
+      "path": "app/model_asset_admin_routes.py",
+      "function": "install_bass_weights",
+      "line": 88,
+      "kind": "http_entry",
+      "route": "/api/admin/ai/bass-roformer/weights/install",
+      "shape_sha256": "a14a0cf0cab9bc0eaf9c9ed91cad23a4030958d8b472775b42a8de33b05c2f60"
+    },
+    {
+      "family": "non_inference",
+      "boundary": "Explicit BS RoFormer profile follows the original project job or admitted registered worker. Separate exact checkpoint policy is disabled until documented rights review. No substitution or inference-time download.",
+      "evidence": [
+        "tests/test_bass_roformer_runtime.py",
+        "tests/test_bass_roformer_project.py",
+        "tests/test_bass_roformer_install.py"
+      ],
+      "path": "app/model_asset_admin_routes.py",
+      "function": "remove_bass_weights",
+      "line": 96,
+      "kind": "http_entry",
+      "route": "/api/admin/ai/bass-roformer/weights/remove",
+      "shape_sha256": "116b68330db5a09faa52fc3526f9674d879fb99cc931b981f880c43c70086ed7"
+    },
+    {
+      "family": "non_inference",
       "boundary": "Administrator consent starts an owned queued transfer from the fixed Mega 53 release; checkpoint bytes and current model policy verified before publication.",
       "evidence": [
         "tests/test_r210_admin_model_lifecycle.py"
       ],
       "path": "app/model_asset_admin_routes.py",
       "function": "install_mega53_weights",
-      "line": 62,
+      "line": 102,
       "kind": "http_entry",
       "route": "/api/admin/ai/mega53/weights/install",
       "shape_sha256": "507e188ac06992236f668c7d151b025148195a1bd7e3aea0a3a3f356e7a839d4"
@@ -7456,7 +7572,7 @@
       ],
       "path": "app/model_asset_admin_routes.py",
       "function": "remove_mega53_weights",
-      "line": 70,
+      "line": 110,
       "kind": "http_entry",
       "route": "/api/admin/ai/mega53/weights/remove",
       "shape_sha256": "9a99bb35ef976fc663f04e92b97e19c6e1d1ecc17d9f9e9ac7782457a6061b7f"
@@ -7464,7 +7580,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "install_mega53_runtime",
-      "line": 76,
+      "line": 116,
       "kind": "http_entry",
       "route": "/api/admin/ai/mega53/runtime/install",
       "shape_sha256": "fcfa6c474dd8a1dd0ddef66a03c05d709469358e9a9e32ad14bf3780f9311127",
@@ -7477,7 +7593,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "mega53_installation_status",
-      "line": 95,
+      "line": 135,
       "kind": "http_entry",
       "route": "/api/admin/ai/mega53/runtime/installations/{job_id}",
       "shape_sha256": "fc3383a3496825c37731d47408318e24e0f95d2560f45907ea0f3d1459302247",
@@ -7490,7 +7606,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "verify_mega53",
-      "line": 102,
+      "line": 142,
       "kind": "http_entry",
       "route": "/api/admin/ai/mega53/checkpoint/verify",
       "shape_sha256": "59c71fd7adb7b9eadd0909ba26a84111870b7ca2ea3ffbc3eb7f2045f8d13d01",
@@ -7503,7 +7619,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "install_mega53",
-      "line": 118,
+      "line": 158,
       "kind": "http_entry",
       "route": "/api/admin/ai/mega53/checkpoint/install",
       "shape_sha256": "f8bc25e8aeecc3eab7cea71d4f974c34ecc6d827f02921b90e0c313c4103246e",
@@ -7516,7 +7632,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "inventory",
-      "line": 151,
+      "line": 191,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets",
       "shape_sha256": "c4ee847bcfdf836e7cd63726c0c5b9680e564b32cae36691cc2384124e567655",
@@ -7530,7 +7646,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "remove_bundle",
-      "line": 158,
+      "line": 198,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets/bundles/{asset_id}",
       "shape_sha256": "bb0c69468153e969582a875c304adbca589a731a3b7a1efba73557bdabcb5e2b",
@@ -7544,7 +7660,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "remove_recipe",
-      "line": 164,
+      "line": 204,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets/recipes/{identifier}",
       "shape_sha256": "1406b7566c7b448f5f52c01bd542fdf6378c80a0300d380ea6afd71a88e8a82e",
@@ -7558,7 +7674,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "remove",
-      "line": 170,
+      "line": 210,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets/{identifier}",
       "shape_sha256": "d8257f2eefdc5f66bbbcf0e51e55e1c6477c75ae0b0f1af9d0afe932a722d200",
@@ -7572,7 +7688,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "export",
-      "line": 176,
+      "line": 216,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets/{identifier}/file",
       "shape_sha256": "f95241df304569fad70f49474446a47e5bfd5b24843bd80393f97d1a4889d3fb",
@@ -7586,7 +7702,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "download",
-      "line": 197,
+      "line": 237,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets/{identifier}/download",
       "shape_sha256": "b9953decff2570a12999de588c80b588a564ff7b24efeff773accac7051a2578",
@@ -7600,7 +7716,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "status",
-      "line": 217,
+      "line": 257,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets/jobs/{job_id}",
       "shape_sha256": "846b949b6c171c046e0135e959eb3d8c87cc5c56afd6aa68d7cc9b7f5ad8933b",
@@ -7614,7 +7730,7 @@
     {
       "path": "app/model_asset_admin_routes.py",
       "function": "restore",
-      "line": 223,
+      "line": 263,
       "kind": "http_entry",
       "route": "/api/admin/ai/model-assets/{identifier}/restore",
       "shape_sha256": "6cd4eb3577d9c72f182795165a8cdbd340c73b363f490efbcdc76bf1e87df97a",
@@ -8348,9 +8464,24 @@
       ]
     },
     {
+      "family": "web_project",
+      "boundary": "Explicit BS RoFormer profile follows the original project job or admitted registered worker. Separate exact checkpoint policy is disabled until documented rights review. No substitution or inference-time download.",
+      "evidence": [
+        "tests/test_bass_roformer_runtime.py",
+        "tests/test_bass_roformer_project.py",
+        "tests/test_bass_roformer_install.py"
+      ],
       "path": "app/plugins.py",
       "function": "split",
-      "line": 632,
+      "line": 540,
+      "kind": "inference_call",
+      "call": "bass_roformer_runtime.infer",
+      "shape_sha256": "60d1f40e378af2505f01a168601dab0052f0d8298d3a3f102ee7238400c506a5"
+    },
+    {
+      "path": "app/plugins.py",
+      "function": "split",
+      "line": 640,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "shape_sha256": "6e593c957d918f2f72447de230b2c1a5db04f78e1f94440d637ede2f6b762ac8",
@@ -12930,5 +13061,13 @@
   "mega53_web_install_review_20261103": {
     "evidence": "tests/test_r210_mega53_web_install.py",
     "scope": "Fixed-source administrator installation; no caller-provided URL or command; model load is not real inference or hardware attestation."
+  },
+  "bass_publication_review_20261111": {
+    "date": "2026-11-11",
+    "scope": "Reviewed bass output staging, exclusive publication and rollback. All audio is finite before publication; final rights and cancellation checks precede successful return. Rollback compares device and inode and preserves pre-existing or replaced files. No process, transport or admission entry changed. This does not certify crash atomicity across the entire output set or neural separation quality.",
+    "evidence": [
+      "tests/test_bass_roformer_runtime.py",
+      "docs/CONTINUATION_20261111_R210.md"
+    ]
   }
 }

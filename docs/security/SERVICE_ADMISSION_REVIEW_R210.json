@@ -96,7 +96,7 @@
     "app/ai_token_routes.py": "sha256:c437a893c2bbb76bdaf53e27b46ace1fb006a834c35469c272332fee26956177",
     "app/ai_torch_diagnostics.py": "sha256:a639fcd5c98fd9519ec0855b8f02cdad3088abe4d41372259178fd3535466ce8",
     "app/ai_trusted_estimates.py": "sha256:1103bf458c9f8912b04fd0f676d2699f67ddcbbbb743c6f156f0b790b0c5a552",
-    "app/ai_unified_adapter.py": "sha256:7d84fccacde4840ddb0e952ee112d4108773ccbd5a179eec02e72c61c5bbec48",
+    "app/ai_unified_adapter.py": "sha256:ce605e78cf271b2b00e37f54bfb6cb787156a92c89f7019e750351cf1b51cdec",
     "app/ai_upload_transaction.py": "sha256:2fbaf2ad0b181a20827f681c8fbe2f40bc076e3eef9e92cf1a3d748b13580ed5",
     "app/ai_usage_reporting.py": "sha256:6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
     "app/ai_worker_artifacts.py": "sha256:9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28",
@@ -108,6 +108,8 @@
     "app/auth.py": "sha256:403e57e502ac1b2e4773a17b54fa67c27e23deb039df3b34b1aad83a78ec0210",
     "app/auto_mix.py": "sha256:3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "sha256:ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa",
+    "app/bass_roformer_install.py": "sha256:a8e1edfe1cde7e1fa79a402e3a9e2c424507f4f05ec30631b0560baf2f42fc9c",
+    "app/bass_roformer_runtime.py": "sha256:db11c362eeb2d6d24b271503fa4043000b10cc4733b3d539fb61216dc0e7b928",
     "app/beat_sync.py": "sha256:48e427e70dedf19ffe26306c3d88ce5d40546fc76c8f7679d389a29d524b7b87",
     "app/bounce.py": "sha256:64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61",
     "app/checkout_reference_recovery.py": "sha256:b94176ebea634d2d8b08c7e6c042d7f8eeeec806012a609ac4601db1c6c22a9c",
@@ -140,7 +142,7 @@
     "app/live_mixer.py": "sha256:c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291",
     "app/live_sources.py": "sha256:729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
     "app/lyric_layout.py": "sha256:c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
-    "app/main.py": "sha256:c15cc8d22012a5eb941ed83e2e4cd198aade5439677cec8ca1bd8066b4add286",
+    "app/main.py": "sha256:6bacf1cee624b432eac6afd29f783e58cc271dec32bc529d8abb37df13d389b7",
     "app/mega53_install.py": "sha256:bf5ca2996bc2b8fdd90d3cf8a40e2c35ab546986ebe7251a82b48e91bda0f6ee",
     "app/mega53_runtime.py": "sha256:a7e696e29a82a3875c28ec95c29c6bf52d70b219ac600f637b24457c58ce91ce",
     "app/merish_mta16.py": "sha256:a5b114a5c3e29491890d28f92b7e5e6a76c21bde3f6989f262429d331bdec816",
@@ -155,11 +157,11 @@
     "app/midi_ump.py": "sha256:5bc915e5a04b841937fec3ebb7ec453fd48dc37b7eb03fcfe0c9d2c0b3825bee",
     "app/mlive_mp3.py": "sha256:d83e56a2142fed65fe0ad85053c18aa0af293186f271619b22bb3ca3b557fe31",
     "app/mlive_profile.py": "sha256:4ebfd83f1137fcd3c88d413078170481ec41d24cb2e909ccb17a502b1b87c695",
-    "app/model_asset_admin.py": "sha256:2bc7c104e64b0a0cabee749738d1a215466d24cbc18eae310bddaa3ad4a06bea",
-    "app/model_asset_admin_routes.py": "sha256:29edb4085f47922213438a8467e5ebee2cb388f93f04eaa138ffa4384170515f",
-    "app/model_license_policy.py": "sha256:c305391928006131d44a7d3ba97083af241a785841dfe1b5826396696c5dc8b1",
-    "app/model_rights_dossiers.py": "sha256:5e98fa960a3d3b52019301707982ea0ed00f2605692f28a6db7feca8d0ea1374",
-    "app/model_selectors.py": "sha256:ad9f896097677e1fd87a4916cace94b17f8def59404b758a4067b25abf449900",
+    "app/model_asset_admin.py": "sha256:b5ff8b4741b9dccd1db960a9c8841aea0426499095cbc226c9e84bb2396b22b0",
+    "app/model_asset_admin_routes.py": "sha256:db34e4ddf331c57f29d7c7fb1260f95b51433bd7243bf12ff9ad2bd6f181421e",
+    "app/model_license_policy.py": "sha256:98a22c99761a59ba84b09fc3a5b95355c3fc4a67860dcdc8bfded8652c7659bc",
+    "app/model_rights_dossiers.py": "sha256:11df3374fa033cbc5843e9429aa1dd1b7340bfe2cf768af80aa05e809b6dec32",
+    "app/model_selectors.py": "sha256:f0d8cdd4073630767cabae11f2c4077a72b034691426506ddeceb2b5a8bab51e",
     "app/model_storage.py": "sha256:99a7c255f886ae7bf1cd6a9506455592f2efd0da9aaba8327a8940a916b1da6b",
     "app/model_updater.py": "sha256:2ceb9df25b17d70d46427bda86fc5a52a9adabe0587b6af944d469306d0ce977",
     "app/models.py": "sha256:7ef663d17e962306c873816ef8c8cf446039e8c93be22569faac6b2d985f6329",
@@ -210,7 +212,7 @@
     "app/percussion_dataset_import.py": "sha256:88aff3d18e5ad3116b37421a1cc5bdebc4834b07624d4d6cda88589686445893",
     "app/percussion_metrics.py": "sha256:d6973ead4fd9711f804ff5e7b1fcf884998c6bf4a703d06f3b9603fc6133395f",
     "app/platform_file_lock.py": "sha256:f465c089ff94a35fe80708e26b8ed69bcc8cf1dbfd8004f12a2051065ffb2a74",
-    "app/plugins.py": "sha256:08eb7f847cbd6eb5c65976be8e04feddb1553c895f79653f573942f262c3a5f2",
+    "app/plugins.py": "sha256:a205dfb7b3cc285705aa8f99500952fa606a75952924e3c74596c2ccacf20391",
     "app/preview_publish.py": "sha256:72b54e1ec35c11b6367d193188eb19621673654fa3aefb52c5b54fe5fd2a887a",
     "app/project_collaboration.py": "sha256:0ed558812dfc81e98ccbd80628ae79461e5cd3725ca4f3c4c4892654853a10da",
     "app/project_kinds.py": "sha256:d2043a15db7f478bf7aca0e9d6e1205e09d9886e5c56ea5d786d2ad6ba8181f1",
@@ -940,7 +942,7 @@
     {
       "path": "app/ai_unified_adapter.py",
       "function": "infer",
-      "line": 188,
+      "line": 196,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "372a03c9d011be4f62fecadd122817f5e3ff05b69843bc791d88eea6919de445",
@@ -951,7 +953,7 @@
     {
       "path": "app/ai_unified_adapter.py",
       "function": "<module>",
-      "line": 253,
+      "line": 261,
       "kind": "command_entry",
       "call": "__main__",
       "ast_sha256": "e9f8cfee08443ea90aa7f2b8b914aeaa4f4c525d68b58881caf0d8c753402d5f",
@@ -1046,6 +1048,39 @@
       "disposition": "request_lifetime",
       "boundary": "Reviewed synchronous caller chain under a full request,finite tracked child,registered inference or install admission;parent waits through process/result cleanup. Reader/heartbeat/cancel helper threads now have independent tickets. Parent/unknown external loss leaves original admission or ledger held.",
       "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred."
+    },
+    {
+      "path": "app/bass_roformer_install.py",
+      "function": "_run",
+      "line": 113,
+      "kind": "process_boundary",
+      "call": "subprocess.Popen",
+      "ast_sha256": "13fe3f25b9259d06b34af6e4a29b0d150e747a5ce4361dc91b74f93d876877a5",
+      "disposition": "tracked_work",
+      "boundary": "The explicit administrator installation runs inside the existing queued worker execution scope; the child is supervised, cancellable, bounded by timeout and reaped before the queued parent completes. Publication uses the model mutation fence.",
+      "verification": "tests/test_r210_bass-roformer_web_install.py checks fixed job submission, progress, cancellation contract and failure rollback; real OS package downloads and GPU hardware remain outside this local test."
+    },
+    {
+      "path": "app/bass_roformer_install.py",
+      "function": "install",
+      "line": 159,
+      "kind": "process_boundary",
+      "call": "subprocess.check_output",
+      "ast_sha256": "a510003b95c422cc5a53bd06ea9df21fc7b070f3577b18b4d0ca6f4b2a8a006e",
+      "disposition": "tracked_work",
+      "boundary": "The explicit administrator installation runs inside the existing queued worker execution scope; the child is supervised, cancellable, bounded by timeout and reaped before the queued parent completes. Publication uses the model mutation fence.",
+      "verification": "tests/test_r210_bass-roformer_web_install.py checks fixed job submission, progress, cancellation contract and failure rollback; real OS package downloads and GPU hardware remain outside this local test."
+    },
+    {
+      "path": "app/bass_roformer_install.py",
+      "function": "install",
+      "line": 179,
+      "kind": "process_boundary",
+      "call": "subprocess.check_output",
+      "ast_sha256": "af883b5a329ad5bf9e891b26bfbb5973832a7eacfc8fdb10b187550853657da5",
+      "disposition": "tracked_work",
+      "boundary": "The explicit administrator installation runs inside the existing queued worker execution scope; the child is supervised, cancellable, bounded by timeout and reaped before the queued parent completes. Publication uses the model mutation fence.",
+      "verification": "tests/test_r210_bass-roformer_web_install.py checks fixed job submission, progress, cancellation contract and failure rollback; real OS package downloads and GPU hardware remain outside this local test."
     },
     {
       "path": "app/chord_ml.py",
@@ -1248,7 +1283,7 @@
     {
       "path": "app/main.py",
       "function": "api_admin_projects_dump",
-      "line": 1451,
+      "line": 1454,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1259,7 +1294,7 @@
     {
       "path": "app/main.py",
       "function": "vst3_parameters",
-      "line": 1601,
+      "line": 1604,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "ed80931ac27dbcefb0d8e3590f252599fe79c87557e31b086bd4af990c524610",
@@ -1270,7 +1305,7 @@
     {
       "path": "app/main.py",
       "function": "project_archive_export",
-      "line": 2791,
+      "line": 2794,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1281,7 +1316,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_audio",
-      "line": 2894,
+      "line": 2897,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "25125771ed742253ce8b8474ad02ee2ac9742a724508dc20a0a14109373f9f57",
@@ -1292,7 +1327,7 @@
     {
       "path": "app/main.py",
       "function": "sample_editor_effect_preview",
-      "line": 2942,
+      "line": 2945,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "950199ef2b6e3d4bdb93c0c381d27a888e1ebc45bb7285a435de56399ec1d730",
@@ -1303,7 +1338,7 @@
     {
       "path": "app/main.py",
       "function": "_normalize_audio_to_project_rate",
-      "line": 3019,
+      "line": 3022,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "1ef3cbaf0a3abeca889313cd85b3eb87211f557a3dba84291ffe6d0e541d70ba",
@@ -1314,7 +1349,7 @@
     {
       "path": "app/main.py",
       "function": "start_waveform_job",
-      "line": 3264,
+      "line": 3267,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "2ab21f2385d2ba58890dff3c78c3937067830df10bc1e138d4f1ab57f4aa82f0",
@@ -1325,7 +1360,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_import_job",
-      "line": 3451,
+      "line": 3454,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "152141a7b66765bd0c1230d92572fd473dd4af68f0fd2541d6bbb4467a843f2e",
@@ -1336,7 +1371,7 @@
     {
       "path": "app/main.py",
       "function": "_native_remote_infer",
-      "line": 3504,
+      "line": 3507,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "63354d4a762c50c82a3ee076466ad3186afcfe33afcf9ec6be8fdd300359c035",
@@ -1347,7 +1382,7 @@
     {
       "path": "app/main.py",
       "function": "_text_music_worker",
-      "line": 3531,
+      "line": 3534,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "f55f9882602b8af337cfa6c132dad2e18f7c325b3e04c915ef169492cd65983d",
@@ -1358,7 +1393,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics_pdf",
-      "line": 3849,
+      "line": 3852,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1369,7 +1404,7 @@
     {
       "path": "app/main.py",
       "function": "download_project_lyrics_pdf",
-      "line": 3853,
+      "line": 3856,
       "kind": "asynchronous_lifetime",
       "call": "starlette.background.BackgroundTask",
       "ast_sha256": "b5400ae0a49f6bc882e8639b67be5c9efe21cd8b8f75d9cbe24c92d8609916a4",
@@ -1380,7 +1415,7 @@
     {
       "path": "app/main.py",
       "function": "start_youtube_import_job",
-      "line": 4146,
+      "line": 4149,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "5d7cc8a2fbe59f62084513a399f3654bfe2fb295e42460f6ea59acc3852c7c95",
@@ -1391,7 +1426,7 @@
     {
       "path": "app/main.py",
       "function": "_start_bounce",
-      "line": 4261,
+      "line": 4264,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "cda43824f22c314bfbd46533b87b036f37be97ce089977c37a595b4f9d3f64da",
@@ -1402,7 +1437,7 @@
     {
       "path": "app/main.py",
       "function": "start_mta_import_job",
-      "line": 4811,
+      "line": 4814,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "c1af4132570b409eec7d50a30a364b6553142628ee88568c514de50ea7fdd234",
@@ -1413,7 +1448,7 @@
     {
       "path": "app/main.py",
       "function": "_drumsep_extract",
-      "line": 5726,
+      "line": 5736,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "16ed5cdd033b2e3fc4bf7190188bdfceca04b04671cde85b4f1b66c449fc7c91",
@@ -1424,7 +1459,7 @@
     {
       "path": "app/main.py",
       "function": "start_track_export_job",
-      "line": 7078,
+      "line": 7106,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "a1a2c97c174a33143f284b9fb40206cfbe2ca013793a4b2847c164bd786bbc73",
@@ -1435,7 +1470,7 @@
     {
       "path": "app/main.py",
       "function": "_render_karaoke_video",
-      "line": 7222,
+      "line": 7250,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -1446,7 +1481,7 @@
     {
       "path": "app/main.py",
       "function": "start_configured_project_export_job",
-      "line": 7405,
+      "line": 7433,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "485b20b4843d6cbd50e172f3f072f2cd7776d2f9013299c31e903e073cab09ce",
@@ -1457,7 +1492,7 @@
     {
       "path": "app/main.py",
       "function": "_karaoke_export_worker",
-      "line": 7441,
+      "line": 7469,
       "kind": "process_boundary",
       "call": "subprocess.run",
       "ast_sha256": "28bba4f4c331ae2a460e30755879fb8e41f4cadb876355ef578d8fd2f362a52b",
@@ -1468,7 +1503,7 @@
     {
       "path": "app/main.py",
       "function": "start_karaoke_export_job",
-      "line": 7475,
+      "line": 7503,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "25bd2b0dec8b83af17ce49cdac963d6f913b538d5faca1d0f56d9e5ad1066368",
@@ -1479,7 +1514,7 @@
     {
       "path": "app/main.py",
       "function": "<module>",
-      "line": 7521,
+      "line": 7549,
       "kind": "command_entry",
       "call": "__main__",
       "ast_sha256": "607d58081f661301abd859308265389ab10fcd588f64dc15d59eb4e3a0eba9c3",
@@ -1490,7 +1525,7 @@
     {
       "path": "app/main.py",
       "function": "<module>",
-      "line": 7529,
+      "line": 7557,
       "kind": "service_entry",
       "call": "uvicorn.run",
       "ast_sha256": "eb5df95bcf270409640c491bb593d14e8a6934e813f51e685518c34878489580",
@@ -1501,7 +1536,7 @@
     {
       "path": "app/main.py",
       "function": "desktop_ace_test",
-      "line": 8072,
+      "line": 8100,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "340066854303f6f9d9de09ff9bd8b0a1a29f95e2f161b9e0544122ede37da00d",
@@ -1721,7 +1756,7 @@
     {
       "path": "app/plugins.py",
       "function": "split",
-      "line": 632,
+      "line": 640,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "ast_sha256": "6e593c957d918f2f72447de230b2c1a5db04f78e1f94440d637ede2f6b762ac8",
@@ -1732,7 +1767,7 @@
     {
       "path": "app/plugins.py",
       "function": "split",
-      "line": 655,
+      "line": 663,
       "kind": "asynchronous_lifetime",
       "call": "service_admission.worker_thread",
       "ast_sha256": "84af63d574dcd5df910e637106e7b050bbdfd67de7e6b148a7226e708721ab6b",
@@ -2585,5 +2620,13 @@
   "mega53_web_install_review_20261103": {
     "evidence": "tests/test_r210_mega53_web_install.py",
     "scope": "Fixed-source administrator installation; no caller-provided URL or command; model load is not real inference or hardware attestation."
+  },
+  "bass_publication_review_20261111": {
+    "date": "2026-11-11",
+    "scope": "Reviewed bass output staging, exclusive publication and rollback. All audio is finite before publication; final rights and cancellation checks precede successful return. Rollback compares device and inode and preserves pre-existing or replaced files. No process, transport or admission entry changed. This does not certify crash atomicity across the entire output set or neural separation quality.",
+    "evidence": [
+      "tests/test_bass_roformer_runtime.py",
+      "docs/CONTINUATION_20261111_R210.md"
+    ]
   }
 }

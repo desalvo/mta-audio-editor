@@ -70,6 +70,7 @@ function showUtilityModal(title,html){
 }
 '''
     checks = r'''
+const sel={a:0,b:0};
 const open=()=>prefix==='track'?openTrackStemWorkflow('t'):openStemWorkflow();
 const target=()=>stemTargetControl(prefix),checkbox=()=>$(`#${prefix}SplitPercussions`),method=()=>$(`#${prefix}PercussionMethod`);
 const run=async()=>{

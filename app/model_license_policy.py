@@ -12,10 +12,11 @@ import time
 
 FREE_ADMISSION=ContextVar('mta_license_free_admission',default=False)
 
-RESTRICTED_MODELS = frozenset({'madmom','btc-hcqt','chordformer','chordmini-btc','chordmini-2e1d','audio-separator-weights','uvr-kara-2','drumsep-weights',
+RESTRICTED_MODELS = frozenset({'bs-roformer-zfturbo','madmom','btc-hcqt','chordformer','chordmini-btc','chordmini-2e1d','audio-separator-weights','uvr-kara-2','drumsep-weights',
     'diffsinger-qixuan','diffsinger-nishiren','diffsinger-spore','diffsinger-vocoder','seed-vc-assets','rvc-assets','transkun-assets','mr-mt3-assets'})
 
 CATALOG={
+    'bs-roformer-zfturbo':('MIT checkpoint grant by ZFTurbo for v1.0.12; MUSDB18-HQ training-data conditions require separate review','disabled','https://github.com/ZFTurbo/Music-Source-Separation-Training/issues/254'),
     'seed-vc-assets':('GPL-3.0 code; each acoustic/encoder/vocoder/reference asset requires individual permission','disabled','https://github.com/Plachtaa/seed-vc'),
     'rvc-assets':('RVC code and individual voice/encoder/F0 checkpoints require review','disabled','https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI'),
     'mr-mt3-assets':('MIT original MR-MT3 code/weights; Apache-2.0 T5 component; exact runtime/checkpoint require operator review','disabled','https://huggingface.co/gudgud1014/MR-MT3/tree/7bd24c3e1dc26468a6a9354c0a4f174405c9bad8'),
@@ -164,6 +165,8 @@ def effective_backing_model(plan):
 
 
 def selected(kind,plan):
+    if kind=='demucs' and plan.get('model') in ('bs-roformer-bass','bs-roformer-4stem'):
+        return 'bs-roformer-zfturbo'
     if kind=='audio-to-midi-transkun':
         from .studio_asset_registry import manifest
         value=manifest(plan.get('options',{}).get('asset_id',''))

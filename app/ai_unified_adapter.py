@@ -177,6 +177,14 @@ def infer(plan: dict, output: Path) -> None:
         paths = drumsep_infer(source, model, folder)
         _artifacts(folder, [(p, 'audio/wav') for p in paths]); return
     if kind == 'demucs':
+        if plan.get('model') in ('bs-roformer-bass', 'bs-roformer-4stem'):
+            from app.bass_roformer_runtime import infer as bass_infer
+            paths = bass_infer(source, folder / 'bass', plan['model'], stem_count=plan.get('stem_count',0))
+            staged = []
+            for path in paths:
+                target = folder / ('stem_' + path.name)
+                path.replace(target); staged.append((target, 'audio/wav'))
+            _artifacts(folder, staged); return
         import subprocess
         from app.model_selectors import demucs_model
         model = demucs_model(plan.get('model'))

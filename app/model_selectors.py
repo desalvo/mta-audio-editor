@@ -42,9 +42,15 @@ def demucs_model(value=None):
     return value
 
 
+def stem_model(value=None):
+    if value in ('bs-roformer-bass', 'bs-roformer-4stem'):
+        return value
+    return demucs_model(value)
+
+
 def validate_selection(kind,plan):
     if kind=='whisper':whisper_model(plan.get('model'))
-    elif kind=='demucs':demucs_model(plan.get('model'))
+    elif kind=='demucs':stem_model(plan.get('model'))
     elif kind in ('sam-audio','singer-separation') or (kind=='drumsep' and str(plan.get('model','')).lower().rsplit('/',1)[-1].startswith('sam-')):
         raise ValueError('Requested separator has been removed')
 

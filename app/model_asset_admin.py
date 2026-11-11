@@ -430,6 +430,18 @@ def recipes():
         else:
             add('vocals-' + identifier, 'vocals', item['display_name'],
                 f'/api/vocal-separation/models/{identifier}/download', f'/api/vocal-separation/models/{identifier}')
+    from . import bass_roformer_install
+    from .bass_roformer_runtime import managed_checkpoint as bass_checkpoint
+    bass_state = bass_roformer_install.receipt()
+    add('bass-roformer-runtime', 'demucs', 'BS RoFormer ZFTurbo v1.0.12 · runtime + checkpoint',
+        '' if bass_state else '/api/admin/ai/bass-roformer/runtime/install',
+        body={'accept_licenses':True, 'device':'auto'}, installed=bool(bass_state),
+        note='MIT code and exact checkpoint; training-data rights require separate review. Local worker only. No SW weights.')
+    if bass_state: rows[-1]['remove_job_url'] = '/api/admin/ai/bass-roformer/runtime/remove'
+    add('bass-roformer-weights', 'demucs', 'BS RoFormer ZFTurbo v1.0.12 · checkpoint',
+        '' if bass_checkpoint().is_file() else '/api/admin/ai/bass-roformer/weights/install',
+        body={'accept_licenses':True}, installed=bass_checkpoint().is_file())
+    if bass_checkpoint().is_file(): rows[-1]['remove_job_url'] = '/api/admin/ai/bass-roformer/weights/remove'
     add('drumsep','drumsep','DrumSep ONNX','/api/drumsep/models/download','/api/drumsep/models')
     add('basic-pitch','basic-pitch','Basic Pitch 0.4.0 ONNX runtime','/api/admin/ai/studio/models/basic-pitch/install',
         '/api/admin/ai/studio/models/basic-pitch',body={'accept_licenses':True},installed=(studio_root()/'basic-pitch.json').exists())
