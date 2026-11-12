@@ -9,7 +9,8 @@ qrcode==8.2
 
 # Runtime PDF export for synchronized lyrics/chords.
 reportlab==4.4.9
-PyMuPDF==2.1
+# Core renderer: 2.x full wheels omit macOS Intel; lite retains supported arches.
+PyMuPDF-lite==2.1
 
 # YouTube audio import.
 yt-dlp==2026.10.26
