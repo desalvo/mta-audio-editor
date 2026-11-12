@@ -394,8 +394,8 @@ jobs:
           pip install -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
           pip check
-          pip install "onnxruntime>=1.17" "audioread>=3,<4" "beartype>=0.18.5,<0.19" "julius>=0.2" "einops>=0.7" "ml-collections>=0.1" "onnx2torch-py313>=1.6" "rotary-embedding-torch>=0.6.1,<0.7" "samplerate==0.1.0" "resampy>=0.4" "pydub>=0.25" "tqdm>=4" "audioop-lts>=0.2.1" "packaging>=23" "six>=1.16,<2"
-          pip install --no-deps "audio-separator==0.47.0"
+          pip install "onnxruntime>=1.17" "audioread>=3,<4" "beartype>=0.18.5,<0.19" "julius>=0.2" "einops>=0.7" "ml-collections>=0.1" "onnx2torch-py313>=1.6" "rotary-embedding-torch>=0.6.1,<0.7" "samplerate==0.1.0" "resampy>=0.4" "pydub>=0.25" "tqdm>=4" "audioop-lts>=0.2.1" "packaging>=23" "six>=1.17.0,<2"
+          pip install --no-deps "audio-separator==0.48.0"
           # audio-separator pins beartype 0.18.x, which cannot validate RoFormer
           # Callable | None annotations on Python 3.14. Override only the checker.
           pip install --no-deps "beartype>=0.23.1,<0.24"

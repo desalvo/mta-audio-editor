@@ -98,7 +98,10 @@ def test_tempo_plan_respects_destination_boundaries_and_source_consumption():
     p.adaptive_tempo_map=[AdaptiveTempoPoint(time_ms=0,bpm=120,beat_index=0),
                           AdaptiveTempoPoint(time_ms=2000,bpm=90,beat_index=4),
                           AdaptiveTempoPoint(time_ms=4000,bpm=90,beat_index=7)]
-    assert tempo_sections(p,0,4000,120,120)==pytest.approx(plan)
+    adaptive=tempo_sections(p,0,4000,120,120)
+    assert len(adaptive)==len(plan)
+    for actual,expected in zip(adaptive,plan):
+        assert actual==pytest.approx(expected)
 
 
 def test_multizone_match_renders_real_audio_at_project_tempo(tmp_path,monkeypatch):

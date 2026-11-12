@@ -20,4 +20,4 @@ def test_ui_sends_selected_backing_model():
 
 def test_requirements_include_audio_separator():
     req=(main.BASE.parent/"requirements-stems.txt").read_text()
-    assert "audio-separator[cpu]==0.47.0" in req
+    assert "audio-separator[cpu]==0.48.0" in req

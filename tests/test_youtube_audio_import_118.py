@@ -31,4 +31,4 @@ def test_youtube_import_ui_and_dependency_are_present():
     assert "openYoutubeImport" in js
     assert "/youtube-import-jobs" in js
     assert "confirm_rights:true" in js
-    assert "yt-dlp==2026.8.19" in requirements
+    assert "yt-dlp==2026.10.26" in requirements

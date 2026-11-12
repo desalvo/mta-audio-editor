@@ -49,7 +49,7 @@ RUN apt-get update \
     && if [ "$INSTALL_STEMS" = "true" ]; then CMAKE=/usr/bin/cmake python -m pip install --no-cache-dir -r requirements-stems.txt; fi \
     && python -m pip install --no-cache-dir -r requirements-lyrics.txt \
     && python -m pip install --no-cache-dir -r requirements-chords.txt \
-    && python -m pip install --no-cache-dir --upgrade --force-reinstall setuptools==84.0.0 wheel==0.48.0 urllib3==2.8.0 msgpack==1.2.3 \
+    && python -m pip install --no-cache-dir --upgrade --force-reinstall setuptools==84.0.0 wheel==0.48.0 urllib3==2.8.0 msgpack==1.2.4 \
     && python -m pip check \
     && curl -fsSL https://github.com/c4dm/nnls-chroma/archive/refs/heads/master.tar.gz -o /tmp/nnls.tar.gz \
     && mkdir -p /tmp/nnls /opt/mta/vamp \
@@ -59,7 +59,7 @@ RUN apt-get update \
     && VAMP_PATH=/opt/mta/vamp vamp-simple-host --list-ids | grep -q 'nnls-chroma:chordino' \
     && rm -rf /tmp/nnls /tmp/nnls.tar.gz \
     && python -c "from importlib.metadata import distributions; n=[dist.metadata.get('Name','') for dist in distributions() if dist.metadata.get('Name','').lower().startswith('nvidia-')]; print('NVIDIA Python packages:', n); assert not n, n" \
-    && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.3'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)" \
+    && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.4'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)" \
     && apt-get purge -y --auto-remove build-essential cmake curl libboost-all-dev vamp-plugin-sdk \
     && rm -rf /var/lib/apt/lists/*
 RUN python -c "import fastapi, uvicorn, numpy, whisper, madmom_infer, pedalboard, av, mido; assert hasattr(pedalboard.VST3Plugin,'_mta_set_transport')" \

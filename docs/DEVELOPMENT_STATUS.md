@@ -1,3 +1,24 @@
+# Stato corrente — 12 novembre 2026
+
+## PR Dependabot residue: compatibilità e regressioni
+
+Riesaminate cinque nuove PR #36–#40 sulla base main `9f51f61`, la cui full CI
+è verde nel tentativo 2. Il gruppo #36 viene corretto e combinato con PyMuPDF
+2.1 (#38), tqdm (#39) e six (#40). #37 non è compatibile: transformers 4.46.3
+richiede huggingface-hub<1 nel runtime di conversione; conservato 0.36.2 e
+richiesta revisione manuale delle major hub nella policy Dependabot.
+
+Allineati msgpack nella convergenza Docker e audio-separator/six nel comando
+Windows. Corretti tre test di pin obsoleti, il confronto annidato non supportato
+da pytest 9.2 e l'interferenza dei worker nella prova del rilascio del flock.
+Passano 43 test mirati, compresi export FFmpeg reali sotto lock SQLite e
+anteprima PDF con PyMuPDF 2.1, e Ruff 0.17.4 su app/native/tests.
+La CI combinata e gli installer richiedono verifica sullo SHA integrato.
+Dettagli e fonti IT/EN: `DEPENDABOT_REMAINING_R210_IT_EN.md`.
+**0.3.0-r210, PRE-RC 73%** invariata; nessuna inferenza/ascolto reale certificati.
+
+## Cronologia precedente
+
 # Stato corrente — 11 novembre 2026
 
 ## Revisione PR Dependabot — 11 novembre 2026
