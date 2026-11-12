@@ -2,7 +2,7 @@
 # from https://download.pytorch.org/whl/cpu ; no torchvision or TensorFlow needed.
 torch==2.8.0
 torchaudio==2.8.0
-transformers==5.13.1
+transformers==4.57.6
 numpy>=1.26,<2.7
 scipy>=1.11,<1.18
 soundfile==0.14.0
