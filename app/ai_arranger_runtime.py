@@ -256,17 +256,20 @@ def _gpu_metadata(payload):
 def _with_live_progress(row):
     """Expose trustworthy backend progress on both client and admin endpoints.
 
-    The progress sidecar contains backend measurements, never wall-clock
-    approximations of GPU time or a fabricated percentage.
+    Sidecar counters remain distinct from the read-only statistical duration
+    fallback. Statistics cannot enter quota checks or settlement evidence.
     """
     value = dict(row)
+    from .ai_job_statistics import project as statistical_view
+    context = value.pop('_resource_live_context', {})
     if value.get('state') != 'running':
-        return value
+        return statistical_view(value)
+    live_gpu = False
     try:
         path = _ROOT / (_validate_job_id(value['job_id']) + '.progress.json')
         payload = json.loads(path.read_text(encoding='utf-8'))
         if not isinstance(payload, dict):
-            return value
+            payload = {}
         for field, maximum in (('phase', 80), ('message', 240)):
             if isinstance(payload.get(field), str):
                 value[field] = payload[field][:maximum]
@@ -280,20 +283,30 @@ def _with_live_progress(row):
                 if type(payload.get(key)) is int and 0 <= payload[key] <= 1000:
                     value[key] = payload[key]
         value.update(_gpu_metadata(payload))
+        stages = context.get('stages', {})
+        stage = payload.get('_ledger_job_id')
+        if stage is None and len(stages) == 1:
+            stage = next(iter(stages))
         for field in ('cpu_seconds', 'gpu_seconds', 'cpu_seconds_estimated', 'gpu_seconds_estimated'):
             # The ledger projection can include earlier stages of this job.
             # A sidecar describes only the current worker, so must not replace
             # an already aggregated partial estimate.
-            if field.endswith('_estimated') and value.get('resource_metrics_partial') and value.get(field) is not None:
-                continue
             amount = payload.get(field)
             if isinstance(amount, (int, float)) and not isinstance(amount, bool) and 0 <= amount < float('inf'):
+                if field.endswith('_estimated') and value.get('resource_metrics_partial'):
+                    if stage in stages:
+                        previous = stages[stage][field]
+                        amount = context['totals'][field] - previous + amount
+                    elif value.get(field) is not None or value.get(field.removesuffix('_estimated')) is not None:
+                        continue  # Ambiguous parallel legacy sidecar; never guess a stage.
                 value[field] = float(amount)
+                if field in ('gpu_seconds', 'gpu_seconds_estimated'):
+                    live_gpu = True
     except (OSError, ValueError, TypeError):
         pass
     if value.get('cancel_requested'):
         value.update(phase='cancelling', message='Cancellation requested; discarding output and stopping ACE cooperatively')
-    return value
+    return statistical_view(value, live_gpu=live_gpu)
 
 
 def list_jobs(limit=100):

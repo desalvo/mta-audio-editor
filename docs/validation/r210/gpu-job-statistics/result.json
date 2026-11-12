@@ -1,0 +1,45 @@
+{
+  "schema": "mta-gpu-job-statistics-1",
+  "date": "2026-11-12",
+  "base_commit": "a77f98b1ef0421082b07c0cb745e9be0da27b902",
+  "before_fix": {
+    "tests": 2,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0
+  },
+  "statistics_regressions": {
+    "tests": 89,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "accounting_available": {
+    "tests": 97,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "accounting_initial": {
+    "tests": 101,
+    "failures": 4,
+    "errors": 0,
+    "skipped": 0
+  },
+  "baseline_process_environment": {
+    "tests": 4,
+    "failures": 4,
+    "errors": 0,
+    "skipped": 0
+  },
+  "duration_statistics_billable": false,
+  "physical_gpu_tested": false,
+  "final_ci": "pending-final-commit",
+  "source_security_gates": {
+    "tests": 58,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "distinct_local_passes": 244
+}

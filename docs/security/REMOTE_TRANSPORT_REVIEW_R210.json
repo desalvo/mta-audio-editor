@@ -567,5 +567,28 @@
       "tests/test_r210_ai_install_lifecycle.py"
     ],
     "boundary": "Review of the published-wheel selection, fixed device probe and complete-group filesystem publication. No new process/transport/admission site; administrator-only fixed installation argv and independent worker admission remain unchanged. Local policy is checked through final publication, remote policy remains on the original executing worker. Rollback only unlinks device/inode-owned outputs. CPU installation and codec/operator execution were tested; synthetic model/device fixtures are not neural/GPU or checkpoint rights acceptance. Interpreter/dependency, remote ACE and F4/F6 target contracts remain open. Mega53 child startup now uses -I with an explicit upstream import root and the existing filtered environment. The actual synthetic child rejects PYTHONPATH sitecustomize injection. This is startup isolation, not independent interpreter/dependency or upstream-checkout authentication."
+  },
+  "gpu_statistics_review_20261112": {
+    "date": "2026-11-12",
+    "sources": [
+      "app/ai_arranger_runtime.py",
+      "app/ai_compute_diagnostics.py",
+      "app/ai_job_statistics.py",
+      "app/ai_job_views.py",
+      "app/ai_metering_agent.py",
+      "app/ai_notifications.py",
+      "app/ai_queue_usage.py",
+      "app/ai_usage_reporting.py",
+      "app/static/ai_jobs.js",
+      "app/static/ai_usage_panel.js",
+      "app/static/app.js"
+    ],
+    "boundary": "Reviewed read-only per-job statistical GPU projection and original-stage live counter replacement. Duration estimates exist only in gpu_statistics,never usage or quota/settlement inputs. Partial diagnostic writes merge numeric CPU/GPU fields transactionally; present samples may refine earlier estimates. Agent sidecars bind original ledger IDs; foreign/ambiguous stages cannot replace an aggregate. API owner/project access remains unchanged; private aggregation context is stripped. HTML/Node renderers and email escape data. No new subprocess,network or admission entry is added. Physical GPU/namespace target acceptance remains independent.",
+    "verification": [
+      "tests/test_r210_gpu_job_statistics.py",
+      "tests/test_r210_universal_queue_usage.py",
+      "tests/test_r210_ai_job_center.py",
+      "tests/test_r210_native_account_mail.py"
+    ]
   }
 }

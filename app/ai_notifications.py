@@ -116,12 +116,14 @@ def collect():
             try:owner=json.loads(row.get('payload_json') or '{}').get('actor_user_id')
             except ValueError:continue
         if owner not in users:continue
-        value=queue._with_live_progress(row)
+        from .ai_queue_usage import enrich
+        value=queue._with_live_progress(enrich(row))
         usage={k:value[k] for k in ('cpu_seconds','gpu_seconds') if value.get(k) is not None}
         estimated={k:value[k] for k in ('cpu_seconds_estimated','gpu_seconds_estimated') if value.get(k) is not None}
         payload={'job_id':row['job_id'],'operation':row['operation'],'status':row['state'],
           'started_at':row['started_at'],'finished_at':row['completed_at'],'usage':usage,'diagnostic':estimated,'token_id':None,
-          'amount_micro':0,'credits_debited_micro':0,'cost_pending':False,'origin':'queue'}
+          'amount_micro':0,'credits_debited_micro':0,'cost_pending':False,'origin':'queue',
+          'gpu_statistics':value['gpu_statistics']}
         # Billing only comes from the ledger, never from progress sidecars.
         linked=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+row['job_id']).hex
         linked_rows=[r for r in ledgers if r['id']==linked or r.get('queue_job_id')==row['job_id']]
@@ -149,7 +151,8 @@ def collect():
         events.append((row['user_id'],{'job_id':row['id'],'operation':row['kind'],'status':row['status'],
           'started_at':row['started_at'],'finished_at':row['finished_at'],'usage':json.loads(row['usage_json']),
           'diagnostic':details['estimated'] if details else {},'token_id':row['token_id'],'amount_micro':details['amount_micro'] if details else 0,
-          'credits_debited_micro':details.get('credits_debited_micro',0) if details else 0,'cost_pending':row['status']=='running','origin':'ledger'}))
+          'credits_debited_micro':details.get('credits_debited_micro',0) if details else 0,'cost_pending':row['status']=='running','origin':'ledger',
+          'gpu_statistics':details.get('gpu_statistics') if details else None}))
     with auth.db() as con:
         _init(con)
         before=con.total_changes
@@ -157,6 +160,7 @@ def collect():
             key=value['origin']+':'+value['job_id']
             if value['started_at'] is not None:
                 start={**value,'event':'started','status':'running','finished_at':None,'usage':{},'diagnostic':{},'amount_micro':0,'credits_debited_micro':0,'cost_pending':True}
+                start['gpu_statistics']={'seconds':0.0,'estimated':True,'source':'not-started','billable':False}
                 _queue_event(con,key+':started',owner,start)
             if value['status'] in ('completed','done','failed','cancelled','interrupted'):
                 _queue_event(con,key+':terminal:'+value['status'],owner,{**value,'event':'terminal'})
@@ -197,6 +201,12 @@ def render(payload,language):
     fields=[]
     def metric(label,values):
         return ', '.join(f'{key}: {value:.3f}' for key,value in values.items()) or tr('Unavailable / not yet measured','Non disponibile / non ancora misurato')
+    def gpu_statistic(value):
+        if not isinstance(value,dict):return tr('Unavailable','Non disponibile')
+        text=('~' if value.get('estimated') else '')+f"{value['seconds']:.3f} s"
+        if value.get('source')=='job-duration' or value.get('duration_estimated_jobs',0):
+            text+=' · '+tr('Job duration estimate; GPU use unconfirmed','Stima durata job; uso GPU non confermato')
+        return text
     def table(rows):return '<table role="presentation" width="100%" style="border-collapse:collapse">'+''.join('<tr><td style="padding:10px;border-bottom:1px solid #dce5ef;color:#54667e">'+esc(k)+'</td><td style="padding:10px;border-bottom:1px solid #dce5ef">'+esc(v)+'</td></tr>' for k,v in rows)+'</table>'
     if payload['event']=='summary':
         report=payload['report'];title=tr('Your AI resource summary','Riepilogo delle tue risorse AI')
@@ -204,6 +214,7 @@ def render(payload,language):
         fields=[(tr('Period','Periodo'),utc(report['start_ts'])+' → '+utc(report['end_ts'])),('Job',report['jobs']),
           (tr('Accounted resources','Risorse contabilizzate'),metric('',report['usage'])),
           (tr('Unsettled counters','Contatori non contabilizzati'),metric('',report['diagnostic'])),
+          (tr('GPU statistical time (not charged)','Tempo GPU statistico (non addebitato)'),gpu_statistic(report.get('gpu_statistics'))),
           (tr('Estimated amount (not an invoice)','Importo stimato (non è una fattura)'),f"€ {report['amount_micro']/1e6:.6f}")]
         extra='<h3>'+tr('By application token','Dettaglio per token applicazione')+'</h3>'+table([(str(row['token_id'])+' · '+row['label'],f"{row['jobs']} job · € {row['amount_micro']/1e6:.6f} · "+metric('',row['usage'])) for row in report['by_token']])
     else:
@@ -213,6 +224,7 @@ def render(payload,language):
           (tr('Status','Stato'),status.get(payload['status'],payload['status'])),('Token',payload.get('token_id') or tr('Web / no token','Web / senza token')),
           (tr('Accounted resources','Risorse contabilizzate'),metric('',payload['usage'])),
           (tr('Unsettled counters','Contatori non contabilizzati'),metric('',payload['diagnostic'])),
+          (tr('GPU statistical time (not charged)','Tempo GPU statistico (non addebitato)'),gpu_statistic(payload.get('gpu_statistics'))),
           (tr('Estimated amount (not an invoice)','Importo stimato (non è una fattura)'),f"€ {payload['amount_micro']/1e6:.6f}"+(' · '+tr('pending','provvisorio') if payload.get('cost_pending') else ''))]
         extra=''
     credits=payload['report'].get('credits_debited_micro',0) if payload['event']=='summary' else payload.get('credits_debited_micro',0)

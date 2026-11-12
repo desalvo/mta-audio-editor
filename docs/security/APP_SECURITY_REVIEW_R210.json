@@ -1,7 +1,7 @@
 {
   "schema": "mta-security-review-1",
   "bandit_version": "1.9.4",
-  "scope": "329 current app Python sources;191 unsuppressed findings reviewed,0 HIGH/21 MEDIUM/170 LOW. Source-bound review only;no release or external runtime attestation.",
+  "scope": "330 current app Python sources;191 unsuppressed findings reviewed,0 HIGH/21 MEDIUM/170 LOW. Statistical reporting is not billing or hardware attestation.",
   "source_sha256": {
     "app/__init__.py": "sha256:eb3205cb75b2a7474361060d9b8d89329c29272cd8978ba62b6290b9a29b7550",
     "app/account_erasure.py": "sha256:eb074aec67b28079948aa846fe7aa1d034af2a1636e09b37ae6e31a0283ae6c8",
@@ -28,7 +28,7 @@
     "app/ai_adapter_identity.py": "sha256:44102cff9b57d788e23f84f3e1b8e6656cb6ef3254c0bcb71bca2aeb405b1cbc",
     "app/ai_amd_smi_collector.py": "sha256:1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b",
     "app/ai_arranger.py": "sha256:4542cfa2668487c1ab309a5758aa593d37a8c18e60ee91b8a73e681047cabbc3",
-    "app/ai_arranger_runtime.py": "sha256:c9da0bbbf3a8f795275646a5c599d9752a56b546e2ce5bbc89d37bc3019c64e6",
+    "app/ai_arranger_runtime.py": "sha256:cf428500ba85f05a84f6e15ac810c8372995815b42df7a62c3c211fe49493ef4",
     "app/ai_async_track_transaction.py": "sha256:cc197d7afb09c65394019db140ad05a6e75009fe9572b4b5634bb173fa5b8a16",
     "app/ai_backend_models.py": "sha256:4dc7ae6d47016cf686df0b70333cbf2d835703461ae3f2e3c570c201dd8d3f6e",
     "app/ai_billing.py": "sha256:ebafc6b42e800b9ed186089f98bcff5b0508047a5c50cad056bed22593929946",
@@ -39,7 +39,7 @@
     "app/ai_billing_scheduler.py": "sha256:1bd09b22d784b0b0aa8af7a610a8aace76bed9d698b82e8f81d7f00f72e3db57",
     "app/ai_cgroup_launcher.py": "sha256:982d32ea4611bedd701bb7ea401cae3e318fae81d6afb6122d18f15a74fd814e",
     "app/ai_cgroup_metering.py": "sha256:14883a66becb8c082158e82e3727745908e7c03f2189bc5102d5c9b57cca26b6",
-    "app/ai_compute_diagnostics.py": "sha256:4f4132e323990949ff82a989db5b6fb2105e9e41eae770caa6aad84c9e254a2d",
+    "app/ai_compute_diagnostics.py": "sha256:b359823b6ccc0d16424cac04494f065b9f5cd05bc2e5e13a7cbed166cb79cb25",
     "app/ai_device_auth.py": "sha256:5af5b48cef66c34b18f1bed6ae738553c452131da86bc603a4fa263f68451e5a",
     "app/ai_durable_remote_executor.py": "sha256:d31426b85058d2442328a6532e2910135f5c1a853fab2f24a3fe30766ac3a287",
     "app/ai_execution_limits.py": "sha256:6110c24edd1311d570d0bcd6cab62422bae840425d6b3d9c23334d46494121b1",
@@ -58,9 +58,10 @@
     "app/ai_install_catalog.py": "sha256:5a405e5391b9031ea3aa1d17449a5f19a99b9bdce36904a22577222929e2776d",
     "app/ai_job_context.py": "sha256:be385d81da8ab7ce6d3c5ba18982c5a23c19a3305d37ff6b3356d07f43b25f35",
     "app/ai_job_queue.py": "sha256:1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
-    "app/ai_job_views.py": "sha256:d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
+    "app/ai_job_statistics.py": "sha256:4e527aba2341ff2d74c9661bddbf2c3a3069ee41d9375c2397f4c56f78a76968",
+    "app/ai_job_views.py": "sha256:1a3dabc70e04bfb7daf1997bb8bff084a03c86abef2e4863d08c213ca2fa9c68",
     "app/ai_media_identity.py": "sha256:c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "sha256:57e237a513fb27f41da0bd7bc003d120116931d68d6823e9a30b348375e1d8a4",
+    "app/ai_metering_agent.py": "sha256:777e6025a44c3f0f3efef467ea86485e9545785683d849b6af8cb730a13c1b18",
     "app/ai_metering_bridge.py": "sha256:792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
     "app/ai_model_attestation.py": "sha256:640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "sha256:fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
@@ -68,7 +69,7 @@
     "app/ai_models.py": "sha256:e9eec5bdda4a9c42e39da7e805d83ae8412fad4ad45f3999e60dee9855bbf199",
     "app/ai_native_remote_journal.py": "sha256:ff398ac148d5cc3b1a361ef46fad151b389b32fe8f92079693f3b9419828c588",
     "app/ai_notification_routes.py": "sha256:c9572bd27f8dcf3210d0617853780fccd7b158d89123946e890625e854df7c66",
-    "app/ai_notifications.py": "sha256:c2645a42a7aa798d733a31927e01d13d52b13bec156fa4b6de6889ae725afa63",
+    "app/ai_notifications.py": "sha256:18a1e81217e438eadc2de2514636ae473ef954c8d0a5d95396238fe836c54dcf",
     "app/ai_payload_limits.py": "sha256:4ed1c2ab2567005161245df0c55f411e8a36f02697fc5264dc8cc84ad857bc33",
     "app/ai_planning_sqlite.py": "sha256:8ffc8a2083b6f1c1d463ad1d881aed0ed1f24cc7aefd70b7e67971d0afaf8722",
     "app/ai_process_guard.py": "sha256:089ef2765d15be1cdf64b8f23150f27b3aca3ccfe3a51626f340ef925b38d49a",
@@ -80,7 +81,7 @@
     "app/ai_pull_routes.py": "sha256:f9bf4e9e1f0e3e92097399b4239a0f70ddfb14a4e17423a09e8d9c9965ca8452",
     "app/ai_pull_worker.py": "sha256:77d125bc2fb83fb636050a011baf2e1815c710d58da799be1ee24808d59e5305",
     "app/ai_queue_admin.py": "sha256:19a02a2451a931722e4d28fbac21fb83f4f0483842b645e59bf46fe82250976d",
-    "app/ai_queue_usage.py": "sha256:e03c04980049f3582055123e0236dc3679265acf13ab0db00af5b40302fd222b",
+    "app/ai_queue_usage.py": "sha256:c30a336857d4cf915bcafbedf3d8469ca198430e3e113a51fd45a42e9a132e7b",
     "app/ai_recovered_stem_transaction.py": "sha256:5799a9f78b9ec07cedb9be2109d8b5d0fa02b996a6355623267a5c52c63b9be2",
     "app/ai_remote_client.py": "sha256:c9a1e7ac7a6fc01af77194bef70c18a3d463ba31ca4dc17d247d02234f8a0acd",
     "app/ai_remote_keyring.py": "sha256:c0d64b458876c97b0b305ac49417c6dc319f82831230dd843f43f5f1ba5115c5",
@@ -98,7 +99,7 @@
     "app/ai_trusted_estimates.py": "sha256:1103bf458c9f8912b04fd0f676d2699f67ddcbbbb743c6f156f0b790b0c5a552",
     "app/ai_unified_adapter.py": "sha256:ce605e78cf271b2b00e37f54bfb6cb787156a92c89f7019e750351cf1b51cdec",
     "app/ai_upload_transaction.py": "sha256:2fbaf2ad0b181a20827f681c8fbe2f40bc076e3eef9e92cf1a3d748b13580ed5",
-    "app/ai_usage_reporting.py": "sha256:6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
+    "app/ai_usage_reporting.py": "sha256:78e5d35956563c2528c85267c69fa20b0cf781f778dfb869403bb9a139cd9b05",
     "app/ai_worker_artifacts.py": "sha256:9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28",
     "app/ai_worker_protocol.py": "sha256:70255f784389b81e80edeaca1fb8d6698375284b962c11dec0cbaecac40c26fb",
     "app/ai_worker_registry.py": "sha256:90df1cbdadcb50574debe2489e074cb47fd9fc5c6178bde0dc1e44e0eb14115a",
@@ -664,11 +665,11 @@
       "verification": "Explicit caller/source review plus tests/test_timeline_cross_track.py, tests/test_timeline_cross_track_ui.py and tests/test_r210_project_file_conversion.py: authorization, bounded PCM, overlap denial, rollback, original preservation, archive/export and undo/redo. No external hardware attestation."
     },
     {
-      "id": "eb976b5cd46675e3335e73818115b1220b32b40e7dfbb94632f97045bf60e217",
+      "id": "de99aceda1fc7c164e6110091e77dd5b4b2f2f9af9aae5ce1f127d4bee76a330",
       "disposition": "false_positive",
-      "rationale": "The flagged literal/default in collect is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
+      "rationale": "The token_id=None field identifies a web job without an application token. It contains no credential. The surrounding new gpu_statistics object is numeric read-only reporting metadata,not authentication material.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
-      "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
+      "verification": "tests/test_r210_native_account_mail.py and tests/test_r210_gpu_job_statistics.py cover owner isolation,zero unchanged charges,and labeled diagnostic/statistical reporting."
     },
     {
       "id": "e306e7b7f07e8db94dc316a221a8b9652e4a119833ca99bc80e791cd904c088c",
@@ -748,11 +749,11 @@
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified. Current model selector validated against the declared engine registry before fixed argv;tests/test_r210_model_selector_boundaries.py covers direct,parent/API and profile child refusals."
     },
     {
-      "id": "56de265cff6ea00cf6b3861a25c2b87603a6854905947b87f8af476aa1ae5428",
+      "id": "c3bce84dfc17dfaa11b0b4e1d9f6e07e8f1dc8af2ef93f6eb70e0e5c8b44740b",
       "disposition": "false_positive",
-      "rationale": "The flagged literal/default in records is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
+      "rationale": "The token_id=None field identifies a web job without an application token. It contains no credential. The surrounding new gpu_statistics object is numeric read-only reporting metadata,not authentication material.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
-      "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
+      "verification": "tests/test_r210_native_account_mail.py and tests/test_r210_gpu_job_statistics.py cover owner isolation,zero unchanged charges,and labeled diagnostic/statistical reporting."
     },
     {
       "id": "d9c982e2441eeeee33b2feba98aa1595f1b40da8497c79d7bca44f95ee95479e",
@@ -1736,7 +1737,7 @@
     "review": "New owner-derived account financial context validates UID through parameterized SQL, verifies private NC/loss histories, exposes only aggregate own totals and no combined debt. Account limits begins a read snapshot after schema setup and includes verified NC closed period ranges. The authenticated limits route returns a generic 409 for unverifiable context without leaking journal identities. No new subprocess, dynamic SQL or suppression. All existing findings matched unchanged code after line-number shifts.",
     "evidence": "tests/test_r210_account_financial_context.py; tests/test_r210_account_financial_browser.py; account-financial-final.xml"
   },
-  "current_scan": "docs/validation/r210/rc-runtime-closeout/bandit.json",
+  "current_scan": "docs/validation/r210/gpu-job-statistics/bandit.json",
   "owner_payment_continuation": {
     "date": "2026-10-23",
     "reviewed_sources": [
@@ -3006,5 +3007,28 @@
       "tests/test_r210_ai_install_lifecycle.py"
     ],
     "boundary": "Review of the published-wheel selection, fixed device probe and complete-group filesystem publication. No new process/transport/admission site; administrator-only fixed installation argv and independent worker admission remain unchanged. Local policy is checked through final publication, remote policy remains on the original executing worker. Rollback only unlinks device/inode-owned outputs. CPU installation and codec/operator execution were tested; synthetic model/device fixtures are not neural/GPU or checkpoint rights acceptance. Interpreter/dependency, remote ACE and F4/F6 target contracts remain open. Mega53 child startup now uses -I with an explicit upstream import root and the existing filtered environment. The actual synthetic child rejects PYTHONPATH sitecustomize injection. This is startup isolation, not independent interpreter/dependency or upstream-checkout authentication."
+  },
+  "gpu_statistics_review_20261112": {
+    "date": "2026-11-12",
+    "sources": [
+      "app/ai_arranger_runtime.py",
+      "app/ai_compute_diagnostics.py",
+      "app/ai_job_statistics.py",
+      "app/ai_job_views.py",
+      "app/ai_metering_agent.py",
+      "app/ai_notifications.py",
+      "app/ai_queue_usage.py",
+      "app/ai_usage_reporting.py",
+      "app/static/ai_jobs.js",
+      "app/static/ai_usage_panel.js",
+      "app/static/app.js"
+    ],
+    "boundary": "Reviewed read-only per-job statistical GPU projection and original-stage live counter replacement. Duration estimates exist only in gpu_statistics,never usage or quota/settlement inputs. Partial diagnostic writes merge numeric CPU/GPU fields transactionally; present samples may refine earlier estimates. Agent sidecars bind original ledger IDs; foreign/ambiguous stages cannot replace an aggregate. API owner/project access remains unchanged; private aggregation context is stripped. HTML/Node renderers and email escape data. No new subprocess,network or admission entry is added. Physical GPU/namespace target acceptance remains independent.",
+    "verification": [
+      "tests/test_r210_gpu_job_statistics.py",
+      "tests/test_r210_universal_queue_usage.py",
+      "tests/test_r210_ai_job_center.py",
+      "tests/test_r210_native_account_mail.py"
+    ]
   }
 }

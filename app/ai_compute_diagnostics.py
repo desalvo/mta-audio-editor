@@ -11,6 +11,15 @@ def store(job_id,payload):
     with db() as con:
         con.execute('''CREATE TABLE IF NOT EXISTS ai_compute_job_diagnostics
           (job_id TEXT PRIMARY KEY, payload TEXT NOT NULL)''')
+        con.execute('BEGIN IMMEDIATE')
+        row=con.execute('SELECT payload FROM ai_compute_job_diagnostics WHERE job_id=?',(job_id,)).fetchone()
+        try:previous=json.loads(row[0]) if row else {}
+        except (ValueError,TypeError):previous={}
+        if not isinstance(previous,dict):previous={}
+        for key,value in previous.items():
+            if (key in ('cpu_seconds_estimated','gpu_seconds_estimated') and type(value) in (int,float)
+                    and math.isfinite(value) and 0<=value<1e18):
+                clean.setdefault(key,value)
         con.execute('INSERT INTO ai_compute_job_diagnostics VALUES(?,?) ON CONFLICT(job_id) DO UPDATE SET payload=excluded.payload',
           (job_id,json.dumps(clean,allow_nan=False)))
 

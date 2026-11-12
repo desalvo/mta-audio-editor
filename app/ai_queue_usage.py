@@ -53,6 +53,7 @@ def enrich(value):
             cpu = gpu = cpu_partial = gpu_partial = 0.0
             all_cpu = all_gpu = True
             have_cpu = have_gpu = False
+            active_stages = {}
             for row in rows:
                 try:
                     usage = json.loads(row['usage_json'] or '{}')
@@ -84,12 +85,17 @@ def enrich(value):
                 all_cpu &= c is not None
                 all_gpu &= g is not None
                 ce, ge = number(diag.get('cpu_seconds_estimated')), number(diag.get('gpu_seconds_estimated'))
+                if row['status'] == 'running':
+                    active_stages[row['id']] = {'cpu_seconds_estimated':ce or 0, 'gpu_seconds_estimated':ge or 0}
                 have_cpu |= c is not None or ce is not None
                 have_gpu |= g is not None or ge is not None
                 cpu += c or 0
                 gpu += g or 0
                 cpu_partial += c if c is not None else ce or 0
                 gpu_partial += g if g is not None else ge or 0
+            if active_stages:
+                result['_resource_live_context'] = {'stages':active_stages,
+                    'totals':{'cpu_seconds_estimated':cpu_partial, 'gpu_seconds_estimated':gpu_partial}}
             if result.get('cpu_seconds') is None:
                 if all_cpu:
                     result['cpu_seconds'] = cpu

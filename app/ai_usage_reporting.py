@@ -5,6 +5,7 @@ import math
 import time
 import uuid
 from . import auth, ai_billing
+from .ai_job_statistics import project as statistical_view, aggregate as statistical_totals
 
 
 def records(user_id, start, end, *, completed_window=False):
@@ -37,6 +38,13 @@ def records(user_id, start, end, *, completed_window=False):
               and key not in ai_billing.NON_BILLABLE_IO and key!='disk_gb_hours')
             row['amount_micro']=row['cost_micro'] if enabled else 0
             row['origin']='ledger'
+            accepted_gpu = (row['usage'].get('gpu_seconds')
+                if row['status'] in ('done','failed','cancelled') and row['resource_source'] in
+                ('gpu-agent','gpu-kernel-verified','diagnostic-estimate') else None)
+            row['gpu_statistics']=statistical_view({**row,'gpu_seconds':accepted_gpu,
+                'gpu_seconds_estimated':row['estimated'].get('gpu_seconds_estimated'),
+                'gpu_metrics_source':row['resource_source']},
+                live_gpu=row['estimated'].get('gpu_seconds_estimated') is not None)['gpu_statistics']
         # Do not count a queue Arranger and its ledger settlement twice.
         queue_links={r[0] for r in con.execute('SELECT queue_job_id FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND queue_job_id IS NOT NULL',(user_id,))}
         all_ledger={r[0] for r in con.execute('SELECT id FROM ai_compute_jobs WHERE user_id=?',(user_id,))}
@@ -55,22 +63,28 @@ def records(user_id, start, end, *, completed_window=False):
         if actor_id!=user_id:continue
         linked=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+row['job_id']).hex
         if linked in all_ledger or row['job_id'] in queue_links:
-            target=next((r for r in ledger if r['id']==linked),None)
+            targets=[r for r in ledger if r['id']==linked or r.get('queue_job_id')==row['job_id']]
+            target=targets[0] if len(targets)==1 else None
             if target is not None and target.get('resource_source')!='diagnostic-estimate':
-                value=queue._with_live_progress(row)
+                from .ai_queue_usage import enrich
+                value=queue._with_live_progress(enrich(row))
                 target['estimated'].update({key:value[key] for key in ('cpu_seconds_estimated','gpu_seconds_estimated') if value.get(key) is not None})
+                target['gpu_statistics']=value['gpu_statistics']
             continue
-        value=queue._with_live_progress(row)
+        from .ai_queue_usage import enrich
+        value=queue._with_live_progress(enrich(row))
         verified={key:value[key] for key in ('cpu_seconds','gpu_seconds') if value.get(key) is not None}
         estimated={key:value[key] for key in ('cpu_seconds_estimated','gpu_seconds_estimated') if value.get(key) is not None}
         ledger.append({'id':row['job_id'],'user_id':user_id,'token_id':None,'kind':row['operation'],
           'status':row['state'],'started_at':row['started_at'] or row['created_at'],'finished_at':row['completed_at'],
           'wall_ms':max(0,int(((row['completed_at'] or time.time())-(row['started_at'] or time.time()))*1000)),
-          'usage':verified,'estimated':estimated,'resource_source':'queue-diagnostic','cost_micro':0,'amount_micro':0,'origin':'queue'})
+          'usage':verified,'estimated':estimated,'resource_source':'queue-diagnostic','cost_micro':0,'amount_micro':0,'origin':'queue',
+          'gpu_statistics':value['gpu_statistics']})
     return ledger
 
 
 def aggregate(items):
+    items=list(items)
     total={'jobs':0,'credits_waived_micro':0,'credits_debited_micro':0,'trusted_estimated_usage':{},'usage':{},'diagnostic':{},'cost_micro':0,'amount_micro':0,'unmetered_jobs':0}
     for row in items:
         total['jobs']+=1
@@ -83,6 +97,7 @@ def aggregate(items):
         if not row['usage']:total['unmetered_jobs']+=1
         for source,target in [('usage','usage'),('estimated','diagnostic')]:
             for key,value in row[source].items():total[target][key]=total[target].get(key,0)+value
+    total['gpu_statistics']=statistical_totals(items)
     return total
 
 

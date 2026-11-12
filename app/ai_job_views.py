@@ -10,7 +10,8 @@ FIELDS = ('job_id', 'project_id', 'operation', 'state', 'phase', 'message', 'cre
           'started_at', 'completed_at', 'elapsed_seconds', 'queue_position', 'jobs_ahead',
           'cancel_requested', 'progress_percent', 'progress_source', 'progress_estimated',
           'steps_completed', 'steps_total', 'cpu_seconds', 'gpu_seconds',
-          'cpu_seconds_estimated', 'gpu_seconds_estimated', 'gpu_metrics_status', 'gpu_metrics_source')
+          'cpu_seconds_estimated', 'gpu_seconds_estimated', 'gpu_metrics_status', 'gpu_metrics_source',
+          'gpu_statistics', 'resource_metrics_partial', 'resources_accounted')
 
 
 def _tables(con):
@@ -165,7 +166,8 @@ def feed(actor_id, can_access, body=None, *, limit=100, offset=0):
                 break
     def public(row):
         # Live sidecars are read only for displayed active jobs.
-        value = runtime._with_live_progress(row)
+        from .ai_queue_usage import enrich
+        value = runtime._with_live_progress(enrich(row))
         value['elapsed_seconds'] = max(0, (row['completed_at'] or time.time())-(row['started_at'] or time.time()))
         return {key: value[key] for key in FIELDS if key in value}
     return {'actor_id': actor_id, 'jobs': [public(row) for row in (active+terminal)[offset:offset+limit]],

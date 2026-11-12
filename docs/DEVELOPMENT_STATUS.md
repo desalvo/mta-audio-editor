@@ -1,3 +1,22 @@
+# Stato corrente — tempo GPU per job, 12 novembre 2026
+
+Corretti campioni GPU persi dopo aggiornamenti CPU e totali multi-fase fermi
+al checkpoint precedente. Job AI, finestra di elaborazione, report ed email
+espongono una statistica GPU per job: misurata/osservata quando disponibile,
+altrimenti stimata dalla durata di esecuzione con uso GPU non confermato.
+Nessuna stima di durata entra in quote o addebiti. Zero misurato e tempi
+terminali sono conservati.
+
+244 test distinti passati: 89 mirati, 97 di contabilità/metering e 58 gate.
+Quattro prove di processo falliscono
+anche sulla base immutata per assenza della prova albero in questo runner e
+restano abilitate in full CI. Ruff/JS/compilazione e review sicurezza passano.
+Base a77f98b / CI 43300697757 verde; nuova full CI sul commit finale da verificare.
+Dettagli IT/EN: GPU_JOB_STATISTICS_R210_IT_EN.md;
+validation/r210/gpu-job-statistics/result.json. 0.3.0-r210 / PRE-RC invariati.
+
+## Cronologia precedente
+
 # Stato corrente — 12 novembre 2026, runtime AI e pubblicazione Mega53
 
 Completate correzioni dell’installer AI server (TorchAudio pubblicato, include

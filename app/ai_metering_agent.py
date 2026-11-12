@@ -434,6 +434,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                         from .storage import _atomic_json_write
                         allowed={'phase','message','progress_percent','progress_source','progress_estimated','steps_completed','steps_total','cpu_seconds_estimated','gpu_seconds_estimated','gpu_metrics_status','gpu_metrics_source'}
                         published={k:v for k,v in counters.items() if k in allowed}
+                        published['_ledger_job_id']=job_id
                         _atomic_json_write(queue._ROOT/(queue_id+'.progress.json'),published)
                 except Exception as exc:
                     import logging
