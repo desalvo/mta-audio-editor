@@ -1,3 +1,25 @@
+# Stato corrente — 12 novembre 2026, revisione nuove major
+
+La full CI43137364247 su main858dea2 è verde:9076 test passati,126skip,
+copertura78,31%, tutti gli installer, Docker Hub e pacchetti early-main riusciti.
+
+Riesaminate le nuove PR#41–#45. Integrare PyAV19.0.2,websockets17.4,
+smart-open9.0.2 e ReportLab5.1.0. La proposta NumPy#42 è stata chiusa perché
+cambiava anche i runtime che richiedono1.26.4: viene estratta soltanto la patch
+server2.5.4. Le major NumPy sono soggette a revisione manuale.
+Corretta la fixture ACE-Step che poteva annullare prima della pubblicazione
+completa del task ID, usando il medesimo os.replace dell'adapter reale.
+
+Passano52 test locali distinti con le nuove librerie, incluse connessioni
+WebSocket reali sui due backend Uvicorn, filtri PyAV reali mono/stereo,
+metadata gzip e HTTP Range/ETag, PDF reali e cancellazione subprocess/HTTP.
+I due casi PyAV passano anche con NumPy1.26.4. Ruff completo passa.
+Nuova full CI e installer da verificare sullo SHA finale integrato.
+Dettagli/fonti IT/EN: DEPENDABOT_MAJOR_REVIEW_20261112_IT_EN.md.
+Versione0.3.0-r210 e PRE-RC73% invariati; prove reali modelli/ascolto aperte.
+
+## Cronologia precedente
+
 # Stato corrente — 12 novembre 2026
 
 ## PR Dependabot residue: compatibilità e regressioni

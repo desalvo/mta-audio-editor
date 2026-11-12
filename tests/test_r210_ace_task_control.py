@@ -332,8 +332,13 @@ def test_real_adapter_termination_delivers_http_cancel(monkeypatch, tmp_path):
     server = ThreadingHTTPServer(('127.0.0.1', 0), API)
     server_thread = threading.Thread(target=server.serve_forever, daemon=True); server_thread.start()
     worker = tmp_path / 'adapter.py'
+    # Match the production adapter's atomic progress publication: mere file
+    # existence must not trigger cancellation while its task ID is half-written.
     worker.write_text('''import json,os,pathlib,time
-pathlib.Path(os.environ['MTA_AI_PROGRESS_FILE']).write_text(json.dumps({'_ace_task_id':'remote-task'}))
+target=pathlib.Path(os.environ['MTA_AI_PROGRESS_FILE'])
+temporary=target.with_suffix('.tmp')
+temporary.write_text(json.dumps({'_ace_task_id':'remote-task'}))
+os.replace(temporary,target)
 while True: time.sleep(.05)
 ''')
     progress = tmp_path / 'progress.json'

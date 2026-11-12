@@ -21,6 +21,10 @@ updates:
       - dependency-name: torch
       - dependency-name: torchaudio
       - dependency-name: torchvision
+      # NumPy 1.26 is intentional in the Intel and isolated model recipes.
+      # Keep server patch updates, but review ABI-breaking majors manually.
+      - dependency-name: numpy
+        update-types: ["version-update:semver-major"]
       # The isolated conversion runtime pins transformers 4.46.3, whose
       # published metadata requires huggingface-hub<1. Review hub major
       # upgrades together with that runtime instead of proposing a broken pin.
