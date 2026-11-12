@@ -1,3 +1,21 @@
+# Stato corrente — 12 novembre 2026, CI account e revoca permessi
+
+La fullCI43211317319 su55b98f8 fallisce un solo test browser account
+(390px/inglese/permission_disabled):9083 test passati,126skip,copertura78,31%.
+Il test richiedeva un controllo di annullamento dopo la revoca dei permessi
+che chiude l'abbonamento. Ora verifica il blocco di nuove attivazioni,
+rinnovi e acquisto crediti; i controlli di annullamento restano per gli stati
+attivi e tutte le32 combinazioni browser sono conservate.
+
+Passano67 regressioni API e5 casi API→DOM con subscriptions.js reale;
+Ruff completo e sintassi JS passano. Chromium locale è bloccato dalle
+restrizioni sui socket: la verifica browser resta alla nuova fullCI.
+Nessun codice applicativo/contabile/permesso del prodotto modificato.
+Dettagli IT/EN: CI_43211317319_ACCOUNT_POLICY_R210_IT_EN.md.
+Versione0.3.0-r210 e PRE-RC73% invariati.
+
+## Cronologia precedente
+
 # Stato corrente — 12 novembre 2026, revisione nuove major
 
 La full CI43137364247 su main858dea2 è verde:9076 test passati,126skip,

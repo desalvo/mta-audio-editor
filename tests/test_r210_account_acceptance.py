@@ -76,8 +76,13 @@ def test_full_account_and_credit_pages_regime_policy_language_and_keyboard(accou
             assert page.locator('[data-resource-account]').is_visible()
             if scenario=='no_plan':assert page.locator('[data-activate=trial]').count()==1
             if scenario=='paid':assert page.get_by_role('button',name='Paga abbonamento con PayPal' if language=='it' else 'Pay subscription with PayPal',exact=False).count()==0
-            if scenario in ('active','trial','paid','credits_disabled','permission_disabled'):
+            if scenario in ('active','trial','paid','credits_disabled'):
                 expect(page.locator('[data-cancel]')).to_have_count(1)
+            if scenario=='permission_disabled':
+                # Revoking subscription permission closes the contract. Check
+                # denied actions rather than requiring an active-plan control.
+                expect(page.locator('[data-activate],[data-renew-plan-save]')).to_have_count(0)
+                expect(page.locator('[data-resource-account] a[href="/account/credits"]')).to_have_count(0)
         # Keyboard reaches the named refresh control, without an artificial click.
         page.locator('#accountLimitsRefresh').focus();assert page.locator('#accountLimitsRefresh').evaluate('e=>document.activeElement===e')
         page.keyboard.press('Enter');page.locator('[data-account-financial]').wait_for()
