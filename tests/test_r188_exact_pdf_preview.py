@@ -19,7 +19,7 @@ def test_pdf_download_and_preview_share_same_builder():
 
 
 def test_native_safe_renderer_dependency_is_pinned():
-    assert 'PyMuPDF==' in REQ
+    assert 'PyMuPDF-lite==2.1' in REQ
 
 
 def test_revision_metadata_consistency():

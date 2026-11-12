@@ -1,7 +1,7 @@
-fastapi==0.142.2
+fastapi==0.162.2
 uvicorn==0.54.0
 websockets==16.0
-python-multipart==0.0.32
+python-multipart==0.0.33
 pydantic==2.12.5
 numpy==2.5.3
 defusedxml==0.7.1
@@ -9,10 +9,11 @@ qrcode==8.2
 
 # Runtime PDF export for synchronized lyrics/chords.
 reportlab==4.4.9
-PyMuPDF==1.28.2
+# Core renderer: 2.x full wheels omit macOS Intel; lite retains supported arches.
+PyMuPDF-lite==2.1
 
 # YouTube audio import.
-yt-dlp==2026.8.19
+yt-dlp==2026.10.26
 
 # Waveform DSP, DrumSep STFT/ISTFT and source-separation postprocessing.
 scipy>=1.16.0,<1.18.0

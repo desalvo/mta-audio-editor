@@ -40,7 +40,13 @@ def test_barrier_reuses_original_connection_without_committing_its_transaction(i
     assert lease.fence_held() is False
 
 
-def test_barrier_timeout_is_bounded_restored_and_its_reader_is_released(installed):
+def test_barrier_timeout_is_bounded_restored_and_its_reader_is_released(installed,monkeypatch,tmp_path):
+    # Probe this thread's failed connection, independently of service workers
+    # from other integration tests. Both paths still use real POSIX flock.
+    original_path=lease._path
+    owner=threading.get_ident()
+    monkeypatch.setattr(lease,'_path',lambda: tmp_path/'failed-connection.lock'
+                        if threading.get_ident()==owner else original_path())
     with closing(sqlite3.connect(auth.db_path())) as reader,sqlite3.connect(auth.db_path()) as writer:
         reader.execute('PRAGMA busy_timeout=1739')
         writer.execute('BEGIN EXCLUSIVE')

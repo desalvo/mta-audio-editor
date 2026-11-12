@@ -6,11 +6,11 @@ torchaudio==2.2.2
 # torchvision 0.17.2 is ABI-matched to the last macOS Intel torch wheels.
 torchvision==0.17.2
 demucs==4.1.0
-msgpack==1.2.3
+msgpack==1.2.4
 urllib3==2.8.0
 
 # Lead/backing vocal AI model download and inference (on-demand).
-# The legacy Intel torch/numpy stack cannot resolve audio-separator 0.47 dependencies.
+# The legacy Intel torch/numpy stack cannot resolve audio-separator 0.48 dependencies.
 # Install its model runtime separately without replacing NumPy 1.26 / Demucs.
 
 # Keep the Intel binary-only stack stable across legacy resampy imports.
