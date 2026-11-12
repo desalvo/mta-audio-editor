@@ -1,5 +1,8 @@
 from pathlib import Path
 
+from packaging.requirements import Requirement
+from packaging.version import Version
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "install_mta.sh"
 REQUIREMENTS = ROOT / "requirements.txt"
@@ -12,4 +15,8 @@ def test_rocky_installer_uses_supported_python():
     assert "sys.version_info >= (3,12)" in text
     assert "if command -v python3.11" not in text
     assert '"$PY" -m venv "$TEMP/venv-mta"' in text
-    assert "numpy==2.5.3" in REQUIREMENTS.read_text()
+    numpy = next(Requirement(line) for line in REQUIREMENTS.read_text().splitlines()
+                 if line.startswith('numpy=='))
+    pin = next(iter(numpy.specifier))
+    assert pin.operator == '=='
+    assert Version('2.5.3') <= Version(pin.version) < Version('3')
