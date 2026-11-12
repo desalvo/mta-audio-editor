@@ -30,9 +30,14 @@ def test_adapter_with_synthetic_stub(tmp_path, monkeypatch):
     source=tmp_path/'song.wav';source.write_bytes(b'RIFFsong')
     for key,value in [('MTA_MEGA53_ROOT',root),('MTA_MEGA53_CONFIG',config),('MTA_MEGA53_CHECKPOINT',ckpt),('MTA_MEGA53_PYTHON',Path(sys.executable).resolve())]:monkeypatch.setenv(key,str(value))
     monkeypatch.setattr(mega53_runtime, 'verify_mega53_checkpoint', lambda value: Path(value))
+    startup = tmp_path / 'injected-startup'; startup.mkdir()
+    marker = tmp_path / 'startup-ran'
+    (startup / 'sitecustomize.py').write_text('from pathlib import Path\nPath('+repr(str(marker))+').write_text("injected")\n')
+    monkeypatch.setenv('PYTHONPATH', str(startup))
     lead,backing,engine=mega53_runtime.infer(source,tmp_path/'output')
     assert lead.read_bytes()==b'RIFFlead' and backing.read_bytes()==b'RIFFback'
     assert engine=='mvsep-mega53'
+    assert not marker.exists()
 
 
 def test_invalid_model_files_are_rejected(tmp_path,monkeypatch):

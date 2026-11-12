@@ -237,10 +237,10 @@
     {
       "path": "app/mega53_install.py",
       "function": "_download",
-      "line": 92,
+      "line": 111,
       "call": "secure_https.https_urlopen",
       "call_sha256": "63fe1b63bcfd96fb8935724d8e65fdc889d0ba359e1031a16f4e557334b02075",
-      "source_sha256": "bf5ca2996bc2b8fdd90d3cf8a40e2c35ab546986ebe7251a82b48e91bda0f6ee",
+      "source_sha256": "12bd2e0ee889a7ed6b982d42b060c454f3d978d0e465b42baf7c40c86b76ed08",
       "category": "asset_download",
       "boundary": "Administrator-triggered HTTPS downloads use constant original release URLs, exact expected length and SHA-256, bounded streaming and private staging; no request-supplied network destination or inference payload.",
       "verification": "tests/test_r210_mega53_web_install.py rejects incorrect bytes and exercises explicit consent and rollback; source commit independently pinned to the upstream release."
@@ -552,5 +552,20 @@
       "tests/test_bass_roformer_device_probe.py",
       "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
     ]
+  },
+  "ai_runtime_closeout_20261112": {
+    "date": "2026-11-12",
+    "sources": [
+      "app/mega53_install.py",
+      "app/mega53_runtime.py",
+      "scripts/install_ai_engines.py"
+    ],
+    "verification": [
+      "tests/test_r210_mega53_publication.py",
+      "tests/test_r210_mega53_web_install.py",
+      "tests/test_bass_roformer_device_probe.py",
+      "tests/test_r210_ai_install_lifecycle.py"
+    ],
+    "boundary": "Review of the published-wheel selection, fixed device probe and complete-group filesystem publication. No new process/transport/admission site; administrator-only fixed installation argv and independent worker admission remain unchanged. Local policy is checked through final publication, remote policy remains on the original executing worker. Rollback only unlinks device/inode-owned outputs. CPU installation and codec/operator execution were tested; synthetic model/device fixtures are not neural/GPU or checkpoint rights acceptance. Interpreter/dependency, remote ACE and F4/F6 target contracts remain open. Mega53 child startup now uses -I with an explicit upstream import root and the existing filtered environment. The actual synthetic child rejects PYTHONPATH sitecustomize injection. This is startup isolation, not independent interpreter/dependency or upstream-checkout authentication."
   }
 }

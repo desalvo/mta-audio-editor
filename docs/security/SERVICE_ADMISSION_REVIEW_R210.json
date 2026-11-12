@@ -143,8 +143,8 @@
     "app/live_sources.py": "sha256:729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
     "app/lyric_layout.py": "sha256:c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
     "app/main.py": "sha256:6bacf1cee624b432eac6afd29f783e58cc271dec32bc529d8abb37df13d389b7",
-    "app/mega53_install.py": "sha256:bf5ca2996bc2b8fdd90d3cf8a40e2c35ab546986ebe7251a82b48e91bda0f6ee",
-    "app/mega53_runtime.py": "sha256:a7e696e29a82a3875c28ec95c29c6bf52d70b219ac600f637b24457c58ce91ce",
+    "app/mega53_install.py": "sha256:12bd2e0ee889a7ed6b982d42b060c454f3d978d0e465b42baf7c40c86b76ed08",
+    "app/mega53_runtime.py": "sha256:1c5d494f1680b999446ccaabdbbaae2ad60accc9352d3bd7299e4a57670414c1",
     "app/merish_mta16.py": "sha256:a5b114a5c3e29491890d28f92b7e5e6a76c21bde3f6989f262429d331bdec816",
     "app/metronome_grid.py": "sha256:65c3e06fd4215ac561a5cb085d0c92fada782a519331e76f861fd01124f0cf02",
     "app/midi.py": "sha256:bfc599a17318a7dfccd050ec430de588420df2f4fe6dded4fd8d7e69e82bad1c",
@@ -1547,7 +1547,7 @@
     {
       "path": "app/mega53_install.py",
       "function": "_run",
-      "line": 113,
+      "line": 132,
       "kind": "process_boundary",
       "call": "subprocess.Popen",
       "ast_sha256": "13fe3f25b9259d06b34af6e4a29b0d150e747a5ce4361dc91b74f93d876877a5",
@@ -1558,7 +1558,7 @@
     {
       "path": "app/mega53_install.py",
       "function": "install",
-      "line": 159,
+      "line": 179,
       "kind": "process_boundary",
       "call": "subprocess.check_output",
       "ast_sha256": "a510003b95c422cc5a53bd06ea9df21fc7b070f3577b18b4d0ca6f4b2a8a006e",
@@ -1569,7 +1569,7 @@
     {
       "path": "app/mega53_install.py",
       "function": "install",
-      "line": 179,
+      "line": 199,
       "kind": "process_boundary",
       "call": "subprocess.check_output",
       "ast_sha256": "af883b5a329ad5bf9e891b26bfbb5973832a7eacfc8fdb10b187550853657da5",
@@ -2638,5 +2638,20 @@
       "tests/test_bass_roformer_device_probe.py",
       "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
     ]
+  },
+  "ai_runtime_closeout_20261112": {
+    "date": "2026-11-12",
+    "sources": [
+      "app/mega53_install.py",
+      "app/mega53_runtime.py",
+      "scripts/install_ai_engines.py"
+    ],
+    "verification": [
+      "tests/test_r210_mega53_publication.py",
+      "tests/test_r210_mega53_web_install.py",
+      "tests/test_bass_roformer_device_probe.py",
+      "tests/test_r210_ai_install_lifecycle.py"
+    ],
+    "boundary": "Review of the published-wheel selection, fixed device probe and complete-group filesystem publication. No new process/transport/admission site; administrator-only fixed installation argv and independent worker admission remain unchanged. Local policy is checked through final publication, remote policy remains on the original executing worker. Rollback only unlinks device/inode-owned outputs. CPU installation and codec/operator execution were tested; synthetic model/device fixtures are not neural/GPU or checkpoint rights acceptance. Interpreter/dependency, remote ACE and F4/F6 target contracts remain open. Mega53 child startup now uses -I with an explicit upstream import root and the existing filtered environment. The actual synthetic child rejects PYTHONPATH sitecustomize injection. This is startup isolation, not independent interpreter/dependency or upstream-checkout authentication."
   }
 }

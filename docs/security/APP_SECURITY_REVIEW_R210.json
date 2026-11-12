@@ -1,7 +1,7 @@
 {
   "schema": "mta-security-review-1",
   "bandit_version": "1.9.4",
-  "scope": "324 current app Python sources; 181 unsuppressed findings, 0 HIGH/21 MEDIUM/160 LOW. Explicit shared-project, benchmark and SAM-retirement delta review; scanner and suppression policy unchanged.",
+  "scope": "329 current app Python sources;191 unsuppressed findings reviewed,0 HIGH/21 MEDIUM/170 LOW. Source-bound review only;no release or external runtime attestation.",
   "source_sha256": {
     "app/__init__.py": "sha256:eb3205cb75b2a7474361060d9b8d89329c29272cd8978ba62b6290b9a29b7550",
     "app/account_erasure.py": "sha256:eb074aec67b28079948aa846fe7aa1d034af2a1636e09b37ae6e31a0283ae6c8",
@@ -143,8 +143,8 @@
     "app/live_sources.py": "sha256:729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
     "app/lyric_layout.py": "sha256:c1194810bd6f75f128c51b53c51350febdba2522287d872fba1e17af4e90c000",
     "app/main.py": "sha256:6bacf1cee624b432eac6afd29f783e58cc271dec32bc529d8abb37df13d389b7",
-    "app/mega53_install.py": "sha256:bf5ca2996bc2b8fdd90d3cf8a40e2c35ab546986ebe7251a82b48e91bda0f6ee",
-    "app/mega53_runtime.py": "sha256:a7e696e29a82a3875c28ec95c29c6bf52d70b219ac600f637b24457c58ce91ce",
+    "app/mega53_install.py": "sha256:12bd2e0ee889a7ed6b982d42b060c454f3d978d0e465b42baf7c40c86b76ed08",
+    "app/mega53_runtime.py": "sha256:1c5d494f1680b999446ccaabdbbaae2ad60accc9352d3bd7299e4a57670414c1",
     "app/merish_mta16.py": "sha256:a5b114a5c3e29491890d28f92b7e5e6a76c21bde3f6989f262429d331bdec816",
     "app/metronome_grid.py": "sha256:65c3e06fd4215ac561a5cb085d0c92fada782a519331e76f861fd01124f0cf02",
     "app/midi.py": "sha256:bfc599a17318a7dfccd050ec430de588420df2f4fe6dded4fd8d7e69e82bad1c",
@@ -1077,21 +1077,21 @@
       "verification": "Reviewed each subprocess call and trust source; tests/test_r210_mega53_web_install.py checks admin authorization, consent, fixed input schema, queue handoff and failed-install rollback. Actual hardware and network installation remain unverified."
     },
     {
-      "id": "2a8bee28c2aedb10d47b5b3476f5e1ccc41ac5fa07e4d80682c9cbb4c4cbc48a",
+      "id": "f6b3977863138ee17236e9188afcf3eb5165259fbde8399edef98b2ed467d1a1",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed Git and Python installation commands are constructed by the administrator-only queued installer. No arbitrary executable, shell command, option or URL can be supplied by an API caller.",
       "boundary": "Command argv uses fixed pinned upstream commit and fixed package requirements; the interpreter comes from the registered trusted worker. Process group is supervised and stopped on cancellation; strict model loading occurs before publication.",
       "verification": "Reviewed each subprocess call and trust source; tests/test_r210_mega53_web_install.py checks admin authorization, consent, fixed input schema, queue handoff and failed-install rollback. Actual hardware and network installation remain unverified."
     },
     {
-      "id": "2683b13e80adcced528ee37b7bb8d647727e3775e886069dc6813899b7b398ce",
+      "id": "e6851a13eb79fa66883d16dc116cc84c644f8aebf834d58bdfc3e6275683caec",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed Git and Python installation commands are constructed by the administrator-only queued installer. No arbitrary executable, shell command, option or URL can be supplied by an API caller.",
       "boundary": "Command argv uses fixed pinned upstream commit and fixed package requirements; the interpreter comes from the registered trusted worker. Process group is supervised and stopped on cancellation; strict model loading occurs before publication.",
       "verification": "Reviewed each subprocess call and trust source; tests/test_r210_mega53_web_install.py checks admin authorization, consent, fixed input schema, queue handoff and failed-install rollback. Actual hardware and network installation remain unverified."
     },
     {
-      "id": "02240fdd1ba7c98076d7b8e02fa7976728855681bdbd2a34799149df46a3ac87",
+      "id": "ca3232853b85873f17f4f39eca90d7f4250a5c9ec2fd01f7dafe8ae170d68256",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed Git and Python installation commands are constructed by the administrator-only queued installer. No arbitrary executable, shell command, option or URL can be supplied by an API caller.",
       "boundary": "Command argv uses fixed pinned upstream commit and fixed package requirements; the interpreter comes from the registered trusted worker. Process group is supervised and stopped on cancellation; strict model loading occurs before publication.",
@@ -1736,7 +1736,7 @@
     "review": "New owner-derived account financial context validates UID through parameterized SQL, verifies private NC/loss histories, exposes only aggregate own totals and no combined debt. Account limits begins a read snapshot after schema setup and includes verified NC closed period ranges. The authenticated limits route returns a generic 409 for unverifiable context without leaking journal identities. No new subprocess, dynamic SQL or suppression. All existing findings matched unchanged code after line-number shifts.",
     "evidence": "tests/test_r210_account_financial_context.py; tests/test_r210_account_financial_browser.py; account-financial-final.xml"
   },
-  "current_scan": "docs/validation/r210/model-lifecycle/bandit.json",
+  "current_scan": "docs/validation/r210/rc-runtime-closeout/bandit.json",
   "owner_payment_continuation": {
     "date": "2026-10-23",
     "reviewed_sources": [
@@ -2991,5 +2991,20 @@
       "tests/test_bass_roformer_device_probe.py",
       "docs/BS_ROFORMER_DEVICE_VALIDATION_R210_IT_EN.md"
     ]
+  },
+  "ai_runtime_closeout_20261112": {
+    "date": "2026-11-12",
+    "sources": [
+      "app/mega53_install.py",
+      "app/mega53_runtime.py",
+      "scripts/install_ai_engines.py"
+    ],
+    "verification": [
+      "tests/test_r210_mega53_publication.py",
+      "tests/test_r210_mega53_web_install.py",
+      "tests/test_bass_roformer_device_probe.py",
+      "tests/test_r210_ai_install_lifecycle.py"
+    ],
+    "boundary": "Review of the published-wheel selection, fixed device probe and complete-group filesystem publication. No new process/transport/admission site; administrator-only fixed installation argv and independent worker admission remain unchanged. Local policy is checked through final publication, remote policy remains on the original executing worker. Rollback only unlinks device/inode-owned outputs. CPU installation and codec/operator execution were tested; synthetic model/device fixtures are not neural/GPU or checkpoint rights acceptance. Interpreter/dependency, remote ACE and F4/F6 target contracts remain open. Mega53 child startup now uses -I with an explicit upstream import root and the existing filtered environment. The actual synthetic child rejects PYTHONPATH sitecustomize injection. This is startup isolation, not independent interpreter/dependency or upstream-checkout authentication."
   }
 }

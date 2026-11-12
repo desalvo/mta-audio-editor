@@ -1,6 +1,7 @@
 """Full AI install coverage, committed results, safe close and notification ordering."""
 import importlib.util
 import io
+import shlex
 from pathlib import Path
 import subprocess
 from types import SimpleNamespace
@@ -78,6 +79,36 @@ def test_failed_ai_install_preserves_live_configuration(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError, match='dependency conflict'):
         module.install(SimpleNamespace(device='rocm', dry_run=False, env_file=str(config), base=str(tmp_path / 'runtime'), python='python3'))
     assert config.read_text() == 'SMTP_PASSWORD=unchanged\n'
+
+
+@pytest.mark.parametrize('with_spaces', [False, True])
+def test_generated_requirements_keep_nested_include_paths_for_real_pip(tmp_path, monkeypatch, with_spaces):
+    module = installer()
+    source = tmp_path / ('source with spaces' if with_spaces else 'source')
+    (source / 'nested').mkdir(parents=True)
+    (source / 'nested/inner.txt').write_text('-r leaf.txt\n')
+    (source / 'nested/leaf.txt').write_text('# no packages; test pip include resolution offline\n')
+    for name in module.REQS:
+        (source / name).write_text('-r nested/inner.txt\n' if name == module.REQS[0] else '')
+    folder = tmp_path / 'runtime';folder.mkdir()
+    monkeypatch.setattr(module, 'SOURCE', source)
+    monkeypatch.setattr(module, 'verify', lambda *args: None)
+    observed = []
+    def run(command, **kwargs):
+        if 'native-ai-requirements.txt' in str(command[-1]):
+            generated = Path(command[-1])
+            option, included = shlex.split(generated.read_text().strip())
+            assert option == '-r' and Path(included) == source / 'nested/inner.txt'
+            # Actual pip parses the combined file and both nested include levels.
+            import sys
+            result = subprocess.run([sys.executable, '-m', 'pip', 'install', '--dry-run',
+                '--no-index', '-r', str(generated)], capture_output=True, text=True, timeout=30)
+            assert result.returncode == 0, result.stderr
+            observed.append('resolved')
+        return SimpleNamespace(stdout='torch==2.14.1+cpu\ntorchaudio==2.11.1+cpu\ntorchvision==0.29.1+cpu\n')
+    monkeypatch.setattr(module, 'run', run)
+    module.install_group('python3', folder, 'cpu', 'audio')
+    assert observed == ['resolved']
 
 
 def test_setup_path_installs_complete_ai_before_service_restart():

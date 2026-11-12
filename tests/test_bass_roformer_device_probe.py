@@ -6,11 +6,11 @@ from types import ModuleType, SimpleNamespace
 import numpy as np
 import pytest
 
-from app.bass_roformer_install import TEST
+from app import bass_roformer_install, mega53_install
 
 
-@pytest.fixture
-def probe(monkeypatch, tmp_path):
+@pytest.fixture(params=['bass', 'mega53'])
+def probe(monkeypatch, tmp_path, request):
     events = []
     torch = ModuleType('torch')
     torch.version = SimpleNamespace(hip=None, cuda=None)
@@ -33,14 +33,15 @@ def probe(monkeypatch, tmp_path):
     settings = ModuleType('utils.settings')
     def get_model(kind, path):
         assert kind == 'bs_roformer'
-        return model, SimpleNamespace(training=SimpleNamespace(instruments=['drums', 'bass', 'other', 'vocals']))
+        instruments = ['drums', 'bass', 'other', 'vocals'] if request.param == 'bass' else list(range(53))
+        return model, SimpleNamespace(training=SimpleNamespace(instruments=instruments))
     settings.get_model_from_config = get_model
     monkeypatch.setitem(sys.modules, 'torch', torch)
     monkeypatch.setitem(sys.modules, 'utils', ModuleType('utils'))
     monkeypatch.setitem(sys.modules, 'utils.settings', settings)
     monkeypatch.setattr(sys, 'path', list(sys.path))
     program = tmp_path / 'device_probe.py'
-    program.write_text(TEST)
+    program.write_text(bass_roformer_install.TEST if request.param == 'bass' else mega53_install.TEST)
     def run(expected):
         monkeypatch.setattr(sys, 'argv', ['-c', '/synthetic-source', 'model.yaml', 'weights.ckpt', expected])
         runpy.run_path(str(program))

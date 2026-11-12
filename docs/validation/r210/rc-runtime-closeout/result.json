@@ -1,0 +1,40 @@
+{
+  "schema": "mta-r210-runtime-closeout-1",
+  "date": "2026-11-12",
+  "base_commit": "17e6a8cfd3b628fa38b65febe1feddc6bb9f5808",
+  "functional": {
+    "tests": 127,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "actual_complete_cpu_install": true,
+  "actual_nonzero_stereo_roundtrip_and_compiled_nms": true,
+  "neural_inference_performed": false,
+  "gpu_acceptance": false,
+  "external_tests_skipped": 3,
+  "cpu_freeze_sha256": "9855c20a24de39e38e6787c46841ff0990d8dbc48dd6ad3f63d7ddc25c451a12",
+  "bandit": {
+    "HIGH": 0,
+    "MEDIUM": 21,
+    "LOW": 170,
+    "new_findings": 0
+  },
+  "rc": {
+    "candidate": false,
+    "verified": 34,
+    "total": 42,
+    "percent": 81.0,
+    "remaining": [
+      "A6",
+      "B6",
+      "C6",
+      "F4",
+      "F5",
+      "F6",
+      "G5",
+      "G6"
+    ]
+  },
+  "ci_final": "pending-final-commit"
+}

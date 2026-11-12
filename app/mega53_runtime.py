@@ -99,11 +99,16 @@ def infer(source, output_dir, cancel_event=None, drum_targets=None):
         inputs, outputs = work / 'inputs', work / 'outputs'
         inputs.mkdir(); outputs.mkdir()
         shutil.copyfile(source, inputs / ('mta_input' + source.suffix))
-        cmd = [str(python), str(root / 'inference.py'), '--model_type', 'bs_roformer',
+        # Keep the explicitly configured upstream root importable without
+        # inheriting PYTHONPATH/user-site or Python/linker startup injection.
+        bootstrap = ('import runpy,sys;sys.path.insert(0,sys.argv[1]);'
+                     'sys.argv=sys.argv[2:];runpy.run_path(sys.argv[0],run_name="__main__")')
+        cmd = [str(python), '-I', '-c', bootstrap, str(root), str(root / 'inference.py'), '--model_type', 'bs_roformer',
                '--config_path', str(config), '--start_check_point', str(checkpoint),
                '--input_folder', str(inputs), '--store_dir', str(outputs)]
         from .separator_process import run
-        try:guarded_model_call('mvsep-mega53',run,cmd,cwd=root,cancel_event=cancel_event)
+        from .ai_execution_policy import isolated_env
+        try:guarded_model_call('mvsep-mega53',run,cmd,cwd=root,cancel_event=cancel_event,env=isolated_env())
         except (RuntimeError,subprocess.SubprocessError) as exc:
             raise RuntimeError('Mega 53 inference failed: '+str(exc)) from exc
         # Exact tokens prevent a source labelled "snare" matching some unrelated artifact.
@@ -121,20 +126,65 @@ def infer(source, output_dir, cancel_event=None, drum_targets=None):
             # must never be silently represented as equivalent.
             if not drum_targets or not drum_targets <= {'kick', 'snare', 'toms', 'hh', 'drums', 'percussion'}:
                 raise RuntimeError('Unsupported Mega 53 drum target')
-            results = []
+            results = {}
             for name in sorted(drum_targets):
                 if len(stems[name]) != 1:
                     raise RuntimeError(f'Mega 53 drum output missing or ambiguous: {name}')
-                dest = out / ({'percussion': 'percussions', 'drums': 'drums_without_percussions'}.get(name, name) + '.wav')
-                shutil.copyfile(stems[name][0], dest)
-                results.append(dest)
-            return results
+                name_out = {'percussion': 'percussions', 'drums': 'drums_without_percussions'}.get(name, name) + '.wav'
+                results[name_out] = stems[name][0]
+            return _publish_outputs(results, out, cancel_event, local=True)
         if any(len(stems[name]) != 1 for name in ('lead-vocal', 'back-vocal')):
             raise RuntimeError('Mega 53 outputs missing or ambiguous: lead-vocal and back-vocal required')
-        lead, backing = out / 'lead_vocals.wav', out / 'backing_vocals.wav'
-        shutil.copyfile(stems['lead-vocal'][0], lead)
-        shutil.copyfile(stems['back-vocal'][0], backing)
+        lead, backing = _publish_outputs({'lead_vocals.wav': stems['lead-vocal'][0],
+                                         'backing_vocals.wav': stems['back-vocal'][0]},
+                                        out, cancel_event, local=True)
         return lead, backing, 'mvsep-mega53'
+
+
+def _publish_outputs(entries, output_dir, cancel_event, *, local=False):
+    """Publish a complete group without replacing files; roll back owned links.
+
+    Remote admission belongs to the executing worker. Local inference must also
+    recheck its policy during publication. This is not a crash-atomic group.
+    """
+    from .model_license_policy import evaluate_model
+    def admit():
+        if cancel_event is not None and cancel_event.is_set():
+            raise RuntimeError('stem separation cancelled')
+        if local:
+            evaluate_model('mvsep-mega53')
+    admit()
+    output_dir = Path(output_dir)
+    if output_dir.is_symlink():
+        raise ValueError('Mega 53 output directory must not be a symbolic link')
+    output_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='.mega53-', dir=output_dir) as work:
+        staged = []
+        for name, value in entries.items():
+            admit()
+            source = Path(work) / name
+            if isinstance(value, bytes):
+                source.write_bytes(value)
+            else:
+                shutil.copyfile(value, source)
+            staged.append((source, output_dir / name))
+        published = []
+        try:
+            for source, target in staged:
+                admit()
+                os.link(source, target)
+                published.append((source, target))
+            admit()
+            return [target for _, target in staged]
+        except BaseException:
+            for source, target in published:
+                try:
+                    current, original = target.lstat(), source.stat()
+                    if (current.st_dev, current.st_ino) == (original.st_dev, original.st_ino):
+                        target.unlink()
+                except FileNotFoundError:
+                    pass
+            raise
 
 
 def infer_drums(source, output_dir, targets, cancel_event=None):
@@ -166,14 +216,7 @@ def dispatch_drums(source, output_dir, targets, *, remote=None, cancel_event=Non
         _verify_wav_bytes(payload)
     if cancel_event is not None and cancel_event.is_set():
         raise RuntimeError('Separazione annullata')
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    paths = []
-    for name in sorted(expected):
-        path = output_dir / name
-        with path.open('xb') as stream:
-            stream.write(audio[name])
-        paths.append(path)
+    paths = _publish_outputs({name: audio[name] for name in sorted(expected)}, output_dir, cancel_event)
     return paths, worker_job_id
 
 

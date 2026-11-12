@@ -29,6 +29,20 @@ DEPENDENCIES = ('numpy==1.26.4', 'scipy==1.13.1', 'soundfile==0.12.1', 'librosa=
                 'omegaconf==2.2.3', 'wandb==0.19.11', 'loralib==0.1.2',
                 'beartype==0.22.5', 'rotary-embedding-torch==0.3.5', 'einops==0.8.1')
 TEST = '''import sys,torch
+expected=sys.argv[4]
+backend='rocm' if torch.version.hip else ('cuda' if torch.version.cuda else 'cpu')
+if expected not in ('cpu','cuda','rocm') or backend!=expected:
+    raise RuntimeError('Mega 53 PyTorch backend mismatch: expected '+expected+', got '+backend)
+device='cpu'
+if expected!='cpu':
+    if not torch.cuda.is_available():
+        raise RuntimeError('Mega 53 selected accelerator is unavailable: '+expected)
+    device='cuda:0'
+sample=torch.ones((16,16),device=device)
+result=sample@sample
+if expected!='cpu': torch.cuda.synchronize()
+if not torch.isfinite(result).all().item() or not torch.allclose(result,torch.full_like(result,16)):
+    raise RuntimeError('Mega 53 device computation validation failed')
 sys.path.insert(0,sys.argv[1])
 from utils.settings import get_model_from_config
 model,config=get_model_from_config('bs_roformer',sys.argv[2])
@@ -37,7 +51,9 @@ for key in ('state','state_dict','model_state_dict'):
     if key in state: state=state[key]
 model.load_state_dict(state,strict=True)
 assert len(config.training.instruments)==53
-print('Mega53 strict model load passed')
+model.to(device)
+if expected!='cpu': torch.cuda.synchronize()
+print('Mega53 strict model load and device validation passed: '+expected)
 '''
 
 
@@ -58,8 +74,10 @@ def torch_arguments(device):
     if device == 'cpu':
         return ['torch==2.14.1+cpu', 'torchaudio==2.11.0+cpu',
                 'torchvision==0.29.1+cpu', '--index-url', 'https://download.pytorch.org/whl/cpu']
-    return ['torch==2.14.1+cu126', 'torchaudio==2.11.0+cu126', 'torchvision==0.29.1+cu126',
-            '--index-url', 'https://download.pytorch.org/whl/cu126']
+    if device == 'cuda':
+        return ['torch==2.11.0+cu128', 'torchaudio==2.11.0+cu128', 'torchvision==0.26.0+cu128',
+                '--index-url', 'https://download.pytorch.org/whl/cu128']
+    raise ValueError('Select cpu, cuda or rocm before installing Mega 53')
 
 
 def receipt():
@@ -80,7 +98,8 @@ def receipt():
                 or config.stat().st_size != CONFIG[1] or hashlib.sha256(config.read_bytes()).hexdigest() != CONFIG[2]):
             return None
         return {'root': source, 'config': config, 'python': python, 'id': ident,
-                'checkpoint_validated': bool(value.get('checkpoint_validated'))}
+                'checkpoint_validated': bool(value.get('checkpoint_validated')),
+                'device': value.get('device', 'auto'), 'device_validated': value.get('device_validated') is True}
     except (OSError, ValueError, TypeError):
         return None
 
@@ -132,6 +151,7 @@ def install(device, cancelled, progress, job_id=None):
     from .ai_worker_registry import worker_python
     from .storage import _atomic_json_write
     if device not in ('auto', 'cpu', 'cuda', 'rocm'): raise ValueError('Invalid accelerator')
+    device = selected_device(device)
     if any(os.getenv(name) for name in ('MTA_MEGA53_ROOT', 'MTA_MEGA53_CONFIG',
                                         'MTA_MEGA53_PYTHON', 'MTA_MEGA53_CHECKPOINT')):
         raise ValueError('Remove the existing Mega 53 environment overrides before activating a managed runtime')
@@ -174,23 +194,23 @@ def install(device, cancelled, progress, job_id=None):
             venv = directory / 'venv'; python = venv / 'bin/python'
             _run([base_python, '-m', 'venv', '--copies', str(venv)], directory, cancelled, progress, 'creating-runtime')
             pip = [python, '-m', 'pip', 'install', '--disable-pip-version-check']
-            _run(pip + torch_arguments(selected_device(device)), directory, cancelled, progress, 'installing-pytorch')
+            _run(pip + torch_arguments(device), directory, cancelled, progress, 'installing-pytorch')
             constraints = directory / 'constraints.txt'
             versions = subprocess.check_output([str(python), '-I', '-c',
                 'import importlib.metadata as m;print("\\n".join(n+"=="+m.version(n) for n in ("torch","torchaudio","torchvision")))'],
                 text=True, env=isolated_env(), timeout=30)
             constraints.write_text(versions)
             _run(pip + ['-c', str(constraints), *DEPENDENCIES], directory, cancelled, progress, 'installing-dependencies')
-            _run([python, '-I', '-c', TEST, src, config, checkpoint], directory, cancelled, progress, 'strict-model-load')
+            _run([python, '-I', '-c', TEST, src, config, checkpoint, device], directory, cancelled, progress, 'strict-model-load')
             if cancelled(): raise RuntimeError('Mega 53 installation cancelled')
             with model_asset_admin.mutation(job_id):
                 if cancelled(): raise RuntimeError('Mega 53 installation cancelled')
                 if checkpoint == checkpoint_tmp: os.replace(checkpoint_tmp, target)
                 _atomic_json_write(directory_root / 'runtime.json', {'id': ident, 'commit': COMMIT,
-                    'checkpoint_validated': True, 'device': selected_device(device), 'installed_at': time.time()})
+                    'checkpoint_validated': True, 'device': device, 'device_validated': True, 'installed_at': time.time()})
                 published = True
             return {'installed': True, 'checkpoint_verified': True, 'model_load_verified': True,
-                    'inference_tested': False, 'scope': 'local-worker'}
+                    'device': device, 'device_verified': True, 'inference_tested': False, 'scope': 'local-worker'}
         finally:
             if (not published and not directory.is_symlink() and directory.is_dir()
                     and directory.stat().st_ino == directory_inode):

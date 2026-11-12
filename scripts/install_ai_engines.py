@@ -15,6 +15,7 @@ import sys
 import tempfile
 import time
 import re
+import shlex
 
 SOURCE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SOURCE))
@@ -42,9 +43,15 @@ def torch_arguments(device):
         return ['torch==2.11.0+rocm7.2', 'torchaudio==2.11.0+rocm7.2',
                 'torchvision==0.26.0+rocm7.2', '--index-url', 'https://download.pytorch.org/whl/rocm7.2']
     if device == 'cpu':
-        return ['torch==2.14.1+cpu', 'torchaudio==2.14.1+cpu', 'torchvision==0.29.1+cpu',
+        # TorchAudio has an independent stable ABI/release cycle from 2.11.
+        return ['torch==2.14.1+cpu', 'torchaudio==2.11.1+cpu', 'torchvision==0.29.1+cpu',
                 '--index-url', 'https://download.pytorch.org/whl/cpu']
-    return ['torch==2.14.1', 'torchaudio==2.14.1', 'torchvision==0.29.1']
+    if device == 'cuda':
+        # Keep one published CUDA wheel family; default PyPI torch now uses
+        # CUDA 13.2, while TorchAudio 2.11.0 checks the exact CUDA minor.
+        return ['torch==2.11.0+cu128', 'torchaudio==2.11.0+cu128', 'torchvision==0.26.0+cu128',
+                '--index-url', 'https://download.pytorch.org/whl/cu128']
+    raise ValueError('Select cpu, cuda or rocm before installing the AI runtime')
 
 
 def ensure_media_tools(manager):
@@ -93,19 +100,15 @@ def install_group(python, folder, device, group):
         'import importlib.metadata as m;print("\\n".join(n+"=="+m.version(n) for n in ("torch","torchaudio","torchvision")))'],
         capture_output=True, text=True).stdout
     constraints.write_text(versions)
-    if device in ('rocm', 'cpu'):
+    if device in ('rocm', 'cpu', 'cuda'):
         # TorchCodec's default Linux wheels can link NVIDIA libraries even when
         # torch itself is ROCm. Decode media on CPU; inference keeps its selected
         # accelerator. Pin the variant so dependency resolution cannot replace it.
-        codec = '0.11.1+cpu' if device == 'rocm' else '0.17.0+cpu'
+        codec = '0.17.0+cpu' if device == 'cpu' else '0.11.1+cpu'
         run(pip + ['--no-deps', '--only-binary=:all:', '--index-url',
                    'https://download.pytorch.org/whl/cpu', 'torchcodec==' + codec])
         with constraints.open('a') as stream:
             stream.write('\ntorchcodec==' + codec + '\n')
-    if device == 'cuda':
-        run(pip + ['-c', constraints, 'torchcodec==0.17.0'])
-        with constraints.open('a') as stream:
-            stream.write('\ntorchcodec==0.17.0\n')
     if group == 'audio':
         # Keep the native requirements as the source of truth. Only the accelerator
         # triplet is selected separately; never replace an existing ACE torch build.
@@ -114,6 +117,14 @@ def install_group(python, folder, device, group):
             for line in (SOURCE / name).read_text().splitlines():
                 if line.startswith(('--extra-index-url ', 'torch==', 'torchvision==', 'torchaudio==')):
                     continue
+                # This combined file lives in the venv, not beside the source
+                # requirements. Keep pip's nested includes bound to the source.
+                if line.startswith(('-r ', '--requirement ', '-c ', '--constraint ')):
+                    option, relative = shlex.split(line, comments=True)
+                    included = (SOURCE / relative).resolve(strict=True)
+                    if not included.is_relative_to(SOURCE.resolve()) or not included.is_file():
+                        raise ValueError('AI requirements include must stay inside the source tree')
+                    line = option + ' ' + shlex.quote(str(included))
                 lines.append(line)
         requirements = folder / 'native-ai-requirements.txt'
         requirements.write_text('\n'.join(lines) + '\n')
@@ -145,15 +156,25 @@ def verify(binary, group, device=None):
     run([binary, '-c',
          'import tempfile;from pathlib import Path;import torch,torchaudio;'
          'd=tempfile.TemporaryDirectory();p=Path(d.name)/"roundtrip.wav";'
-         'torchaudio.save(str(p),torch.zeros(2,1600),16000);'
+         't=torch.arange(1600,dtype=torch.float32)/16000;'
+         'original=torch.stack((0.2*torch.sin(2*torch.pi*440*t),0.1*torch.cos(2*torch.pi*660*t)));'
+         'torchaudio.save(str(p),original,16000);'
          'x,sr=torchaudio.load(str(p));'
-         'assert sr==16000 and tuple(x.shape)==(2,1600);d.cleanup()'])
+         'assert sr==16000 and tuple(x.shape)==(2,1600);'
+         'assert torch.isfinite(x).all() and torch.allclose(x,original,atol=4e-5,rtol=0);d.cleanup()'])
+    if device is not None:
+        run([binary, '-c',
+             'import torch,sys;'
+             'backend="rocm" if torch.version.hip else ("cuda" if torch.version.cuda else "cpu");'
+             'assert backend==sys.argv[1], "AI runtime backend mismatch: "+backend', device])
     if device in ('rocm', 'cuda'):
         run([binary, '-c', "import torch;assert torch.cuda.is_available(), 'GPU unavailable to AI runtime';" +
              ("assert torch.version.hip, 'ROCm build required';" if device == 'rocm' else '') +
              "x=torch.ones(4,device='cuda');y=x+x;torch.cuda.synchronize();assert y.sum().item()==8"])
     # Exercise the compiled vision operator and reject mismatched wheel triplets.
-    run([binary, '-c', 'import torch;from torchvision.ops import nms;assert nms(torch.empty((0,4)),torch.empty(0),0.5).numel()==0'])
+    run([binary, '-c', 'import torch;from torchvision.ops import nms;'
+         'boxes=torch.tensor([[0.,0.,10.,10.],[1.,1.,9.,9.],[20.,20.,30.,30.]]);'
+         'assert nms(boxes,torch.tensor([0.9,0.8,0.7]),0.5).tolist()==[0,2]'])
 
 
 def update_environment(path, values, original):

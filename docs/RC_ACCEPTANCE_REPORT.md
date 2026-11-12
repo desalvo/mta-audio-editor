@@ -1,3 +1,22 @@
+# Stato corrente — 12 novembre 2026, runtime AI e pubblicazione Mega53
+
+Completate correzioni dell’installer AI server (TorchAudio pubblicato, include
+annidati, famiglia CUDA/codec coerente) e di Mega53 (acceleratore verificato,
+avvio isolato, pubblicazione senza sovrascritture e rollback dei soli file propri).
+127 regressioni funzionali passate; installazione completa CPU reale e prova
+audio stereo non silenziosa/codec/NMS riuscite. Nessuna inferenza neurale o GPU
+certificata. Nuovo job CI esegue l’installazione completa.
+
+Base17e6a8c/fullCI43259970098 verde; nuova full CI da verificare sul commit finale.
+Checklist RC **34/42=81,0%**, nessun criterio promosso; restano
+A6,B6,C6,F4,F5,F6,G5,G6. Questi includono ancora contratti runtime/backend
+e integrazione fra host, oltre a sandbox/diritti/target mancanti. Versione
+0.3.0-r210 PRE-RC; precedente stima globale73% non ricalcolata.
+Dettagli, prove e limiti: RC_RUNTIME_CLOSEOUT_20261112_IT_EN.md;
+validation/r210/rc-runtime-closeout/result.json.
+
+## Cronologia precedente
+
 # Stato aggiornato - editor r210
 
 RC **34/42 = 81,0%, PRE-RC**; nessun criterio promosso. Le funzioni di editor e i limiti rimanenti sono in `EDITOR_WORKFLOWS_R210.md`.

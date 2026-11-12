@@ -76,6 +76,27 @@ def test_config_tampering_prevents_managed_runtime_activation(fake_install):
     assert not mega53_runtime.configured()
 
 
+def test_auto_device_is_selected_once_and_bound_to_validation_and_receipt(fake_install, monkeypatch):
+    selected = []
+    commands = []
+    original = install._run
+    def choose(value):
+        assert value == 'auto' and not selected
+        selected.append('rocm')
+        return 'rocm'
+    def run(command, *args):
+        commands.append(command)
+        return original(command, *args)
+    monkeypatch.setattr(install, 'selected_device', choose)
+    monkeypatch.setattr(install, '_run', run)
+    result = install.install('auto', lambda: False, lambda *args: None)
+    assert selected == ['rocm']
+    assert any('torch==2.11.0+rocm7.2' in command for command in commands)
+    assert commands[-1][-1] == 'rocm'
+    assert result['device'] == install.receipt()['device'] == 'rocm'
+    assert result['device_verified'] is True and install.receipt()['device_validated'] is True
+
+
 def test_install_endpoint_requires_admin_and_strict_body(monkeypatch):
     def client(role):
         app = FastAPI(); register_routes(app, lambda req: {'id': 7, 'role': role})
@@ -122,5 +143,5 @@ def test_download_rejects_wrong_bytes_without_publishing(tmp_path, monkeypatch):
 
 def test_torchaudio_stable_abi_uses_published_versions():
     assert 'torchaudio==2.11.0+cpu' in install.torch_arguments('cpu')
-    assert 'torchaudio==2.11.0+cu126' in install.torch_arguments('cuda')
+    assert 'torchaudio==2.11.0+cu128' in install.torch_arguments('cuda')
     assert 'torchaudio==2.11.0+rocm7.2' in install.torch_arguments('rocm')

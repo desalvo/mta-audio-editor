@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths:
       - 'requirements.txt'
+      - 'requirements-stems.txt'
+      - 'requirements-lyrics.txt'
+      - 'requirements-chords.txt'
+      - 'requirements-roformer-compat.txt'
+      - 'scripts/install_ai_engines.py'
       - 'app/**'
       - 'native/audio_core/**'
       - 'scripts/build_audio_core.py'
@@ -20,6 +25,11 @@ on:
   pull_request:
     paths:
       - 'requirements.txt'
+      - 'requirements-stems.txt'
+      - 'requirements-lyrics.txt'
+      - 'requirements-chords.txt'
+      - 'requirements-roformer-compat.txt'
+      - 'scripts/install_ai_engines.py'
       - 'app/**'
       - 'native/audio_core/**'
       - 'scripts/build_audio_core.py'
@@ -35,6 +45,44 @@ on:
 permissions:
   contents: read
 jobs:
+  ai-cpu-install:
+    name: Install and exercise isolated AI CPU runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements*.txt
+            scripts/install_ai_engines.py
+      - name: Prepare disposable installer target
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ffmpeg libsndfile1
+          sudo install -d -m 0755 -o "$USER" /opt/mta /opt/mta/ai-0000000000000210
+      - name: Install complete runtime and exercise imports, audio codecs and compiled operators
+        env:
+          CC: gcc
+          CXX: g++
+        run: |
+          set -euo pipefail
+          python scripts/install_ai_engines.py --python "$(command -v python)" --device cpu --runtime-only 0000000000000210 2>&1 | tee "$RUNNER_TEMP/ai-install.log"
+          /opt/mta/ai-0000000000000210/audio/bin/python -m pip freeze > "$RUNNER_TEMP/ai-install-freeze.txt"
+          test -f /opt/mta/ai-0000000000000210/audio/.mta-ai-ready.json
+      - name: Preserve installer evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ai-cpu-installer-evidence
+          if-no-files-found: warn
+          include-hidden-files: true
+          path: |
+            ${{ runner.temp }}/ai-install.log
+            ${{ runner.temp }}/ai-install-freeze.txt
+            /opt/mta/ai-0000000000000210/audio/.mta-ai-ready.json
   offline-wheelhouse:
     name: ${{ matrix.name }} ${{ matrix.arch }}
     strategy:
