@@ -1,6 +1,6 @@
 fastapi==0.162.2
 uvicorn==0.54.0
-websockets==16.0
+websockets==17.4
 python-multipart==0.0.33
 pydantic==2.12.5
 numpy==2.5.3
