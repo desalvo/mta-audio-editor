@@ -1,6 +1,6 @@
 # Separate CPU runtime; never merge into the server ROCm environment.
 numpy==1.26.4
-transformers==4.57.6
+transformers==5.22.2
 lightning==2.6.6
 librosa==0.11.0
 einops==0.8.2
