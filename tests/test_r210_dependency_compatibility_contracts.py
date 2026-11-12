@@ -53,6 +53,7 @@ def test_dependabot_preserves_historical_evidence_and_runtime_families():
     rules = {item['dependency-name']: item for item in pip['ignore']}
     assert {'torch', 'torchaudio', 'torchvision'} <= rules.keys()
     assert rules['numpy']['update-types'] == ['version-update:semver-major']
+    assert rules['transformers']['update-types'] == ['version-update:semver-major']
     for name in ['numba', 'llvmlite', 'scipy', 'contourpy']:
         assert set(rules[name]['update-types']) == {'version-update:semver-major', 'version-update:semver-minor'}
     docker = next(item for item in config['updates'] if item['package-ecosystem'] == 'docker')

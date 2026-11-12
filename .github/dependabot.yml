@@ -30,6 +30,10 @@ updates:
       # upgrades together with that runtime instead of proposing a broken pin.
       - dependency-name: huggingface-hub
         update-types: ["version-update:semver-major"]
+      # Conversion/YourMT3 retain their validated Transformers 4.x recipes;
+      # a 5.x migration also changes Hub, Torch and model interfaces.
+      - dependency-name: transformers
+        update-types: ["version-update:semver-major"]
       # NumPy/Numba/LLVM and plotting binaries have platform-specific recipes.
       # Permit patch proposals, but review a new minor/major line as a unit.
       - dependency-name: numba
