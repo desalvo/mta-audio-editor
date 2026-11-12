@@ -13,9 +13,13 @@ PyMuPDF 2.1 completo e offre le API renderer effettivamente usate dall’app.
 Allineati msgpack nella convergenza Docker e audio-separator/six nel comando
 Windows. Corretti tre test di pin obsoleti, il confronto annidato non supportato
 da pytest 9.2 e l'interferenza dei worker nella prova del rilascio del flock.
-Passano 43 test mirati, compresi export FFmpeg reali sotto lock SQLite e
+Passano 44 test mirati, compresi export FFmpeg reali sotto lock SQLite e
 anteprima PDF con PyMuPDF-lite 2.1, e Ruff 0.17.4 su app/native/tests.
-La CI combinata e gli installer richiedono verifica sullo SHA integrato.
+La CI combinata su 4ea84d1 ha superato 8689 test (58 saltati), copertura
+77,81%, sicurezza/CodeQL/VST3 e matrice server 7/7. La build container riuscita
+conteneva msgpack 1.2.4; allineato anche il secondo checker CI ancora fermo a
+1.2.3, aggiungendo un test di coerenza dei pin. I successivi audit/smoke del
+container e gli installer richiedono verifica nella full CI sullo SHA finale.
 Dettagli e fonti IT/EN: `DEPENDABOT_REMAINING_R210_IT_EN.md`.
 **0.3.0-r210, PRE-RC 73%** invariata; nessuna inferenza/ascolto reale certificati.
 

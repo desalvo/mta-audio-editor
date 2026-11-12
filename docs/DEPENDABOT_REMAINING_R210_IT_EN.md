@@ -32,6 +32,14 @@ fitz/pymupdf necessarie all'anteprima e mantiene wheel Intel e arm64. Viene
 usata uniformemente sulle piattaforme supportate, senza retrocedere a 1.28.2.
 Il test applicativo rasterizza il PDF reale con questa distribuzione.
 
+La CI combinata su 4ea84d1 ha superato 8689 test (58 saltati), copertura
+77,81%, sicurezza/CodeQL/VST3 e tutta la matrice server (7/7). L'immagine
+container è stata costruita correttamente con msgpack 1.2.4; un secondo
+controllo nel workflow pretendeva ancora 1.2.3 e ha fermato il job prima dei
+successivi audit/smoke. Allineato quel controllo senza abbassare la versione
+di sicurezza, e aggiunto un test di coerenza tra i manifest e i due checker.
+La successiva full CI deve verificare tutti gli step sullo SHA finale.
+
 Correzioni necessarie:
 
 - Docker installa e verifica msgpack 1.2.4 anche nella convergenza finale,
@@ -49,7 +57,7 @@ Correzioni necessarie:
   Il timeout SQL, il ripristino del busy_timeout e l'acquisizione esclusiva
   immediata dopo il fallimento restano verificati.
 
-Validazione locale: 43 test distinti superati con Python 3.12, pytest 9.2,
+Validazione locale: 44 test distinti superati con Python 3.12, pytest 9.2,
 pytest-asyncio 1.4.1.post1, FastAPI 0.162.2 e PyMuPDF-lite 2.1; inclusi
 FFmpeg reale, export/poll/download autenticati sotto lock esclusivo SQLite,
 normalizzazione/tempo e rasterizzazione del PDF dell'app.
@@ -78,7 +86,7 @@ renderer provides both Intel and arm64 wheels and the same PDF rendering API.
 MTA uses the lite renderer consistently, without adding unused layout/LLM/ONNX
 features. The actual app PDF rasterization test runs against this distribution.
 
-Local verification: 43 targeted tests and full app/native/tests Ruff pass.
+Local verification: 44 targeted tests and full app/native/tests Ruff pass.
 Combined CI and native packaging must still be checked on the integrated SHA.
 No model quality or hardware acceptance claim; version and PRE-RC status stay
 0.3.0-r210 / 73%.
