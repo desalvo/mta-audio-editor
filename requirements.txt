@@ -8,7 +8,7 @@ defusedxml==0.7.1
 qrcode==8.2
 
 # Runtime PDF export for synchronized lyrics/chords.
-reportlab==4.4.9
+reportlab==5.1.0
 # Core renderer: 2.x full wheels omit macOS Intel; lite retains supported arches.
 PyMuPDF-lite==2.1
 
