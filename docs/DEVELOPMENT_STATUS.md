@@ -1,3 +1,28 @@
+# Stato corrente — 12 novembre 2026, chiusura PR46/47
+
+Base62c3643 con fullCI43219262885 tutta verde:9084passati,126skip,
+copertura78,31%,Docker e bundleearly-main pubblicati.
+
+PR46:Setuptools 84.2.1 verificato in un nuovo ambiente isolato Basic Pitch
+con il self-test MTA originale: inferenza ONNXCPU riuscita,hash checkpoint
+fissato verificato e notaMIDI 69 sul segnale sinteticoLa 440. Versioni effettive
+Basic Pitch0.4.0,NumPy 1.26.4,ONNX Runtime 1.31.1. Nessun runtime esistente attivato
+o sostituito. Integrare l'aggiornamento; CI finale da verificare sul nuovoSHA.
+
+PR47 chiusa senza merge: Transformers 5.22.2 richiedeHub>=1.31.0,<3.0 e non
+può convivere conHub 0.36.2 della ricetta di conversione. Conservate le ricette
+Transformers4.46.3/4.57.6/5.13.1; major soggette a revisione manuale coordinata.
+Dettagli/fonti IT/EN: DEPENDABOT_CLOSEOUT_46_47_R210_IT_EN.md.
+0.3.0-r210 / PRE-RC 73% invariati; il self-test sintetico non certifica accuratezza
+musicale generale,ascolto,GPU o hardware.
+
+
+Validazione aggiuntiva: 16 test di regressione passati; Ruff completo e
+controllo whitespace passano. Nessun esito attribuito alla CI finale prima
+del suo completamento.
+
+## Cronologia precedente
+
 # Stato corrente — 12 novembre 2026, CI account e revoca permessi
 
 La fullCI43211317319 su55b98f8 fallisce un solo test browser account
