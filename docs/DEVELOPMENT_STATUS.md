@@ -1,3 +1,21 @@
+# Stato corrente — 13 novembre 2026, correzione CI cache GPU
+
+La full CI 43328653496 su f1c23c4 fallisce un solo controllo: il prefisso
+release della chiave cache app.js. Passano 9143 test, 126 skip, copertura
+78,36%; matrice server 43328653510, CodeQL 43328653475, SAST e VST3 verdi.
+Docker e bundle della run sono bloccati dal Quality fallito.
+
+Ripristinato app.js?v=0.3.0-r210-gpu-job-statistics: conservati prefisso della
+release e invalidazione della cache per il contatore GPU. Nessun test o gate
+indebolito; nessun cambiamento a metriche, quote o addebiti.
+Riprodotto il difetto originale (1 fallito / 4 passati). Dopo la correzione
+passano 94 test distinti: identità release e regressioni GPU/coda/report/email.
+La nuova full CI va verificata sul commit correttivo.
+Dettagli IT/EN: CI_GPU_CACHE_KEY_R210_IT_EN.md.
+Versione 0.3.0-r210 PRE-RC, checklist 34/42 = 81,0% invariati.
+
+## Cronologia precedente
+
 # Stato corrente — tempo GPU per job, 12 novembre 2026
 
 Corretti campioni GPU persi dopo aggiornamenti CPU e totali multi-fase fermi
