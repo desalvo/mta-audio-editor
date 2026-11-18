@@ -1,7 +1,7 @@
 # Deliberately isolated CPU runtime; do not merge with the server/ROCm stack.
 setuptools==84.2.1
 numpy==1.26.4
-librosa==0.11.0
+librosa==1.0.1
 pretty-midi==0.2.11.post0
 onnxruntime==1.31.1
 resampy==0.4.3
