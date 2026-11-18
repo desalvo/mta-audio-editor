@@ -2,7 +2,7 @@ pyinstaller==6.22.3
 pywebview==6.2.1
 truststore==0.10.5
 certifi==2026.10.23
-uv==0.13.7
+uv==0.13.8
 python-rtmidi>=1.5.8,<2
 
 # Native MIDI 2 Universal MIDI Packets; no MIDI 1 down-conversion.

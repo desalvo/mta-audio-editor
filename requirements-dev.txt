@@ -1,10 +1,10 @@
 -r requirements.txt
 pytest==9.2.0
-pytest-asyncio==1.4.1.post1
+pytest-asyncio==1.5.0
 pytest-timeout==2.4.0
 pytest-cov==7.1.0
 httpx==0.28.1
-ruff==0.17.4
+ruff==0.17.5
 bandit==1.9.4
 pip-audit==2.10.1
 
@@ -12,11 +12,11 @@ weasyprint==70.0
 
 # Documentation maintenance and bilingual manual rendering
 beautifulsoup4==4.15.0
-markdown-it-py==4.2.0
+markdown-it-py==4.3.0
 
 # Exercise the reviewed optional runtime compatibility contracts in Quality.
 beartype>=0.23.1,<0.24
 h5py>=3.16.0,<4
 
 # Exercise the isolated YourMT3 file-reader contract in the normal test gate.
-smart-open[http]==9.0.2
+smart-open[http]==9.0.4
